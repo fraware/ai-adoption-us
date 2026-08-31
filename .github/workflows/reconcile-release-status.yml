@@ -1,0 +1,143 @@
+name: Reconcile Release 1 engineering status
+
+on:
+  push:
+    branches: [import/genai-at-work-handoff]
+    paths:
+      - .github/workflows/reconcile-release-status.yml
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out handoff branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: import/genai-at-work-handoff
+          fetch-depth: 0
+
+      - name: Reconcile canonical status documents
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"expected one match in {path}, found {count}: {old!r}")
+              p.write_text(text.replace(old, new, 1))
+
+          # ROADMAP: close R1-G1 while preserving browser/deployment gates.
+          replace_once(
+              "docs/ROADMAP.md",
+              "| R1-G1 | Final merge-candidate verification | Production web/CI gate | current PR tree | permanent CI passes Python/governance/mypy + locked web build + server smoke tests |",
+              "| R1-G1 | **Complete — engineering gate** | Production web/CI gate | permanent PR CI | exact source candidate passed Python/governance/mypy + locked web build + server smoke tests |",
+          )
+          replace_once(
+              "docs/ROADMAP.md",
+              "The first genuine networked optimized Next.js build passed on 2026-08-31 in GitHub Actions run `33411128343`. The temporary bootstrap is retired. R1-G1 is considered complete only when the **permanent** PR workflow passes on the exact merge candidate, including `mypy src`, `npm ci`, production-server startup, and route smoke tests.",
+              "The first genuine networked optimized Next.js build passed on 2026-08-31 in GitHub Actions run `33411128343`. The temporary bootstrap is retired. R1-G1 is now **complete at the engineering gate**: permanent PR run `33414088473` passed strict `mypy src`, `npm ci`, TypeScript, the rights-safe optimized build, production-server startup, all public-route smoke tests, governance/privacy scans, and the public Python suite. A later documentation-only head also passed the same permanent workflow in run `33414442837`. Any subsequent PR head must re-pass permanent CI before merge; this does not reopen the engineering gate unless code, build, governance, or empirical contracts change.",
+          )
+          replace_once(
+              "docs/ROADMAP.md",
+              "## R1-G1 — permanent CI and exact merge-candidate verification",
+              "## R1-G1 — complete: permanent CI and exact merge-candidate verification",
+          )
+          replace_once(
+              "docs/ROADMAP.md",
+              "### Final merge-candidate requirements",
+              "### Permanent merge requirements",
+          )
+          replace_once(
+              "docs/ROADMAP.md",
+              "- permanent PR CI is green on the exact merge commit candidate;",
+              "- permanent PR CI remains green on every exact PR head presented for merge;",
+          )
+
+          # RELEASE_CHECKLIST: check only gates actually executed; browser/deployment remain open.
+          replace_once(
+              "docs/RELEASE_CHECKLIST.md",
+              "- [ ] Permanent merge-candidate CI passes strict `mypy src`.",
+              "- [x] Permanent merge-candidate CI passes strict `mypy src` (run `33414088473`; repeated on documentation-only head in `33414442837`).",
+          )
+          replace_once(
+              "docs/RELEASE_CHECKLIST.md",
+              "- [ ] Permanent PR CI is green on the exact merge candidate.",
+              "- [x] Permanent PR CI passed on the exact engineering merge candidate (`33414088473`) and again after provenance reconciliation (`33414442837`); the final documentation-only head must also pass before merge.",
+          )
+          replace_once(
+              "docs/RELEASE_CHECKLIST.md",
+              "- [ ] Permanent merge-candidate CI succeeds with **`npm ci`** from the committed lockfile.",
+              "- [x] Permanent merge-candidate CI succeeds with **`npm ci`** from the committed lockfile (run `33414088473`).",
+          )
+          replace_once(
+              "docs/RELEASE_CHECKLIST.md",
+              "- [ ] Permanent merge-candidate CI starts the production server successfully.",
+              "- [x] Permanent merge-candidate CI starts the production server successfully (run `33414088473`).",
+          )
+          replace_once(
+              "docs/RELEASE_CHECKLIST.md",
+              "- [ ] Permanent merge-candidate CI HTTP-smoke-tests every public route successfully.",
+              "- [x] Permanent merge-candidate CI HTTP-smoke-tests every public route successfully (run `33414088473`).",
+          )
+
+          # HANDOFF_INDEX: make the takeover path consistent with the validated engineering state.
+          replace_once(
+              "docs/HANDOFF_INDEX.md",
+              "| Permanent PR CI | Installed; exact merge-candidate run remains the R1-G1 gate |",
+              "| Permanent PR CI | **Passed**; R1-G1 engineering gate complete on run 33414088473; later documentation-only head also green in 33414442837 |",
+          )
+          replace_once(
+              "docs/HANDOFF_INDEX.md",
+              "| Strict mypy / locked `npm ci` / server smoke | Enforced by permanent PR CI; do not claim pass until that PR run is green |",
+              "| Strict mypy / locked `npm ci` / server smoke | **Passed** in permanent PR CI run 33414088473; remain enforced on every PR head |",
+          )
+          replace_once(
+              "docs/HANDOFF_INDEX.md",
+              "1. Require permanent PR CI to pass on the exact merge candidate.\n2. Do not modify empirical claims merely to solve CI or presentation issues.\n3. Execute R1-G2 browser/accessibility/performance QA and commit dated evidence.\n4. Execute R1-G3 deployment audit before any public-launch claim.\n5. Run D-G1 source-rights outreach in parallel.\n6. Execute CPS composition only when official inputs are available and validated; do not let Release 1.1 block Release 1.",
+              "1. Keep permanent PR CI green on every exact head presented for merge; R1-G1 itself is complete.\n2. Do not modify empirical claims merely to solve CI or presentation issues.\n3. Execute R1-G2 browser/accessibility/performance QA and commit dated evidence.\n4. Execute R1-G3 deployment audit before any public-launch claim.\n5. Run D-G1 source-rights outreach in parallel.\n6. Execute CPS composition only when official inputs are available and validated; do not let Release 1.1 block Release 1.",
+          )
+
+          # README: expose the stronger permanent validation contract without implying public launch.
+          replace_once(
+              "README.md",
+              "- GitHub Actions rights-safe validation: **52 passed, 6 expected private-data tests skipped; Ruff passed**;",
+              "- permanent GitHub Actions validation: **52 passed, 6 expected private-data tests skipped; compileall, Ruff, strict mypy, governance/privacy scans, and Git whitespace checks passed**;",
+          )
+          replace_once(
+              "README.md",
+              "- genuine networked web validation: Node **22.23.2**, npm **10.9.8**, Next.js **16.3.3**, TypeScript passed, and optimized `next build` completed successfully for all seven application routes plus the framework not-found route;",
+              "- genuine networked web validation: Node **22.23.2**, npm **10.9.8**, Next.js **16.3.3**; locked `npm ci`, TypeScript, optimized `next build`, private-build scan, production-server startup, and public-route HTTP smoke tests passed in permanent PR CI run **33414088473**;",
+          )
+          replace_once(
+              "README.md",
+              "ruff check src tests scripts\n```",
+              "ruff check src tests scripts\nmypy src\n```",
+          )
+          replace_once(
+              "README.md",
+              "The first genuine networked production build was completed in GitHub Actions on **2026-08-31**, run `33411128343`: dependency installation, TypeScript, and the optimized Next.js build all passed in rights-safe `derived_only` mode. See `VALIDATION_2026-08-31.md`.",
+              "The first genuine networked production build was completed in GitHub Actions on **2026-08-31**, run `33411128343`. Permanent PR run `33414088473` subsequently passed the stronger locked-install contract: strict mypy, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. See `VALIDATION_2026-08-31.md`.",
+          )
+          PY
+
+          git diff --check
+          git diff -- docs/ROADMAP.md docs/RELEASE_CHECKLIST.md docs/HANDOFF_INDEX.md README.md
+
+      - name: Commit reconciled documentation only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/ROADMAP.md docs/RELEASE_CHECKLIST.md docs/HANDOFF_INDEX.md README.md
+          git diff --cached --check
+          git commit -m "Reconcile Release 1 engineering gate status"
+          git push origin HEAD:import/genai-at-work-handoff
