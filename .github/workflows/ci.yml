@@ -1,0 +1,147 @@
+name: Release candidate CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python, empirical contracts, and governance
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Verify public-tree governance boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -Eq '^data/audit/private/'; then
+            echo 'Private RPS audit material is tracked in the public repository.' >&2
+            exit 1
+          fi
+          if git ls-files | grep -Eq '(^|/)tsconfig\.tsbuildinfo$'; then
+            echo 'Generated TypeScript build metadata is tracked.' >&2
+            exit 1
+          fi
+          if git ls-files | grep -Eq '(^|/)\.bootstrap(-|/|$)|bootstrap-import\.yml$'; then
+            echo 'Bootstrap transfer material remains tracked.' >&2
+            exit 1
+          fi
+          test -f data/registry/rps_source_series_manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          rows = json.loads(Path('data/registry/rps_source_series_manifest.json').read_text())
+          if isinstance(rows, dict):
+              rows = rows.get('series', rows.get('records', rows))
+          if not isinstance(rows, list):
+              raise SystemExit('RPS registry is not a list-like record collection')
+          if len(rows) != 131:
+              raise SystemExit(f'expected 131 RPS source-series records, found {len(rows)}')
+          PY
+
+      - name: Install Python package and development checks
+        run: python -m pip install -e '.[dev]'
+
+      - name: Run public test suite
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: PYTHONPATH=src pytest -q
+
+      - name: Compile Python sources
+        run: python -m compileall -q src scripts
+
+      - name: Run Ruff
+        run: ruff check src tests scripts
+
+      - name: Run strict mypy
+        run: mypy src
+
+      - name: Check Git whitespace integrity
+        run: git diff --check
+
+  web:
+    name: Rights-safe Next.js production build and smoke test
+    runs-on: ubuntu-24.04
+    env:
+      DATA_MODE: derived_only
+      NEXT_TELEMETRY_DISABLED: '1'
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run TypeScript validation
+        run: npm run lint
+
+      - name: Build optimized production application
+        run: npm run build
+
+      - name: Verify private data is absent from build tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find .next -path '*data/audit/private*' -print | grep -q .; then
+            echo 'Private audit path found in production build tree.' >&2
+            exit 1
+          fi
+
+      - name: Smoke-test production server and all public routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run start -- -H 127.0.0.1 -p 3000 >/tmp/genai-at-work-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true; cat /tmp/genai-at-work-next.log' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Production server did not become ready.' >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          for route in \
+            / \
+            /blog/after-adoption \
+            /explore/industries \
+            /explore/occupations \
+            /methodology \
+            /sources; do
+            curl --fail --silent --show-error "http://127.0.0.1:3000${route}" >/dev/null
+          done
+
+          kill "$server_pid"
+          wait "$server_pid" || true
+          trap - EXIT
