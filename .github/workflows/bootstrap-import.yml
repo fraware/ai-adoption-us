@@ -122,14 +122,18 @@ jobs:
           npm run lint
           npm run build
 
-      - name: Install validated tree and remove bootstrap material
+      - name: Install validated source without modifying workflow files
         shell: bash
         run: |
           set -euo pipefail
+          cp .github/workflows/bootstrap-import.yml /tmp/bootstrap-import.yml
           find /tmp/handoff -type d -name __pycache__ -prune -exec rm -rf {} + || true
           rm -rf /tmp/handoff/.pytest_cache /tmp/handoff/apps/web/node_modules /tmp/handoff/apps/web/.next
           find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
           cp -a /tmp/handoff/. .
+          rm -f .github/workflows/ci.yml
+          mkdir -p .github/workflows
+          cp /tmp/bootstrap-import.yml .github/workflows/bootstrap-import.yml
           test ! -e .bootstrap-v2
           test ! -e .bootstrap-xz
           test ! -e .bootstrap
@@ -139,12 +143,12 @@ jobs:
           fi
           git status --short
 
-      - name: Commit complete rights-safe handoff
+      - name: Commit complete rights-safe source handoff
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -m 'Import complete GenAI at Work rights-safe handoff'
+          git commit -m 'Import complete GenAI at Work rights-safe source handoff'
           git push origin HEAD:import/genai-at-work-handoff
