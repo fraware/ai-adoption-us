@@ -3,7 +3,22 @@
   "checkpoint_date": "2026-08-31",
   "data_mode_for_public_render": "derived_only",
   "genuine_next_build_verified": true,
-  "networked_validation_run_id": 33411128343,
+  "initial_networked_validation_run_id": 33411128343,
+  "permanent_pr_validation": {
+    "pull_request": 1,
+    "run_id": 33414088473,
+    "head_sha": "0c73caa4b82ac9b29635e2c7ea09ae1e7a533dad",
+    "governance_boundary_passed": true,
+    "compileall_passed": true,
+    "ruff_passed": true,
+    "strict_mypy_passed": true,
+    "git_whitespace_passed": true,
+    "npm_ci_passed": true,
+    "typescript_passed": true,
+    "next_production_build_passed": true,
+    "private_build_tree_scan_passed": true,
+    "production_server_smoke_passed": true
+  },
   "networked_validation_environment": {
     "python": "3.12.14",
     "node": "22.23.2",
@@ -14,10 +29,16 @@
     "passed": 52,
     "expected_private_fixture_skips": 6
   },
+  "private_fixture_test_result": {
+    "passed": 58,
+    "validation_date": "2026-08-30"
+  },
   "private_prefixes_excluded": [
     "data/audit/private/"
   ],
   "raw_rps_observations_included": false,
+  "real_cps_composition_claimed": false,
+  "empirical_composition_residuals_claimed": false,
   "rights_safe_import_commit": "04393d8b3f927cb723ebbd5c77a104dd2b514a07",
   "reconstruction_source_commit": "8fd110238459654849dd6378d3204295ba954fc8",
   "archive_sha256": "05580775c1f93067c1cc9fa6ad0c7c456f3c1941fa6850167dbbd5e8dee3ce16"
