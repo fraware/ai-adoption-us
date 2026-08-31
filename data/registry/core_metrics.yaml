@@ -1,0 +1,47 @@
+release_id: 6
+source: fred_rps
+metrics:
+  adoption_overall:
+    label: Overall GenAI adoption
+    construct_type: direct_response
+    denominator: working_age_adults_18_64
+    unit: Percent
+    productivity_measure: false
+    core_series_id: RPSGENAIUSAGESHAREALL
+  adoption_work:
+    label: GenAI adoption for work
+    construct_type: direct_response
+    denominator: employed_adults_18_64
+    unit: Percent
+    productivity_measure: false
+    core_series_id: RPSGENAIUSAGESHAREWORK
+  work_use_last_week:
+    label: Used GenAI for work last week
+    construct_type: direct_response
+    denominator: employed_adults_18_64
+    unit: Percent
+    productivity_measure: false
+    core_series_id: RPSGENAIUSAGESHARELWWORK
+  work_use_daily:
+    label: Used GenAI every workday last week
+    construct_type: direct_response
+    denominator: employed_adults_18_64
+    unit: Percent
+    productivity_measure: false
+    core_series_id: RPSGENAIUSAGESHAREEDLWWOR
+  assisted_hours_share:
+    label: Share of work hours assisted by GenAI
+    construct_type: reconstructed
+    denominator: total_work_hours
+    unit: Percent
+    zero_for_nonusers: true
+    productivity_measure: false
+    core_series_id: RPSGENAIASSISTWRKHRSALL
+  reported_time_savings_share:
+    label: Reported work hours saved due to GenAI
+    construct_type: self_reported_counterfactual
+    denominator: total_work_hours
+    unit: Percent
+    zero_for_nonusers: true
+    productivity_measure: false
+    core_series_id: RPSGENAITSALL

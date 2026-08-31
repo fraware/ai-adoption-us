@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "genai-at-work"
+version = "0.1.0"
+description = "Auditable data pipeline for a GenAI-at-work data publication"
+requires-python = ">=3.12"
+dependencies = [
+  "httpx>=0.27,<1",
+  "polars>=1,<2",
+  "pyarrow>=17,<24",
+  "pydantic>=2.9,<3",
+  "python-dotenv>=1,<2",
+  "pyyaml>=6,<7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.11,<2",
+  "pytest>=8,<10",
+  "ruff>=0.7,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/genai_at_work"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["genai_at_work"]

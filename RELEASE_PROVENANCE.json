@@ -1,0 +1,13 @@
+{
+  "archive_role": "rights_safe_release_candidate",
+  "checkpoint_date": "2026-08-30",
+  "data_mode_for_public_render": "derived_only",
+  "genuine_next_build_verified": false,
+  "private_prefixes_excluded": [
+    "data/audit/private/"
+  ],
+  "raw_rps_observations_included": false,
+  "source_commit": "8fd110238459654849dd6378d3204295ba954fc8",
+  "tracked_files_included": 77,
+  "tracked_private_files_excluded": 2
+}

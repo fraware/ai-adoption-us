@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/genai-at-work/canonical-observation.schema.json",
+  "title": "Canonical RPS observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "source", "series_id", "metric_id", "entity_id", "entity_type",
+    "date", "period", "value", "unit", "ingested_at_utc"
+  ],
+  "properties": {
+    "source": {"const": "fred_rps"},
+    "series_id": {"type": "string", "minLength": 1},
+    "metric_id": {"type": "string", "minLength": 1},
+    "entity_id": {"type": "string", "minLength": 1},
+    "entity_type": {"enum": ["national", "industry", "occupation"]},
+    "date": {"type": "string", "format": "date"},
+    "period": {"type": "string", "pattern": "^[0-9]{4}-Q[1-4]$"},
+    "value": {"type": "number"},
+    "unit": {"const": "Percent"},
+    "realtime_start": {"type": ["string", "null"], "format": "date"},
+    "realtime_end": {"type": ["string", "null"], "format": "date"},
+    "ingested_at_utc": {"type": "string", "format": "date-time"},
+    "source_last_updated": {"type": ["string", "null"]}
+  }
+}

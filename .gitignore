@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+node_modules/
+.next/
+apps/web/.tsbuildinfo
+.env
+.env.local
+.DS_Store
