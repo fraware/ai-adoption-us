@@ -73,8 +73,15 @@ def test_no_python_runtime_cache_is_tracked_or_packaged():
 
 def test_rights_safe_export_script_has_fail_closed_private_boundary():
     text = (ROOT / "scripts" / "export_rights_safe.py").read_text()
+    gitignore = (ROOT / ".gitignore").read_text()
     assert 'PRIVATE_PREFIXES = ("data/audit/private/",)' in text
+    assert 'GENERATED_PROVENANCE_NAME = "RELEASE_PROVENANCE.json"' in text
+    assert "rel == GENERATED_PROVENANCE_NAME" in text
+    assert "duplicate archive member names" in text
+    assert "exactly one generated provenance record" in text
     assert "refusing to export from a dirty Git working tree" in text
     assert '"raw_rps_observations_included": False' in text
+    assert '"build_verified_by_export_process": False' in text
     assert "validate_zip(out)" in text
     assert "st_mode & 0o111" in text
+    assert "data/audit/private/" in gitignore
