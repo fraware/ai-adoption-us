@@ -22,8 +22,8 @@ Verified at the current public handoff state:
 - static FRED-to-public-JSON export retired;
 - explicit web `DATA_MODE`; no implicit fallback into private data;
 - code-level Release 1 accessibility/responsiveness pass complete;
-- GitHub Actions rights-safe validation: **52 passed, 6 expected private-data tests skipped; Ruff passed**;
-- genuine networked web validation: Node **22.23.2**, npm **10.9.8**, Next.js **16.3.3**, TypeScript passed, and optimized `next build` completed successfully for all seven application routes plus the framework not-found route;
+- permanent GitHub Actions validation: **52 passed, 6 expected private-data tests skipped; compileall, Ruff, strict mypy, governance/privacy scans, and Git whitespace checks passed**;
+- genuine networked web validation: Node **22.23.2**, npm **10.9.8**, Next.js **16.3.3**; locked `npm ci`, TypeScript, optimized `next build`, private-build scan, production-server startup, and public-route HTTP smoke tests passed in permanent PR CI run **33414088473**;
 - browser/screen-reader QA and deployment audit remain launch gates.
 
 The private 630-cell RPS audit fixture is intentionally **not in this public repository**. See `docs/PRIVATE_RESEARCH_ASSETS.md`.
@@ -73,6 +73,7 @@ python -m pip install -e '.[dev]'
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src pytest -q
 python -m compileall -q src scripts
 ruff check src tests scripts
+mypy src
 ```
 
 For a private research checkout with the audit fixture restored:
@@ -95,7 +96,7 @@ DATA_MODE=derived_only npm run build
 DATA_MODE=derived_only npm run dev
 ```
 
-The first genuine networked production build was completed in GitHub Actions on **2026-08-31**, run `33411128343`: dependency installation, TypeScript, and the optimized Next.js build all passed in rights-safe `derived_only` mode. See `VALIDATION_2026-08-31.md`.
+The first genuine networked production build was completed in GitHub Actions on **2026-08-31**, run `33411128343`. Permanent PR run `33414088473` subsequently passed the stronger locked-install contract: strict mypy, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. See `VALIDATION_2026-08-31.md`.
 
 ## Essential documents
 

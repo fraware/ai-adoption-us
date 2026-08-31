@@ -6,7 +6,7 @@ The project advances in four tracks. Release 1 production completion is the imme
 
 | Stage | Status | Objective | Dependency | Definition of done |
 |---|---|---|---|---|
-| R1-G1 | Final merge-candidate verification | Production web/CI gate | current PR tree | permanent CI passes Python/governance/mypy + locked web build + server smoke tests |
+| R1-G1 | **Complete — engineering gate** | Production web/CI gate | permanent PR CI | exact source candidate passed Python/governance/mypy + locked web build + server smoke tests |
 | R1-G2 | Open | Browser/accessibility QA | R1-G1 | cross-browser, mobile, keyboard, screen-reader, axe/Lighthouse gates pass |
 | R1-G3 | Open | Deployment audit | R1-G1/G2 | rights-safe production deployment verified against exact release commit |
 | D-G1 | Open external dependency | Direct RPS source relationship | data owner | documented permission/feed or explicit production-rights decision |
@@ -17,13 +17,13 @@ The project advances in four tracks. Release 1 production completion is the imme
 | R1.2 | Future | BTOS triangulation | construct alignment | firm-side triangulation only where measurement is defensible |
 | V2 | Future research | Mechanism research | richer data | worker × occupation × industry × time analyses |
 
-The first genuine networked optimized Next.js build passed on 2026-08-31 in GitHub Actions run `33411128343`. The temporary bootstrap is retired. R1-G1 is considered complete only when the **permanent** PR workflow passes on the exact merge candidate, including `mypy src`, `npm ci`, production-server startup, and route smoke tests.
+The first genuine networked optimized Next.js build passed on 2026-08-31 in GitHub Actions run `33411128343`. The temporary bootstrap is retired. R1-G1 is now **complete at the engineering gate**: permanent PR run `33414088473` passed strict `mypy src`, `npm ci`, TypeScript, the rights-safe optimized build, production-server startup, all public-route smoke tests, governance/privacy scans, and the public Python suite. A later documentation-only head also passed the same permanent workflow in run `33414442837`. Any subsequent PR head must re-pass permanent CI before merge; this does not reopen the engineering gate unless code, build, governance, or empirical contracts change.
 
 ---
 
 # Track 1 — Release 1 production completion
 
-## R1-G1 — permanent CI and exact merge-candidate verification
+## R1-G1 — complete: permanent CI and exact merge-candidate verification
 
 ### What is already verified
 
@@ -39,7 +39,7 @@ GitHub Actions run `33411128343` established:
 
 The committed web lockfile exists. Generated TypeScript build metadata has been removed from version control.
 
-### Final merge-candidate requirements
+### Permanent merge requirements
 
 Permanent `.github/workflows/ci.yml` must, from the actual PR tree:
 
@@ -63,7 +63,7 @@ GitHub Actions dependencies should remain pinned to immutable commit SHAs.
 
 ### Acceptance criteria
 
-- permanent PR CI is green on the exact merge commit candidate;
+- permanent PR CI remains green on every exact PR head presented for merge;
 - only the documented private-fixture tests skip in the public checkout;
 - `npm ci`, TypeScript, and optimized build exit 0;
 - production server starts and all public routes return successful HTTP responses;

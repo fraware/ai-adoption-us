@@ -34,8 +34,8 @@ This file is the navigation aid for engineers/researchers taking over the projec
 | Private Python validation | 58 passed in frozen 2026-08-30 private reconstruction run |
 | Ruff / compileall | Passed on networked public handoff |
 | Genuine Next.js production build | **Passed** on 2026-08-31, Next.js 16.3.3 |
-| Permanent PR CI | Installed; exact merge-candidate run remains the R1-G1 gate |
-| Strict mypy / locked `npm ci` / server smoke | Enforced by permanent PR CI; do not claim pass until that PR run is green |
+| Permanent PR CI | **Passed**; R1-G1 engineering gate complete on run 33414088473; later documentation-only head also green in 33414442837 |
+| Strict mypy / locked `npm ci` / server smoke | **Passed** in permanent PR CI run 33414088473; remain enforced on every PR head |
 | Browser/screen-reader audit | Outstanding |
 | axe/Lighthouse/performance audit | Outstanding |
 | Production deployment audit | Outstanding |
@@ -49,7 +49,7 @@ This file is the navigation aid for engineers/researchers taking over the projec
 
 ## Immediate takeover sequence
 
-1. Require permanent PR CI to pass on the exact merge candidate.
+1. Keep permanent PR CI green on every exact head presented for merge; R1-G1 itself is complete.
 2. Do not modify empirical claims merely to solve CI or presentation issues.
 3. Execute R1-G2 browser/accessibility/performance QA and commit dated evidence.
 4. Execute R1-G3 deployment audit before any public-launch claim.
