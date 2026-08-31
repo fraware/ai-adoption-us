@@ -10,9 +10,9 @@ The project does **not** estimate a single aggregate “AI impact” number and 
 
 ## Current state
 
-Release 1 is code-complete at the rights-safe source level and is awaiting the final production/browser gates.
+Release 1 is code-complete at the rights-safe source level. The genuine networked production-build gate is now closed; browser/accessibility and deployment validation remain before public launch.
 
-Verified at the frozen source state used to construct this public package:
+Verified at the current public handoff state:
 
 - canonical metadata registry: **131 source series** = 5 national + 60 industry + 66 occupation;
 - privately audited subgroup research panel: **630 cells** = (20 industries + 22 occupations) × 3 constructs × 5 quarters, Q2 2025–Q2 2026;
@@ -22,7 +22,9 @@ Verified at the frozen source state used to construct this public package:
 - static FRED-to-public-JSON export retired;
 - explicit web `DATA_MODE`; no implicit fallback into private data;
 - code-level Release 1 accessibility/responsiveness pass complete;
-- genuine `next build`, browser/screen-reader QA, and deployment audit remain launch gates.
+- GitHub Actions rights-safe validation: **52 passed, 6 expected private-data tests skipped; Ruff passed**;
+- genuine networked web validation: Node **22.23.2**, npm **10.9.8**, Next.js **16.3.3**, TypeScript passed, and optimized `next build` completed successfully for all seven application routes plus the framework not-found route;
+- browser/screen-reader QA and deployment audit remain launch gates.
 
 The private 630-cell RPS audit fixture is intentionally **not in this public repository**. See `docs/PRIVATE_RESEARCH_ASSETS.md`.
 
@@ -49,7 +51,7 @@ src/genai_at_work/                Python research/analysis library
 scripts/                          Builders, validators, rights-safe exporter
 tests/                            Scientific, governance, CPS, composition, web-release tests
 docs/                             Product, method, results, architecture, roadmap, handoff
-.github/workflows/                CI and real web-build validation
+.github/workflows/                CI and genuine web-build validation
 ```
 
 ## Data modes
@@ -62,7 +64,7 @@ The web application requires an explicit `DATA_MODE`:
 
 There is no silent fallback between modes.
 
-## Local validation
+## Validation
 
 Python 3.12+:
 
@@ -70,7 +72,7 @@ Python 3.12+:
 python -m pip install -e '.[dev]'
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src pytest -q
 python -m compileall -q src scripts
-./scripts/validate_ts_structural.sh
+ruff check src tests scripts
 ```
 
 For a private research checkout with the audit fixture restored:
@@ -87,12 +89,13 @@ Web application:
 
 ```bash
 cd apps/web
-npm install
+npm ci
+npm run lint
 DATA_MODE=derived_only npm run build
 DATA_MODE=derived_only npm run dev
 ```
 
-The local research runtime used during reconstruction could not reach `registry.npmjs.org`, so it did not independently verify a genuine Next.js production build. GitHub CI is configured to close that gate in a normal networked environment.
+The first genuine networked production build was completed in GitHub Actions on **2026-08-31**, run `33411128343`: dependency installation, TypeScript, and the optimized Next.js build all passed in rights-safe `derived_only` mode. See `VALIDATION_2026-08-31.md`.
 
 ## Essential documents
 
@@ -107,7 +110,8 @@ Start here:
 7. `docs/methodology.md` — scientific methodology.
 8. `docs/product-spec.md` — product specification.
 9. `docs/source-provenance.md` — source and rights provenance.
-10. `VALIDATION_2026-08-30.md` — last frozen validation record from the reconstruction environment.
+10. `VALIDATION_2026-08-31.md` — current public-handoff validation record, including the genuine production build.
+11. `VALIDATION_2026-08-30.md` — prior reconstruction validation record retained for historical provenance.
 
 ## Product invariants
 
@@ -125,7 +129,7 @@ These must remain true in every release:
 
 ## Release sequence
 
-- **Release 1:** rights-safe national/industry/occupation observatory, methodology, sources, five-wave stability evidence, technical essay.
+- **Release 1:** rights-safe national/industry/occupation observatory, methodology, sources, five-wave stability evidence, technical essay. Production build is green; browser/accessibility and deployment gates remain.
 - **Release 1.1:** CPS occupation-composition counterfactuals and occupation-adjusted industry-context residuals after real CPS execution and robustness validation.
 - **Release 1.2:** BTOS and other firm-side triangulation only where construct alignment is defensible.
 - **Research v2:** worker × occupation × industry × time mechanism analysis, potentially incorporating tasks, firm policies, digital intensity, management practices, and other organizational complements.
