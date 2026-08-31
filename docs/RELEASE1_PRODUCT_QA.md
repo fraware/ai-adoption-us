@@ -46,7 +46,9 @@ These are implementation provisions, not proof that the rendered experience is a
 
 ## Networked production-build evidence — 2026-08-31
 
-GitHub Actions run `33411128343` validated the rights-safe public handoff in a networked Ubuntu 24.04 environment.
+The 2026-08-30 code-only QA explicitly listed **Genuine `npm install` and `next build`** as unverified external gates. That historical statement remains important provenance; it is no longer the current state.
+
+GitHub Actions run `33411128343` subsequently validated the rights-safe public handoff in a networked Ubuntu 24.04 environment.
 
 Python/public surface:
 
