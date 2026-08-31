@@ -4,10 +4,10 @@
   "data_mode_for_public_render": "derived_only",
   "genuine_next_build_verified": true,
   "initial_networked_validation_run_id": 33411128343,
-  "permanent_pr_validation": {
+  "final_permanent_pr_validation": {
     "pull_request": 1,
-    "run_id": 33414088473,
-    "head_sha": "0c73caa4b82ac9b29635e2c7ea09ae1e7a533dad",
+    "run_id": 33418097200,
+    "head_sha": "fa53e93383af16a1c1b4e274b041a1bb0fcfebd1",
     "governance_boundary_passed": true,
     "compileall_passed": true,
     "ruff_passed": true,
@@ -17,7 +17,28 @@
     "typescript_passed": true,
     "next_production_build_passed": true,
     "private_build_tree_scan_passed": true,
-    "production_server_smoke_passed": true
+    "production_server_smoke_passed": true,
+    "all_public_routes_smoke_passed": true
+  },
+  "merge": {
+    "pull_request": 1,
+    "method": "squash",
+    "merge_commit": "1a5a1437c67f84a407536ae4d35670a30278ac7c"
+  },
+  "post_merge_main_validation": {
+    "run_id": 33418234311,
+    "head_sha": "1a5a1437c67f84a407536ae4d35670a30278ac7c",
+    "governance_boundary_passed": true,
+    "compileall_passed": true,
+    "ruff_passed": true,
+    "strict_mypy_passed": true,
+    "git_whitespace_passed": true,
+    "npm_ci_passed": true,
+    "typescript_passed": true,
+    "next_production_build_passed": true,
+    "private_build_tree_scan_passed": true,
+    "production_server_smoke_passed": true,
+    "all_public_routes_smoke_passed": true
   },
   "networked_validation_environment": {
     "python": "3.12.14",
@@ -36,10 +57,18 @@
   "private_prefixes_excluded": [
     "data/audit/private/"
   ],
+  "private_prefix_ignored_by_git": true,
+  "rights_safe_export_has_unique_generated_provenance": true,
   "raw_rps_observations_included": false,
   "real_cps_composition_claimed": false,
   "empirical_composition_residuals_claimed": false,
+  "causal_organizational_effect_claimed": false,
+  "measured_productivity_effect_claimed": false,
+  "browser_accessibility_validation_complete": false,
+  "production_deployment_audit_complete": false,
+  "direct_rps_rights_feed_resolved": false,
   "rights_safe_import_commit": "04393d8b3f927cb723ebbd5c77a104dd2b514a07",
   "reconstruction_source_commit": "8fd110238459654849dd6378d3204295ba954fc8",
-  "archive_sha256": "05580775c1f93067c1cc9fa6ad0c7c456f3c1941fa6850167dbbd5e8dee3ce16"
+  "archive_sha256": "05580775c1f93067c1cc9fa6ad0c7c456f3c1941fa6850167dbbd5e8dee3ce16",
+  "record_scope_note": "This provenance record was written after the validated squash merge. Its own documentation-only commit is not identified by a self-referential field; permanent main CI must pass on that subsequent commit before the record is treated as the final repository state."
 }
