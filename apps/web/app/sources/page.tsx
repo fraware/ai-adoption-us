@@ -97,14 +97,15 @@ export default function SourcesPage() {
       <section className="section" aria-labelledby="validation-heading">
         <h2 id="validation-heading">Validation boundary</h2>
         <p>
-          The repository includes deterministic Python tests, Python compilation checks, a strict
-          dependency-light TypeScript structural validator, archive-boundary tests, and byte-for-byte
-          regeneration checks for the longitudinal publication artifacts.
+          Permanent GitHub Actions CI validates the public research and application surface with the
+          public Python suite, compilation, Ruff, strict mypy, governance/privacy checks, locked
+          <code>npm ci</code>, TypeScript validation, and an optimized <code>derived_only</code> Next.js
+          production build. It also starts the production server and smoke-tests every public route.
         </p>
         <p className="note">
-          A genuine Next.js production build remains a separate release gate. It is not represented as
-          verified until dependencies can be installed and <code>next build</code> runs successfully in
-          a network-capable environment.
+          Those engineering checks are complete, but they do not substitute for rendered browser,
+          keyboard, screen-reader, axe/Lighthouse, responsive, performance, or production-deployment
+          validation. Those remain explicit launch gates.
         </p>
         <p><Link href="/methodology">Read the measurement contract →</Link></p>
       </section>
