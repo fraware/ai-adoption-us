@@ -1,0 +1,93 @@
+name: Bootstrap validated handoff
+
+on:
+  push:
+    branches: [import/genai-at-work-handoff]
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    if: ${{ hashFiles('.bootstrap-v2/part-*') != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: import/genai-at-work-handoff
+          fetch-depth: 0
+
+      - name: Reassemble and verify source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap-v2/part-* > /tmp/repo-import.tar.xz.b64
+          base64 --decode /tmp/repo-import.tar.xz.b64 > /tmp/repo-import.tar.xz
+          echo '05580775c1f93067c1cc9fa6ad0c7c456f3c1941fa6850167dbbd5e8dee3ce16  /tmp/repo-import.tar.xz' | sha256sum --check --strict
+          mkdir -p /tmp/handoff
+          tar -xJf /tmp/repo-import.tar.xz -C /tmp/handoff
+          test -f /tmp/handoff/README.md
+          test -f /tmp/handoff/docs/ROADMAP.md
+          test -f /tmp/handoff/docs/RESULTS.md
+          test -f /tmp/handoff/docs/ENGINEERING_HANDOFF.md
+          test -f /tmp/handoff/data/registry/rps_source_series_manifest.json
+          if find /tmp/handoff -path '*/data/audit/private/*' -print | grep -q .; then
+            echo 'Private RPS audit material found in public handoff.' >&2
+            exit 1
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate Python and empirical release surface
+        working-directory: /tmp/handoff
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[dev]'
+          PYTHONPATH=src pytest -q
+          python -m compileall -q src scripts
+          ruff check src tests scripts
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate genuine web production build
+        working-directory: /tmp/handoff/apps/web
+        env:
+          DATA_MODE: derived_only
+        run: |
+          set -euo pipefail
+          npm install --no-audit --no-fund
+          npm run lint
+          npm run build
+
+      - name: Install validated tree and remove bootstrap material
+        shell: bash
+        run: |
+          set -euo pipefail
+          find /tmp/handoff -type d -name __pycache__ -prune -exec rm -rf {} + || true
+          rm -rf /tmp/handoff/.pytest_cache /tmp/handoff/apps/web/node_modules /tmp/handoff/apps/web/.next
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/handoff/. .
+          test ! -e .bootstrap-v2
+          test ! -e .bootstrap-xz
+          test ! -e .bootstrap
+          if find . -path './.git' -prune -o -path '*/data/audit/private/*' -print | grep -q .; then
+            echo 'Private RPS audit material leaked into public repository.' >&2
+            exit 1
+          fi
+          git status --short
+
+      - name: Commit complete rights-safe handoff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Import complete GenAI at Work rights-safe handoff'
+          git push origin HEAD:import/genai-at-work-handoff
