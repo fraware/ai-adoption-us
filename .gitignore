@@ -3,7 +3,7 @@ __pycache__/
 .pytest_cache/
 node_modules/
 .next/
-apps/web/.tsbuildinfo
+*.tsbuildinfo
 .env
 .env.local
 .DS_Store
