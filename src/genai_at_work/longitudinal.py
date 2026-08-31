@@ -33,6 +33,24 @@ class AuditRecord:
     rights_status: str
 
 
+def _coerce_int(value: object, *, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        raise ValueError(f"{field} must be an integer-compatible scalar, got {type(value).__name__}")
+    try:
+        return int(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{field} must be integer-compatible, got {value!r}") from exc
+
+
+def _coerce_float(value: object, *, field: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        raise ValueError(f"{field} must be a numeric scalar, got {type(value).__name__}")
+    try:
+        return float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{field} must be numeric, got {value!r}") from exc
+
+
 def _mean(xs: Sequence[float]) -> float:
     return sum(xs) / len(xs)
 
@@ -120,10 +138,10 @@ def normalize_records(raw_records: Iterable[Mapping[str, object]]) -> list[Audit
         rec = AuditRecord(
             entity_type=str(raw["entity_type"]),
             entity_id=str(raw["entity_id"]),
-            entity_index=int(raw["entity_index"]),
+            entity_index=_coerce_int(raw["entity_index"], field="entity_index"),
             metric_id=str(raw["metric_id"]),
             period=str(raw["period"]),
-            value=float(raw["value"]),
+            value=_coerce_float(raw["value"], field="value"),
             series_id=str(raw["series_id"]),
             audit_scope=str(raw["audit_scope"]),
             rights_status=str(raw["rights_status"]),
@@ -357,11 +375,16 @@ def nested_quarter_diagnostics(records: Sequence[AuditRecord]) -> dict[str, dict
     for row in all_quarter_diagnostics(records):
         entity_type = str(row["entity_type"])
         period = str(row["period"])
-        nested[entity_type][period] = {
-            str(key): value
-            for key, value in row.items()
-            if key not in {"entity_type", "period"}
-        }
+        numeric: dict[str, float | int] = {}
+        for key, value in row.items():
+            if key in {"entity_type", "period"}:
+                continue
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ValueError(
+                    f"quarter diagnostic {entity_type}/{period}/{key} must be numeric, got {value!r}"
+                )
+            numeric[str(key)] = value
+        nested[entity_type][period] = numeric
     return nested
 
 

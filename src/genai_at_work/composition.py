@@ -16,6 +16,15 @@ WORKER_METRICS = {"adoption_work"}
 HOUR_METRICS = {"assisted_hours_share", "reported_time_savings_share"}
 
 
+def _coerce_float(value: object, *, field: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        raise ValueError(f"{field} must be numeric, got {type(value).__name__}")
+    try:
+        return float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{field} must be numeric, got {value!r}") from exc
+
+
 @dataclass(frozen=True)
 class CompositionResidual:
     industry_id: str
@@ -47,7 +56,7 @@ def _rps_values(
             entity_id = str(row["entity_id"])
             if entity_id in out:
                 raise ValueError(f"duplicate RPS value for {entity_type}/{entity_id}/{metric_id}/{period}")
-            out[entity_id] = float(row["value"])
+            out[entity_id] = _coerce_float(row["value"], field="RPS value")
     return out
 
 

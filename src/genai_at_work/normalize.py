@@ -27,7 +27,7 @@ def normalize_observations(
     observations: list[Observation] = []
     for row in raw_rows:
         raw_value = row.get("value")
-        if raw_value in (None, ".", ""):
+        if raw_value is None or raw_value in (".", ""):
             continue
         obs_date = date.fromisoformat(row["date"])
         try:

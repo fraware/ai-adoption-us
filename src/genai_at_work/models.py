@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date as Date
+from datetime import datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, Field
@@ -26,8 +27,8 @@ class SeriesMetadata(BaseModel):
     frequency: str
     unit: str
     seasonal_adjustment: str
-    observation_start: date
-    observation_end: date
+    observation_start: Date
+    observation_end: Date
     last_updated: str
     notes: str = ""
     notes_hash: str
@@ -44,11 +45,11 @@ class Observation(BaseModel):
     metric_id: str
     entity_id: str
     entity_type: EntityType
-    date: date
+    date: Date
     period: str
     value: float
     unit: str
-    realtime_start: date | None = None
-    realtime_end: date | None = None
+    realtime_start: Date | None = None
+    realtime_end: Date | None = None
     ingested_at_utc: datetime
     source_last_updated: str | None = None

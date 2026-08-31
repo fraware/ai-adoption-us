@@ -17,6 +17,23 @@ class FredError(RuntimeError):
     """Raised when the FRED API returns an invalid or unsuccessful response."""
 
 
+def _string_keyed_dict(value: object, *, label: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise FredError(f"FRED {label} must be a JSON object")
+    return {str(key): item for key, item in value.items()}
+
+
+def _dict_rows(value: object, *, label: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list):
+        raise FredError(f"FRED {label} must be a JSON array")
+    rows: list[dict[str, Any]] = []
+    for index, item in enumerate(value):
+        if not isinstance(item, dict):
+            raise FredError(f"FRED {label}[{index}] must be a JSON object")
+        rows.append({str(key): cell for key, cell in item.items()})
+    return rows
+
+
 @dataclass(frozen=True)
 class FredClient:
     """Small, explicit FRED API v1 client.
@@ -46,7 +63,8 @@ class FredClient:
         except httpx.HTTPError as exc:
             raise FredError(f"FRED request failed for {path}: {exc}") from exc
 
-        payload = response.json()
+        raw_payload: object = response.json()
+        payload = _string_keyed_dict(raw_payload, label="response")
         if "error_code" in payload:
             raise FredError(f"FRED API error {payload['error_code']}: {payload.get('error_message')}")
         return payload
@@ -66,7 +84,7 @@ class FredClient:
                     "sort_order": "asc",
                 },
             )
-            rows = payload.get("seriess", [])
+            rows = _dict_rows(payload.get("seriess", []), label="release series")
             yield from rows
             offset += len(rows)
             if not rows or offset >= int(payload.get("count", offset)):
@@ -76,7 +94,7 @@ class FredClient:
         """Return metadata, including series notes, for one FRED series."""
 
         payload = self._get("series", {"series_id": series_id})
-        rows = payload.get("seriess", [])
+        rows = _dict_rows(payload.get("seriess", []), label="series metadata")
         if len(rows) != 1:
             raise FredError(f"Expected one metadata row for {series_id}, got {len(rows)}")
         return rows[0]
@@ -85,7 +103,7 @@ class FredClient:
         """Return FRED tags for one series, including copyright-status tags."""
 
         payload = self._get("series/tags", {"series_id": series_id, "limit": 1000})
-        return list(payload.get("tags", []))
+        return _dict_rows(payload.get("tags", []), label="series tags")
 
     def series_observations(self, series_id: str) -> list[dict[str, Any]]:
         """Return all available observations for one series."""
@@ -94,4 +112,4 @@ class FredClient:
             "series/observations",
             {"series_id": series_id, "sort_order": "asc"},
         )
-        return list(payload.get("observations", []))
+        return _dict_rows(payload.get("observations", []), label="series observations")

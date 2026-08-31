@@ -11,9 +11,8 @@ import csv
 import hashlib
 import json
 import urllib.request
-from collections import defaultdict
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 REQUIRED_COLUMNS = {
@@ -63,6 +62,22 @@ class IndustryComposition:
     usual_hours_suppressed: bool
 
 
+@dataclass
+class _IndustryStats:
+    industry_index: int
+    worker_total: float = 0.0
+    worker_mapped: float = 0.0
+    worker_occ: dict[str, float] = field(default_factory=dict)
+    actual_valid_worker: float = 0.0
+    actual_total_hours: float = 0.0
+    actual_mapped_hours: float = 0.0
+    actual_occ: dict[str, float] = field(default_factory=dict)
+    usual_valid_worker: float = 0.0
+    usual_total_hours: float = 0.0
+    usual_mapped_hours: float = 0.0
+    usual_occ: dict[str, float] = field(default_factory=dict)
+
+
 def _parse_int(value: object) -> int | None:
     if value is None:
         return None
@@ -87,12 +102,19 @@ def _parse_float(value: object) -> float | None:
         return None
 
 
+def _required_int(value: object, *, field: str) -> int:
+    parsed = _parse_int(value)
+    if parsed is None:
+        raise ValueError(f"{field} must be integer-compatible, got {value!r}")
+    return parsed
+
+
 def parse_final_weight(value: object) -> float | None:
     """Decode PWSSWGT, which the 2026 CPS dictionary defines with four implied decimals."""
     raw = _parse_float(value)
     if raw is None or raw <= 0:
         return None
-    return raw / (10**WEIGHT_IMPLIED_DECIMALS)
+    return float(raw / (10**WEIGHT_IMPLIED_DECIMALS))
 
 
 def load_crosswalks(registry_dir: Path) -> tuple[dict[int, dict[str, object]], dict[int, dict[str, object]]]:
@@ -181,9 +203,13 @@ def decode_person(
     return CPSPerson(
         month=month,
         industry_id=str(industry["entity_id"]),
-        industry_index=int(industry["entity_index"]),
+        industry_index=_required_int(industry["entity_index"], field="industry.entity_index"),
         occupation_id=str(occupation["entity_id"]) if occupation is not None else None,
-        occupation_index=int(occupation["entity_index"]) if occupation is not None else None,
+        occupation_index=(
+            _required_int(occupation["entity_index"], field="occupation.entity_index")
+            if occupation is not None
+            else None
+        ),
         worker_weight=worker_weight,
         actual_hours=actual_hours,
         usual_hours=usual_hours,
@@ -208,57 +234,44 @@ def build_composition(
     if not 0 < coverage_gate <= 1:
         raise ValueError("coverage_gate must be in (0, 1]")
 
-    stats: dict[str, dict[str, object]] = {}
+    stats: dict[str, _IndustryStats] = {}
     for person in people:
-        s = stats.setdefault(
-            person.industry_id,
-            {
-                "industry_index": person.industry_index,
-                "worker_total": 0.0,
-                "worker_mapped": 0.0,
-                "worker_occ": defaultdict(float),
-                "actual_valid_worker": 0.0,
-                "actual_total_hours": 0.0,
-                "actual_mapped_hours": 0.0,
-                "actual_occ": defaultdict(float),
-                "usual_valid_worker": 0.0,
-                "usual_total_hours": 0.0,
-                "usual_mapped_hours": 0.0,
-                "usual_occ": defaultdict(float),
-            },
-        )
+        s = stats.setdefault(person.industry_id, _IndustryStats(person.industry_index))
+        if s.industry_index != person.industry_index:
+            raise ValueError(f"conflicting industry index for {person.industry_id}")
+
         w = person.worker_weight
-        s["worker_total"] = float(s["worker_total"]) + w
+        s.worker_total += w
         if person.occupation_id is not None:
-            s["worker_mapped"] = float(s["worker_mapped"]) + w
-            s["worker_occ"][person.occupation_id] += w  # type: ignore[index]
+            s.worker_mapped += w
+            s.worker_occ[person.occupation_id] = s.worker_occ.get(person.occupation_id, 0.0) + w
 
         if person.actual_hours is not None:
-            s["actual_valid_worker"] = float(s["actual_valid_worker"]) + w
+            s.actual_valid_worker += w
             hours = w * person.actual_hours
-            s["actual_total_hours"] = float(s["actual_total_hours"]) + hours
+            s.actual_total_hours += hours
             if person.occupation_id is not None:
-                s["actual_mapped_hours"] = float(s["actual_mapped_hours"]) + hours
-                s["actual_occ"][person.occupation_id] += hours  # type: ignore[index]
+                s.actual_mapped_hours += hours
+                s.actual_occ[person.occupation_id] = s.actual_occ.get(person.occupation_id, 0.0) + hours
 
         if person.usual_hours is not None:
-            s["usual_valid_worker"] = float(s["usual_valid_worker"]) + w
+            s.usual_valid_worker += w
             hours = w * person.usual_hours
-            s["usual_total_hours"] = float(s["usual_total_hours"]) + hours
+            s.usual_total_hours += hours
             if person.occupation_id is not None:
-                s["usual_mapped_hours"] = float(s["usual_mapped_hours"]) + hours
-                s["usual_occ"][person.occupation_id] += hours  # type: ignore[index]
+                s.usual_mapped_hours += hours
+                s.usual_occ[person.occupation_id] = s.usual_occ.get(person.occupation_id, 0.0) + hours
 
     out: list[IndustryComposition] = []
     for industry_id, s in stats.items():
-        worker_total = float(s["worker_total"])
-        worker_mapped = float(s["worker_mapped"])
-        actual_valid_worker = float(s["actual_valid_worker"])
-        actual_total_hours = float(s["actual_total_hours"])
-        actual_mapped_hours = float(s["actual_mapped_hours"])
-        usual_valid_worker = float(s["usual_valid_worker"])
-        usual_total_hours = float(s["usual_total_hours"])
-        usual_mapped_hours = float(s["usual_mapped_hours"])
+        worker_total = s.worker_total
+        worker_mapped = s.worker_mapped
+        actual_valid_worker = s.actual_valid_worker
+        actual_total_hours = s.actual_total_hours
+        actual_mapped_hours = s.actual_mapped_hours
+        usual_valid_worker = s.usual_valid_worker
+        usual_total_hours = s.usual_total_hours
+        usual_mapped_hours = s.usual_mapped_hours
 
         worker_coverage = worker_mapped / worker_total if worker_total > 0 else 0.0
         actual_valid_worker_coverage = actual_valid_worker / worker_total if worker_total > 0 else 0.0
@@ -283,15 +296,15 @@ def build_composition(
         out.append(
             IndustryComposition(
                 industry_id=industry_id,
-                industry_index=int(s["industry_index"]),
+                industry_index=s.industry_index,
                 worker_coverage=worker_coverage,
                 actual_hours_valid_worker_coverage=actual_valid_worker_coverage,
                 actual_hours_mapping_coverage=actual_mapping_coverage,
                 usual_hours_valid_worker_coverage=usual_valid_worker_coverage,
                 usual_hours_mapping_coverage=usual_mapping_coverage,
-                worker_weights=None if worker_suppressed else _normalized(s["worker_occ"], worker_mapped),  # type: ignore[arg-type]
-                actual_hour_weights=None if actual_suppressed else _normalized(s["actual_occ"], actual_mapped_hours),  # type: ignore[arg-type]
-                usual_hour_weights=None if usual_suppressed else _normalized(s["usual_occ"], usual_mapped_hours),  # type: ignore[arg-type]
+                worker_weights=None if worker_suppressed else _normalized(s.worker_occ, worker_mapped),
+                actual_hour_weights=None if actual_suppressed else _normalized(s.actual_occ, actual_mapped_hours),
+                usual_hour_weights=None if usual_suppressed else _normalized(s.usual_occ, usual_mapped_hours),
                 worker_suppressed=worker_suppressed,
                 actual_hours_suppressed=actual_suppressed,
                 usual_hours_suppressed=usual_suppressed,
