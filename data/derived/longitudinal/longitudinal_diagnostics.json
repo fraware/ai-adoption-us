@@ -1,0 +1,415 @@
+{
+  "checkpoint_date": "2026-08-30",
+  "cross_level_comparison": {
+    "2025-Q2": {
+      "industry_H_minus_A_for_S_r2": 0.2590304915,
+      "industry_incremental_H_given_A_r2": 0.2956159066,
+      "occupation_A_minus_H_for_S_r2": 0.2327600218,
+      "occupation_incremental_H_given_A_r2": 0.000546682,
+      "occupation_minus_industry_pearson_A_H": 0.283108423,
+      "occupation_minus_industry_spearman_A_H": 0.3580195548
+    },
+    "2025-Q3": {
+      "industry_H_minus_A_for_S_r2": -0.2605831675,
+      "industry_incremental_H_given_A_r2": 0.0006817159,
+      "occupation_A_minus_H_for_S_r2": 0.3406655966,
+      "occupation_incremental_H_given_A_r2": 0.0182395055,
+      "occupation_minus_industry_pearson_A_H": 0.0187755586,
+      "occupation_minus_industry_spearman_A_H": 0.0106570775
+    },
+    "2025-Q4": {
+      "industry_H_minus_A_for_S_r2": 0.1578351789,
+      "industry_incremental_H_given_A_r2": 0.2449493972,
+      "occupation_A_minus_H_for_S_r2": 0.0619529431,
+      "occupation_incremental_H_given_A_r2": 0.0220278687,
+      "occupation_minus_industry_pearson_A_H": 0.2573248843,
+      "occupation_minus_industry_spearman_A_H": 0.2776962168
+    },
+    "2026-Q1": {
+      "industry_H_minus_A_for_S_r2": -0.1327639124,
+      "industry_incremental_H_given_A_r2": 0.0821844945,
+      "occupation_A_minus_H_for_S_r2": 0.0835691099,
+      "occupation_incremental_H_given_A_r2": 0.0840612691,
+      "occupation_minus_industry_pearson_A_H": 0.0350592517,
+      "occupation_minus_industry_spearman_A_H": 0.136848049
+    },
+    "2026-Q2": {
+      "industry_H_minus_A_for_S_r2": 0.0549885493,
+      "industry_incremental_H_given_A_r2": 0.1267639082,
+      "occupation_A_minus_H_for_S_r2": 0.1300430391,
+      "occupation_incremental_H_given_A_r2": 0.0029896656,
+      "occupation_minus_industry_pearson_A_H": 0.1295001604,
+      "occupation_minus_industry_spearman_A_H": 0.2107521769
+    }
+  },
+  "input_private_fixture_rows": 630,
+  "input_private_fixture_sha256": "bdeffa95911a94cb60f904c51efc48f7ce4d1bf1eaaec490f5c4bfacd20d4fba",
+  "input_scope": {
+    "industry_entities": 20,
+    "metrics": [
+      "adoption_work",
+      "assisted_hours_share",
+      "reported_time_savings_share"
+    ],
+    "occupation_entities": 22,
+    "periods": [
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ],
+    "source_vintage_note": "Current FRED series pages show Aug 4, 2026 updates for the Q2 2026 wave."
+  },
+  "interpretive_guardrails": [
+    "All regressions are unweighted aggregate cross-sectional descriptive diagnostics.",
+    "No conventional significance claims are licensed because subgroup standard errors are not available in the audited FRED series pages.",
+    "Reported time savings are self-reported counterfactual hours, not measured labor productivity.",
+    "Quarterly instability may reflect both true changes and sampling noise in subgroup estimates."
+  ],
+  "quarter_diagnostics": {
+    "industry": {
+      "2025-Q2": {
+        "increment_A_given_H": 0.0365854151,
+        "increment_H_given_A": 0.2956159066,
+        "loo_A_beats_H": 0,
+        "loo_H_beats_A": 20,
+        "loo_H_minus_A_max": 0.3653302391,
+        "loo_H_minus_A_min": 0.0994417139,
+        "n": 20,
+        "r2_H_A": 0.3097650549,
+        "r2_S_A": 0.3533845718,
+        "r2_S_A_H": 0.6490004785,
+        "r2_S_H": 0.6124150634,
+        "r_A_H": 0.5565654094,
+        "spearman_A_H": 0.4511278195
+      },
+      "2025-Q3": {
+        "increment_A_given_H": 0.2612648834,
+        "increment_H_given_A": 0.0006817159,
+        "loo_A_beats_H": 20,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.0571856633,
+        "loo_H_minus_A_min": -0.3067572839,
+        "n": 20,
+        "r2_H_A": 0.6310309607,
+        "r2_S_A": 0.7667257946,
+        "r2_S_A_H": 0.7674075106,
+        "r2_S_H": 0.5061426271,
+        "r_A_H": 0.794374572,
+        "spearman_A_H": 0.8030075188
+      },
+      "2025-Q4": {
+        "increment_A_given_H": 0.0871142183,
+        "increment_H_given_A": 0.2449493972,
+        "loo_A_beats_H": 0,
+        "loo_H_beats_A": 20,
+        "loo_H_minus_A_max": 0.2019638012,
+        "loo_H_minus_A_min": 0.0625308158,
+        "n": 20,
+        "r2_H_A": 0.4103121848,
+        "r2_S_A": 0.6355250138,
+        "r2_S_A_H": 0.880474411,
+        "r2_S_H": 0.7933601928,
+        "r_A_H": 0.6405561527,
+        "spearman_A_H": 0.6285714286
+      },
+      "2026-Q1": {
+        "increment_A_given_H": 0.2149484069,
+        "increment_H_given_A": 0.0821844945,
+        "loo_A_beats_H": 20,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.0851107355,
+        "loo_H_minus_A_min": -0.2178961315,
+        "n": 20,
+        "r2_H_A": 0.4567797285,
+        "r2_S_A": 0.7955265808,
+        "r2_S_A_H": 0.8777110753,
+        "r2_S_H": 0.6627626684,
+        "r_A_H": 0.6758548132,
+        "spearman_A_H": 0.5819548872
+      },
+      "2026-Q2": {
+        "increment_A_given_H": 0.071775359,
+        "increment_H_given_A": 0.1267639082,
+        "loo_A_beats_H": 2,
+        "loo_H_beats_A": 18,
+        "loo_H_minus_A_max": 0.1349678564,
+        "loo_H_minus_A_min": -0.050809239,
+        "n": 20,
+        "r2_H_A": 0.572064964,
+        "r2_S_A": 0.6743621529,
+        "r2_S_A_H": 0.8011260612,
+        "r2_S_H": 0.7293507022,
+        "r_A_H": 0.756349763,
+        "spearman_A_H": 0.6751879699
+      }
+    },
+    "occupation": {
+      "2025-Q2": {
+        "increment_A_given_H": 0.2333067038,
+        "increment_H_given_A": 0.000546682,
+        "loo_A_beats_H": 22,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.170299218,
+        "loo_H_minus_A_min": -0.2692525242,
+        "n": 22,
+        "r2_H_A": 0.7050521447,
+        "r2_S_A": 0.8566190898,
+        "r2_S_A_H": 0.8571657718,
+        "r2_S_H": 0.623859068,
+        "r_A_H": 0.8396738324,
+        "spearman_A_H": 0.8091473744
+      },
+      "2025-Q3": {
+        "increment_A_given_H": 0.3589051021,
+        "increment_H_given_A": 0.0182395055,
+        "loo_A_beats_H": 22,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.2044999682,
+        "loo_H_minus_A_min": -0.3837307227,
+        "n": 22,
+        "r2_H_A": 0.6612131348,
+        "r2_S_A": 0.7065891487,
+        "r2_S_A_H": 0.7248286542,
+        "r2_S_H": 0.3659235521,
+        "r_A_H": 0.8131501306,
+        "spearman_A_H": 0.8136645963
+      },
+      "2025-Q4": {
+        "increment_A_given_H": 0.0839808118,
+        "increment_H_given_A": 0.0220278687,
+        "loo_A_beats_H": 22,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.0267451644,
+        "loo_H_minus_A_min": -0.084305908,
+        "n": 22,
+        "r2_H_A": 0.8061903565,
+        "r2_S_A": 0.9234649302,
+        "r2_S_A_H": 0.9454927989,
+        "r2_S_H": 0.8615119871,
+        "r_A_H": 0.897881037,
+        "spearman_A_H": 0.9062676454
+      },
+      "2026-Q1": {
+        "increment_A_given_H": 0.167630379,
+        "increment_H_given_A": 0.0840612691,
+        "loo_A_beats_H": 22,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.0350181409,
+        "loo_H_minus_A_min": -0.2134123661,
+        "n": 22,
+        "r2_H_A": 0.5053988077,
+        "r2_S_A": 0.7660616811,
+        "r2_S_A_H": 0.8501229502,
+        "r2_S_H": 0.6824925712,
+        "r_A_H": 0.7109140649,
+        "spearman_A_H": 0.7188029362
+      },
+      "2026-Q2": {
+        "increment_A_given_H": 0.1330327047,
+        "increment_H_given_A": 0.0029896656,
+        "loo_A_beats_H": 22,
+        "loo_H_beats_A": 0,
+        "loo_H_minus_A_max": -0.0624501606,
+        "loo_H_minus_A_min": -0.2337994625,
+        "n": 22,
+        "r2_H_A": 0.7847300868,
+        "r2_S_A": 0.793012806,
+        "r2_S_A_H": 0.7960024716,
+        "r2_S_H": 0.6629697669,
+        "r_A_H": 0.8858499234,
+        "spearman_A_H": 0.8859401468
+      }
+    }
+  },
+  "rank_stability": {
+    "industry": {
+      "A": {
+        "consecutive": [
+          [
+            "2025-Q2",
+            "2025-Q3",
+            0.9172932331
+          ],
+          [
+            "2025-Q3",
+            "2025-Q4",
+            0.8646616541
+          ],
+          [
+            "2025-Q4",
+            "2026-Q1",
+            0.8466165414
+          ],
+          [
+            "2026-Q1",
+            "2026-Q2",
+            0.8511278195
+          ]
+        ],
+        "endpoint": 0.7593984962,
+        "max_pairwise": 0.9172932331,
+        "median_pairwise": 0.8503759398,
+        "min_pairwise": 0.7187969925
+      },
+      "H": {
+        "consecutive": [
+          [
+            "2025-Q2",
+            "2025-Q3",
+            0.5052631579
+          ],
+          [
+            "2025-Q3",
+            "2025-Q4",
+            0.6105263158
+          ],
+          [
+            "2025-Q4",
+            "2026-Q1",
+            0.6330827068
+          ],
+          [
+            "2026-Q1",
+            "2026-Q2",
+            0.7578947368
+          ]
+        ],
+        "endpoint": 0.5864661654,
+        "max_pairwise": 0.7578947368,
+        "median_pairwise": 0.6135338346,
+        "min_pairwise": 0.4977443609
+      },
+      "S": {
+        "consecutive": [
+          [
+            "2025-Q2",
+            "2025-Q3",
+            0.5488721805
+          ],
+          [
+            "2025-Q3",
+            "2025-Q4",
+            0.6781954887
+          ],
+          [
+            "2025-Q4",
+            "2026-Q1",
+            0.8120300752
+          ],
+          [
+            "2026-Q1",
+            "2026-Q2",
+            0.7263157895
+          ]
+        ],
+        "endpoint": 0.6661654135,
+        "max_pairwise": 0.8120300752,
+        "median_pairwise": 0.7112781955,
+        "min_pairwise": 0.5142857143
+      }
+    },
+    "occupation": {
+      "A": {
+        "consecutive": [
+          [
+            "2025-Q2",
+            "2025-Q3",
+            0.8136645963
+          ],
+          [
+            "2025-Q3",
+            "2025-Q4",
+            0.8667419537
+          ],
+          [
+            "2025-Q4",
+            "2026-Q1",
+            0.9017504235
+          ],
+          [
+            "2026-Q1",
+            "2026-Q2",
+            0.8949745906
+          ]
+        ],
+        "endpoint": 0.850931677,
+        "max_pairwise": 0.9107848673,
+        "median_pairwise": 0.8729531338,
+        "min_pairwise": 0.8136645963
+      },
+      "H": {
+        "consecutive": [
+          [
+            "2025-Q2",
+            "2025-Q3",
+            0.3540372671
+          ],
+          [
+            "2025-Q3",
+            "2025-Q4",
+            0.6126482213
+          ],
+          [
+            "2025-Q4",
+            "2026-Q1",
+            0.5607001694
+          ],
+          [
+            "2026-Q1",
+            "2026-Q2",
+            0.7605872388
+          ]
+        ],
+        "endpoint": 0.7436476567,
+        "max_pairwise": 0.8339920949,
+        "median_pairwise": 0.6075663467,
+        "min_pairwise": 0.3540372671
+      },
+      "S": {
+        "consecutive": [
+          [
+            "2025-Q2",
+            "2025-Q3",
+            0.704121965
+          ],
+          [
+            "2025-Q3",
+            "2025-Q4",
+            0.7605872388
+          ],
+          [
+            "2025-Q4",
+            "2026-Q1",
+            0.6431394692
+          ],
+          [
+            "2026-Q1",
+            "2026-Q2",
+            0.8283455675
+          ]
+        ],
+        "endpoint": 0.7526821005,
+        "max_pairwise": 0.8328627894,
+        "median_pairwise": 0.7272727273,
+        "min_pairwise": 0.6386222473
+      }
+    }
+  },
+  "rank_stability_dominance": {
+    "industry": {
+      "adoption_rank_corr_gt_assisted_hours_rank_corr": 10,
+      "adoption_rank_corr_gt_reported_savings_rank_corr": 10,
+      "quarter_pairs": 10,
+      "reported_savings_rank_corr_gt_assisted_hours_rank_corr": 8
+    },
+    "occupation": {
+      "adoption_rank_corr_gt_assisted_hours_rank_corr": 10,
+      "adoption_rank_corr_gt_reported_savings_rank_corr": 10,
+      "quarter_pairs": 10,
+      "reported_savings_rank_corr_gt_assisted_hours_rank_corr": 8
+    }
+  },
+  "status": "DERIVED RESEARCH DIAGNOSTICS; DESCRIPTIVE, NOT CAUSAL"
+}

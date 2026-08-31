@@ -1,0 +1,27 @@
+{
+  "all_passed": true,
+  "check_count": 21,
+  "checks": {
+    "all_private": true,
+    "entities_42": true,
+    "industry_H_beats_A_in_3_of_5": true,
+    "industry_adoption_rank_more_stable_than_H_all_10": true,
+    "industry_adoption_rank_more_stable_than_S_all_10": true,
+    "occupation_AH_pearson_gt_industry_all_5": true,
+    "occupation_AH_spearman_gt_industry_all_5": true,
+    "occupation_A_predicts_S_gt_H_all_5": true,
+    "occupation_LOO_A_beats_H_all_110": true,
+    "occupation_adoption_rank_more_stable_than_H_all_10": true,
+    "occupation_adoption_rank_more_stable_than_S_all_10": true,
+    "periods_5": true,
+    "q2_industry_r2_H_A": true,
+    "q2_industry_r2_S_A": true,
+    "q2_industry_r2_S_A_H": true,
+    "q2_industry_r2_S_H": true,
+    "rights_marked": true,
+    "row_count_630": true,
+    "series_126": true,
+    "unique_key_630": true,
+    "values_finite_0_100": true
+  }
+}

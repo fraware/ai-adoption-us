@@ -1,0 +1,30 @@
+{
+  "version": "calendar-basic-monthly-v1",
+  "quarter_months": {
+    "1": [
+      "jan",
+      "feb",
+      "mar"
+    ],
+    "2": [
+      "apr",
+      "may",
+      "jun"
+    ],
+    "3": [
+      "jul",
+      "aug",
+      "sep"
+    ],
+    "4": [
+      "oct",
+      "nov",
+      "dec"
+    ]
+  },
+  "unavailable": {
+    "2025-Q4": {
+      "reason": "October 2025 CPS interviewing was not conducted during the federal government shutdown. No two-month substitution is permitted."
+    }
+  }
+}

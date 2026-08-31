@@ -1,0 +1,1080 @@
+{
+  "status": "source metadata only; no raw observations",
+  "series_count": 126,
+  "series": [
+    {
+      "entity_type": "occupation",
+      "entity_index": 1,
+      "entity_id": "management-occupations",
+      "entity_name": "Management Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC1",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC1"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 1,
+      "entity_id": "management-occupations",
+      "entity_name": "Management Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI7S1J",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI7S1J"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 1,
+      "entity_id": "management-occupations",
+      "entity_name": "Management Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC1",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC1"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 2,
+      "entity_id": "business-and-financial-operations-occupations",
+      "entity_name": "Business and Financial Operations Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC2",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC2"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 2,
+      "entity_id": "business-and-financial-operations-occupations",
+      "entity_name": "Business and Financial Operations Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI0PRG",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI0PRG"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 2,
+      "entity_id": "business-and-financial-operations-occupations",
+      "entity_name": "Business and Financial Operations Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC2",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC2"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 3,
+      "entity_id": "computer-and-mathematical-occupations",
+      "entity_name": "Computer and Mathematical Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC3",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC3"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 3,
+      "entity_id": "computer-and-mathematical-occupations",
+      "entity_name": "Computer and Mathematical Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIAUMZ",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIAUMZ"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 3,
+      "entity_id": "computer-and-mathematical-occupations",
+      "entity_name": "Computer and Mathematical Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC3",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC3"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 4,
+      "entity_id": "architecture-and-engineering-occupations",
+      "entity_name": "Architecture and Engineering Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC4",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC4"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 4,
+      "entity_id": "architecture-and-engineering-occupations",
+      "entity_name": "Architecture and Engineering Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI8M6D",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI8M6D"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 4,
+      "entity_id": "architecture-and-engineering-occupations",
+      "entity_name": "Architecture and Engineering Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC4",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC4"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 5,
+      "entity_id": "life-physical-and-social-science-occupations",
+      "entity_name": "Life, Physical, and Social Science Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC5",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC5"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 5,
+      "entity_id": "life-physical-and-social-science-occupations",
+      "entity_name": "Life, Physical, and Social Science Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIKHJL",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIKHJL"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 5,
+      "entity_id": "life-physical-and-social-science-occupations",
+      "entity_name": "Life, Physical, and Social Science Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC5",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC5"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 6,
+      "entity_id": "community-and-social-service-occupations",
+      "entity_name": "Community and Social Service Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC6",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC6"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 6,
+      "entity_id": "community-and-social-service-occupations",
+      "entity_name": "Community and Social Service Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIKMAU",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIKMAU"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 6,
+      "entity_id": "community-and-social-service-occupations",
+      "entity_name": "Community and Social Service Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC6",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC6"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 7,
+      "entity_id": "legal-occupations",
+      "entity_name": "Legal Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC7",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC7"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 7,
+      "entity_id": "legal-occupations",
+      "entity_name": "Legal Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI4FMQ",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI4FMQ"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 7,
+      "entity_id": "legal-occupations",
+      "entity_name": "Legal Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC7",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC7"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 8,
+      "entity_id": "educational-instruction-and-library-occupations",
+      "entity_name": "Educational Instruction and Library Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC8"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 8,
+      "entity_id": "educational-instruction-and-library-occupations",
+      "entity_name": "Educational Instruction and Library Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSITJ7A",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSITJ7A"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 8,
+      "entity_id": "educational-instruction-and-library-occupations",
+      "entity_name": "Educational Instruction and Library Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC8"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 9,
+      "entity_id": "arts-design-entertainment-sports-and-media-occupations",
+      "entity_name": "Arts, Design, Entertainment, Sports, and Media Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC9",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC9"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 9,
+      "entity_id": "arts-design-entertainment-sports-and-media-occupations",
+      "entity_name": "Arts, Design, Entertainment, Sports, and Media Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSICFZR",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSICFZR"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 9,
+      "entity_id": "arts-design-entertainment-sports-and-media-occupations",
+      "entity_name": "Arts, Design, Entertainment, Sports, and Media Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC9",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC9"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 10,
+      "entity_id": "healthcare-practitioners-and-technical-occupations",
+      "entity_name": "Healthcare Practitioners and Technical Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC10",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC10"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 10,
+      "entity_id": "healthcare-practitioners-and-technical-occupations",
+      "entity_name": "Healthcare Practitioners and Technical Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI8T60",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI8T60"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 10,
+      "entity_id": "healthcare-practitioners-and-technical-occupations",
+      "entity_name": "Healthcare Practitioners and Technical Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC10",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC10"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 11,
+      "entity_id": "healthcare-support-occupations",
+      "entity_name": "Healthcare Support Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC11",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC11"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 11,
+      "entity_id": "healthcare-support-occupations",
+      "entity_name": "Healthcare Support Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI0H33",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI0H33"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 11,
+      "entity_id": "healthcare-support-occupations",
+      "entity_name": "Healthcare Support Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC11",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC11"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 12,
+      "entity_id": "protective-service-occupations",
+      "entity_name": "Protective Service Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC12",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC12"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 12,
+      "entity_id": "protective-service-occupations",
+      "entity_name": "Protective Service Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIQ8Z0",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIQ8Z0"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 12,
+      "entity_id": "protective-service-occupations",
+      "entity_name": "Protective Service Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC12",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC12"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 13,
+      "entity_id": "food-preparation-and-serving-related-occupations",
+      "entity_name": "Food Preparation and Serving Related Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC13",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC13"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 13,
+      "entity_id": "food-preparation-and-serving-related-occupations",
+      "entity_name": "Food Preparation and Serving Related Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI0IX8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI0IX8"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 13,
+      "entity_id": "food-preparation-and-serving-related-occupations",
+      "entity_name": "Food Preparation and Serving Related Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC13",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC13"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 14,
+      "entity_id": "building-and-grounds-cleaning-and-maintenance-occupations",
+      "entity_name": "Building and Grounds Cleaning and Maintenance Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC14",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC14"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 14,
+      "entity_id": "building-and-grounds-cleaning-and-maintenance-occupations",
+      "entity_name": "Building and Grounds Cleaning and Maintenance Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI3OSJ",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI3OSJ"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 14,
+      "entity_id": "building-and-grounds-cleaning-and-maintenance-occupations",
+      "entity_name": "Building and Grounds Cleaning and Maintenance Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC14",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC14"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 15,
+      "entity_id": "personal-care-and-service-occupations",
+      "entity_name": "Personal Care and Service Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC15",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC15"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 15,
+      "entity_id": "personal-care-and-service-occupations",
+      "entity_name": "Personal Care and Service Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIKV9V",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIKV9V"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 15,
+      "entity_id": "personal-care-and-service-occupations",
+      "entity_name": "Personal Care and Service Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC15",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC15"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 16,
+      "entity_id": "sales-and-related-occupations",
+      "entity_name": "Sales and Related Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC16",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC16"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 16,
+      "entity_id": "sales-and-related-occupations",
+      "entity_name": "Sales and Related Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIS78B",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIS78B"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 16,
+      "entity_id": "sales-and-related-occupations",
+      "entity_name": "Sales and Related Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC16",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC16"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 17,
+      "entity_id": "office-and-administrative-support-occupations",
+      "entity_name": "Office and Administrative Support Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC17",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC17"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 17,
+      "entity_id": "office-and-administrative-support-occupations",
+      "entity_name": "Office and Administrative Support Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIGBH8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIGBH8"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 17,
+      "entity_id": "office-and-administrative-support-occupations",
+      "entity_name": "Office and Administrative Support Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC17",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC17"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 18,
+      "entity_id": "farming-fishing-and-forestry-occupations",
+      "entity_name": "Farming, Fishing, and Forestry Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC18",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC18"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 18,
+      "entity_id": "farming-fishing-and-forestry-occupations",
+      "entity_name": "Farming, Fishing, and Forestry Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIKVLE",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIKVLE"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 18,
+      "entity_id": "farming-fishing-and-forestry-occupations",
+      "entity_name": "Farming, Fishing, and Forestry Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC18",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC18"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 19,
+      "entity_id": "construction-and-extraction-occupations",
+      "entity_name": "Construction and Extraction Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC19",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC19"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 19,
+      "entity_id": "construction-and-extraction-occupations",
+      "entity_name": "Construction and Extraction Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIM78R",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIM78R"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 19,
+      "entity_id": "construction-and-extraction-occupations",
+      "entity_name": "Construction and Extraction Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC19",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC19"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 20,
+      "entity_id": "installation-maintenance-and-repair-occupations",
+      "entity_name": "Installation, Maintenance, and Repair Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC20",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC20"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 20,
+      "entity_id": "installation-maintenance-and-repair-occupations",
+      "entity_name": "Installation, Maintenance, and Repair Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI0Q6O",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI0Q6O"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 20,
+      "entity_id": "installation-maintenance-and-repair-occupations",
+      "entity_name": "Installation, Maintenance, and Repair Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC20",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC20"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 21,
+      "entity_id": "production-occupations",
+      "entity_name": "Production Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC21",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC21"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 21,
+      "entity_id": "production-occupations",
+      "entity_name": "Production Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSILCIA",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSILCIA"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 21,
+      "entity_id": "production-occupations",
+      "entity_name": "Production Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC21",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC21"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 22,
+      "entity_id": "transportation-and-material-moving-occupations",
+      "entity_name": "Transportation and Material Moving Occupations",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREOCC22",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREOCC22"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 22,
+      "entity_id": "transportation-and-material-moving-occupations",
+      "entity_name": "Transportation and Material Moving Occupations",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSILTUI",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSILTUI"
+    },
+    {
+      "entity_type": "occupation",
+      "entity_index": 22,
+      "entity_id": "transportation-and-material-moving-occupations",
+      "entity_name": "Transportation and Material Moving Occupations",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSOCC22",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSOCC22"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 1,
+      "entity_name": "Agriculture, Forestry, Fishing, and Hunting",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND1",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND1"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 1,
+      "entity_name": "Agriculture, Forestry, Fishing, and Hunting",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIQ9RZ",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIQ9RZ"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 1,
+      "entity_name": "Agriculture, Forestry, Fishing, and Hunting",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND1",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND1"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 2,
+      "entity_name": "Mining, Quarrying, and Oil and Gas Extraction",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND2",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND2"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 2,
+      "entity_name": "Mining, Quarrying, and Oil and Gas Extraction",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIJY0H",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIJY0H"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 2,
+      "entity_name": "Mining, Quarrying, and Oil and Gas Extraction",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND2",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND2"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 3,
+      "entity_name": "Construction",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND3",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND3"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 3,
+      "entity_name": "Construction",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIBB4A",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIBB4A"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 3,
+      "entity_name": "Construction",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND3",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND3"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 4,
+      "entity_name": "Manufacturing",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND4",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND4"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 4,
+      "entity_name": "Manufacturing",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIIUKT",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIIUKT"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 4,
+      "entity_name": "Manufacturing",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND4",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND4"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 5,
+      "entity_name": "Wholesale Trade",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND5",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND5"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 5,
+      "entity_name": "Wholesale Trade",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIK13X",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIK13X"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 5,
+      "entity_name": "Wholesale Trade",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND5",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND5"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 6,
+      "entity_name": "Retail Trade",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND6",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND6"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 6,
+      "entity_name": "Retail Trade",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSISTED",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSISTED"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 6,
+      "entity_name": "Retail Trade",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND6",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND6"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 7,
+      "entity_name": "Transportation and Warehousing",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND7",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND7"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 7,
+      "entity_name": "Transportation and Warehousing",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIVV9H",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIVV9H"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 7,
+      "entity_name": "Transportation and Warehousing",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND7",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND7"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 8,
+      "entity_name": "Utilities",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND8"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 8,
+      "entity_name": "Utilities",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI286Z",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI286Z"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 8,
+      "entity_name": "Utilities",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND8"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 9,
+      "entity_name": "Information",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND9",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND9"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 9,
+      "entity_name": "Information",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIL15Q",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIL15Q"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 9,
+      "entity_name": "Information",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND9",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND9"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 10,
+      "entity_name": "Finance and Insurance",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND10",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND10"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 10,
+      "entity_name": "Finance and Insurance",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIU8JG",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIU8JG"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 10,
+      "entity_name": "Finance and Insurance",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND10",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND10"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 11,
+      "entity_name": "Real Estate and Rental and Leasing",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND11",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND11"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 11,
+      "entity_name": "Real Estate and Rental and Leasing",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSINRNE",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSINRNE"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 11,
+      "entity_name": "Real Estate and Rental and Leasing",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND11",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND11"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 12,
+      "entity_name": "Professional, Scientific, and Technical Services",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND12",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND12"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 12,
+      "entity_name": "Professional, Scientific, and Technical Services",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI88FW",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI88FW"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 12,
+      "entity_name": "Professional, Scientific, and Technical Services",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND12",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND12"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 13,
+      "entity_name": "Management of Companies and Enterprises",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND13",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND13"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 13,
+      "entity_name": "Management of Companies and Enterprises",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI2EJ0",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI2EJ0"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 13,
+      "entity_name": "Management of Companies and Enterprises",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND13",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND13"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 14,
+      "entity_name": "Administrative and Support and Waste Management Services",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND14",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND14"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 14,
+      "entity_name": "Administrative and Support and Waste Management Services",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIVDLK",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIVDLK"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 14,
+      "entity_name": "Administrative and Support and Waste Management Services",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND14",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND14"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 15,
+      "entity_name": "Educational Services",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND15",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND15"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 15,
+      "entity_name": "Educational Services",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIY8FA",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIY8FA"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 15,
+      "entity_name": "Educational Services",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND15",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND15"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 16,
+      "entity_name": "Health Care and Social Assistance",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND16",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND16"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 16,
+      "entity_name": "Health Care and Social Assistance",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSICLH0",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSICLH0"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 16,
+      "entity_name": "Health Care and Social Assistance",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND16",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND16"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 17,
+      "entity_name": "Arts, Entertainment, and Recreation",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND17",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND17"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 17,
+      "entity_name": "Arts, Entertainment, and Recreation",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI93R4",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI93R4"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 17,
+      "entity_name": "Arts, Entertainment, and Recreation",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND17",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND17"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 18,
+      "entity_name": "Accommodation and Food Services",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND18",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND18"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 18,
+      "entity_name": "Accommodation and Food Services",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSI2BEW",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSI2BEW"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 18,
+      "entity_name": "Accommodation and Food Services",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND18",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND18"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 19,
+      "entity_name": "Other Services, Except Public Administration",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND19",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND19"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 19,
+      "entity_name": "Other Services, Except Public Administration",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIZPM8",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIZPM8"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 19,
+      "entity_name": "Other Services, Except Public Administration",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND19",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND19"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 20,
+      "entity_name": "Public Administration",
+      "metric_id": "adoption_work",
+      "series_id": "RPSGENAIUSAGESHAREIND20",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND20"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 20,
+      "entity_name": "Public Administration",
+      "metric_id": "assisted_hours_share",
+      "series_id": "RPSGENAIWORKHOURSASSIR0QP",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAIWORKHOURSASSIR0QP"
+    },
+    {
+      "entity_type": "industry",
+      "entity_index": 20,
+      "entity_name": "Public Administration",
+      "metric_id": "reported_time_savings_share",
+      "series_id": "RPSGENAITSIND20",
+      "source_url": "https://fred.stlouisfed.org/series/RPSGENAITSIND20"
+    }
+  ]
+}
