@@ -3,7 +3,7 @@
 Initial code-level pass: 2026-08-30  
 Networked production-build update: 2026-08-31
 
-This document records the **code-level product QA** completed for the rights-safe Release 1 candidate plus the first genuine networked production build. It does **not** substitute for rendered browser, screen-reader, automated accessibility, performance, visual-regression, or deployment QA.
+This document records the **code-level product QA** completed for the rights-safe Release 1 candidate plus the first genuine networked production build. It **does not substitute for a real browser**, screen-reader, automated accessibility, performance, visual-regression, or deployment audit.
 
 ## Implemented in the code-level pass
 
