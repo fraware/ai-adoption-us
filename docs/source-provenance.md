@@ -27,11 +27,17 @@ Purpose: industry-by-occupation composition weights.
 - usual hours are a labeled sensitivity only;
 - Q4 2025 remains unavailable because October 2025 CPS was not collected; no two-month substitute is allowed.
 
-The composition pipeline is implemented and tested, but **no real CPS composition values or residuals are claimed in the current release candidate** because the required April–June 2026 input files have not been executed in the validated runtime.
+Official Q2 2025 and Q2 2026 Basic Monthly CPS inputs have been executed through the validated composition pipeline. The public repository contains versioned composition and reliability artifacts for both quarters, including worker-share and actual-main-job-hour occupation weights, coverage/suppression diagnostics, and sensitivity evidence.
+
+These CPS artifacts are **composition inputs and diagnostics**. They do not by themselves produce an occupation-adjusted RPS industry-context residual. That observed-versus-counterfactual join remains fail-closed until compatible RPS observations are available through a rights-cleared publication path and the residual robustness gate is rerun.
 
 ## OEWS
 
-May 2025 OEWS staffing data are reserved as a possible independent robustness basis for occupation composition. A third-party public repository with derived OEWS sensitivity outputs was inspected, but its exact staffing input was not distributed. Those derived outputs were therefore rejected as empirical inputs to this project.
+Source family: U.S. Bureau of Labor Statistics Occupational Employment and Wage Statistics.
+
+Official May 2025 staffing data have been executed as an independent establishment-side robustness basis for occupation composition. The public repository contains versioned May 2025 OEWS composition outputs plus cross-vintage/coverage robustness artifacts.
+
+OEWS does not reproduce the CPS/RPS worker-survey universe: it is establishment and wage-and-salary-worker oriented, with materially different coverage, including treatment of self-employment. It therefore remains robustness evidence rather than the primary composition basis. OEWS composition persistence or disagreement must be reported directly; OEWS weights do not identify organizational effects or productivity effects.
 
 ## BTOS
 
@@ -45,7 +51,7 @@ Every public claim must identify which evidence class it belongs to:
 
 1. direct measurement;
 2. derived descriptive statistic;
-3. composition counterfactual;
+3. composition evidence/counterfactual;
 4. causal/mechanism claim.
 
-The current public candidate contains classes 1 only as source metadata and classes 2 as derived publication artifacts. Empirical class-3 CPS residuals and class-4 causal claims are not yet published.
+The current public candidate contains class-1 RPS evidence only as source metadata and class-2 RPS evidence as derived longitudinal publication artifacts. It also contains rights-safe class-3 **composition-input and robustness evidence** from CPS/OEWS. It does **not** yet publish the RPS-dependent occupation-adjusted industry residual or any class-4 causal claim.
