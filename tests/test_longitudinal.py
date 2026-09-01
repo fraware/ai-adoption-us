@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -18,7 +19,14 @@ from genai_at_work.longitudinal import (
     validate_private_fixture,
 )
 
-FIXTURE = Path(__file__).parents[1] / "data" / "audit" / "private" / "rps_subgroup_5q_audit.json"
+ROOT = Path(__file__).parents[1]
+FIXTURE = Path(
+    os.environ.get(
+        "RPS_PRIVATE_FIXTURE",
+        str(ROOT / "data" / "audit" / "private" / "rps_subgroup_5q_audit.json"),
+    )
+)
+REVISION_CANDIDATE = os.environ.get("RPS_REVISION_CANDIDATE") == "1"
 
 
 def records():
@@ -89,32 +97,35 @@ def test_rank_stability_medians_reproduce_checkpoint():
 
 
 def test_builder_reproduces_committed_derived_artifacts_byte_for_byte(tmp_path):
-    import os
     import subprocess
     import sys
 
+    if REVISION_CANDIDATE:
+        pytest.skip("same-freeze byte-for-byte assertion is inapplicable to a separately staged revision candidate")
     if not FIXTURE.exists():
         pytest.skip("private RPS audit fixture is intentionally absent from the rights-safe release")
-    root = FIXTURE.parents[3]
     out = tmp_path / "derived"
     env = os.environ.copy()
-    env["PYTHONPATH"] = str(root / "src")
+    env["PYTHONPATH"] = str(ROOT / "src")
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     subprocess.run(
         [
             sys.executable,
-            str(root / "scripts" / "build_longitudinal.py"),
-            "--fixture", str(FIXTURE),
-            "--output-dir", str(out),
-            "--checkpoint-date", "2026-08-30",
+            str(ROOT / "scripts" / "build_longitudinal.py"),
+            "--fixture",
+            str(FIXTURE),
+            "--output-dir",
+            str(out),
+            "--checkpoint-date",
+            "2026-08-30",
         ],
-        cwd=root,
+        cwd=ROOT,
         env=env,
         check=True,
         capture_output=True,
         text=True,
     )
-    canonical = root / "data" / "derived" / "longitudinal"
+    canonical = ROOT / "data" / "derived" / "longitudinal"
     for name in (
         "longitudinal_diagnostics.json",
         "validation_checks.json",
