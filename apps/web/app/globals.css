@@ -201,7 +201,7 @@ code {
   .site-header-inner { align-items: flex-start; flex-direction: column; padding: 15px 20px; gap: 10px; }
   nav { gap: 11px 16px; }
   main { padding: 40px 20px 72px; }
-  h1 { font-size: clamp(2.65rem, 14vw, 4.6rem); }
+  h1 { font-size: clamp(2.25rem, 12vw, 3.15rem); }
   section.section { margin-top: 58px; }
   .metric-row { grid-template-columns: 1fr; }
   .metric { min-height: 0; }
