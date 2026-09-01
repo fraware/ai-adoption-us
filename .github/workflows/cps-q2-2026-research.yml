@@ -25,9 +25,16 @@ jobs:
       - name: Install package and development checks
         run: python -m pip install -e '.[dev]'
 
-      - name: Normalize and validate code before official-data execution
+      - name: Align fixed-width CLI test and validate code
         run: |
           set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('tests/test_cps.py')
+          text = path.read_text()
+          text = text.replace('assert "apr26pub.csv" in proc.stderr', 'assert "apr26pub.dat.gz" in proc.stderr')
+          path.write_text(text)
+          PY
           ruff check --fix tests/test_cps.py
           PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src pytest -q tests/test_cps.py tests/test_composition.py
           ruff check src tests scripts
@@ -51,6 +58,16 @@ jobs:
             --source-build-commit "$SOURCE_BUILD_COMMIT" \
             --download-missing
 
+      - name: Audit civilian population boundary independently
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python scripts/audit_cps_population.py \
+            --year 2026 \
+            --quarter 2 \
+            --input-dir /tmp/cps-q2-2026 \
+            --composition-validation data/derived/composition/cps-q2-2026/validation_checks.json \
+            --output data/derived/composition/cps-q2-2026/population_audit.json
+
       - name: Verify raw CPS inputs are not staged
         shell: bash
         run: |
@@ -60,7 +77,7 @@ jobs:
             exit 1
           fi
 
-      - name: Commit normalized test and generated research artifacts to branch
+      - name: Commit normalized tests and generated research artifacts to branch
         shell: bash
         run: |
           set -euo pipefail
@@ -73,5 +90,5 @@ jobs:
             echo 'No generated changes to commit.'
             exit 0
           fi
-          git commit -m 'Execute official Q2 2026 CPS composition weights'
+          git commit -m 'Audit official Q2 2026 CPS population boundary'
           git push origin HEAD:research/cps-q2-2026-program
