@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-01T08:37:18.133033+00:00",
+  "generated_at_utc": "2026-09-01T08:38:30.311110+00:00",
   "industry_count": 20,
   "inferential_boundary": "Kish effective person-month counts are weight-dispersion diagnostics only. They do not account for CPS stratification, clustering, the 4-8-4 rotating panel, repeat observations, or replicate variance structure, and are not standard errors or design-based effective sample sizes.",
   "largest_primary_cross_year_shifts": [
@@ -183,6 +183,6 @@
   "q2_2025_in_scope_person_months": 121331,
   "q2_2026_in_scope_person_months": 117687,
   "raw_files_retained_in_repository": false,
-  "source_build_commit": "01a03396aba2405752ff14fcd105701d85ddaab2",
+  "source_build_commit": "6857ad02e6649782689c027544c4cd49aa0f540e",
   "status": "descriptive CPS domain stability diagnostics executed"
 }
