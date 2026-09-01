@@ -12,7 +12,7 @@ A completed engineering component does not imply that its downstream empirical j
 
 ## Executive sequence
 
-Release 1 production QA and the RPS source-rights decision remain the two immediate critical paths. Composition, firm-side triangulation, and task-level measurement proceed in parallel only where their source and construct dependencies are satisfied.
+Release 1 production QA and the RPS source-rights decision remain the two immediate critical paths. Composition, firm-side triangulation, task-level measurement, and observatory operations proceed in parallel only where their dependencies are satisfied.
 
 | Stage | Status | Objective | Blocking dependency | Definition of done |
 |---|---|---|---|---|
@@ -27,6 +27,8 @@ Release 1 production QA and the RPS source-rights decision remain the two immedi
 | R1.1-G4 | **Blocked** | Experimental composition explorer | D-G1 + R1.1-G2 | UI exposes only supported, stability-qualified residual evidence |
 | R1.2 | **Future** | BTOS firm-side triangulation | construct alignment | firm-side evidence added only where measurement objects are explicit |
 | R1.3-G1 | **New — source/provenance gated** | Realized task adoption versus AI exposure | occupation/task index provenance + rights | lawful, versioned aggregate task/occupation measurement layer |
+| O-G1 | **Open** | Versioned new-wave/revision release pipeline | stable source paths + #11 | tested pipeline produces revision diffs and blocks contract-breaking releases |
+| O-G2 | **Open** | Private-fixture regeneration governance | authorized private fixture + #12 | any fixture revision forces full dependent regeneration/review |
 | V2 | **Future research** | Worker/task/occupation/industry mechanisms | authorized richer microdata + inference | pre-specified respondent-level design separates composition from context |
 
 ## Canonical progress checkpoint
@@ -470,21 +472,55 @@ Do not label an aggregate industry-context residual organizational complementari
 
 ---
 
+# Track 6 — observatory operations and reproducibility governance
+
+## O-G1 — versioned new-wave and revision pipeline
+
+Issue #11 converts the project from a one-time validated release into a controlled longitudinal observatory.
+
+For every new source wave or revision, the production/research process must:
+
+1. ingest through a rights-approved source path or update source metadata only;
+2. record source vintage, retrieval time, and revision status;
+3. run rights/permission checks before persistence/publication;
+4. detect changes to frozen observations, definitions, or taxonomies;
+5. regenerate all dependent derived artifacts;
+6. compare them with the previous frozen vintage;
+7. run stability, influence, coverage, and regression-contract checks;
+8. identify every chart/table/text claim affected by the change;
+9. require explicit scientific/editorial review;
+10. publish a versioned release only after CI and review;
+11. retain immutable analytical history and provenance.
+
+Engineering requirements include deterministic inputs/outputs, no silent data-mode fallback, a structured revision-diff artifact, claim-to-number traceability, and fail-closed behavior on source-definition, rights, missing-series, or coverage changes.
+
+Definition of done: a documented/tested update command can process a synthetic/new test vintage, generate an auditable revision diff, and block publication when a contract changes.
+
+## O-G2 — private fixture revision and regeneration gate
+
+Issue #12 governs the private RPS audit fixture. The fixture remains outside the public repository, while public CI must continue to pass without it.
+
+Whenever an authorized private fixture is added or revised:
+
+- verify expected identity/version/checksum;
+- retain the previous frozen version rather than silently replacing history;
+- run the complete fixture-present private test suite;
+- regenerate every dependent longitudinal artifact;
+- compare generated outputs against the previous freeze;
+- produce a structured diff for changed cells, diagnostics, rankings, and claims;
+- require review of every affected public chart/table/text statement;
+- create a new dated validation and source-vintage record;
+- block publication if the fixture is incomplete, rights change, definitions change, or diagnostics fail.
+
+Definition of done: fixture revision cannot occur without mandatory regeneration/review and an auditable revision record.
+
+---
+
 # Long-run observatory contract
 
-The mature product should support a controlled new-wave/revision pipeline:
+The mature product should support the O-G1/O-G2 controls as permanent operating infrastructure, not one-time release chores.
 
-1. ingest or source-metadata update;
-2. source-rights check;
-3. revision/vintage detection;
-4. regenerate derived diagnostics;
-5. compare with the previous frozen vintage;
-6. run stability/influence/coverage checks;
-7. review changed claims and charts;
-8. publish only after automated and human review;
-9. retain versioned analytical history and release provenance.
-
-The mature public experience should make measurement boundaries visible rather than compressing them into a score. Where supported by rights and evidence, the reader should be able to follow:
+The public experience should make measurement boundaries visible rather than compressing them into a score. Where supported by rights and evidence, the reader should be able to follow:
 
 `capability/exposure → adoption → routine use → work-hour penetration → reported time savings → separately identified economic outcomes`.
 
