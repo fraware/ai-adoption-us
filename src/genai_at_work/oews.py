@@ -376,6 +376,8 @@ def compare_cps_oews_worker_composition(
             )
             continue
 
+        if not isinstance(cps_weights_raw, Mapping):
+            raise AssertionError("CPS weight mapping failed type narrowing")
         cps_weights = {str(key): float(value) for key, value in cps_weights_raw.items()}
         oews_weights = oews_row.worker_weights
         missing_ids = [
