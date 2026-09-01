@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -83,6 +84,7 @@ def _stage_payload(
     candidate_manifest: Path,
     candidate: dict[str, Any],
     release_diff: dict[str, Any],
+    review: dict[str, Any],
     status: str,
 ) -> dict[str, Any]:
     payload: dict[str, Any] = {
@@ -95,10 +97,25 @@ def _stage_payload(
         "candidate_manifest_sha256": sha256_file(candidate_manifest),
         "candidate_manifest_digest": canonical_digest(candidate),
         "release_diff_digest": canonical_digest(release_diff),
+        "review_package_digest": canonical_digest(review),
         "gate_status": status,
     }
     payload["stage_id"] = stage_fingerprint(payload)
     return payload
+
+
+def _gate_payload(stage_id: str, status: str, failures: list[dict[str, str]]) -> dict[str, Any]:
+    return {
+        "stage_id": stage_id,
+        "status": status,
+        "failures": failures,
+        "promotion_requires_review": status == "BLOCKED_REVIEW_REQUIRED",
+        "source_input_bytes_publishable_by_this_engine": False,
+    }
+
+
+def _promotion_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def stage(args: argparse.Namespace) -> int:
@@ -112,22 +129,15 @@ def stage(args: argparse.Namespace) -> int:
     release_diff = diff_releases(previous, candidate)
     failures = candidate_gate_failures(candidate, release_diff)
     status = gate_status(failures, _has_changes(release_diff))
-    stage_manifest = _stage_payload(registry, args.candidate_manifest, candidate, release_diff, status)
+    review = review_package(candidate, release_diff)
+    stage_manifest = _stage_payload(registry, args.candidate_manifest, candidate, release_diff, review, status)
+    gate = _gate_payload(str(stage_manifest["stage_id"]), status, failures)
 
     args.staging_dir.mkdir(parents=True)
     _write_json(args.staging_dir / "stage_manifest.json", stage_manifest)
     _write_json(args.staging_dir / "release_diff.json", release_diff)
-    _write_json(args.staging_dir / "review_package.json", review_package(candidate, release_diff))
-    _write_json(
-        args.staging_dir / "publication_gate.json",
-        {
-            "stage_id": stage_manifest["stage_id"],
-            "status": status,
-            "failures": failures,
-            "promotion_requires_review": status == "BLOCKED_REVIEW_REQUIRED",
-            "source_input_bytes_publishable_by_this_engine": False,
-        },
-    )
+    _write_json(args.staging_dir / "review_package.json", review)
+    _write_json(args.staging_dir / "publication_gate.json", gate)
     print(json.dumps({"stage_id": stage_manifest["stage_id"], "status": status}, indent=2))
     return 0
 
@@ -164,14 +174,26 @@ def promote(args: argparse.Namespace) -> int:
 
     staged_manifest = load_json_object(args.staging_dir / "stage_manifest.json")
     staged_diff = load_json_object(args.staging_dir / "release_diff.json")
+    staged_review = load_json_object(args.staging_dir / "review_package.json")
     staged_gate = load_json_object(args.staging_dir / "publication_gate.json")
-    if staged_gate.get("status") != "BLOCKED_REVIEW_REQUIRED":
-        raise SystemExit("Staged publication gate is not review-promotable")
-    recomputed = _stage_payload(registry, args.candidate_manifest, candidate, release_diff, status)
+    expected_review = review_package(candidate, release_diff)
+    recomputed = _stage_payload(
+        registry,
+        args.candidate_manifest,
+        candidate,
+        release_diff,
+        expected_review,
+        status,
+    )
     if recomputed != staged_manifest:
         raise SystemExit("Release candidate, registry, or stage fingerprint changed after staging")
     if staged_diff != release_diff:
         raise SystemExit("Release diff changed after staging")
+    if staged_review != expected_review:
+        raise SystemExit("Review package changed after staging")
+    expected_gate = _gate_payload(str(recomputed["stage_id"]), status, failures)
+    if staged_gate != expected_gate:
+        raise SystemExit("Publication gate changed after staging")
 
     attestation = load_json_object(args.attestation)
     validate_review_attestation(
@@ -189,11 +211,13 @@ def promote(args: argparse.Namespace) -> int:
         raise SystemExit(f"Immutable release directory already exists: {target}")
     if temporary.exists():
         raise SystemExit(f"Temporary release directory already exists: {temporary}")
+    promotion_time = _promotion_timestamp()
     temporary.mkdir(parents=True)
     try:
         public_manifest = _copy_artifacts(candidate, args.candidate_root, temporary)
         public_manifest["release_status"] = "PROMOTED_AFTER_EXPLICIT_REVIEW"
-        public_manifest["promoted_at"] = attestation["reviewed_at"]
+        public_manifest["reviewed_at"] = attestation["reviewed_at"]
+        public_manifest["promoted_at"] = promotion_time
         public_manifest["reviewer"] = attestation["reviewer"]
         _write_json(temporary / "release_manifest.json", public_manifest)
         _write_json(temporary / "release_diff.json", release_diff)
@@ -203,15 +227,23 @@ def promote(args: argparse.Namespace) -> int:
                 "stage_id": staged_manifest["stage_id"],
                 "release_id": release_id,
                 "data_mode": candidate["data_mode"],
+                "candidate_manifest_sha256": staged_manifest["candidate_manifest_sha256"],
+                "candidate_manifest_digest": staged_manifest["candidate_manifest_digest"],
+                "release_diff_digest": staged_manifest["release_diff_digest"],
+                "review_package_digest": staged_manifest["review_package_digest"],
                 "reviewer": attestation["reviewer"],
                 "reviewed_at": attestation["reviewed_at"],
+                "promoted_at": promotion_time,
                 "scientific_reviewed": True,
                 "editorial_reviewed": True,
                 "source_rights_reviewed": True,
-                "ci_passed": True,
+                "ci_passed_attested": True,
+                "ci_evidence_verified_by_release_engine": False,
                 "candidate_commit": attestation["candidate_commit"],
                 "ci_run_ids": attestation["ci_run_ids"],
+                "artifact_sha256": attestation["artifact_sha256"],
                 "reviewed_source_ids": attestation["reviewed_source_ids"],
+                "reviewed_artifact_ids": attestation["reviewed_artifact_ids"],
                 "reviewed_diagnostic_ids": attestation["reviewed_diagnostic_ids"],
                 "reviewed_claim_ids": attestation["reviewed_claim_ids"],
                 "source_input_bytes_included": False,
@@ -238,8 +270,11 @@ def promote(args: argparse.Namespace) -> int:
         {
             "release_id": release_id,
             "manifest_sha256": manifest_sha,
-            "promoted_at": attestation["reviewed_at"],
+            "promoted_at": promotion_time,
             "supersedes_release_id": candidate.get("supersedes_release_id"),
+            "data_mode": candidate["data_mode"],
+            "candidate_commit": attestation["candidate_commit"],
+            "ci_run_ids": attestation["ci_run_ids"],
         },
     ]
     try:
@@ -253,6 +288,7 @@ def promote(args: argparse.Namespace) -> int:
                 "release_id": release_id,
                 "release_manifest_sha256": manifest_sha,
                 "release_directory": str(target),
+                "promoted_at": promotion_time,
                 "source_input_bytes_included": False,
                 "status": "PROMOTED_AFTER_EXPLICIT_REVIEW",
             },
