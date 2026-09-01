@@ -1,0 +1,21 @@
+industry_index,industry_id,industry_name,worker_coverage,actual_hours_valid_worker_coverage,actual_hours_mapping_coverage,usual_hours_valid_worker_coverage,usual_hours_mapping_coverage,worker_suppressed,actual_hours_suppressed,usual_hours_suppressed
+1,agriculture-forestry-fishing-and-hunting,"Agriculture, Forestry, Fishing, and Hunting",1.0,1.0,1.0,0.9218930376969116,1.0,False,False,True
+2,mining-quarrying-and-oil-and-gas-extraction,"Mining, Quarrying, and Oil and Gas Extraction",1.0,1.0,1.0,0.9471427082378702,1.0,False,False,True
+3,construction,Construction,1.0,1.0,1.0,0.9374530966515666,1.0,False,False,True
+4,manufacturing,Manufacturing,1.0,1.0,1.0,0.9703137674952741,1.0,False,False,True
+5,wholesale-trade,Wholesale Trade,1.0,1.0,1.0,0.9604170249867586,1.0,False,False,True
+6,retail-trade,Retail Trade,1.0,1.0,1.0,0.9539460560235593,1.0,False,False,True
+7,transportation-and-warehousing,Transportation and Warehousing,1.0,1.0,1.0,0.9318580751908095,1.0,False,False,True
+8,utilities,Utilities,1.0,1.0,1.0,0.977229023044186,1.0,False,False,True
+9,information,Information,1.0,1.0,1.0,0.9618841732557336,1.0,False,False,True
+10,finance-and-insurance,Finance and Insurance,1.0,1.0,1.0,0.9791190602359017,1.0,False,False,True
+11,real-estate-and-rental-and-leasing,Real Estate and Rental and Leasing,1.0,1.0,1.0,0.9189186814784047,1.0,False,False,True
+12,professional-scientific-and-technical-services,"Professional, Scientific, and Technical Services",1.0,1.0,1.0,0.965249680859179,1.0,False,False,True
+13,management-of-companies-and-enterprises,Management of Companies and Enterprises,1.0,1.0,1.0,0.8820285138296556,1.0,False,False,True
+14,administrative-and-support-and-waste-management-services,Administrative and Support and Waste Management Services,1.0,1.0,1.0,0.9428523036559155,1.0,False,False,True
+15,educational-services,Educational Services,1.0,1.0,1.0,0.9674451959869872,1.0,False,False,True
+16,health-care-and-social-assistance,Health Care and Social Assistance,1.0,1.0,1.0,0.967534348642132,1.0,False,False,True
+17,arts-entertainment-and-recreation,"Arts, Entertainment, and Recreation",1.0,1.0,1.0,0.9041668035687463,1.0,False,False,True
+18,accommodation-and-food-services,Accommodation and Food Services,1.0,1.0,1.0,0.9271100246935646,1.0,False,False,True
+19,other-services-except-public-administration,"Other Services, Except Public Administration",1.0,1.0,1.0,0.9356607425534467,1.0,False,False,True
+20,public-administration,Public Administration,1.0,1.0,1.0,0.9808948268413022,1.0,False,False,False

@@ -1,13 +1,16 @@
 """CPS composition primitives for occupation-adjusted RPS analysis.
 
-The module is deliberately independent of pandas/polars. It accepts CSV-like mappings,
-uses versioned crosswalk registries, applies equal month factors, and fails closed when
-coverage falls below the configured threshold.
+The module is deliberately independent of pandas/polars. It supports the official
+2026 Basic Monthly CPS fixed-width public-use records for live research execution,
+while retaining a small headered-CSV reader for deterministic unit fixtures.
+Crosswalks are versioned, month weights are equal within a quarter, and unsupported
+composition cells fail closed when coverage falls below the configured threshold.
 """
 
 from __future__ import annotations
 
 import csv
+import gzip
 import hashlib
 import json
 import urllib.request
@@ -27,6 +30,21 @@ REQUIRED_COLUMNS = {
 }
 DEFAULT_COVERAGE_GATE = 0.98
 WEIGHT_IMPLIED_DECIMALS = 4
+
+# Official 2026 Basic CPS public-use fixed-width locations, converted from the
+# Census 1-based inclusive record-layout locations to Python 0-based slices.
+# Source: 2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt.
+FIXED_WIDTH_FIELDS_2026: dict[str, tuple[int, int]] = {
+    "PRTAGE": (121, 123),       # 122-123
+    "PEMLR": (179, 181),        # 180-181
+    "PEHRUSL1": (217, 219),     # 218-219
+    "PEHRACT1": (242, 244),     # 243-244
+    "PREMPNOT": (392, 394),     # 393-394
+    "PRDTIND1": (471, 473),     # 472-473
+    "PRDTOCC1": (475, 477),     # 476-477
+    "PWSSWGT": (612, 622),      # 613-622
+}
+FIXED_WIDTH_MIN_RECORD_LENGTH_2026 = max(end for _, end in FIXED_WIDTH_FIELDS_2026.values())
 
 
 class UnavailableQuarter(ValueError):
@@ -117,7 +135,9 @@ def parse_final_weight(value: object) -> float | None:
     return float(raw / (10**WEIGHT_IMPLIED_DECIMALS))
 
 
-def load_crosswalks(registry_dir: Path) -> tuple[dict[int, dict[str, object]], dict[int, dict[str, object]]]:
+def load_crosswalks(
+    registry_dir: Path,
+) -> tuple[dict[int, dict[str, object]], dict[int, dict[str, object]]]:
     industry_doc = json.loads((registry_dir / "cps_industry_crosswalk_v2.json").read_text())
     occupation_doc = json.loads((registry_dir / "cps_occupation_crosswalk_v1.json").read_text())
 
@@ -150,15 +170,59 @@ def quarter_months(year: int, quarter: int, registry_dir: Path) -> tuple[str, ..
     return tuple(str(m) for m in months)
 
 
-def official_month_filename(year: int, month: str) -> str:
-    month = month.lower()
-    if month not in {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"}:
+def _validate_month(month: str) -> str:
+    normalized = month.lower()
+    if normalized not in {
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+    }:
         raise ValueError(f"unsupported month abbreviation: {month}")
+    return normalized
+
+
+def official_month_filename(year: int, month: str) -> str:
+    """Return the Census CSV filename retained for fixture/backward compatibility."""
+    month = _validate_month(month)
     return f"{month}{str(year)[-2:]}pub.csv"
 
 
 def official_month_url(year: int, month: str) -> str:
-    return f"https://www2.census.gov/programs-surveys/cps/datasets/{year}/basic/{official_month_filename(year, month)}"
+    return (
+        f"https://www2.census.gov/programs-surveys/cps/datasets/{year}/basic/"
+        f"{official_month_filename(year, month)}"
+    )
+
+
+def official_fixed_width_filename(year: int, month: str) -> str:
+    """Return the compressed official fixed-width Basic CPS public-use filename."""
+    month = _validate_month(month)
+    return f"{month}{str(year)[-2:]}pub.dat.gz"
+
+
+def official_fixed_width_url(year: int, month: str) -> str:
+    return (
+        f"https://www2.census.gov/programs-surveys/cps/datasets/{year}/basic/"
+        f"{official_fixed_width_filename(year, month)}"
+    )
+
+
+def official_record_layout_url(year: int) -> str:
+    if year != 2026:
+        raise ValueError("live fixed-width ingestion is currently pinned to the audited 2026 layout")
+    return (
+        "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/"
+        "2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt"
+    )
 
 
 def decode_person(
@@ -214,6 +278,20 @@ def decode_person(
         actual_hours=actual_hours,
         usual_hours=usual_hours,
     )
+
+
+def decode_fixed_width_record_2026(record: str) -> dict[str, str]:
+    """Extract the project-required variables from one official 2026 fixed-width record."""
+    record = record.rstrip("\r\n")
+    if len(record) < FIXED_WIDTH_MIN_RECORD_LENGTH_2026:
+        raise ValueError(
+            "2026 CPS fixed-width record is shorter than the required 622-character prefix: "
+            f"{len(record)}"
+        )
+    return {
+        name: record[start:end]
+        for name, (start, end) in FIXED_WIDTH_FIELDS_2026.items()
+    }
 
 
 def _normalized(numerators: Mapping[str, float], denominator: float) -> dict[str, float] | None:
@@ -303,14 +381,30 @@ def build_composition(
                 usual_hours_valid_worker_coverage=usual_valid_worker_coverage,
                 usual_hours_mapping_coverage=usual_mapping_coverage,
                 worker_weights=None if worker_suppressed else _normalized(s.worker_occ, worker_mapped),
-                actual_hour_weights=None if actual_suppressed else _normalized(s.actual_occ, actual_mapped_hours),
-                usual_hour_weights=None if usual_suppressed else _normalized(s.usual_occ, usual_mapped_hours),
+                actual_hour_weights=(
+                    None
+                    if actual_suppressed
+                    else _normalized(s.actual_occ, actual_mapped_hours)
+                ),
+                usual_hour_weights=(
+                    None
+                    if usual_suppressed
+                    else _normalized(s.usual_occ, usual_mapped_hours)
+                ),
                 worker_suppressed=worker_suppressed,
                 actual_hours_suppressed=actual_suppressed,
                 usual_hours_suppressed=usual_suppressed,
             )
         )
     return sorted(out, key=lambda x: x.industry_index)
+
+
+def _sha256_file(path: Path) -> str:
+    hasher = hashlib.sha256()
+    with path.open("rb") as handle:
+        while chunk := handle.read(1024 * 1024):
+            hasher.update(chunk)
+    return hasher.hexdigest()
 
 
 def read_quarter_csvs(
@@ -320,6 +414,12 @@ def read_quarter_csvs(
     quarter: int,
     registry_dir: Path,
 ) -> tuple[list[CPSPerson], list[dict[str, object]]]:
+    """Read headered CSV fixtures.
+
+    The official Census 2026 live-ingestion path is `read_quarter_fixed_width_gz`.
+    This reader remains useful for small deterministic tests and explicit converted
+    CSV inputs that include variable-name headers.
+    """
     months = quarter_months(year, quarter, registry_dir)
     industry, occupation = load_crosswalks(registry_dir)
     month_factor = 1.0 / len(months)
@@ -331,7 +431,7 @@ def read_quarter_csvs(
         path = input_dir / filename
         if not path.exists():
             raise FileNotFoundError(f"missing official CPS input: {path}")
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        digest = _sha256_file(path)
         with path.open(newline="", encoding="utf-8-sig") as fh:
             reader = csv.DictReader(fh)
             missing = REQUIRED_COLUMNS - set(reader.fieldnames or [])
@@ -360,13 +460,71 @@ def read_quarter_csvs(
                 "rows_read": row_count,
                 "in_scope_rows": in_scope_count,
                 "month_factor": month_factor,
+                "input_format": "headered_csv",
             }
         )
     return people, provenance
 
 
-def download_official_month(year: int, month: str, destination: Path) -> dict[str, object]:
-    url = official_month_url(year, month)
+def read_quarter_fixed_width_gz(
+    input_dir: Path,
+    *,
+    year: int,
+    quarter: int,
+    registry_dir: Path,
+) -> tuple[list[CPSPerson], list[dict[str, object]]]:
+    """Read the official compressed fixed-width Basic CPS files for 2026."""
+    if year != 2026:
+        raise ValueError("live fixed-width ingestion is currently pinned to the audited 2026 layout")
+
+    months = quarter_months(year, quarter, registry_dir)
+    industry, occupation = load_crosswalks(registry_dir)
+    month_factor = 1.0 / len(months)
+    people: list[CPSPerson] = []
+    provenance: list[dict[str, object]] = []
+
+    for month in months:
+        filename = official_fixed_width_filename(year, month)
+        path = input_dir / filename
+        if not path.exists():
+            raise FileNotFoundError(f"missing official CPS fixed-width input: {path}")
+        digest = _sha256_file(path)
+        row_count = 0
+        in_scope_count = 0
+        with gzip.open(path, mode="rt", encoding="ascii", newline="") as handle:
+            for line in handle:
+                row_count += 1
+                try:
+                    row = decode_fixed_width_record_2026(line)
+                except ValueError as exc:
+                    raise ValueError(f"{filename} record {row_count}: {exc}") from exc
+                person = decode_person(
+                    row,
+                    month=month,
+                    month_factor=month_factor,
+                    industry_crosswalk=industry,
+                    occupation_crosswalk=occupation,
+                )
+                if person is not None:
+                    people.append(person)
+                    in_scope_count += 1
+        provenance.append(
+            {
+                "month": month,
+                "filename": filename,
+                "source_url": official_fixed_width_url(year, month),
+                "record_layout_url": official_record_layout_url(year),
+                "sha256": digest,
+                "rows_read": row_count,
+                "in_scope_rows": in_scope_count,
+                "month_factor": month_factor,
+                "input_format": "official_fixed_width_gzip",
+            }
+        )
+    return people, provenance
+
+
+def _download_url(url: str, destination: Path) -> dict[str, object]:
     destination.parent.mkdir(parents=True, exist_ok=True)
     hasher = hashlib.sha256()
     try:
@@ -381,3 +539,23 @@ def download_official_month(year: int, month: str, destination: Path) -> dict[st
         destination.unlink(missing_ok=True)
         raise
     return {"source_url": url, "path": str(destination), "sha256": hasher.hexdigest()}
+
+
+def download_official_month(year: int, month: str, destination: Path) -> dict[str, object]:
+    """Download the Census CSV distribution file.
+
+    This is retained for compatibility. Live 2026 ingestion uses the fixed-width gzip
+    file because its record layout is explicit and independently auditable.
+    """
+    return _download_url(official_month_url(year, month), destination)
+
+
+def download_official_fixed_width_month(
+    year: int,
+    month: str,
+    destination: Path,
+) -> dict[str, object]:
+    """Download one official compressed fixed-width Basic CPS public-use file."""
+    if year != 2026:
+        raise ValueError("live fixed-width ingestion is currently pinned to the audited 2026 layout")
+    return _download_url(official_fixed_width_url(year, month), destination)

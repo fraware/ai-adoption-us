@@ -1,0 +1,62 @@
+{
+  "actual_hours_variable": "PEHRACT1",
+  "dataset": "U.S. Census Bureau Current Population Survey Basic Monthly public-use data",
+  "files": [
+    {
+      "file_size_bytes": 9590761,
+      "filename": "apr26pub.dat.gz",
+      "in_scope_rows": 39168,
+      "input_format": "official_fixed_width_gzip",
+      "month": "apr",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "retrieval_validation_timestamp_utc": "2026-09-01T07:02:34.408410+00:00",
+      "rows_read": 122216,
+      "sha256": "a1b38258ae1012badcbd7ff557ff5e2ddf5c01c54478dbd2c2144e221906e095",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/apr26pub.dat.gz"
+    },
+    {
+      "file_size_bytes": 9626197,
+      "filename": "may26pub.dat.gz",
+      "in_scope_rows": 39688,
+      "input_format": "official_fixed_width_gzip",
+      "month": "may",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "retrieval_validation_timestamp_utc": "2026-09-01T07:02:34.408410+00:00",
+      "rows_read": 122338,
+      "sha256": "02a67a81aaa64d7007730cab67fa29f5e23db3a6d7a7e876af31208961f4a666",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/may26pub.dat.gz"
+    },
+    {
+      "file_size_bytes": 9559413,
+      "filename": "jun26pub.dat.gz",
+      "in_scope_rows": 38831,
+      "input_format": "official_fixed_width_gzip",
+      "month": "jun",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "retrieval_validation_timestamp_utc": "2026-09-01T07:02:34.408410+00:00",
+      "rows_read": 121618,
+      "sha256": "f20d53bcaab977033ff7c7b48b9bafb675c61d7d78bfca73d6853f18325369ae",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/jun26pub.dat.gz"
+    }
+  ],
+  "industry_crosswalk_version": "cps-2022-industry-rps-v2",
+  "industry_variable": "PRDTIND1",
+  "input_format": "official_fixed_width_gzip",
+  "month_factor": 0.3333333333333333,
+  "months": [
+    "apr",
+    "may",
+    "jun"
+  ],
+  "occupation_crosswalk_version": "cps-2022-occupation-rps-v1",
+  "occupation_variable": "PRDTOCC1",
+  "period": "2026-Q2",
+  "population": "employed adults age 18-64 under PREMPNOT=1 project filter",
+  "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+  "source_build_commit": "604b8d32e516de4b958a859a61c7ab7c25c45f30",
+  "usual_hours_variable": "PEHRUSL1",
+  "weight_variable": "PWSSWGT"
+}

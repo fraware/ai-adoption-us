@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Build CPS occupation-composition weights from official public-use files."""
+
 from __future__ import annotations
 
 import argparse
@@ -8,10 +10,10 @@ from pathlib import Path
 
 from genai_at_work.cps import (
     build_composition,
-    download_official_month,
-    official_month_filename,
+    download_official_fixed_width_month,
+    official_fixed_width_filename,
     quarter_months,
-    read_quarter_csvs,
+    read_quarter_fixed_width_gz,
 )
 
 
@@ -31,17 +33,24 @@ def main() -> int:
         months = quarter_months(args.year, args.quarter, registry)
     except Exception as exc:
         raise SystemExit(f"CPS quarter unavailable or invalid: {exc}") from exc
+
+    if args.year != 2026:
+        raise SystemExit(
+            "CPS composition build blocked: authoritative fixed-width ingestion is currently "
+            "pinned to the audited 2026 Census record layout"
+        )
+
     if args.download_missing:
         for month in months:
-            path = args.input_dir / official_month_filename(args.year, month)
+            path = args.input_dir / official_fixed_width_filename(args.year, month)
             if not path.exists():
                 try:
-                    download_official_month(args.year, month, path)
+                    download_official_fixed_width_month(args.year, month, path)
                 except Exception as exc:
                     raise SystemExit(f"failed to download {month} {args.year} CPS: {exc}") from exc
 
     try:
-        people, provenance = read_quarter_csvs(
+        people, provenance = read_quarter_fixed_width_gz(
             args.input_dir,
             year=args.year,
             quarter=args.quarter,
@@ -49,12 +58,14 @@ def main() -> int:
         )
     except (FileNotFoundError, ValueError) as exc:
         raise SystemExit(f"CPS composition build blocked: {exc}") from exc
+
     composition = build_composition(people, coverage_gate=args.coverage_gate)
     payload = {
         "status": "derived CPS composition; not public RPS observation data",
         "year": args.year,
         "quarter": args.quarter,
         "months": list(months),
+        "input_format": "official_fixed_width_gzip",
         "coverage_gate": args.coverage_gate,
         "sample_rows": len(people),
         "provenance": provenance,
