@@ -3,7 +3,6 @@ from __future__ import annotations
 from json import loads
 from pathlib import Path
 
-
 REGISTRY = Path(__file__).parents[1] / "data" / "registry" / "rps_task_adoption_source_scope_v1.json"
 
 
