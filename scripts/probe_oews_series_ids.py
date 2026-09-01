@@ -23,22 +23,33 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
+    # BLS sector identifiers use half-open interval notation for NAICS sectors:
+    # 54--55 means sector 54, 31--34 means sectors 31-33, etc. Sector 99 uses
+    # the legacy OEWS 99-100 token. These candidates cover the project's 20
+    # industry groups in canonical order.
     candidates = [
-        "540000",
-        "54----",
-        "23----",
-        "31--33",
-        "44--45",
-        "48--49",
-        "56----",
+        "11--12",
+        "21--22",
+        "23--24",
+        "31--34",
+        "42--43",
+        "44--46",
+        "48--50",
+        "22--23",
+        "51--52",
+        "52--53",
+        "53--54",
+        "54--55",
+        "55--56",
         "56--57",
+        "61--62",
+        "62--63",
+        "71--72",
+        "72--73",
+        "81--82",
         "99-100",
-        "999000",
     ]
-    ids = []
-    for industry in candidates:
-        ids.append(series_id(industry))
-        ids.append(series_id(industry, "110000"))
+    ids = [series_id(industry) for industry in candidates]
 
     response = requests.post(
         API_URL,
@@ -49,10 +60,11 @@ def main() -> int:
     response.raise_for_status()
     payload = response.json()
     results = []
-    for series in payload.get("Results", {}).get("series", []):
+    for industry, series in zip(candidates, payload.get("Results", {}).get("series", []), strict=True):
         data = series.get("data", [])
         results.append(
             {
+                "industry_code": industry,
                 "series_id": series.get("seriesID"),
                 "has_data": bool(data),
                 "data": data,
@@ -63,11 +75,20 @@ def main() -> int:
         "status": payload.get("status"),
         "messages": payload.get("message", []),
         "candidate_industry_codes": candidates,
+        "all_candidates_resolved": all(result["has_data"] for result in results),
         "results": results,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(output, indent=2, sort_keys=True) + "\n")
-    print(json.dumps({"resolved": [r["series_id"] for r in results if r["has_data"]]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "resolved_count": sum(1 for result in results if result["has_data"]),
+                "total_candidates": len(results),
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
