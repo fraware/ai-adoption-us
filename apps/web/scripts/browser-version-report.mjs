@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { chromium, firefox, webkit } from "playwright";
 
 const outputDirectory = process.argv[2] ?? "qa-results";
 await mkdir(outputDirectory, { recursive: true });
+
+const packageJson = JSON.parse(
+  await readFile(new URL("../package.json", import.meta.url), "utf8"),
+);
+const playwrightVersion = packageJson.devDependencies?.["@playwright/test"] ?? null;
+if (!playwrightVersion) {
+  throw new Error("Unable to resolve pinned @playwright/test version from package.json");
+}
 
 const launchers = [
   ["chrome", () => chromium.launch({ channel: "chrome", headless: true })],
@@ -24,7 +32,7 @@ for (const [name, launch] of launchers) {
 
 const report = {
   generatedAtUtc: new Date().toISOString(),
-  playwrightVersion: process.env.npm_package_devDependencies__playwright_test ?? null,
+  playwrightVersion,
   browsers,
   interpretation: {
     chrome: "Stable Chrome channel installed on the GitHub-hosted Ubuntu runner.",
