@@ -66,18 +66,22 @@ def test_fixture_contract_and_frozen_checksum(tmp_path: Path):
         verify_current_fixture(path, registry)
 
 
-def test_source_vintage_fails_closed_on_rights_or_definition_change(tmp_path: Path):
+def test_source_vintage_fails_closed_on_identity_rights_or_definition_change(tmp_path: Path):
     fixture = tmp_path / "fixture.json"
     fixture.write_text(json.dumps(_fixture()))
     registry = _registry(fixture)
     good = {
         "source_vintage_id": "rps-v2",
+        "new_freeze_id": "freeze-2",
         "retrieved_at": "2026-09-01T12:00:00Z",
         "checkpoint_date": "2026-09-01",
         "rights_status": "Copyrighted: Citation Required",
         "definitions_status": "unchanged",
     }
     validate_source_vintage(good, registry)
+    reused_freeze = dict(good, new_freeze_id="freeze-1")
+    with pytest.raises(ValueError, match="new freeze ID"):
+        validate_source_vintage(reused_freeze, registry)
     changed_rights = dict(good, rights_status="unknown")
     with pytest.raises(ValueError, match="Rights status changed"):
         validate_source_vintage(changed_rights, registry)
