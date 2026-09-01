@@ -94,7 +94,7 @@ def test_delta_method_composition_covariance_respects_simplex() -> None:
         ((25.0, 0.0), (0.0, 16.0)),
         source_method="synthetic full level covariance",
     )
-    assert result.support is UncertaintySupport.DESIGN_COVARIANCE
+    assert result.support is UncertaintySupport.COVARIANCE_AWARE
     assert result.shares == (0.6, 0.4)
     assert math.isclose(sum(result.covariance[0]), 0.0, abs_tol=1e-12)
     assert math.isclose(sum(result.covariance[1]), 0.0, abs_tol=1e-12)
