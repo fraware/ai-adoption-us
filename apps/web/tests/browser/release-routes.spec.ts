@@ -60,7 +60,9 @@ test.describe("Release 1 rendered browser QA", () => {
         await expect(table.locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' table-wrap ')][1]")).toHaveCount(1);
       }
 
-      await page.locator("body").click({ position: { x: 1, y: 1 } });
+      // Test keyboard entry from the freshly loaded document. A pointer click before Tab
+      // changes the browser's sequential-focus starting point and does not model a keyboard
+      // user entering the page from browser chrome.
       await page.keyboard.press("Tab");
       const skipLink = page.locator(".skip-link");
       await expect(skipLink).toBeFocused();
