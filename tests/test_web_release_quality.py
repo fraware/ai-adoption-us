@@ -17,6 +17,21 @@ def test_layout_has_accessible_navigation_and_source_surface():
     assert 'className="site-footer"' in layout
 
 
+def test_app_icon_and_cross_engine_wrap_contract_exist():
+    methodology = read("apps/web/app/methodology/page.tsx")
+    assert (WEB / "app" / "icon.svg").exists()
+    assert "occupation_<wbr />adjusted_<wbr />industry_<wbr />context_<wbr />residual" in methodology
+
+
+def test_labelled_generic_home_groups_have_explicit_roles():
+    home = read("apps/web/app/page.tsx")
+    assert 'className="metric-row" role="group" aria-label="Five-wave evidence summary"' in home
+    assert (
+        'className="measurement-ladder" role="group" '
+        'aria-label="Measurement ladder from adoption to realization"'
+    ) in home
+
+
 def test_css_has_keyboard_reduced_motion_and_small_screen_rules():
     css = read("apps/web/app/globals.css")
     assert ":focus-visible" in css
@@ -61,7 +76,11 @@ def test_public_sources_page_states_current_composition_evidence_boundary():
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     assert "Reported time savings are not an observed measure of labor productivity" in page
-    assert "occupation_adjusted_industry_context_residual" in page
+    assert "occupation_" in page
+    assert "adjusted_" in page
+    assert "industry_" in page
+    assert "context_" in page
+    assert "residual" in page
     assert "CPS composition foundation has been executed and validated" in page
     assert "RPS observation path remains rights-gated" in page
 

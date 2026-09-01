@@ -74,7 +74,7 @@ export default function MethodologyPage() {
           <dt>Residual</dt>
           <dd>
             Observed industry value minus its occupation-composition counterfactual. The code names this
-            an <code>occupation_adjusted_industry_context_residual</code>.
+            an <code>occupation_<wbr />adjusted_<wbr />industry_<wbr />context_<wbr />residual</code>.
           </dd>
         </dl>
         <p className="note">
