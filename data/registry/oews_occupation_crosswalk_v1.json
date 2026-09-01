@@ -1,0 +1,30 @@
+{
+  "version": "oews-2018-soc-rps-v1",
+  "source_vintage": "May 2025 OEWS",
+  "all_occupations_code": "000000",
+  "entries": [
+    {"entity_index": 1, "entity_id": "management-occupations", "entity_name": "Management Occupations", "oews_occupation_code": "110000"},
+    {"entity_index": 2, "entity_id": "business-and-financial-operations-occupations", "entity_name": "Business and Financial Operations Occupations", "oews_occupation_code": "130000"},
+    {"entity_index": 3, "entity_id": "computer-and-mathematical-occupations", "entity_name": "Computer and Mathematical Occupations", "oews_occupation_code": "150000"},
+    {"entity_index": 4, "entity_id": "architecture-and-engineering-occupations", "entity_name": "Architecture and Engineering Occupations", "oews_occupation_code": "170000"},
+    {"entity_index": 5, "entity_id": "life-physical-and-social-science-occupations", "entity_name": "Life, Physical, and Social Science Occupations", "oews_occupation_code": "190000"},
+    {"entity_index": 6, "entity_id": "community-and-social-service-occupations", "entity_name": "Community and Social Service Occupations", "oews_occupation_code": "210000"},
+    {"entity_index": 7, "entity_id": "legal-occupations", "entity_name": "Legal Occupations", "oews_occupation_code": "230000"},
+    {"entity_index": 8, "entity_id": "educational-instruction-and-library-occupations", "entity_name": "Educational Instruction and Library Occupations", "oews_occupation_code": "250000"},
+    {"entity_index": 9, "entity_id": "arts-design-entertainment-sports-and-media-occupations", "entity_name": "Arts, Design, Entertainment, Sports, and Media Occupations", "oews_occupation_code": "270000"},
+    {"entity_index": 10, "entity_id": "healthcare-practitioners-and-technical-occupations", "entity_name": "Healthcare Practitioners and Technical Occupations", "oews_occupation_code": "290000"},
+    {"entity_index": 11, "entity_id": "healthcare-support-occupations", "entity_name": "Healthcare Support Occupations", "oews_occupation_code": "310000"},
+    {"entity_index": 12, "entity_id": "protective-service-occupations", "entity_name": "Protective Service Occupations", "oews_occupation_code": "330000"},
+    {"entity_index": 13, "entity_id": "food-preparation-and-serving-related-occupations", "entity_name": "Food Preparation and Serving Related Occupations", "oews_occupation_code": "350000"},
+    {"entity_index": 14, "entity_id": "building-and-grounds-cleaning-and-maintenance-occupations", "entity_name": "Building and Grounds Cleaning and Maintenance Occupations", "oews_occupation_code": "370000"},
+    {"entity_index": 15, "entity_id": "personal-care-and-service-occupations", "entity_name": "Personal Care and Service Occupations", "oews_occupation_code": "390000"},
+    {"entity_index": 16, "entity_id": "sales-and-related-occupations", "entity_name": "Sales and Related Occupations", "oews_occupation_code": "410000"},
+    {"entity_index": 17, "entity_id": "office-and-administrative-support-occupations", "entity_name": "Office and Administrative Support Occupations", "oews_occupation_code": "430000"},
+    {"entity_index": 18, "entity_id": "farming-fishing-and-forestry-occupations", "entity_name": "Farming, Fishing, and Forestry Occupations", "oews_occupation_code": "450000"},
+    {"entity_index": 19, "entity_id": "construction-and-extraction-occupations", "entity_name": "Construction and Extraction Occupations", "oews_occupation_code": "470000"},
+    {"entity_index": 20, "entity_id": "installation-maintenance-and-repair-occupations", "entity_name": "Installation, Maintenance, and Repair Occupations", "oews_occupation_code": "490000"},
+    {"entity_index": 21, "entity_id": "production-occupations", "entity_name": "Production Occupations", "oews_occupation_code": "510000"},
+    {"entity_index": 22, "entity_id": "transportation-and-material-moving-occupations", "entity_name": "Transportation and Material Moving Occupations", "oews_occupation_code": "530000"}
+  ],
+  "note": "These 22 civilian SOC major groups align one-for-one with the project's RPS/CPS occupation entities; Military Specific Occupations are outside the comparison universe."
+}
