@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
@@ -61,6 +62,14 @@ def test_plots_reflow_with_resize_observer():
         assert "ResizeObserver" in text
         assert ".observe(host)" in text
         assert "observer.disconnect()" in text
+
+
+def test_browser_version_report_uses_pinned_playwright_version():
+    package = json.loads(read("apps/web/package.json"))
+    reporter = read("apps/web/scripts/browser-version-report.mjs")
+    assert package["devDependencies"]["@playwright/test"] == "1.62.1"
+    assert 'packageJson.devDependencies?.["@playwright/test"]' in reporter
+    assert "Unable to resolve pinned @playwright/test version" in reporter
 
 
 def test_public_sources_page_states_current_composition_evidence_boundary():
