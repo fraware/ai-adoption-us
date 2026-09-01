@@ -1,0 +1,304 @@
+name: Q2 2026 CPS research execution
+
+on:
+  push:
+    branches: [research/cps-q2-2026-program]
+    paths:
+      - '.github/workflows/cps-q2-2026-research.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  execute:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install package and development checks
+        run: python -m pip install -e '.[dev]'
+
+      - name: Validate existing CPS/composition contracts before real-data execution
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src pytest -q tests/test_cps.py tests/test_composition.py
+
+      - name: Download official April-June 2026 CPS public-use CSV files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cps-q2-2026
+          PYTHONPATH=src python - <<'PY'
+          from pathlib import Path
+          from genai_at_work.cps import download_official_month
+
+          target = Path('/tmp/cps-q2-2026')
+          for month in ('apr', 'may', 'jun'):
+              result = download_official_month(2026, month, target / f'{month}26pub.csv')
+              print(result)
+          PY
+
+      - name: Execute composition and generate validation package
+        env:
+          SOURCE_BUILD_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          PYTHONPATH=src python - <<'PY'
+          from __future__ import annotations
+
+          import csv
+          import json
+          import math
+          import os
+          from dataclasses import asdict
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          from genai_at_work.cps import build_composition, read_quarter_csvs
+
+          root = Path.cwd()
+          input_dir = Path('/tmp/cps-q2-2026')
+          registry = root / 'data' / 'registry'
+          out_dir = root / 'data' / 'derived' / 'composition' / 'cps-q2-2026'
+          validation_dir = root / 'docs' / 'validation'
+          out_dir.mkdir(parents=True, exist_ok=True)
+          validation_dir.mkdir(parents=True, exist_ok=True)
+
+          people, provenance = read_quarter_csvs(
+              input_dir,
+              year=2026,
+              quarter=2,
+              registry_dir=registry,
+          )
+          composition = build_composition(people, coverage_gate=0.98)
+          retrieved_at = datetime.now(timezone.utc).isoformat()
+          build_commit = os.environ['SOURCE_BUILD_COMMIT']
+
+          industry_crosswalk = json.loads((registry / 'cps_industry_crosswalk_v2.json').read_text())
+          occupation_crosswalk = json.loads((registry / 'cps_occupation_crosswalk_v1.json').read_text())
+          names = {entry['entity_id']: entry['entity_name'] for entry in industry_crosswalk['entries']}
+
+          for item in provenance:
+              path = input_dir / str(item['filename'])
+              item['file_size_bytes'] = path.stat().st_size
+              item['retrieved_at_utc'] = retrieved_at
+
+          weighted_worker_population = sum(person.worker_weight for person in people)
+
+          def weight_sum(weights: dict[str, float] | None) -> float | None:
+              return None if weights is None else sum(weights.values())
+
+          def all_nonnegative(weights: dict[str, float] | None) -> bool:
+              return weights is None or all(value >= 0 for value in weights.values())
+
+          def l1(a: dict[str, float] | None, b: dict[str, float] | None) -> float | None:
+              if a is None or b is None:
+                  return None
+              keys = set(a) | set(b)
+              return sum(abs(a.get(k, 0.0) - b.get(k, 0.0)) for k in keys)
+
+          serialized = []
+          coverage_rows = []
+          sensitivity_rows = []
+          for row in composition:
+              doc = asdict(row)
+              doc['industry_name'] = names[row.industry_id]
+              serialized.append(doc)
+              coverage_rows.append({
+                  'industry_index': row.industry_index,
+                  'industry_id': row.industry_id,
+                  'industry_name': names[row.industry_id],
+                  'worker_coverage': row.worker_coverage,
+                  'actual_hours_valid_worker_coverage': row.actual_hours_valid_worker_coverage,
+                  'actual_hours_mapping_coverage': row.actual_hours_mapping_coverage,
+                  'usual_hours_valid_worker_coverage': row.usual_hours_valid_worker_coverage,
+                  'usual_hours_mapping_coverage': row.usual_hours_mapping_coverage,
+                  'worker_suppressed': row.worker_suppressed,
+                  'actual_hours_suppressed': row.actual_hours_suppressed,
+                  'usual_hours_suppressed': row.usual_hours_suppressed,
+              })
+              sensitivity_rows.append({
+                  'industry_index': row.industry_index,
+                  'industry_id': row.industry_id,
+                  'industry_name': names[row.industry_id],
+                  'worker_vs_actual_hour_weights_l1': l1(row.worker_weights, row.actual_hour_weights),
+                  'actual_vs_usual_hour_weights_l1': l1(row.actual_hour_weights, row.usual_hour_weights),
+                  'worker_supported': not row.worker_suppressed,
+                  'actual_hours_supported': not row.actual_hours_suppressed,
+                  'usual_hours_supported': not row.usual_hours_suppressed,
+              })
+
+          all_weight_sums_valid = all(
+              weights is None or math.isclose(sum(weights.values()), 1.0, abs_tol=1e-10)
+              for row in composition
+              for weights in (row.worker_weights, row.actual_hour_weights, row.usual_hour_weights)
+          )
+          all_weights_nonnegative = all(
+              all_nonnegative(weights)
+              for row in composition
+              for weights in (row.worker_weights, row.actual_hour_weights, row.usual_hour_weights)
+          )
+          worker_actual_differences = [
+              value for row in composition
+              if (value := l1(row.worker_weights, row.actual_hour_weights)) is not None
+          ]
+          actual_usual_differences = [
+              value for row in composition
+              if (value := l1(row.actual_hour_weights, row.usual_hour_weights)) is not None
+          ]
+
+          checks = {
+              'status': 'official CPS Q2 2026 composition weights executed; RPS counterfactual join not executed',
+              'source_build_commit': build_commit,
+              'generated_at_utc': retrieved_at,
+              'coverage_gate': 0.98,
+              'sample_rows': len(people),
+              'weighted_worker_population_age_18_64_employed': weighted_worker_population,
+              'industry_count': len(composition),
+              'supported_worker_industries': sum(not row.worker_suppressed for row in composition),
+              'supported_actual_hours_industries': sum(not row.actual_hours_suppressed for row in composition),
+              'supported_usual_hours_industries': sum(not row.usual_hours_suppressed for row in composition),
+              'minimum_worker_coverage': min(row.worker_coverage for row in composition),
+              'minimum_actual_hours_valid_worker_coverage': min(row.actual_hours_valid_worker_coverage for row in composition),
+              'minimum_actual_hours_mapping_coverage': min(
+                  row.actual_hours_mapping_coverage for row in composition if row.actual_hours_mapping_coverage is not None
+              ),
+              'all_supported_weight_vectors_sum_to_one': all_weight_sums_valid,
+              'all_weights_nonnegative': all_weights_nonnegative,
+              'industries_with_worker_vs_actual_hour_weight_difference_gt_1e_6': sum(
+                  value > 1e-6 for value in worker_actual_differences
+              ),
+              'median_worker_vs_actual_hour_weights_l1': sorted(worker_actual_differences)[len(worker_actual_differences)//2] if worker_actual_differences else None,
+              'median_actual_vs_usual_hour_weights_l1': sorted(actual_usual_differences)[len(actual_usual_differences)//2] if actual_usual_differences else None,
+              'sanity_checks': {
+                  'industry_count_is_20': len(composition) == 20,
+                  'weighted_worker_population_between_100m_and_200m': 100_000_000 <= weighted_worker_population <= 200_000_000,
+                  'all_supported_weight_vectors_sum_to_one': all_weight_sums_valid,
+                  'all_weights_nonnegative': all_weights_nonnegative,
+              },
+              'remaining_gate': 'Occupation-composition counterfactuals/residuals require a compatible authorized RPS occupation observation vintage; the public repository intentionally contains no raw RPS subgroup fixture.',
+          }
+
+          if not all(checks['sanity_checks'].values()):
+              raise SystemExit(f'CPS validation sanity check failed: {checks["sanity_checks"]}')
+
+          manifest = {
+              'dataset': 'U.S. Census Bureau Current Population Survey Basic Monthly public-use data',
+              'period': '2026-Q2',
+              'months': ['apr', 'may', 'jun'],
+              'population': 'employed adults age 18-64 under PREMPNOT=1 project filter',
+              'month_factor': 1/3,
+              'weight_variable': 'PWSSWGT',
+              'actual_hours_variable': 'PEHRACT1',
+              'usual_hours_variable': 'PEHRUSL1',
+              'industry_variable': 'PRDTIND1',
+              'occupation_variable': 'PRDTOCC1',
+              'industry_crosswalk_version': industry_crosswalk['version'],
+              'occupation_crosswalk_version': occupation_crosswalk['version'],
+              'source_build_commit': build_commit,
+              'files': provenance,
+          }
+
+          composition_payload = {
+              'status': 'official CPS composition weights; no RPS observations or residuals',
+              'period': '2026-Q2',
+              'coverage_gate': 0.98,
+              'sample_rows': len(people),
+              'weighted_worker_population_age_18_64_employed': weighted_worker_population,
+              'source_build_commit': build_commit,
+              'provenance': provenance,
+              'crosswalk_versions': {
+                  'industry': industry_crosswalk['version'],
+                  'occupation': occupation_crosswalk['version'],
+              },
+              'industries': serialized,
+          }
+
+          (out_dir / 'cps_composition.json').write_text(json.dumps(composition_payload, indent=2, sort_keys=True) + '\n')
+          (out_dir / 'input_manifest.json').write_text(json.dumps(manifest, indent=2, sort_keys=True) + '\n')
+          (out_dir / 'validation_checks.json').write_text(json.dumps(checks, indent=2, sort_keys=True) + '\n')
+
+          with (out_dir / 'coverage.csv').open('w', newline='') as fh:
+              writer = csv.DictWriter(fh, fieldnames=list(coverage_rows[0]))
+              writer.writeheader()
+              writer.writerows(coverage_rows)
+
+          with (out_dir / 'sensitivity.csv').open('w', newline='') as fh:
+              writer = csv.DictWriter(fh, fieldnames=list(sensitivity_rows[0]))
+              writer.writeheader()
+              writer.writerows(sensitivity_rows)
+
+          report = f'''# CPS Q2 2026 composition execution — official-data checkpoint
+
+## Status
+
+This record documents execution of the occupation-composition **weighting layer** on official April, May, and June 2026 CPS Basic Monthly public-use CSV files.
+
+It does **not** claim completed RPS occupation-composition counterfactuals or occupation-adjusted industry-context residuals. Those require a compatible authorized RPS occupation observation vintage, which is intentionally absent from the public repository.
+
+## Execution identity
+
+- source build commit: `{build_commit}`
+- generated at: `{retrieved_at}`
+- in-scope CPS person-month rows: **{len(people):,}**
+- pooled weighted employed population age 18–64: **{weighted_worker_population:,.0f}**
+- industry groups produced: **{len(composition)}**
+- coverage gate: **98%**
+
+## Source inputs
+
+Official Census Basic Monthly CPS CSVs were retrieved for April, May, and June 2026. Exact source URLs, SHA-256 checksums, file sizes, row counts, and retrieval timestamp are frozen in `data/derived/composition/cps-q2-2026/input_manifest.json`.
+
+## Weighting contract executed
+
+- adoption composition basis: worker shares;
+- assisted-hours/reported-savings composition basis: actual-main-job-hour shares;
+- usual-main-job-hours: sensitivity only;
+- equal one-third month factors across April/May/June;
+- employed-absent workers: zero actual hours under the existing implementation contract;
+- invalid active-worker actual hours: not imputed;
+- unsupported mapping/validity coverage: fail closed at 98%.
+
+## Validation summary
+
+- worker-share-supported industries: **{checks['supported_worker_industries']}/{len(composition)}**
+- actual-hour-supported industries: **{checks['supported_actual_hours_industries']}/{len(composition)}**
+- usual-hour-supported industries: **{checks['supported_usual_hours_industries']}/{len(composition)}**
+- minimum worker mapping coverage: **{checks['minimum_worker_coverage']:.6f}**
+- minimum valid-worker coverage for actual hours: **{checks['minimum_actual_hours_valid_worker_coverage']:.6f}**
+- minimum actual-hour occupation mapping coverage: **{checks['minimum_actual_hours_mapping_coverage']:.6f}**
+- supported weight vectors sum to one: **{checks['all_supported_weight_vectors_sum_to_one']}**
+- all weights nonnegative: **{checks['all_weights_nonnegative']}**
+- industries with a worker-share versus actual-hour-share composition difference > 1e-6: **{checks['industries_with_worker_vs_actual_hour_weight_difference_gt_1e_6']}**
+
+The machine-readable per-industry coverage and actual-versus-usual-hours sensitivity diagnostics are committed beside the composition artifact.
+
+## Scientific boundary and next gate
+
+This checkpoint establishes whether the official CPS composition inputs and weighting implementation are operational on real Q2 2026 data. It does not establish an industry-context effect and it does not produce any productivity or causal claim.
+
+The next step is to review these diagnostics, resolve any suppression/coverage problems, and then join the validated composition weights to an authorized compatible RPS occupation vintage. Only after that join and the prespecified robustness suite can an occupation-adjusted industry-context residual be considered for publication.
+'''
+          (validation_dir / 'CPS_Q2_2026_COMPOSITION_EXECUTION.md').write_text(report)
+
+          print(json.dumps(checks, indent=2, sort_keys=True))
+          PY
+
+      - name: Commit generated research artifacts to the branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/derived/composition/cps-q2-2026 docs/validation/CPS_Q2_2026_COMPOSITION_EXECUTION.md
+          if git diff --cached --quiet; then
+            echo 'No generated changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Execute official Q2 2026 CPS composition weights'
+          git push origin HEAD:research/cps-q2-2026-program
