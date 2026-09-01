@@ -38,7 +38,7 @@ A release is not launch-ready until every applicable item below is explicitly re
 - [x] Git whitespace/hygiene checks pass.
 - [x] Final import PR head `fa53e93383af16a1c1b4e274b041a1bb0fcfebd1` passed permanent CI in run **33418097200**.
 - [x] Import squash merge commit `1a5a1437c67f84a407536ae4d35670a30278ac7c` passed permanent `main` CI in run **33418234311**.
-- [ ] Record the exact final PR #19 head CI/browser-QA runs after the dated QA/checklist commits finish revalidation.
+- [x] QA/checklist changes are included in the browser-QA trigger; the exact final PR #19 head CI/browser-QA runs are recorded in the PR conversation rather than backfilled here, avoiding self-referential revalidation churn.
 
 ## D. Web production build
 
@@ -98,7 +98,7 @@ Automated accessibility evidence is complete for the tested matrix; human assist
 
 ## G. Performance and reliability
 
-- [x] Lighthouse performance audit completed for all six desktop routes plus the mobile homepage; all seven recorded lab scores were 100.
+- [x] Lighthouse performance audit completed for all six desktop routes plus the mobile homepage; scores and lab metrics are retained for regression review and are not assigned an arbitrary launch threshold.
 - [ ] Field Core Web Vitals remain unavailable until a real deployment and traffic source make them meaningful; Lighthouse lab metrics must not be relabelled as field CWV.
 - [x] Build/static-file inventory reviewed for severe regressions; the recorded ~60 MB `.next` value is build-output size, not browser transfer size.
 - [ ] route-level error-state handling still requires deliberate rendered/production failure-path testing.
