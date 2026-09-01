@@ -1,0 +1,199 @@
+{
+  "candidate_industry_codes": [
+    "540000",
+    "54----",
+    "23----",
+    "31--33",
+    "44--45",
+    "48--49",
+    "56----",
+    "56--57",
+    "99-100",
+    "999000"
+  ],
+  "messages": [
+    "Series does not exist for Series OEUN000000023----00000001",
+    "Series does not exist for Series OEUN000000023----11000001",
+    "Series does not exist for Series OEUN000000031--3300000001",
+    "Series does not exist for Series OEUN000000031--3311000001",
+    "Series does not exist for Series OEUN000000044--4500000001",
+    "Series does not exist for Series OEUN000000044--4511000001",
+    "Series does not exist for Series OEUN000000048--4900000001",
+    "Series does not exist for Series OEUN000000048--4911000001",
+    "Series does not exist for Series OEUN000000054----00000001",
+    "Series does not exist for Series OEUN000000054----11000001",
+    "Series does not exist for Series OEUN000000054000000000001",
+    "Series does not exist for Series OEUN000000054000011000001",
+    "Series does not exist for Series OEUN000000056----00000001",
+    "Series does not exist for Series OEUN000000056----11000001"
+  ],
+  "results": [
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000054000000000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000054000011000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000054----00000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000054----11000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000023----00000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000023----11000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000031--3300000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000031--3311000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000044--4500000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000044--4511000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000048--4900000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000048--4911000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000056----00000001"
+    },
+    {
+      "data": [],
+      "has_data": false,
+      "series_id": "OEUN000000056----11000001"
+    },
+    {
+      "data": [
+        {
+          "footnotes": [
+            {}
+          ],
+          "latest": "true",
+          "period": "A01",
+          "periodName": "Annual",
+          "value": "9114350",
+          "year": "2025"
+        }
+      ],
+      "has_data": true,
+      "series_id": "OEUN000000056--5700000001"
+    },
+    {
+      "data": [
+        {
+          "footnotes": [
+            {}
+          ],
+          "latest": "true",
+          "period": "A01",
+          "periodName": "Annual",
+          "value": "488670",
+          "year": "2025"
+        }
+      ],
+      "has_data": true,
+      "series_id": "OEUN000000056--5711000001"
+    },
+    {
+      "data": [
+        {
+          "footnotes": [
+            {}
+          ],
+          "latest": "true",
+          "period": "A01",
+          "periodName": "Annual",
+          "value": "10242890",
+          "year": "2025"
+        }
+      ],
+      "has_data": true,
+      "series_id": "OEUN000000099-10000000001"
+    },
+    {
+      "data": [
+        {
+          "footnotes": [
+            {}
+          ],
+          "latest": "true",
+          "period": "A01",
+          "periodName": "Annual",
+          "value": "695690",
+          "year": "2025"
+        }
+      ],
+      "has_data": true,
+      "series_id": "OEUN000000099-10011000001"
+    },
+    {
+      "data": [
+        {
+          "footnotes": [
+            {}
+          ],
+          "latest": "true",
+          "period": "A01",
+          "periodName": "Annual",
+          "value": "10242890",
+          "year": "2025"
+        }
+      ],
+      "has_data": true,
+      "series_id": "OEUN000000099900000000001"
+    },
+    {
+      "data": [
+        {
+          "footnotes": [
+            {}
+          ],
+          "latest": "true",
+          "period": "A01",
+          "periodName": "Annual",
+          "value": "695690",
+          "year": "2025"
+        }
+      ],
+      "has_data": true,
+      "series_id": "OEUN000000099900011000001"
+    }
+  ],
+  "status": "REQUEST_SUCCEEDED"
+}
