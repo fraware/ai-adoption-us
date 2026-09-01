@@ -202,17 +202,17 @@ def main() -> int:
     vintage = _read_csv(args.cps_vintage_comparison)
 
     unfiltered = {
-        "oeWS_vs_cps_2025_exact": _exact_summary(exact_2025, stable_ids=None),
-        "oeWS_vs_cps_2026_exact": _exact_summary(exact_2026, stable_ids=None),
-        "oeWS_vs_cps_2025_bounds": _bound_summary(bounds_2025, stable_ids=None),
-        "oeWS_vs_cps_2026_bounds": _bound_summary(bounds_2026, stable_ids=None),
+        "oews_vs_cps_2025_exact": _exact_summary(exact_2025, stable_ids=None),
+        "oews_vs_cps_2026_exact": _exact_summary(exact_2026, stable_ids=None),
+        "oews_vs_cps_2025_bounds": _bound_summary(bounds_2025, stable_ids=None),
+        "oews_vs_cps_2026_bounds": _bound_summary(bounds_2026, stable_ids=None),
         "cps_2025_vs_2026": _vintage_summary(vintage, stable_ids=None),
     }
     stable = {
-        "oeWS_vs_cps_2025_exact": _exact_summary(exact_2025, stable_ids=stable_ids),
-        "oeWS_vs_cps_2026_exact": _exact_summary(exact_2026, stable_ids=stable_ids),
-        "oeWS_vs_cps_2025_bounds": _bound_summary(bounds_2025, stable_ids=stable_ids),
-        "oeWS_vs_cps_2026_bounds": _bound_summary(bounds_2026, stable_ids=stable_ids),
+        "oews_vs_cps_2025_exact": _exact_summary(exact_2025, stable_ids=stable_ids),
+        "oews_vs_cps_2026_exact": _exact_summary(exact_2026, stable_ids=stable_ids),
+        "oews_vs_cps_2025_bounds": _bound_summary(bounds_2025, stable_ids=stable_ids),
+        "oews_vs_cps_2026_bounds": _bound_summary(bounds_2026, stable_ids=stable_ids),
         "cps_2025_vs_2026": _vintage_summary(vintage, stable_ids=stable_ids),
     }
 
@@ -282,10 +282,10 @@ def main() -> int:
     )
 
     unstable_names = ", ".join(row.industry_name for row in unstable) or "none"
-    stable_2025_exact = stable["oeWS_vs_cps_2025_exact"]
-    stable_2026_exact = stable["oeWS_vs_cps_2026_exact"]
-    stable_2025_bounds = stable["oeWS_vs_cps_2025_bounds"]
-    stable_2026_bounds = stable["oeWS_vs_cps_2026_bounds"]
+    stable_2025_exact = stable["oews_vs_cps_2025_exact"]
+    stable_2026_exact = stable["oews_vs_cps_2026_exact"]
+    stable_2025_bounds = stable["oews_vs_cps_2025_bounds"]
+    stable_2026_bounds = stable["oews_vs_cps_2026_bounds"]
     stable_vintage = stable["cps_2025_vs_2026"]
     report = f"""# Stability-qualified CPS/OEWS composition evidence
 
