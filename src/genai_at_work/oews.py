@@ -347,7 +347,13 @@ def compare_cps_oews_worker_composition(
     *,
     occupation_ids: Sequence[str],
 ) -> list[CompositionComparisonRow]:
-    """Compare OEWS employee shares with CPS worker shares by industry."""
+    """Compare OEWS employee shares with CPS worker shares by industry.
+
+    CPS dictionaries omit sampled zero-mass occupation groups, so absent CPS keys are
+    valid zeros. OEWS missing series are different: an unpublished aggregate cannot be
+    assumed to be zero. Exact 22-group diagnostics therefore fail closed whenever a
+    canonical OEWS occupation series is missing, even if the broader coverage gate passes.
+    """
 
     cps_by_id = {str(row["industry_id"]): row for row in cps_industries}
     comparisons: list[CompositionComparisonRow] = []
@@ -380,23 +386,38 @@ def compare_cps_oews_worker_composition(
             raise AssertionError("CPS weight mapping failed type narrowing")
         cps_weights = {str(key): float(value) for key, value in cps_weights_raw.items()}
         oews_weights = oews_row.worker_weights
-        missing_ids = [
+        missing_oews = [
             occupation_id
             for occupation_id in occupation_ids
-            if occupation_id not in cps_weights or occupation_id not in oews_weights
+            if occupation_id not in oews_weights
         ]
-        if missing_ids:
-            raise ValueError(
-                f"supported composition missing canonical occupations: {missing_ids}"
+        if missing_oews:
+            comparisons.append(
+                CompositionComparisonRow(
+                    industry_index=oews_row.industry_index,
+                    industry_id=oews_row.industry_id,
+                    industry_name=oews_row.industry_name,
+                    comparability=oews_row.comparability,
+                    oews_supported=False,
+                    cps_supported=True,
+                    l1_distance=None,
+                    cosine_similarity=None,
+                    spearman_rank_correlation=None,
+                    top_occupation_agreement=None,
+                    cps_top_occupation=None,
+                    oews_top_occupation=None,
+                    max_absolute_share_difference=None,
+                )
             )
+            continue
 
-        cps_vector = [cps_weights[occupation_id] for occupation_id in occupation_ids]
+        cps_vector = [cps_weights.get(occupation_id, 0.0) for occupation_id in occupation_ids]
         oews_vector = [oews_weights[occupation_id] for occupation_id in occupation_ids]
         absolute_differences = [
             abs(cps_value - oews_value)
             for cps_value, oews_value in zip(cps_vector, oews_vector, strict=True)
         ]
-        cps_top = max(occupation_ids, key=cps_weights.__getitem__)
+        cps_top = max(occupation_ids, key=lambda key: cps_weights.get(key, 0.0))
         oews_top = max(occupation_ids, key=oews_weights.__getitem__)
 
         comparisons.append(
