@@ -74,13 +74,14 @@ export default function MethodologyPage() {
           <dt>Residual</dt>
           <dd>
             Observed industry value minus its occupation-composition counterfactual. The code names this
-            an <code>occupation_adjusted_industry_context_residual</code>.
+            an <code>occupation_<wbr />adjusted_<wbr />industry_<wbr />context_<wbr />residual</code>.
           </dd>
         </dl>
         <p className="note">
-          No empirical CPS residual values are published in the current release candidate. The pipeline
-          is implemented and tested, but the required April–June 2026 CPS input files have not been
-          executed in the validated environment.
+          The CPS composition foundation has been executed and validated on official Q2 2025 and Q2 2026
+          inputs. The current public candidate still does not publish occupation-adjusted RPS industry
+          residuals because the compatible RPS observation path remains rights-gated; that join stays
+          fail-closed until source permissions are resolved and the residual robustness checks can run.
         </p>
       </section>
 
@@ -98,9 +99,12 @@ export default function MethodologyPage() {
             <p>Changes, correlations, regressions, rank stability, and leave-one-group-out checks.</p>
           </div>
           <div className="status-card">
-            <span className="status-tag gated">Experimental</span>
+            <span className="status-tag gated">RPS join gated</span>
             <h3>Composition counterfactuals</h3>
-            <p>CPS-based standardization once official inputs are executed and coverage gates pass.</p>
+            <p>
+              CPS occupation weights are executed and validated; observed-versus-counterfactual RPS
+              residuals remain blocked until a rights-cleared RPS observation path is available.
+            </p>
           </div>
           <div className="status-card">
             <span className="status-tag gated">Not identified</span>

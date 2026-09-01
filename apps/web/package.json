@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "qa:browser": "playwright test"
   },
   "dependencies": {
     "@observablehq/plot": "0.6.17",
@@ -14,9 +15,12 @@
     "react-dom": "19.2.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "lighthouse": "13.4.1",
     "typescript": "^6.0.0"
   }
 }

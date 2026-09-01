@@ -1,9 +1,10 @@
-# Release 1 product QA — code and production-build pass
+# Release 1 product QA — code, build, and automated rendered pass
 
 Initial code-level pass: 2026-08-30  
-Networked production-build update: 2026-08-31
+Networked production-build update: 2026-08-31  
+Automated rendered-browser update: 2026-09-01
 
-This document records the **code-level product QA** completed for the rights-safe Release 1 candidate plus the first genuine networked production build. It **does not substitute for a real browser**, screen-reader, automated accessibility, performance, visual-regression, or deployment audit.
+This document records the code-level, networked production-build, and automated rendered-browser QA completed for the rights-safe Release 1 candidate. The automated pass is real browser-engine execution, but it **does not substitute for a real browser** review on native Safari/iOS, Android-device validation, or human assistive-technology testing where those remain required.
 
 ## Implemented in the code-level pass
 
@@ -26,8 +27,6 @@ This document records the **code-level product QA** completed for the rights-saf
 - Plot containers redraw on width changes through `ResizeObserver` instead of assuming a desktop-only initial width.
 - Scatter labels are selected by a stated rule rather than input order.
 
-These are implementation provisions, not proof that the rendered experience is accessible. The rendered checks remain open below.
-
 ### Rights and provenance communication
 
 - Public release strip states that raw RPS observations are excluded.
@@ -42,13 +41,13 @@ These are implementation provisions, not proof that the rendered experience is a
 - The Q2-2026 industry `R²(S~H) > R²(S~A)` ordering is described as a **3-of-5-wave** result, not a structural law.
 - Occupation–industry comparisons are phrased as aggregate alignment differences, not identified organizational mechanisms.
 - A/H/S notation is defined near diagnostic tables.
-- Composition/residual language remains experimental and non-causal; zero real CPS residual values are claimed.
+- Composition/residual language remains experimental and non-causal; zero real RPS-dependent residual values are claimed.
 
 ## Networked production-build evidence — 2026-08-31
 
 The 2026-08-30 code-only QA explicitly listed **Genuine `npm install` and `next build`** as unverified external gates. That historical statement remains important provenance; it is no longer the current state.
 
-GitHub Actions run `33411128343` subsequently validated the rights-safe public handoff in a networked Ubuntu 24.04 environment.
+GitHub Actions run `33411128343` validated the rights-safe public handoff in a networked Ubuntu 24.04 environment.
 
 Python/public surface:
 
@@ -66,33 +65,82 @@ Web surface:
 - Next.js 16.3.3 optimized production build passed;
 - static generation completed for `/`, `/blog/after-adoption`, `/explore/industries`, `/explore/occupations`, `/methodology`, `/sources`, and the framework not-found route.
 
-This closes the earlier **genuine production build unverified** gate.
+Permanent PR CI subsequently strengthened that proof by requiring strict `mypy src`, locked `npm ci`, production-server startup, route smoke tests, private-path build scans, and repository-governance checks.
 
-Permanent PR CI now strengthens that proof by requiring:
+## Automated rendered-browser evidence — 2026-09-01
 
-- strict `mypy src`;
-- `npm ci` from the committed lockfile;
-- production-server startup;
-- HTTP route smoke tests;
-- governance checks for private paths, bootstrap residue, and generated TypeScript metadata.
+The successful baseline execution is GitHub Actions run `33501320183`, associated with PR #19 source head `6ed9da2074c2ee042c88912e2c3bdb05806e88f7`. GitHub checked out the PR merge candidate for execution, while artifact metadata records the source head separately.
 
-## Checks that remain external/rendered gates
+The retained artifact from that run is:
 
-The following are **not verified** by the code/build pass and must remain explicitly open:
+- artifact ID: `9797926404`;
+- artifact name: `r1-g2-browser-qa-d034f29cfaf981656a291f004be5fc7f1d64d3fb`;
+- artifact SHA-256: `c096aed747fd8fd7dd67195243185c1c5618e03c91e671c7747cf361783ebbf0`;
+- retention at creation: 30 days.
 
-1. Browser rendering/interaction in current Safari, Chrome, and Firefox.
-2. Mobile rendering in iOS Safari and Android/Chrome or defensible equivalents.
-3. Keyboard-only traversal of the fully rendered application, including chart/table interactions.
-4. Screen-reader traversal with VoiceOver and NVDA or a defensible second screen reader.
-5. Automated axe/WCAG browser scan.
-6. Lighthouse accessibility audit.
-7. Lighthouse performance/Core Web Vitals review.
-8. Visual-regression screenshots across the target viewport matrix.
-9. Browser-console hydration/runtime error review.
+The artifact contains the Playwright JSON and HTML reports, screenshots for successful cases, Lighthouse JSON reports, browser-version metadata, production-server log, optimized build-size record, and largest-static-file inventory.
+
+### Browser/viewport matrix
+
+The Playwright suite passed **48/48** cases across all six public routes:
+
+- stable Chrome 151.0.7922.173 at 375, 768, 1024, and 1440 px;
+- Playwright-managed Firefox 153.0 at 375 and 1440 px;
+- Playwright WebKit 26.5 at 375 and 1440 px.
+
+WebKit is an engine-compatibility signal only. It is **not** evidence that native Safari, macOS Safari, or iOS Safari QA is complete.
+
+For each route/project case, the suite verifies successful document response, application-icon loading, expected semantic surfaces, primary-navigation links, no page-level horizontal overflow, visible table fallbacks inside horizontal-scroll wrappers, keyboard entry through the skip link, visible focus styling, skip-link transfer to `main`, reduced-motion behavior, no serious/critical axe violations under the configured WCAG tags, and no uncaught page or console errors.
+
+The test does not currently click every navigation link, exercise every chart tooltip, or assert a redraw after an explicit runtime resize. Those manual/interaction checks remain open where the release checklist says so.
+
+### Lighthouse evidence
+
+Seven Lighthouse reports completed successfully: all six desktop routes plus the mobile homepage.
+
+| Report | Accessibility | Performance | LCP (ms) | CLS | TBT (ms) |
+|---|---:|---:|---:|---:|---:|
+| after-adoption desktop | 100 | 100 | 445 | 0.000 | 0 |
+| home desktop | 100 | 100 | 528 | 0.000 | 0 |
+| home mobile | 100 | 100 | 1855 | 0.000 | 48 |
+| industries desktop | 100 | 100 | 506 | 0.000 | 0 |
+| methodology desktop | 100 | 100 | 459 | 0.000 | 0 |
+| occupations desktop | 100 | 100 | 494 | 0.000 | 0 |
+| sources desktop | 100 | 100 | 449 | 0.000 | 0 |
+
+The accessibility launch gate in automation is `>=95`; every report scored 100. Performance scores and timing values are CI laboratory evidence only and are **not field Core Web Vitals**.
+
+The optimized `.next` directory was approximately 60 MB in the runner. That is build-output size, not a browser transfer-size claim. The retained largest-static-file inventory is the appropriate artifact for client-bundle regression inspection.
+
+### Visual evidence review
+
+The retained successful screenshots were reviewed for the tested main-content states. No clipping, page-level horizontal spill, or obvious breakpoint failure was observed, including the previously failing 375-px methodology page in Chrome, Firefox, and WebKit.
+
+The screenshots are captured after the skip-link exercise transfers focus to `main`, so they are useful responsive-content regression evidence but not a complete manual visual review of the header/navigation state.
+
+### Provenance hardening after the baseline run
+
+The baseline artifact correctly recorded browser versions but its `playwrightVersion` field was null because the reporter relied on an npm environment variable that was not populated in that invocation. The reporter has been changed to read the pinned `@playwright/test` version directly from `apps/web/package.json` and fail closed if it cannot resolve it. A repository test guards that contract.
+
+The browser workflow now also triggers when `docs/qa/**`, `docs/RELEASE1_PRODUCT_QA.md`, or `docs/RELEASE_CHECKLIST.md` changes. This prevents a final QA/checklist documentation commit from bypassing the rendered gate. A post-documentation successful run must therefore be checked on the exact final PR head before merge.
+
+## Checks that remain external/manual gates
+
+The automated pass materially closes the automated portion of R1-G2. The following are still open unless separately recorded:
+
+1. Native current Safari desktop validation.
+2. Real or defensible iOS Safari validation.
+3. Real or defensible Android/Chrome device validation beyond a narrow desktop-browser viewport.
+4. Full keyboard-only traversal beyond the automated skip-link entry contract, including interactive chart/table affordances.
+5. **Screen-reader traversal** with VoiceOver and NVDA or a defensible second screen reader.
+6. Manual chart resize/tooltip/label interaction review.
+7. Manual review that no critical meaning depends only on color.
+8. Manual heading/landmark review with assistive technology.
+9. Field performance/Core Web Vitals once a real deployment and traffic source make them meaningful.
 10. Production deployment, headers, caching, artifact identity, analytics/privacy, secrets, and monitoring review.
 
 ## Release-language rule
 
-A successful optimized build means the application compiles and prerenders under the tested rights-safe configuration. It does **not** establish browser accessibility, real-user performance, deployment correctness, source-rights resolution, CPS composition validity, or causal interpretation.
+A successful optimized build plus automated rendered QA establishes that the tested rights-safe build compiled, served, and passed the recorded automated browser/accessibility matrix. It does **not** establish native Safari/iOS behavior, human screen-reader usability, field performance, deployment correctness, RPS source-rights resolution, or a completed RPS-dependent composition residual.
 
-No public-launch claim should imply those gates are complete until dated execution evidence is committed.
+**No public-launch claim** should imply those gates are complete until dated execution evidence exists.

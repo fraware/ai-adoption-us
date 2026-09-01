@@ -23,23 +23,25 @@ export default function SourcesPage() {
             <p>
               Primary measurement family for worker adoption, recent/routine use, assisted work hours,
               and reported time savings. Series metadata are retained in the public registry; reviewed
-              subgroup observations remain private.
+              subgroup observations remain private and the public observation path remains rights-gated.
             </p>
           </div>
           <div className="status-card">
-            <span className="status-tag gated">Execution pending</span>
+            <span className="status-tag ready">Composition inputs validated</span>
             <h3>Current Population Survey</h3>
             <p>
-              Intended source for industry-by-occupation worker and actual-hours composition. The
-              computation pipeline is implemented; no real CPS composition outputs are claimed yet.
+              Official Q2 2025 and Q2 2026 Basic Monthly public-use files have been executed through the
+              composition pipeline, producing versioned worker-share and actual-main-job-hour occupation
+              weights plus reliability diagnostics. These are composition inputs, not RPS residuals.
             </p>
           </div>
           <div className="status-card">
-            <span className="status-tag gated">Not used as evidence</span>
+            <span className="status-tag ready">Robustness input validated</span>
             <h3>May 2025 OEWS</h3>
             <p>
-              Reserved as an independent composition robustness source. A third-party derived artifact
-              was inspected but rejected because its underlying staffing matrix was not distributed.
+              Official staffing data have been executed as an independent establishment-side composition
+              robustness source, with cross-vintage and coverage diagnostics. Population differences from
+              CPS remain explicit; OEWS weights do not establish an organizational effect.
             </p>
           </div>
           <div className="status-card">
@@ -79,17 +81,23 @@ export default function SourcesPage() {
           <dt>Public bundle</dt>
           <dd>
             Source metadata, formulas, crosswalks, deterministic code, longitudinal derived diagnostics,
-            methodology, and the technical publication. It runs in <code>derived_only</code> mode.
+            versioned CPS/OEWS composition evidence, methodology, and the technical publication. It runs
+            in <code>derived_only</code> mode.
           </dd>
           <dt>Private research bundle</dt>
           <dd>
             Adds the reviewed five-wave subgroup fixture used to regenerate and regression-test the
             longitudinal publication artifacts.
           </dd>
-          <dt>Not yet produced</dt>
+          <dt>Produced composition evidence</dt>
           <dd>
-            Empirical CPS composition weights, occupation-adjusted industry residuals, causal firm
-            effects, or measured labor-productivity effects.
+            Q2 2025 and Q2 2026 CPS composition/reliability artifacts and May 2025 OEWS robustness
+            artifacts. These contain composition weights and diagnostics, not direct RPS observations.
+          </dd>
+          <dt>Still gated</dt>
+          <dd>
+            Occupation-adjusted RPS industry residuals, the public composition explorer, causal firm
+            effects, and measured labor-productivity effects.
           </dd>
         </dl>
       </section>
@@ -102,10 +110,16 @@ export default function SourcesPage() {
           <code>npm ci</code>, TypeScript validation, and an optimized <code>derived_only</code> Next.js
           production build. It also starts the production server and smoke-tests every public route.
         </p>
+        <p>
+          A separate rendered-browser workflow exercises the same production candidate across stable
+          Chrome, Firefox, and a WebKit engine proxy, with responsive, keyboard, axe, runtime, and
+          Lighthouse checks. That automated evidence does not substitute for real Safari/iOS,
+          screen-reader traversal, manual interaction/color review, or production field-performance
+          validation.
+        </p>
         <p className="note">
-          Those engineering checks are complete, but they do not substitute for rendered browser,
-          keyboard, screen-reader, axe/Lighthouse, responsive, performance, or production-deployment
-          validation. Those remain explicit launch gates.
+          Public-launch accessibility and deployment claims remain gated until the outstanding manual
+          browser/assistive-technology checks and the production deployment audit are complete.
         </p>
         <p><Link href="/methodology">Read the measurement contract →</Link></p>
       </section>

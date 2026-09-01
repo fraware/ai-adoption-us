@@ -65,7 +65,7 @@ export default async function HomePage() {
           The durable evidence is about persistence and cross-level structure, not a latest-quarter
           leaderboard.
         </p>
-        <div className="metric-row" aria-label="Five-wave evidence summary">
+        <div className="metric-row" role="group" aria-label="Five-wave evidence summary">
           <div className="metric">
             <span>Audited window</span>
             <strong>{longitudinal.input_scope.periods.length} waves</strong>
@@ -109,7 +109,7 @@ export default async function HomePage() {
           Public discussion frequently collapses distinct stages into one “AI adoption” number. This
           publication keeps them separate because their denominators and economic meanings differ.
         </p>
-        <div className="measurement-ladder" aria-label="Measurement ladder from adoption to realization">
+        <div className="measurement-ladder" role="group" aria-label="Measurement ladder from adoption to realization">
           <div className="measurement-step">
             <span>01</span><strong>Adoption</strong><p>Who reports using GenAI for work.</p>
           </div>

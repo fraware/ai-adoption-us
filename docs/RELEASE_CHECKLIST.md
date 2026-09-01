@@ -1,6 +1,6 @@
 # Release checklist
 
-A release is not launch-ready until every applicable item below is explicitly resolved. Checked items are backed by an execution record or committed code inspection; unchecked items remain open. See `VALIDATION_2026-08-30.md` and `VALIDATION_2026-08-31.md` for the private/public validation distinction.
+A release is not launch-ready until every applicable item below is explicitly resolved. Checked items are backed by an execution record or committed code inspection; unchecked items remain open. See `VALIDATION_2026-08-30.md`, `VALIDATION_2026-08-31.md`, `docs/RELEASE1_PRODUCT_QA.md`, and the dated records under `docs/qa/` for the private/public/build/rendered distinction.
 
 ## A. Scientific integrity
 
@@ -10,7 +10,7 @@ A release is not launch-ready until every applicable item below is explicitly re
 - [x] Latest-quarter subgroup presentation is accompanied by multi-wave stability context in the Release 1 design.
 - [x] Current displayed longitudinal statistics come from generated rights-safe artifacts or directly defined transformations.
 - [ ] Establish an explicit operational procedure that forces full longitudinal regeneration/review whenever the private source fixture is revised.
-- [x] CPS/Release 1.1 empirical content is disabled until real CPS execution is complete.
+- [x] Official CPS composition inputs are executed and validated as composition evidence; the RPS-dependent counterfactual/residual remains disabled until a compatible authorized RPS occupation observation vintage exists.
 
 ## B. Data rights and provenance
 
@@ -29,15 +29,16 @@ A release is not launch-ready until every applicable item below is explicitly re
 ## C. Python/research validation
 
 - [x] Private fixture-present checkout: **58 passed** on the frozen 2026-08-30 reconstruction validation.
-- [x] Public checkout: **52 passed / 6 expected private-fixture skips** under the validated public CI contract.
-- [x] `python -m compileall -q src scripts` passes.
-- [x] Ruff passes.
+- [x] Public checkout validation is enforced by permanent CI; exact counts evolve as regression coverage is added and must be taken from the exact release-head run rather than the historical 52-pass import baseline.
+- [x] `python -m compileall -q src scripts` passes in permanent CI.
+- [x] Ruff passes in permanent CI.
 - [x] Strict `mypy src` passes without relaxing the configured strictness.
 - [x] Longitudinal derived artifacts regenerate byte-for-byte from the frozen private fixture under the private validation contract.
 - [x] Canonical RPS registry cardinality = **131** and identities are regression-tested.
 - [x] Git whitespace/hygiene checks pass.
-- [x] Final exact PR head `fa53e93383af16a1c1b4e274b041a1bb0fcfebd1` passed permanent CI in run **33418097200**.
-- [x] Squash merge commit `1a5a1437c67f84a407536ae4d35670a30278ac7c` passed permanent `main` CI in run **33418234311**.
+- [x] Final import PR head `fa53e93383af16a1c1b4e274b041a1bb0fcfebd1` passed permanent CI in run **33418097200**.
+- [x] Import squash merge commit `1a5a1437c67f84a407536ae4d35670a30278ac7c` passed permanent `main` CI in run **33418234311**.
+- [x] QA/checklist changes are included in the browser-QA trigger; the exact final PR #19 head CI/browser-QA runs are recorded in the PR conversation rather than backfilled here, avoiding self-referential revalidation churn.
 
 ## D. Web production build
 
@@ -51,55 +52,57 @@ A release is not launch-ready until every applicable item below is explicitly re
 - [x] Permanent CI starts the production server successfully.
 - [x] Permanent CI HTTP-smoke-tests every public route successfully.
 - [x] The optimized build-tree private-path scan passes.
-- [ ] Browser runtime shows no hydration/runtime errors; this requires rendered browser QA.
+- [x] Automated rendered QA on the tested Chrome/Firefox/WebKit matrix reports no uncaught page errors or browser-console errors on any primary route.
 
 ## E. Browser and responsive QA
 
+Automated execution record: `docs/qa/2026-09-01-r1-g2-automated-browser-qa.md`.
+
 Test at minimum:
 
-- [ ] current Chrome desktop;
-- [ ] current Safari desktop;
-- [ ] current Firefox desktop;
+- [x] stable Chrome desktop engine on Ubuntu CI (Chrome 151.0.7922.173); native/manual desktop review remains separate;
+- [ ] current native Safari desktop;
+- [x] Playwright-managed Firefox 153.0 on Ubuntu CI;
 - [ ] real or defensible emulated iOS Safari environment;
-- [ ] real or defensible emulated Android/Chrome environment;
-- [ ] ~375 px width;
-- [ ] ~768 px width;
-- [ ] ~1024 px width;
-- [ ] ~1440 px width.
+- [ ] real or defensible emulated Android/Chrome environment beyond narrow viewport sizing;
+- [x] ~375 px width;
+- [x] ~768 px width in stable Chrome;
+- [x] ~1024 px width in stable Chrome;
+- [x] ~1440 px width.
 
 For every primary route:
 
-- [ ] navigation works;
-- [ ] no horizontal page overflow;
-- [ ] tables remain usable;
-- [ ] plots redraw after resize;
-- [ ] labels/tooltips remain legible and do not create material overlap;
-- [ ] no-data/error states are intelligible;
-- [ ] no hydration/runtime errors appear in browser console;
-- [ ] dated visual-regression evidence is captured/reviewed.
+- [ ] end-to-end navigation clicking remains to be reviewed; automated QA verifies the named navigation surface, expected links, and successful route responses;
+- [x] no horizontal page overflow in the automated matrix;
+- [ ] table fallbacks are automatically visible/contained, but full keyboard/screen-reader usability remains open;
+- [ ] explicit runtime plot-redraw-after-resize interaction is not yet asserted by the browser suite;
+- [ ] labels/tooltips require manual interaction review;
+- [ ] no-data/error states require manual intelligibility review;
+- [x] no uncaught runtime errors or browser-console errors in the automated matrix;
+- [x] dated screenshot evidence is captured and reviewed for the tested main-content states, with the header/navigation-state limitation documented.
 
 ## F. Accessibility
 
-Code-level accessibility provisions exist, but the rendered product remains unverified until this section is executed.
+Automated accessibility evidence is complete for the tested matrix; human assistive-technology validation remains open.
 
-- [ ] keyboard-only route/navigation test;
-- [ ] rendered visible-focus behavior verified;
-- [ ] rendered skip link verified;
+- [ ] full keyboard-only route/navigation traversal beyond the automated skip-link entry contract;
+- [ ] full rendered visible-focus review across all interactive controls; the skip-link focus contract passes automatically;
+- [x] rendered skip link is verified as the first keyboard focus target and transfers focus to `main`;
 - [ ] VoiceOver test;
 - [ ] NVDA or equivalent second screen-reader test;
-- [ ] axe automated browser scan;
-- [ ] Lighthouse accessibility audit;
-- [ ] chart-equivalent data tables verified with keyboard/screen reader;
-- [ ] no critical meaning encoded only by color in rendered output;
-- [ ] heading hierarchy and landmarks reviewed in rendered DOM.
+- [x] axe automated browser scan: zero unresolved serious/critical violations in all 48 executed cases;
+- [x] Lighthouse accessibility audit: 100/100 on all seven recorded reports, above the >=95 automated threshold;
+- [ ] chart-equivalent data tables require keyboard/screen-reader verification beyond automated visibility/containment;
+- [ ] no-critical-meaning-by-color requires manual rendered review;
+- [ ] heading hierarchy and landmarks require human/assistive-technology review beyond automated semantic assertions.
 
 ## G. Performance and reliability
 
-- [ ] Lighthouse performance audit;
-- [ ] Core Web Vitals reviewed where meaningful;
-- [ ] bundle size reviewed;
-- [ ] route-level error handling verified in rendered/production behavior;
-- [x] production build is statically generated for the current route set as recorded by Next.js build output;
+- [x] Lighthouse performance audit completed for all six desktop routes plus the mobile homepage; scores and lab metrics are retained for regression review and are not assigned an arbitrary launch threshold.
+- [ ] Field Core Web Vitals remain unavailable until a real deployment and traffic source make them meaningful; Lighthouse lab metrics must not be relabelled as field CWV.
+- [x] Build/static-file inventory reviewed for severe regressions; the recorded ~60 MB `.next` value is build-output size, not browser transfer size.
+- [ ] route-level error-state handling still requires deliberate rendered/production failure-path testing.
+- [x] production build is statically generated for the current route set as recorded by Next.js build output.
 - [ ] deployment headers/security baseline reviewed;
 - [ ] caching behavior documented;
 - [ ] analytics/privacy decision documented;
@@ -116,15 +119,16 @@ Code-level accessibility provisions exist, but the rendered product remains unve
 - [ ] deployed artifact identity/checksum recorded;
 - [ ] release commit/tag created;
 - [ ] release notes summarize evidence, rights boundaries, and limitations;
-- [ ] public-launch wording reviewed so it does not imply causal, CPS-composition, accessibility, or deployment evidence that has not been completed.
+- [ ] public-launch wording reviewed so it does not imply causal, RPS-residual, native-Safari/iOS, human screen-reader, or deployment evidence that has not been completed.
 
 ## I. Release 1.1 / later research guardrails
 
-These do not block Release 1 engineering completion, but publication of the relevant analysis must remain disabled until completed.
+These do not block Release 1 engineering completion, but publication of the relevant analysis must remain disabled until its own gates pass.
 
-- [ ] Execute official April–June 2026 CPS composition pipeline.
-- [ ] Validate worker-share adoption weighting and actual-hour-share H/S weighting on real inputs.
-- [ ] Run coverage, suppression, influence, and actual-vs-usual-hours sensitivity checks.
-- [ ] Produce no empirical occupation-adjusted industry-context residual until the above gates pass.
-- [ ] Obtain official May-2025 OEWS staffing input before any OEWS robustness claim.
+- [x] Execute official April–June 2026 CPS composition pipeline.
+- [x] Validate worker-share adoption weighting and actual-main-job-hour-share H/S weighting on real CPS inputs; supported vectors are nonnegative and sum to one, and worker-vs-actual-hour weights differ in all 20 industries.
+- [x] Execute CPS coverage and actual-vs-usual-hours sensitivity diagnostics with fail-closed support. The usual-hours sensitivity is supported in only 1 of 20 industries and therefore is not generalized.
+- [x] Execute Q2-2025/Q2-2026 CPS reliability diagnostics including leave-one-month-out and cross-vintage stability, explicitly without claiming design-based significance from those diagnostics.
+- [x] Produce no empirical RPS-dependent occupation-adjusted industry-context residual until an authorized compatible RPS occupation observation vintage is available and the join passes its own gates.
+- [x] Official May-2025 OEWS staffing robustness input has been executed and validated with documented comparability limits.
 - [ ] Add BTOS only after exact construct/denominator alignment is documented.
