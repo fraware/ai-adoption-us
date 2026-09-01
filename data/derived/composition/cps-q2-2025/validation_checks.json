@@ -1,0 +1,19 @@
+{
+  "coverage_gate": 0.98,
+  "generated_at_utc": "2026-09-01T08:29:25.692816+00:00",
+  "industry_count": 20,
+  "minimum_worker_coverage": 1.0,
+  "period": "2025-Q2",
+  "sample_rows": 121331,
+  "sanity_checks": {
+    "all_worker_vectors_supported": true,
+    "industry_count_is_20": true,
+    "supported_worker_vectors_sum_to_one": true,
+    "supported_worker_weights_nonnegative": true
+  },
+  "scientific_boundary": "This artifact provides household-side occupation composition only. It does not contain RPS observations and does not identify an industry-context effect.",
+  "source_build_commit": "4893fe8088f811351d4b219d481c866e47018546",
+  "status": "Q2 2025 official CPS worker composition executed",
+  "supported_worker_industries": 20,
+  "weighted_worker_population_age_18_64_employed": 150900973.81226665
+}

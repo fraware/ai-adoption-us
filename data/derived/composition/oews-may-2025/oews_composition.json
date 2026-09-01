@@ -1,6 +1,6 @@
 {
   "coverage_gate": 0.98,
-  "generated_at_utc": "2026-09-01T07:38:53.691193+00:00",
+  "generated_at_utc": "2026-09-01T08:29:30.956807+00:00",
   "global_scope_note": "OEWS covers wage and salary workers in covered nonfarm establishments and excludes self-employed workers. CPS/RPS worker composition has a broader worker universe, so even primary rows are an independent-source robustness comparison, not a synchronized-universe validation.",
   "industries": [
     {
@@ -1254,7 +1254,7 @@
   "industry_crosswalk_version": "oews-2022-naics-rps-v1",
   "occupation_crosswalk_version": "oews-2018-soc-rps-v1",
   "period": "A01",
-  "source_build_commit": "ccadf8af5bda3f32e41c2b41549109967a7e3643",
+  "source_build_commit": "4893fe8088f811351d4b219d481c866e47018546",
   "status": "May-2025 OEWS employee-share occupation composition",
   "year": 2025
 }

@@ -1,0 +1,12 @@
+industry_index,industry_id,industry_name,l1_q2_2025,l1_q2_2026,l1_2026_minus_2025,q2_2025_closer_to_may_2025_oews
+3,construction,Construction,0.2772387012212034,0.24162064657452856,-0.03561805464667486,False
+4,manufacturing,Manufacturing,0.3144837536883402,0.3209737915610507,0.006490037872710519,True
+5,wholesale-trade,Wholesale Trade,0.2980375879144468,0.19475216114657512,-0.10328542676787167,False
+6,retail-trade,Retail Trade,0.17291453995542466,0.16380586470723071,-0.009108675248193948,False
+7,transportation-and-warehousing,Transportation and Warehousing,0.24711741339887838,0.29913370577202886,0.052016292373150474,True
+10,finance-and-insurance,Finance and Insurance,0.2777058311436663,0.28700710973533083,0.009301278591664519,True
+12,professional-scientific-and-technical-services,"Professional, Scientific, and Technical Services",0.22861257448143013,0.2332648815459405,0.004652307064510364,True
+13,management-of-companies-and-enterprises,Management of Companies and Enterprises,0.5862893100719345,0.37948651806207717,-0.20680279200985735,False
+15,educational-services,Educational Services,0.13640060283145303,0.1271107394415011,-0.009289863389951913,False
+16,health-care-and-social-assistance,Health Care and Social Assistance,0.23687856147042083,0.25325221201813486,0.01637365054771403,True
+17,arts-entertainment-and-recreation,"Arts, Entertainment, and Recreation",0.4959345181618425,0.5018519006803909,0.0059173825185483975,True

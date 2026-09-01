@@ -1,0 +1,53 @@
+{
+  "cps_2025": {
+    "exact_top_occupation_agreement_count": 6,
+    "exact_top_occupation_agreement_rate": 0.5454545454545454,
+    "maximum_partial_l1_bound_width": 0.0011404111812703954,
+    "maximum_residual_unpublished_mass_share": 0.001976976461624004,
+    "median_exact_cosine_similarity": 0.9724645398102251,
+    "median_exact_l1_distance": 0.2772387012212034,
+    "median_exact_spearman_rank_correlation": 0.9604743083003953,
+    "median_primary_l1_lower_bound": 0.2980375879144468,
+    "median_primary_l1_upper_bound": 0.2980375879144468,
+    "period": "2025-Q2",
+    "primary_bound_supported_count": 17,
+    "primary_exact_comparison_count": 11,
+    "primary_industry_count": 17,
+    "primary_partially_identified_count": 6
+  },
+  "cps_2026": {
+    "exact_top_occupation_agreement_count": 7,
+    "exact_top_occupation_agreement_rate": 0.6363636363636364,
+    "maximum_partial_l1_bound_width": 0.0032471856122205933,
+    "maximum_residual_unpublished_mass_share": 0.001976976461624004,
+    "median_exact_cosine_similarity": 0.973706182811574,
+    "median_exact_l1_distance": 0.25325221201813486,
+    "median_exact_spearman_rank_correlation": 0.9491812535290797,
+    "median_primary_l1_lower_bound": 0.3209737915610507,
+    "median_primary_l1_upper_bound": 0.3209737915610507,
+    "period": "2026-Q2",
+    "primary_bound_supported_count": 17,
+    "primary_exact_comparison_count": 11,
+    "primary_industry_count": 17,
+    "primary_partially_identified_count": 6
+  },
+  "cps_q2_2025_vs_q2_2026_primary": {
+    "median_cosine_similarity": 0.9972584734339354,
+    "median_l1_distance": 0.08960026006702666,
+    "median_spearman_rank_correlation": 0.9607344632768362,
+    "supported_industry_count": 17,
+    "top_occupation_agreement_count": 15,
+    "top_occupation_agreement_rate": 0.8823529411764706
+  },
+  "generated_at_utc": "2026-09-01T08:29:31.232205+00:00",
+  "identification_boundary": "Partial L1 intervals condition on published OEWS all-occupations totals and published major-group employment counts. They identify only the effect of allocating unpublished OEWS occupation-cell mass; they do not include source sampling/model uncertainty or published-value rounding uncertainty.",
+  "occupation_count": 22,
+  "oews_period": "May 2025",
+  "same_exact_industry_vintage_deltas": {
+    "industry_count": 11,
+    "median_l1_2026_minus_2025": 0.004652307064510364,
+    "q2_2025_closer_count": 6
+  },
+  "source_build_commit": "4893fe8088f811351d4b219d481c866e47018546",
+  "status": "OEWS partial-identification and CPS vintage robustness executed"
+}

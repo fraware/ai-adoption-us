@@ -1,0 +1,21 @@
+industry_index,industry_id,industry_name,comparability,oews_supported,cps_supported,l1_distance,cosine_similarity,spearman_rank_correlation,top_occupation_agreement,cps_top_occupation,oews_top_occupation,max_absolute_share_difference
+1,agriculture-forestry-fishing-and-hunting,"Agriculture, Forestry, Fishing, and Hunting",excluded,False,True,,,,,,,
+2,mining-quarrying-and-oil-and-gas-extraction,"Mining, Quarrying, and Oil and Gas Extraction",primary,False,True,,,,,,,
+3,construction,Construction,primary,True,True,0.24162064657452856,0.9797734252718309,0.9697825859746574,True,construction-and-extraction-occupations,construction-and-extraction-occupations,0.1051312363100321
+4,manufacturing,Manufacturing,primary,True,True,0.3209737915610507,0.9664969017414727,0.9616036137775268,True,production-occupations,production-occupations,0.13274228649690628
+5,wholesale-trade,Wholesale Trade,primary,True,True,0.19475216114657512,0.973706182811574,0.9822084548689163,False,sales-and-related-occupations,transportation-and-material-moving-occupations,0.0893751701851116
+6,retail-trade,Retail Trade,primary,True,True,0.16380586470723071,0.9960349822776288,0.9469226425748165,True,sales-and-related-occupations,sales-and-related-occupations,0.049767384671835724
+7,transportation-and-warehousing,Transportation and Warehousing,primary,True,True,0.29913370577202886,0.9768065130574224,0.9234679837324198,True,transportation-and-material-moving-occupations,transportation-and-material-moving-occupations,0.12931707869449316
+8,utilities,Utilities,primary,False,True,,,,,,,
+9,information,Information,primary,False,True,,,,,,,
+10,finance-and-insurance,Finance and Insurance,primary,True,True,0.28700710973533083,0.9530774398625975,0.8509316770186336,False,business-and-financial-operations-occupations,office-and-administrative-support-occupations,0.10099978953272251
+11,real-estate-and-rental-and-leasing,Real Estate and Rental and Leasing,primary,False,True,,,,,,,
+12,professional-scientific-and-technical-services,"Professional, Scientific, and Technical Services",primary,True,True,0.2332648815459405,0.9744464550255503,0.9649915302089215,False,computer-and-mathematical-occupations,business-and-financial-operations-occupations,0.04684899540751919
+13,management-of-companies-and-enterprises,Management of Companies and Enterprises,primary,True,True,0.37948651806207717,0.9295260783603968,0.7159504010786045,False,management-occupations,business-and-financial-operations-occupations,0.13743105508129336
+14,administrative-and-support-and-waste-management-services,Administrative and Support and Waste Management Services,primary,False,True,,,,,,,
+15,educational-services,Educational Services,primary,True,True,0.1271107394415011,0.9967122844988682,0.9424054206662902,True,educational-instruction-and-library-occupations,educational-instruction-and-library-occupations,0.03927059272982408
+16,health-care-and-social-assistance,Health Care and Social Assistance,primary,True,True,0.25325221201813486,0.9670560245261696,0.9819311123658949,True,healthcare-practitioners-and-technical-occupations,healthcare-practitioners-and-technical-occupations,0.0994179294837712
+17,arts-entertainment-and-recreation,"Arts, Entertainment, and Recreation",primary,True,True,0.5018519006803909,0.8749561120268489,0.9491812535290797,True,personal-care-and-service-occupations,personal-care-and-service-occupations,0.10602564774404144
+18,accommodation-and-food-services,Accommodation and Food Services,primary,False,True,,,,,,,
+19,other-services-except-public-administration,"Other Services, Except Public Administration",limited,True,True,0.3642271022290893,0.943261243083555,0.9254658385093167,True,personal-care-and-service-occupations,personal-care-and-service-occupations,0.05583784962329061
+20,public-administration,Public Administration,excluded,True,True,0.31455064187444864,0.9639904012350764,0.7741389045736872,True,protective-service-occupations,protective-service-occupations,0.04779944071845921
