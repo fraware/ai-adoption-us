@@ -11,10 +11,9 @@ from genai_at_work.models import EntityType, SeriesMetadata
 
 PREFIX = "Generative Artificial Intelligence, "
 
-# The mapping is semantic rather than ID-pattern based because some assisted-hours series
-# use opaque suffixes. Classification is checked against titles returned by the release API.
+# The first public data model is explicitly work-focused. The overall/outside-work
+# national constructs remain provider-catalog metadata, not supported observatory metrics.
 METRIC_PREFIXES: tuple[tuple[str, str], ...] = (
-    ("Adoption Rate Overall: ", "adoption_overall"),
     ("Adoption Rate for Work: ", "adoption_work"),
     ("Use Last Week for Work: ", "work_use_last_week"),
     ("Daily Use for Work: ", "work_use_daily"),
@@ -23,8 +22,10 @@ METRIC_PREFIXES: tuple[tuple[str, str], ...] = (
 )
 
 # These release constructs are known but intentionally outside the first public data model.
-# They are surfaced in build reports so their exclusion remains explicit.
+# They are surfaced in build reports so their exclusion remains explicit. Keep this list
+# synchronized with data/registry/rps_provider_catalog_scope.json.
 KNOWN_EXCLUDED_PREFIXES: tuple[str, ...] = (
+    "Adoption Rate Overall: ",
     "Adoption Rate Outside of Work: ",
     "Use Last Week Overall: ",
     "Use Last Week Outside of Work: ",
@@ -36,8 +37,9 @@ KNOWN_EXCLUDED_PREFIXES: tuple[str, ...] = (
 def is_known_excluded_title(title: str) -> bool:
     if not title.startswith(PREFIX):
         return False
-    remainder = title[len(PREFIX):]
+    remainder = title[len(PREFIX) :]
     return any(remainder.startswith(prefix) for prefix in KNOWN_EXCLUDED_PREFIXES)
+
 
 NATIONAL_LABELS = {"Working-Age Adults", "Employed Adults"}
 
@@ -50,10 +52,12 @@ def slugify(value: str) -> str:
 
 
 def parse_title(title: str, known_industries: set[str], known_occupations: set[str]) -> tuple[str, EntityType, str]:
-    """Map a FRED title to metric, entity type, and entity display name.
+    """Map a supported FRED title to metric, entity type, and entity display name.
 
     Industry and occupation labels are learned from the adoption series first. This avoids
-    guessing entity type from opaque assisted-hours/time-savings series IDs.
+    guessing entity type from opaque assisted-hours/time-savings series IDs. Known provider
+    constructs outside the work-focused observatory scope must be filtered with
+    :func:`is_known_excluded_title` before calling this function.
     """
 
     if not title.startswith(PREFIX):
