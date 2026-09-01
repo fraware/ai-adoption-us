@@ -70,6 +70,23 @@ def test_marginal_variances_are_rejected_as_composition_covariance() -> None:
         )
 
 
+def test_indefinite_simplex_matrix_is_rejected() -> None:
+    # This symmetric matrix has zero row sums and positive diagonal entries, but eigenvector
+    # (1, -1, 0) has eigenvalue -1. The PSD guard must therefore reject it independently of
+    # the simplex-row-sum guard.
+    with pytest.raises(ValueError, match="positive semidefinite"):
+        build_composition_covariance(
+            ("a", "b", "c"),
+            (0.3, 0.3, 0.4),
+            (
+                (1.0, 2.0, -3.0),
+                (2.0, 1.0, -3.0),
+                (-3.0, -3.0, 6.0),
+            ),
+            source_method="invalid indefinite covariance fixture",
+        )
+
+
 def test_delta_method_composition_covariance_respects_simplex() -> None:
     result = composition_covariance_from_level_covariance(
         ("a", "b"),
@@ -114,23 +131,35 @@ def test_nonconstant_counterfactual_propagates_covariance() -> None:
 
 
 def test_pooled_month_covariance_uses_cross_month_blocks() -> None:
-    # Two months, two occupations. The off-diagonal month blocks are nonzero to ensure the
-    # pooling transformation actually carries cross-month dependence into the quarter estimate.
-    block = (
+    # Two months, two occupations. Positive off-diagonal month blocks must increase the
+    # pooled variance relative to the otherwise identical block-diagonal covariance.
+    with_cross_month_dependence = (
         (4.0, 0.0, 1.0, 0.0),
         (0.0, 4.0, 0.0, 1.0),
         (1.0, 0.0, 4.0, 0.0),
         (0.0, 1.0, 0.0, 4.0),
     )
-    result = pooled_composition_covariance_from_month_block(
+    independent_month_fixture = (
+        (4.0, 0.0, 0.0, 0.0),
+        (0.0, 4.0, 0.0, 0.0),
+        (0.0, 0.0, 4.0, 0.0),
+        (0.0, 0.0, 0.0, 4.0),
+    )
+    dependent = pooled_composition_covariance_from_month_block(
         ("a", "b"),
         ((60.0, 40.0), (62.0, 38.0)),
-        block,
+        with_cross_month_dependence,
         source_method="synthetic full cross-month covariance",
     )
-    assert math.isclose(sum(result.shares), 1.0, abs_tol=1e-12)
-    assert result.covariance[0][0] > 0.0
-    assert math.isclose(sum(result.covariance[0]), 0.0, abs_tol=1e-12)
+    independent = pooled_composition_covariance_from_month_block(
+        ("a", "b"),
+        ((60.0, 40.0), (62.0, 38.0)),
+        independent_month_fixture,
+        source_method="synthetic independent-month comparison fixture",
+    )
+    assert math.isclose(sum(dependent.shares), 1.0, abs_tol=1e-12)
+    assert dependent.covariance[0][0] > independent.covariance[0][0]
+    assert math.isclose(sum(dependent.covariance[0]), 0.0, abs_tol=1e-12)
 
 
 def test_pooled_month_covariance_requires_full_block_dimension() -> None:
