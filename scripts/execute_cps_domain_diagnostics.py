@@ -11,11 +11,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from genai_at_work.cps import download_official_fixed_width_month as download_2026_month
 from genai_at_work.cps import (
     official_fixed_width_filename,
     read_quarter_fixed_width_gz,
 )
-from genai_at_work.cps import download_official_fixed_width_month as download_2026_month
 from genai_at_work.cps_domain_diagnostics import (
     CpsDomainDiagnostic,
     build_cps_domain_diagnostics,
@@ -275,7 +275,7 @@ def main() -> int:
     )
 
     top = ranked[0] if ranked else None
-    report = f"""# CPS Q2 2025–Q2 2026 domain-stability diagnostics
+    report = f"""# CPS Q2 2025-Q2 2026 domain-stability diagnostics
 
 ## Purpose
 
