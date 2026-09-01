@@ -4,18 +4,52 @@ Status: **OPEN — direct permission/feed decision not yet obtained**
 
 This record governs whether and how GenAI at Work may ingest, store, transform, and publish direct Real-Time Population Survey (RPS) Generative AI Adoption Tracker observations in the public observatory.
 
-No public-source availability is treated as permission for independent redistribution. Until this record is resolved, the public product remains `DATA_MODE=derived_only` and `fred_live_no_store` remains fail-closed.
+Until an authorized source-owner/data-provider decision is recorded here, the public product remains `DATA_MODE=derived_only` and `fred_live_no_store` remains fail-closed. Public availability, FRED distribution, a public tracker, and a preferred citation are not treated as substitutes for an explicit decision covering the product's intended persistent use.
 
-## Why this decision is required
+## Current source/catalog audit
 
-The canonical RPS registry currently maps 131 source series: 5 national constructs, 60 industry series, and 66 occupation series. Many are surfaced through FRED, but FRED is a distribution layer rather than the underlying data owner.
+The current FRED release for the RPS Generative AI Adoption Tracker contains **137 series**. FRED announced that release on 2026-07-24.
 
-Current FRED API terms state that third-party series may be copyrighted and subject to owner restrictions; use of the FRED API does not override those rights, and users must contact the data owner before using third-party data for purposes beyond personal use. Therefore, the existence of RPS series in FRED is not sufficient authority for a persistent public observation store or independent interactive redistribution.
+The repository's canonical RPS source registry intentionally contains **131 series**:
 
-Primary terms reviewed:
+- 5 national work/economic constructs;
+- 60 industry series = 20 industries × adoption / assisted-hours / reported-savings;
+- 66 occupation series = 22 occupations × adoption / assisted-hours / reported-savings.
 
+The six-series difference has been provenance-resolved. FRED's full release contains 11 national series; the repository excludes exactly six national overall/outside-of-work constructs:
+
+- `RPSGENAIUSAGESHAREALL` — adoption overall;
+- `RPSGENAIUSAGESHARENONWORK` — adoption outside work;
+- `RPSGENAIUSAGESHAREEDLWALL` — daily use overall;
+- `RPSGENAIUSAGESHAREEDLWNON` — daily use outside work;
+- `RPSGENAIUSAGESHARELWALL` — use last week overall;
+- `RPSGENAIUSAGESHARELWNONWO` — use last week outside work.
+
+Therefore 131 is a deliberate work-focused analytical subset of the 137-series provider catalog, not a stale subgroup inventory. The detailed audit is recorded in `docs/reference/RPS_FRED_SERIES_SCOPE_2026-09-01.md`.
+
+Adding any of those six non-work national constructs later would be a measurement-scope decision, not a routine source-registry repair.
+
+## Why a direct rights decision is still required
+
+Current RPS series on FRED are labeled **Copyrighted: Citation Required**.
+
+FRED's summarized services terms say that series with this label may be displayed or published with proper attribution, provided prohibited uses are avoided. However, FRED's FAQ and full services terms also state that copyright-noticed/third-party data remain subject to the data owner's rights and that the data owner must be contacted for uses beyond personal use. The FRED API terms likewise state that API access does not override third-party rights and that FRED cannot grant source-owner permission.
+
+This combination is not sufficiently unambiguous to treat FRED as the rights authority for a persistent independent observatory that may store source values, preserve historical vintages, expose interactive observations, offer downloads/APIs, and publish transformed statistics.
+
+Primary terms reviewed on 2026-09-01:
+
+- FRED legal notices and services terms: https://fred.stlouisfed.org/legal/
 - FRED API Terms of Use: https://fred.stlouisfed.org/docs/api/terms_of_use.html
-- FRED API overview: https://fred.stlouisfed.org/docs/api/fred/overview.html
+- current RPS FRED release: https://fred.stlouisfed.org/release?rid=6
+
+### Correction to an earlier working interpretation
+
+The current FRED API Terms of Use were re-read and searched on 2026-09-01 for `cache`, `archive`, and `store`. The current API terms text reviewed in this audit does **not** contain a cache/archive-specific prohibition.
+
+Accordingly, this repository must not justify `fred_live_no_store` by claiming that the current FRED API terms explicitly prohibit caching or archiving unless a specific current provision is subsequently identified and retained.
+
+The present fail-closed architecture is instead grounded in the unresolved source-owner permission scope: FRED distribution does not itself establish the project's rights to persistent independent storage, display, redistribution, historical-vintage retention, or transformed-result publication.
 
 ## Underlying measurement/product identified
 
@@ -25,15 +59,15 @@ Primary source family:
 - public tracker: https://www.genaiadoptiontracker.com/;
 - Harvard Project on Workforce description: https://pw.hks.harvard.edu/post/the-generative-ai-adoption-tracker.
 
-The tracker states that its data come from the RPS, a nationally representative online labor-market survey of working-age adults ages 18–64, and that the public tracker combines multiple survey waves. The tracker cites the underlying research by Alexander Bick, Adam Blandin, and David Deming.
+The tracker states that its data come from the RPS, a nationally representative online labor-market survey of working-age adults ages 18–64, and cites the underlying research by Alexander Bick, Adam Blandin, and David Deming.
 
 This repository does not infer from the tracker’s public presentation that the underlying subgroup observations may be persisted or redistributed independently.
 
 ## Separate historical replication-data path
 
-A distinct research-data path now exists for the published paper **Bick, Blandin, and Deming (2026), “The Rapid Adoption of Generative AI,” Management Science, DOI 10.1287/mnsc.2025.02523**.
+A distinct research-data path exists for **Bick, Blandin, and Deming (2026), “The Rapid Adoption of Generative AI,” Management Science, DOI 10.1287/mnsc.2025.02523**.
 
-The peer-reviewed article explicitly states that supplemental data files are available with the paper. Adam Blandin’s research page describes the published version as including **micro data and a replication package**. The earlier NBER working-paper page also exposes a `data appendix` for Working Paper 32966.
+The peer-reviewed article advertises supplemental data files. Adam Blandin's research page describes the published version as including microdata and a replication package. The earlier NBER working-paper page also exposes a data-appendix location for Working Paper 32966.
 
 Relevant public references reviewed on 2026-09-01:
 
@@ -42,36 +76,41 @@ Relevant public references reviewed on 2026-09-01:
 - NBER Working Paper 32966: https://www.nber.org/papers/w32966
 - NBER data-appendix location advertised by the paper: https://www.nber.org/data-appendix/w32966
 
-### Interpretation of this discovery
+### Historical package access status
 
-This is potentially important for historical research and validation, but it does **not** resolve the live Tracker production-feed decision.
+A clean networked runner tested the official INFORMS replication-files endpoint advertised by the published article. The HTTPS request failed certificate validation because the endpoint presented an expired TLS certificate. Certificate verification was **not** disabled and the transport-security failure was not bypassed. No replication package or microdata were retrieved.
 
-The replication package may support, subject to its exact package terms and contents:
+Therefore package contents, license/reuse terms, microdata schema, and covered waves remain **unverified**. The existence/advertisement of replication materials is source-supported; the project does not claim possession of or rights to their contents.
 
-- reconstruction of the 2024 RPS survey analysis;
+### Interpretation
+
+This historical path may support, subject to actual package terms:
+
+- reconstruction of published survey analysis;
 - validation of weighting and subgroup construction;
 - respondent-level occupation/industry analysis;
-- task-level analysis from the early survey waves;
+- task-level analysis from covered early waves;
 - comparison of later Tracker definitions against the published-paper instrument;
 - reproducible historical mechanism research.
 
 It must not be assumed to authorize:
 
 - redistribution of current 2025–2026 Tracker observations;
-- persistent mirroring of the current Tracker feed;
-- publication of later-wave microdata that are not in the replication package;
-- use outside the license or terms attached to the replication files.
+- persistent mirroring of current Tracker values;
+- publication of later-wave microdata absent from the package;
+- use outside the actual package terms.
 
-The INFORMS replication download endpoint returned a transient gateway error during the 2026-09-01 audit, and the NBER data-appendix page was not retrievable in the automated research environment. Package contents and attached license/terms therefore remain **unverified** in this decision record. The existence of the package is source-supported; its exact reusable contents are not yet claimed.
+## Three independent gates
 
-### Consequence for the research program
+The canonical permission request preserves three separate decisions:
 
-Treat the RPS source architecture as two independent gates:
+1. **Live aggregate observatory gate** — current/future published national, industry, and occupation Tracker observations, including persistent display, storage, redistribution, revisions, attribution, and delivery mechanism.
+2. **Historical replication gate** — package contents and reuse terms for the published paper's replication materials.
+3. **Detailed task/occupation research gate** — access and publication terms for respondent/task/occupation data underlying later RPS research.
 
-1. **historical replication-data gate** — inspect and license-review the published paper’s microdata/replication package for research use;
-2. **live observatory-feed gate** — obtain explicit terms/permission for current and future Tracker observations, revisions, storage, and public redistribution.
+A positive decision on one gate must not be propagated to another.
 
-The first gate can accelerate mechanism research without weakening the second.
+Canonical request: `docs/source-rights/RPS_PERMISSION_REQUEST.md`.
 
 ## Current contact route
 
@@ -79,52 +118,47 @@ Harvard Project on Workforce public contact page:
 
 https://pw.hks.harvard.edu/contact
 
-Current public contacts reviewed on 2026-09-01:
+Public contacts recorded for routing:
 
 - general inquiries: `projectonworkforce@hks.harvard.edu`;
 - research and press: `kerry_mckittrick@gse.harvard.edu`;
 - research and press: `ngazzaneo@hks.harvard.edu`.
 
-Initial outreach should be directed to the research contact and/or general Project on Workforce address, with a request to route the inquiry to the data owner or person authorized to grant publication/feed rights if necessary.
+The request should be routed to the Tracker/RPS data owner or an authorized decision-maker if those contacts do not hold the relevant rights authority.
 
 No outreach is recorded as sent in this repository unless an actual sent-message record or direct response is available.
 
-## Exact permission/feed request
-
-The observatory seeks a documented decision covering all of the following.
+## Exact live aggregate decision required
 
 ### Data delivery
 
-- machine-readable national series;
-- machine-readable industry series;
-- machine-readable occupation series;
+- machine-readable national, industry, and occupation values;
 - complete available historical observations;
 - historical revisions/vintages where available;
 - stable identifiers and metadata;
-- expected future release cadence and update mechanism.
+- future release cadence and update mechanism.
 
 ### Publication and redistribution
 
-- permission for independent non-commercial/public-interest interactive publication of direct observations;
-- whether observation values may be included in downloadable CSV/Parquet/JSON artifacts;
-- whether derived subgroup statistics may be redistributed;
-- whether transformed/standardized composition results may be published;
-- whether charts/tables may display historical values persistently after future source revisions;
+- permission for independent non-commercial/public-interest persistent interactive display;
+- downloadable CSV/JSON/Parquet redistribution;
+- public API redistribution;
+- publication of transformed aggregate statistics, including longitudinal and composition-standardized results;
+- persistence of superseded historical values for reproducibility;
 - attribution, citation, disclaimer, and branding requirements.
 
-### Storage and caching
+### Storage
 
-- whether raw/normalized observations may be persisted in the project’s build/data store;
-- permitted caching duration if persistence is restricted;
-- whether server-side no-store retrieval is required;
-- whether archival source vintages may be retained for reproducibility;
-- any restrictions on public mirrors, APIs, bulk download, or derived release archives.
+- whether published observations may be persisted in a versioned build/data store;
+- whether any bounded-cache or no-store constraint applies;
+- whether historical source vintages may be retained;
+- any restriction on mirrors, bulk downloads, APIs, or release archives.
 
 ### Methods, revisions, and uncertainty
 
 - questionnaire/instrument wording and change log;
 - subgroup-estimation methodology;
-- standard errors, confidence intervals, replicate weights, or equivalent inference information;
+- standard errors, confidence intervals, replicate information, or equivalent uncertainty assets;
 - revision policy and historical-vintage availability;
 - weighting/methodology changes over time;
 - treatment of missing/suppressed subgroup estimates.
@@ -132,23 +166,23 @@ The observatory seeks a documented decision covering all of the following.
 ### Research access
 
 - latest microdata availability;
-- application/research-use process, if any;
-- permitted linkage or enrichment with CPS/O*NET/firm-side data;
-- restrictions on publication of microdata-derived aggregate results.
+- application/research-use process;
+- permitted linkage with CPS/O*NET/OEWS or other public labor-market sources;
+- publication restrictions on microdata-derived aggregate results.
 
 ## Decision outcomes and engineering consequences
 
-### Outcome A — direct machine-readable feed + explicit publication/storage rights
+### Outcome A — direct feed plus explicit publication/storage rights
 
-Implement a versioned direct RPS ingestion adapter. Record every source vintage and revision, retain immutable analytical history if permitted, generate public observation artifacts within the granted terms, and retire FRED as the production observation backbone except where useful for source-link provenance.
+Implement a versioned direct RPS ingestion adapter. Record source vintages and revisions, retain immutable analytical history if permitted, generate public observation artifacts within the granted terms, and retire FRED as the production observation backbone except for metadata/provenance links where useful.
 
-### Outcome B — publication permitted but persistence/cache constrained
+### Outcome B — display/publication permitted with storage or redistribution constraints
 
-Implement only the explicitly permitted server-side/no-store or bounded-cache architecture. Public downloadable data and historical-vintage retention remain disabled unless separately authorized. Reproducibility must rely on permitted derived artifacts and source-vintage metadata.
+Implement only the explicitly authorized architecture. Separate persistent display, server/build storage, historical-vintage retention, downloadable redistribution, API redistribution, and derived-result publication; do not infer one permission from another.
 
-### Outcome C — direct observation redistribution not permitted
+### Outcome C — direct observation use not authorized for the intended observatory
 
-Keep the public product rights-safe and derived-only for RPS. Do not reconstruct a persistent FRED cache as a workaround. Reassess the product design around derived diagnostics, metadata/source links, and other public data sources while preserving private research reproducibility under an authorized research-use arrangement if available.
+Keep public RPS observations fail-closed and derived-only. Do not reconstruct a FRED-backed persistent store as a substitute for source-owner permission. Reassess the public product around authorized derived evidence, provenance/source links, and complementary public sources.
 
 ## Required fields when resolved
 
@@ -161,10 +195,11 @@ Keep the public product rights-safe and derived-only for RPS. Do not reconstruct
 - complete-history availability:
 - historical-vintage availability:
 - update cadence:
-- storage/cache terms:
-- direct observation publication terms:
+- storage terms:
+- direct observation display/publication terms:
 - downloadable redistribution terms:
-- derived-result redistribution terms:
+- public API terms:
+- derived-result publication terms:
 - attribution/disclaimer requirements:
 - uncertainty/inference assets:
 - microdata/research-access status:
@@ -174,4 +209,4 @@ Keep the public product rights-safe and derived-only for RPS. Do not reconstruct
 
 ## Current decision
 
-**Unresolved.** No direct permission response has yet been recorded in this repository. The public architecture therefore remains fail-closed with respect to direct RPS observations.
+**Unresolved.** No direct source-owner permission response has yet been recorded in this repository. The public architecture therefore remains fail-closed with respect to direct RPS observations.
