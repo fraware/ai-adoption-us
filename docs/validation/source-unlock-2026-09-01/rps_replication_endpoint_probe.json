@@ -1,11 +1,11 @@
 {
   "article_doi": "10.1287/mnsc.2025.02523",
-  "generated_at_utc": "2026-09-01T07:30:43.507146+00:00",
+  "generated_at_utc": "2026-09-01T07:31:31.893851+00:00",
   "provider_surface": "INFORMS Management Science replication-files endpoint",
   "raw_retained_in_repository": false,
   "request_error": "SSLError: HTTPSConnectionPool(host='services.informs.org', port=443): Max retries exceeded with url: /dataset/download.php?doi=mnsc.2025.02523 (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1010)')))",
   "rights_conclusion": "none; technical accessibility does not establish reuse or redistribution permission",
-  "source_build_commit": "9eb4e60d5dc58a9454fbf4e053f247778580ca06",
+  "source_build_commit": "5ede73ff8323f690f6b9192e6682c825b51107e3",
   "source_url": "https://services.informs.org/dataset/download.php?doi=mnsc.2025.02523",
   "status": "request_error"
 }
