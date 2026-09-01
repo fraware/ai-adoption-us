@@ -1,23 +1,49 @@
 # Roadmap and remaining engineering/research specifications
 
+Status date: **2026-09-01**
+
+This roadmap separates three things that must remain distinct:
+
+1. **product/release gates** — whether the public observatory is actually ready to launch;
+2. **measurement/evidence gates** — whether a statistic is reproducible and interpretable;
+3. **source/rights gates** — whether the project is authorized to ingest, persist, and republish the observations needed for the intended product.
+
+A completed engineering component does not imply that its downstream empirical join is authorized. A public data source does not imply redistribution rights. A descriptive robustness result does not imply causal identification.
+
 ## Executive sequence
 
-The project advances in four tracks. Release 1 production completion is the immediate critical path; source-rights resolution and composition research proceed in parallel where dependencies permit.
+Release 1 production QA and the RPS source-rights decision remain the two immediate critical paths. Composition, firm-side triangulation, and task-level measurement proceed in parallel only where their source and construct dependencies are satisfied.
 
-| Stage | Status | Objective | Dependency | Definition of done |
+| Stage | Status | Objective | Blocking dependency | Definition of done |
 |---|---|---|---|---|
-| R1-G1 | **Complete — engineering gate** | Production web/CI gate | permanent PR CI | exact source candidate passed Python/governance/mypy + locked web build + server smoke tests |
-| R1-G2 | Open | Browser/accessibility QA | R1-G1 | cross-browser, mobile, keyboard, screen-reader, axe/Lighthouse gates pass |
-| R1-G3 | Open | Deployment audit | R1-G1/G2 | rights-safe production deployment verified against exact release commit |
-| D-G1 | Open external dependency | Direct RPS source relationship | data owner | documented permission/feed or explicit production-rights decision |
-| R1.1-G1 | Open data dependency | Real CPS Q2-2026 composition | official CPS bytes | worker/hour composition outputs with diagnostics |
-| R1.1-G2 | Open | Residual robustness | R1.1-G1 | residuals pass suppression, sensitivity, temporal, and influence checks |
-| R1.1-G3 | Optional robustness | OEWS robustness | official May-2025 OEWS | independent composition comparison |
-| R1.1-G4 | Blocked on G1/G2 | Composition explorer | R1.1-G1/G2 | experimental UI + methodology + provenance |
-| R1.2 | Future | BTOS triangulation | construct alignment | firm-side triangulation only where measurement is defensible |
-| V2 | Future research | Mechanism research | richer data | worker × occupation × industry × time analyses |
+| R1-G1 | **Complete — engineering gate** | Permanent production CI | none | exact candidate passes Python/governance/type checks + locked optimized web build + production smoke tests |
+| R1-G2 | **Open** | Browser/accessibility/performance QA | R1-G1 | cross-browser/mobile/keyboard/screen-reader/axe/Lighthouse review complete |
+| R1-G3 | **Open** | Deployment audit | R1-G2 | rights-safe deployed artifact verified against exact release commit |
+| D-G1 | **Open external dependency** | Direct RPS source relationship | authorized data owner | explicit live-feed/publication/storage decision recorded |
+| R1.1-G1 | **Composition foundation complete; empirical join blocked** | CPS occupation composition + RPS counterfactual | D-G1 for RPS observations | validated composition plus authorized A/H/S counterfactuals/residuals |
+| R1.1-G2 | **Methodology advanced; empirical residual robustness blocked** | Residual persistence/sensitivity | D-G1; formal uncertainty work #14 | authorized residuals survive predeclared sensitivity and stability suite |
+| R1.1-G2b | **Open** | Design-based CPS composition uncertainty | suitable CPS variance method | defensible covariance-aware uncertainty for custom composition vectors |
+| R1.1-G3 | **OEWS composition robustness complete; residual application blocked** | Independent establishment-side composition check | D-G1 for adoption counterfactual | CPS/OEWS comparison plus authorized residual robustness |
+| R1.1-G4 | **Blocked** | Experimental composition explorer | D-G1 + R1.1-G2 | UI exposes only supported, stability-qualified residual evidence |
+| R1.2 | **Future** | BTOS firm-side triangulation | construct alignment | firm-side evidence added only where measurement objects are explicit |
+| R1.3-G1 | **New — source/provenance gated** | Realized task adoption versus AI exposure | occupation/task index provenance + rights | lawful, versioned aggregate task/occupation measurement layer |
+| V2 | **Future research** | Worker/task/occupation/industry mechanisms | authorized richer microdata + inference | pre-specified respondent-level design separates composition from context |
 
-The first genuine networked optimized Next.js build passed on 2026-08-31 in GitHub Actions run `33411128343`. The temporary bootstrap is retired. R1-G1 is now **complete at the engineering gate**: permanent PR run `33414088473` passed strict `mypy src`, `npm ci`, TypeScript, the rights-safe optimized build, production-server startup, all public-route smoke tests, governance/privacy scans, and the public Python suite. A later documentation-only head also passed the same permanent workflow in run `33414442837`. Any subsequent PR head must re-pass permanent CI before merge; this does not reopen the engineering gate unless code, build, governance, or empirical contracts change.
+## Canonical progress checkpoint
+
+The current canonical `main` includes the following completed foundations:
+
+- permanent rights-safe release CI;
+- official Q2 2026 CPS composition execution;
+- official Q2 2025 CPS composition execution for a second comparable quarter;
+- May 2025 OEWS occupation-composition robustness;
+- partial-identification bounds for unpublished OEWS occupation cells;
+- Q2 2025 versus Q2 2026 CPS composition stability diagnostics;
+- monthly and leave-one-month-out CPS composition reliability diagnostics;
+- versioned `cps-composition-evidence-v1` evidence-tier policy;
+- canonical RPS source-rights decision record and three-gate permission request.
+
+The current public product remains fail-closed for direct RPS observations. The existence of these composition foundations therefore does **not** imply that an occupation-adjusted RPS industry residual has been produced or may be published.
 
 ---
 
@@ -25,65 +51,26 @@ The first genuine networked optimized Next.js build passed on 2026-08-31 in GitH
 
 ## R1-G1 — complete: permanent CI and exact merge-candidate verification
 
-### What is already verified
+Permanent `.github/workflows/ci.yml` is the release engineering contract. Every candidate presented for merge must continue to:
 
-GitHub Actions run `33411128343` established:
+1. reject tracked private-audit data and bootstrap transfer material;
+2. verify canonical registry/governance constraints;
+3. install the Python package and run the public test suite;
+4. run Python compilation, Ruff, and strict `mypy src`;
+5. verify Git whitespace integrity;
+6. install locked Node dependencies with `npm ci`;
+7. run TypeScript validation;
+8. build the optimized site in rights-safe `DATA_MODE=derived_only`;
+9. verify private-data paths are absent from the production build tree;
+10. start the production server and smoke-test all public routes.
 
-- public Python suite: 52 passed / 6 expected private-fixture skips;
-- Python compilation: passed;
-- Ruff: passed;
-- Node 22.23.2 / npm 10.9.8;
-- TypeScript: passed;
-- Next.js 16.3.3 optimized production build: passed;
-- all intended public routes generated in `DATA_MODE=derived_only`.
-
-The committed web lockfile exists. Generated TypeScript build metadata has been removed from version control.
-
-### Permanent merge requirements
-
-Permanent `.github/workflows/ci.yml` must, from the actual PR tree:
-
-1. reject any tracked `data/audit/private/` path;
-2. reject bootstrap transfer material and tracked TypeScript build metadata;
-3. verify canonical RPS registry cardinality;
-4. install Python 3.12 package/development dependencies;
-5. run public pytest suite;
-6. run `compileall`;
-7. run Ruff;
-8. run strict `mypy src`;
-9. perform Git whitespace integrity check;
-10. install Node 22 dependencies with `npm ci` from the committed lockfile;
-11. run TypeScript validation;
-12. build with `DATA_MODE=derived_only`;
-13. verify no private-data path appears in the production build tree;
-14. start the production server;
-15. HTTP-smoke-test `/`, `/blog/after-adoption`, `/explore/industries`, `/explore/occupations`, `/methodology`, and `/sources`.
-
-GitHub Actions dependencies should remain pinned to immutable commit SHAs.
-
-### Acceptance criteria
-
-- permanent PR CI remains green on every exact PR head presented for merge;
-- only the documented private-fixture tests skip in the public checkout;
-- `npm ci`, TypeScript, and optimized build exit 0;
-- production server starts and all public routes return successful HTTP responses;
-- no private fixture is required in `derived_only` mode;
-- no bootstrap material or generated `.tsbuildinfo` file is tracked;
-- no build claim exceeds what the workflow actually exercises.
-
-### Failure policy
-
-Do not weaken strict typing, test expectations, rights scans, TypeScript strictness, or production dependencies merely to make this gate green. Fix the underlying defect or leave the gate open with the exact blocker documented.
+Do not weaken tests, strict typing, rights scans, or production dependencies to obtain a green build.
 
 ## R1-G2 — browser, responsive, accessibility, and performance QA
 
-### Objective
+### Required matrix
 
-Convert code-level accessibility/responsiveness intentions into validated rendered behavior.
-
-### Required browser/device matrix
-
-Desktop browsers:
+Desktop:
 
 - current Chrome;
 - current Safari;
@@ -91,154 +78,146 @@ Desktop browsers:
 
 Mobile:
 
-- mobile Safari or a real iOS browser where available;
-- mobile Chrome/Android or equivalent real/emulated environment.
+- mobile Safari / iOS;
+- mobile Chrome / Android or defensible emulation.
 
-Target viewport widths:
+Representative widths:
 
-- approximately 375 px;
-- approximately 768 px;
-- approximately 1024 px;
-- approximately 1440 px.
+- ~375 px;
+- ~768 px;
+- ~1024 px;
+- ~1440 px.
 
 Assistive technology:
 
 - VoiceOver;
-- NVDA or a defensible second screen-reader environment.
+- NVDA or another defensible second screen-reader environment.
 
 ### Route-level assertions
 
 For `/`, `/explore/industries`, `/explore/occupations`, `/methodology`, `/sources`, and `/blog/after-adoption`:
 
-- primary navigation works;
-- keyboard route/navigation is complete;
-- skip link works;
-- focus order is logical and visible;
-- headings and landmarks are semantically coherent;
-- charts render and resize without clipping;
-- chart-equivalent HTML tables remain readable and navigable;
-- tooltips/interactions do not trap keyboard users;
+- primary navigation and skip links work;
+- keyboard focus order is logical and visible;
+- headings/landmarks are coherent;
+- charts resize without clipping;
+- chart-equivalent tables remain usable;
+- interactions do not trap keyboard users;
 - reduced-motion preference is respected;
-- no critical meaning requires color alone;
-- no horizontal page overflow at supported viewport widths;
-- data labels do not create material unreadability;
-- no-data/error states explain why data are unavailable;
-- no hydration/runtime error appears in browser console.
+- critical meaning does not depend on color alone;
+- no horizontal page overflow at supported widths;
+- data/no-data/error states remain legible;
+- no hydration/runtime error appears in the browser console.
 
-### Automated checks
+### Automated and manual review
 
-- axe: zero critical/serious violations unless each remaining item is documented as a reviewed false positive;
-- Lighthouse accessibility target ≥95, with every remaining issue manually reviewed;
-- Lighthouse performance recorded;
-- Core Web Vitals reviewed where the deployment environment permits meaningful measurement;
-- bundle size and route complexity reviewed for severe regressions.
-
-### Visual regression
-
-Capture dated screenshots at the target viewport matrix for each primary route. Compare for clipping, typography breaks, chart/table overflow, unexpected layout shifts, and release-mode/provenance visibility.
+- axe: zero unresolved critical/serious violations;
+- Lighthouse accessibility target ≥95, with remaining findings manually reviewed;
+- performance and bundle-size regressions recorded;
+- Core Web Vitals reviewed where the deployment context supports meaningful measurement;
+- dated visual-regression screenshots captured for the primary route/viewport matrix.
 
 ### Definition of done
 
-Commit a dated QA report under `docs/qa/` recording browser versions, devices/viewports, screen readers, automated tool versions, findings, fixes, screenshots/evidence references, and residual accepted limitations.
+Commit a dated report under `docs/qa/` with browser/device versions, viewports, assistive technology, automated-tool versions, findings, fixes, screenshots/evidence references, and residual accepted limitations.
 
 ## R1-G3 — deployment audit
 
-### Objective
+The deployed artifact must preserve repository rights/scientific boundaries.
 
-Verify that the deployed artifact preserves the same rights, scientific, and reproducibility boundaries as the repository.
+Required checks:
 
-### Requirements
-
-- production `DATA_MODE=derived_only` is explicit;
-- `data/audit/private/` absent from build context and deployed artifact;
-- Sources/Provenance page reachable;
+- production `DATA_MODE` explicit;
+- private-audit data absent from build context/deployed artifact;
+- Sources/Provenance reachable;
 - release-mode notice visible;
-- no accidental raw-observation API/static endpoint;
-- environment secrets are not client-exposed;
-- canonical metadata, robots policy, and sitemap decision reviewed;
-- HTTP security-header baseline established;
+- no accidental raw-observation endpoint;
+- secrets not client-exposed;
+- metadata/robots/sitemap reviewed;
+- security-header baseline recorded;
 - 404/error pages reviewed;
-- caching behavior understood and documented;
+- caching behavior documented;
 - analytics/privacy configuration explicitly accepted or disabled;
-- error monitoring/logging decision documented;
-- deployment commit recorded;
-- public artifact/build checksum or equivalent immutable deployment identity recorded.
+- monitoring/logging decision documented;
+- deployment commit and immutable deployment identity recorded.
 
-### Publication completion
+After deployment audit, review final source citations, methodology links near empirical claims, editorial copy, release notes, and exact release tag.
 
-After deployment audit:
-
-- final source citations reviewed;
-- methodology links present near empirical claims;
-- editorial proofread completed;
-- release notes summarize evidence and limitations;
-- release tag points to the exact audited commit.
-
-### Definition of done
-
-A production release tag references the exact Git commit and a dated deployment-audit record. Public-launch language begins only after R1-G2 and R1-G3 are complete.
+Public-launch language begins only after R1-G2 and R1-G3 are complete.
 
 ---
 
-# Track 2 — direct RPS source and rights resolution
+# Track 2 — RPS source, rights, and research access
 
 ## D-G1 — direct source relationship
 
-### Objective
+### Current state
 
-Replace FRED-hosted third-party distribution as the long-run production backbone where possible, while preserving the current fail-closed rights architecture until a documented decision exists.
+The production-feed decision is unresolved. Public Tracker presentation, public download controls, FRED distribution, paper replication files, and research microdata access are not treated as equivalent permissions.
 
-### Request from RPS / GenAI Adoption Tracker authors or data owners
+`docs/source-rights/RPS_PERMISSION_REQUEST.md` now separates three independent gates:
 
-Seek:
+1. **live aggregate observatory gate** — current/future national, industry, and occupation Tracker observations;
+2. **historical replication gate** — reuse terms for the published paper replication package;
+3. **detailed task/occupation research gate** — access to later respondent/task/occupation research data.
 
-- machine-readable national, industry, and occupation series;
-- historical revisions/vintages where available;
-- future update cadence;
-- explicit terms for independent interactive publication;
-- whether transformed/derived subgroup results may be redistributed;
-- permitted storage/cache behavior;
-- attribution/disclaimer requirements;
-- subgroup standard errors, replicate weights, or inference methodology;
-- latest microdata availability;
-- questionnaire/instrument change log.
+### Live aggregate decision must cover
 
-### Required decision record
+- machine-readable national, industry, and occupation observations;
+- complete available history;
+- prior vintages/revisions where available;
+- future update cadence and preferred delivery mechanism;
+- persistent interactive display rights;
+- server/build storage and cache restrictions;
+- downloadable CSV/JSON/Parquet redistribution;
+- public API redistribution;
+- redistribution of transformed aggregate results;
+- attribution/disclaimer/branding requirements;
+- survey instruments and methodology/change logs;
+- subgroup sample sizes and uncertainty/inference assets.
 
-Commit `docs/source-rights/RPS_SOURCE_DECISION.md` recording:
+### Historical replication decision must cover
 
-- provider/contact;
-- contact date(s);
-- exact scope requested;
-- granted/denied/unclear permissions;
-- source delivery format;
-- attribution requirements;
-- cache/storage restrictions;
-- permitted transformations;
-- permitted publication/redistribution;
-- update mechanism;
-- uncertainty/microdata availability;
-- engineering consequence.
+- exact package contents and covered waves;
+- license/reuse terms;
+- reproduction of published estimates;
+- external-data linkage;
+- publication of new aggregate results;
+- restrictions on redistribution of source microdata.
+
+### Detailed research decision must cover
+
+- current/later respondent or task microdata access process;
+- task/occupation codebooks and taxonomy vintages;
+- permissible CPS/O*NET/OEWS or other linkage;
+- respondent clustering/inference assets;
+- publication restrictions for aggregate derived results.
 
 ### Definition of done
 
-A source architecture decision is traceable to explicit permission/terms. Do not implement a persistent FRED cache as a shortcut around this gate.
+`docs/source-rights/RPS_SOURCE_DECISION.md` contains an authorized response with exact scope, dates, delivery format, storage/publication/redistribution terms, attribution, uncertainty assets, research-access status, and engineering consequence.
+
+Until then:
+
+- public RPS observation mode remains fail-closed;
+- do not build a persistent FRED cache as a workaround;
+- do not infer rights from public availability;
+- do not mark outreach as sent without a verifiable sent-message record.
 
 ---
 
 # Track 3 — Release 1.1 composition analysis
 
-## R1.1-G1 — execute Q2 2026 CPS composition
+## R1.1-G1 — CPS composition foundation complete; RPS join pending
 
-### Inputs
+### Completed composition work
 
-Official Basic Monthly CPS public-use files:
+Official Basic Monthly CPS inputs have been executed for:
 
-- April 2026;
-- May 2026;
-- June 2026.
+- Q2 2026: April, May, June 2026;
+- Q2 2025: April, May, June 2025.
 
-Record source URLs, retrieval dates, file sizes, and checksums.
+The composition contract remains:
 
 ### Population
 
@@ -256,30 +235,27 @@ For assisted hours and reported savings:
 
 `w_hours(j,o,t) = weighted actual main-job hours(j,o,t) / weighted actual main-job hours(j,t)`
 
-Do **not** reuse worker weights for H/S.
+Never reuse worker weights for H/S.
 
 ### Actual-hours rules
 
 - employed-absent workers: zero actual main-job hours;
-- active workers with invalid actual-hours values: do not impute;
-- usual-hours specification: sensitivity only, separately labeled.
+- active workers with invalid actual-hours values: no imputation;
+- usual-hours specification: sensitivity only and separately labeled;
+- equal month factors under the current quarter-pooling design.
 
-### Quarter pooling
+Q4 2025 remains unavailable because October 2025 CPS was not collected; November–December must not be substituted for a missing quarter.
 
-Pool April/May/June with equal month factors under the current design unless a separately justified weighting design supersedes it.
+### Coverage and support
 
-Q4 2025 remains unavailable because October 2025 CPS was not collected; do not substitute November–December.
+- compute mapped worker/hour coverage by industry and metric;
+- fail closed when missing/unmapped share breaches the current 2% contract;
+- unsupported estimates remain null;
+- no silent renormalization into apparent completeness.
 
-### Coverage and suppression
+### Pending authorized empirical join
 
-For each industry × metric:
-
-- compute mapped weight coverage;
-- fail closed when missing/unmapped share exceeds the 2% threshold under the current contract;
-- propagate unsupported estimates as `null`;
-- never renormalize an unsupported cell into apparent completeness without an explicitly labeled sensitivity analysis.
-
-### Counterfactuals
+When compatible RPS industry/occupation observations are authorized, compute:
 
 `A_hat_occ(j,t) = Σ_o w_worker(j,o,t) * A(o,t)`
 
@@ -287,182 +263,229 @@ For each industry × metric:
 
 `S_hat_occ(j,t) = Σ_o w_hours(j,o,t) * S(o,t)`
 
-Residual:
+and
 
 `G(j,t,m) = observed(j,t,m) - predicted_occ(j,t,m)`
 
-Canonical label:
+Canonical label: **occupation-adjusted industry-context residual**.
 
-**occupation-adjusted industry-context residual**
-
-Forbidden interpretations absent a separate identification strategy:
+Forbidden interpretations absent a separate identification design:
 
 - organizational effect;
 - organizational quality;
 - organizational efficiency;
 - productivity effect.
 
-### Required outputs
-
-Generate a versioned composition artifact with fields at minimum:
-
-- period;
-- industry_id/name;
-- metric;
-- observed;
-- predicted_from_occupation_composition;
-- residual;
-- weighting_basis;
-- mapped_coverage;
-- suppression_status/reason;
-- CPS input months;
-- CPS input checksums;
-- crosswalk versions;
-- source build timestamp/commit.
-
-Also produce:
-
-- coverage table;
-- actual-vs-usual-hours sensitivity table;
-- validation checks artifact;
-- input manifest;
-- dated validation report.
-
-### Validation
-
-- industry composition weights sum to 1 within tolerance for supported cells;
-- worker and hour weights differ where expected;
-- no negative weights;
-- no silent missing-occupation dropping;
-- Information and Professional/Scientific/Technical Services are not special-cased;
-- every industry is processed symmetrically;
-- influence/leave-one-occupation diagnostics run;
-- actual-hours and usual-hours specifications compared;
-- suppression propagates to output/UI;
-- representative crosswalk cells are pinned by tests.
-
 ## R1.1-G2 — residual robustness and persistence
 
-Before publication, test:
+The composition-side reliability layer is substantially advanced, but this gate cannot be completed until authorized observed RPS industry/occupation values permit the counterfactual/residual itself to be generated.
 
-1. sign and magnitude under actual vs usual hours;
-2. sensitivity to coverage threshold;
+Required residual checks remain:
+
+1. actual-hours versus usual-hours sensitivity;
+2. coverage-threshold sensitivity;
 3. leave-one-occupation-out influence;
 4. finer occupation mappings where defensible;
-5. class-of-worker/coverage differences where available;
-6. temporal replication in every CPS-supported quarter;
-7. uncertainty or partial-identification intervals if source precision supports them;
-8. rank/sign persistence across available waves;
-9. whether results are dominated by a small number of occupations or crosswalk cells.
+5. class-of-worker/coverage sensitivity where available;
+6. replication in every supported quarter;
+7. rank/sign persistence across waves;
+8. dominance by individual occupations or crosswalk cells;
+9. uncertainty or partial-identification treatment appropriate to each source.
 
-Do not publish a residual leaderboard from one quarter without stability diagnostics.
+Do not publish a one-quarter residual leaderboard.
 
-## R1.1-G3 — independent May-2025 OEWS robustness
+Every displayed residual must expose weighting basis, coverage, suppression status, stability/influence context, and its descriptive standardization interpretation.
 
-### Objective
+## R1.1-G2b — formal CPS composition uncertainty
 
-Use official BLS May-2025 national industry-specific occupational employment data as an independent establishment-side composition source.
+Issue #14 tracks a separate inferential problem: the custom CPS industry × occupation composition vectors need uncertainty treatment that respects the complex rotating-panel design.
 
-### Important population difference
+Current diagnostics include person-month counts, final-weight dispersion, monthly movement, leave-one-month-out perturbations, and cross-vintage stability. These are quality-control diagnostics, **not** design-based standard errors or confidence intervals.
 
-OEWS is not the primary composition basis because it is establishment/wage-and-salary-worker oriented and does not reproduce the RPS/CPS worker-survey universe. Treat it as robustness only.
+A defensible future method must address:
 
-### Requirements
+- official replicate/GVF or another justified CPS variance path;
+- covariance among occupation shares that sum to one;
+- repeated households/rotation-group overlap;
+- quarter pooling and quarter-to-quarter comparisons;
+- uncertainty propagation into occupation-standardized RPS quantities;
+- validation against published CPS estimates where a sufficiently comparable benchmark exists.
 
-- download official May-2025 OEWS staffing input from BLS;
-- record file checksum and release date;
-- map detailed occupations to the same 22 major groups;
-- map industries to the 20 RPS groups;
-- document self-employed/coverage differences;
-- compute employment-share adoption counterfactual independently;
-- compare direction and magnitude with CPS worker-share results;
-- report disagreements rather than averaging them away.
+Do not label Kish weight-dispersion effective n as a CPS design-based effective sample size.
 
-### Definition of done
+## R1.1-G3 — OEWS independent composition robustness
 
-A residual becomes materially more credible if its sign/ranking persists under CPS and OEWS despite their coverage differences. Non-persistence is an empirical result and must remain visible.
+### Completed foundation
+
+May 2025 OEWS industry-specific occupational employment has been mapped into the same 20 industry × 22 major-occupation structure and compared with CPS worker composition.
+
+The source-universe difference is first-class:
+
+- CPS/RPS are worker-survey constructs;
+- OEWS covers wage-and-salary employment in covered establishments and excludes self-employed workers;
+- OEWS is therefore robustness evidence, not a synchronized worker-universe replacement.
+
+Unpublished OEWS occupation cells are handled with partial-identification bounds rather than zero imputation. Current results show that the unresolved published-cell mass is too small to explain the observed CPS/OEWS composition differences.
+
+The current evidence-tier policy retains full unfiltered results and treats one highly unstable thin CPS domain—Management of Companies and Enterprises—as sensitivity-only for primary composition comparisons.
+
+### Remaining RPS-dependent application
+
+After D-G1 resolves compatible observations:
+
+- compute CPS-based and OEWS-based adoption composition counterfactuals independently;
+- compare sign/magnitude/rank of the resulting descriptive residuals;
+- preserve disagreements rather than averaging sources;
+- retain source-universe caveats next to every comparison.
+
+Persistence across both sources strengthens a descriptive standardization finding. Non-persistence is itself a result.
 
 ## R1.1-G4 — composition explorer
 
-Begin only after G1/G2 are scientifically green.
-
 Route: `/explore/composition`.
+
+Begin only when the underlying empirical residual has passed R1.1-G2 and the necessary publication rights exist.
 
 Required UI:
 
 - explicit **Experimental composition analysis** banner;
-- observed vs occupation-composition counterfactual;
+- observed versus occupation-composition counterfactual;
 - occupation-adjusted industry-context residual;
-- quarter selector limited to supported periods;
-- metric selector;
+- quarter/metric selector limited to supported observations;
 - weighting-basis disclosure;
 - CPS/OEWS source and coverage metadata;
 - suppression reason shown directly;
-- actual vs usual-hours sensitivity where relevant;
+- actual-versus-usual-hours sensitivity where relevant;
 - stability/influence context;
+- reliability tier where material;
 - no causal or productivity language.
 
 ---
 
-# Track 4 — Release 1.2 and mechanism research
+# Track 4 — Release 1.2 and Release 1.3 measurement triangulation
 
-## R1.2 — BTOS triangulation
+## R1.2 — BTOS firm-side triangulation
 
-Use BTOS only when the firm-side construct aligns defensibly with the RPS construct under comparison.
+BTOS is a distinct firm/business evidence layer. For every measure used, document:
 
-Requirements:
+- exact question wording and denominator;
+- survey population;
+- reference period;
+- sector taxonomy/crosswalk;
+- whether the object is firm use, business-function breadth, worker-task use, investment, or something else;
+- questionnaire-version changes and period mismatches.
 
-- document exact BTOS question and denominator;
-- document survey population and time reference;
-- harmonize sector taxonomy explicitly;
-- treat BTOS as firm/business-side evidence, not a worker-level equivalent;
-- avoid combining incompatible adoption constructs into one composite score;
-- disclose any period/taxonomy mismatch directly.
+Do not treat a firm/business measure as a worker-level equivalent. Do not combine incompatible constructs into a composite score. Do not mechanically join a sector-level firm measure to worker outcomes and label the result an organizational effect.
 
-## V2 — explain the industry-context wedge
+## R1.3-G1 — realized task adoption versus AI exposure
 
-### Research target
+The 2026 RPS task-level research introduces a new measurement boundary upstream of the existing adoption-to-benefit chain:
 
-Move from industry/occupation aggregates toward worker × occupation × industry × time.
+**theoretical/model-based AI exposure or capability ≠ realized worker-reported adoption**.
 
-Conceptual models may include:
+Issue #17 governs this aggregate evidence layer. It is intentionally separate from respondent-level V2 mechanism research.
 
-`Y_iojt = α_o + γ_j + τ_t + X_i β + ε_iojt`
+### Source gate
 
-with outcomes including adoption, assisted use, and reported savings.
+The official RPS Generative AI page advertises an `Occupation and Task Adoption Indices` resource. Before ingestion:
 
-Candidate mechanism variables:
+- resolve exact canonical artifact URL and publisher;
+- record retrieval date, hash, version/vintage, format, and documentation;
+- determine explicit storage/reuse/publication terms;
+- identify survey waves, sample, weighting, task taxonomy, SOC/O*NET vintage, aggregation formula, suppression rules, and uncertainty assets;
+- keep this artifact's rights distinct from the live Tracker gate unless an authorized term explicitly covers both.
 
-- O*NET task structure / AI suitability;
-- employer tool provision and policy;
+An advertised index is not treated as permission to mirror it.
+
+### Construct contract
+
+Keep these objects separate:
+
+- `E_task` / `E_occ`: theoretical/model-based exposure or capability;
+- `A_task`: realized worker-reported task adoption;
+- `A_occ`: realized occupation-level work adoption;
+- `H`: share of work hours actively using GenAI;
+- `S`: self-reported counterfactual hours-saved share.
+
+### Proposed aggregate analyses
+
+Subject to source/provenance resolution:
+
+1. reproduce source headline quantities before new analysis;
+2. pin a fixed task/occupation taxonomy and crosswalk;
+3. compare multiple exposure measures separately rather than constructing a composite score;
+4. report Pearson/Spearman relationships, calibration, rank disagreement, and support/coverage;
+5. label high-exposure/low-adoption or low-exposure/high-adoption differences only as descriptive **exposure-adoption gaps**;
+6. diagnose generic-task classification and task-prevalence weighting effects;
+7. test stability across index vintages/waves if available;
+8. document within-occupation heterogeneity as a limitation of aggregate occupation measures.
+
+Potential later product layer:
+
+`capability/exposure → realized task adoption → occupation/work adoption → assisted-hours penetration → reported savings`
+
+This is an explanatory measurement sequence, not a readiness or impact score.
+
+---
+
+# Track 5 — V2 mechanism research
+
+## V2 — explain the remaining context wedge
+
+The preferred richer-data structure is now:
+
+`worker × task × occupation × industry/context × time`.
+
+The new task-level evidence means `task suitability` must not be represented by a single occupation-level exposure control. The preferred conceptual sequence is:
+
+`worker characteristics / prior adoption propensity → task assignment + realized task adoption → occupation → industry/firm context → depth of use / reported savings`.
+
+Candidate mechanism variables include:
+
+- task content and expertise level under a versioned O*NET/SOC mapping;
+- worker prior adoption propensity and correlated multi-task use;
+- employer tool provision/policy;
 - firm size;
 - remote-work feasibility;
 - education and earnings;
 - software/digital intensity;
 - management practices;
-- regulatory burden;
+- regulatory context;
 - capital intensity;
 - firm-side AI investment/use;
 - worker selection and class of worker.
 
 ### Identification standard
 
-Do not call an industry residual organizational complementarity until a design conditions on occupation/task composition and has a defensible strategy for remaining confounding, selection, sampling uncertainty, and measurement error.
+Before stronger mechanism claims:
 
-Cross-sectional correlations/regressions remain descriptive absent a separate identification strategy.
+- condition on occupation and task composition where the estimand requires it;
+- model respondent-level correlation when workers report multiple tasks;
+- separate exposure/capability measures from realized adoption;
+- address remaining worker/firm selection and measurement error;
+- use inference appropriate to the authorized microdata/sample design;
+- state the estimand and external-validity boundary before results are generated.
 
-## Long-run observatory
+Do not label an aggregate industry-context residual organizational complementarity merely because it survives occupation standardization. Cross-sectional regressions remain descriptive absent a separate identification strategy.
 
-The mature product should support versioned new-wave updates:
+---
 
-1. ingest/source metadata update;
+# Long-run observatory contract
+
+The mature product should support a controlled new-wave/revision pipeline:
+
+1. ingest or source-metadata update;
 2. source-rights check;
-3. audit/revision detection;
+3. revision/vintage detection;
 4. regenerate derived diagnostics;
-5. compare against the previous frozen vintage;
-6. run stability/influence checks;
+5. compare with the previous frozen vintage;
+6. run stability/influence/coverage checks;
 7. review changed claims and charts;
 8. publish only after automated and human review;
 9. retain versioned analytical history and release provenance.
 
-The long-run product should answer not only who uses GenAI, but where adoption converts into routine use, working-time penetration, and reported benefit; where that conversion is unstable; and which next research design could explain the remaining wedge.
+The mature public experience should make measurement boundaries visible rather than compressing them into a score. Where supported by rights and evidence, the reader should be able to follow:
+
+`capability/exposure → adoption → routine use → work-hour penetration → reported time savings → separately identified economic outcomes`.
+
+The observatory should answer not only who uses GenAI, but where one layer converts into the next, where that conversion is unstable, what composition explains, what remains unexplained, and which stronger research design would be needed before mechanism or productivity claims are justified.
