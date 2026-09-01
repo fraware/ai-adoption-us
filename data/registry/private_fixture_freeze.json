@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "freeze_id": "rps-private-5q-2026-08-30",
+  "checkpoint_date": "2026-08-30",
+  "fixture_sha256": "bdeffa95911a94cb60f904c51efc48f7ce4d1bf1eaaec490f5c4bfacd20d4fba",
+  "fixture_path": "data/audit/private/rps_subgroup_5q_audit.json",
+  "contract": {
+    "rows": 630,
+    "industry_entities": 20,
+    "occupation_entities": 22,
+    "series": 126,
+    "periods": ["2025-Q2", "2025-Q3", "2025-Q4", "2026-Q1", "2026-Q2"],
+    "metrics": ["adoption_work", "assisted_hours_share", "reported_time_savings_share"],
+    "audit_scope": "private_research_only",
+    "rights_status": "Copyrighted: Citation Required"
+  },
+  "derived_directory": "data/derived/longitudinal",
+  "claim_inventory": "data/registry/longitudinal_claim_inventory.json",
+  "status": "FROZEN_PRIVATE_SOURCE; RAW FIXTURE NOT IN PUBLIC REPOSITORY"
+}
