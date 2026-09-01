@@ -1,0 +1,213 @@
+name: OEWS and RPS source reconnaissance
+
+on:
+  push:
+    branches:
+      - research/oews-rps-source-unlock
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install inspection dependencies
+        run: python -m pip install openpyxl==3.1.5 requests==2.32.5
+
+      - name: Inspect official source packages without retaining raw files
+        env:
+          SOURCE_BUILD_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from __future__ import annotations
+
+          import hashlib
+          import io
+          import json
+          import os
+          import zipfile
+          from datetime import UTC, datetime
+          from pathlib import Path
+
+          import openpyxl
+          import requests
+
+          OUT = Path('docs/validation/source-unlock-2026-09-01')
+          OUT.mkdir(parents=True, exist_ok=True)
+          generated_at = datetime.now(UTC).isoformat()
+
+          def sha256(data: bytes) -> str:
+              return hashlib.sha256(data).hexdigest()
+
+          def fetch(url: str, *, timeout: int = 90) -> tuple[requests.Response | None, str | None]:
+              try:
+                  response = requests.get(
+                      url,
+                      timeout=timeout,
+                      allow_redirects=True,
+                      headers={'User-Agent': 'genai-at-work-research/0.1 source-validation'},
+                  )
+                  return response, None
+              except requests.RequestException as exc:
+                  return None, f'{type(exc).__name__}: {exc}'
+
+          def safe_headers(response: requests.Response) -> dict[str, str | None]:
+              return {
+                  'content_type': response.headers.get('content-type'),
+                  'content_length': response.headers.get('content-length'),
+                  'content_disposition': response.headers.get('content-disposition'),
+                  'last_modified': response.headers.get('last-modified'),
+                  'etag': response.headers.get('etag'),
+              }
+
+          oews_url = 'https://www.bls.gov/oes/special-requests/oesm25in4.zip'
+          oews_response, oews_error = fetch(oews_url)
+          if oews_response is None:
+              raise SystemExit(f'OEWS download failed: {oews_error}')
+          if oews_response.status_code != 200:
+              raise SystemExit(f'OEWS returned HTTP {oews_response.status_code}')
+          oews_bytes = oews_response.content
+          if not zipfile.is_zipfile(io.BytesIO(oews_bytes)):
+              raise SystemExit('OEWS response is not a ZIP archive')
+
+          oews_entries: list[dict[str, object]] = []
+          with zipfile.ZipFile(io.BytesIO(oews_bytes)) as outer:
+              for info in outer.infolist():
+                  entry: dict[str, object] = {
+                      'path': info.filename,
+                      'size_bytes': info.file_size,
+                      'compressed_size_bytes': info.compress_size,
+                  }
+                  if info.filename.lower().endswith('.xlsx'):
+                      workbook_bytes = outer.read(info.filename)
+                      workbook = openpyxl.load_workbook(
+                          io.BytesIO(workbook_bytes),
+                          read_only=True,
+                          data_only=True,
+                      )
+                      sheets: list[dict[str, object]] = []
+                      for sheet in workbook.worksheets:
+                          preview = []
+                          for row in sheet.iter_rows(min_row=1, max_row=6, values_only=True):
+                              preview.append([None if value is None else str(value) for value in row])
+                          sheets.append(
+                              {
+                                  'name': sheet.title,
+                                  'max_row': sheet.max_row,
+                                  'max_column': sheet.max_column,
+                                  'first_six_rows': preview,
+                              }
+                          )
+                      entry['xlsx_sha256'] = sha256(workbook_bytes)
+                      entry['sheets'] = sheets
+                      workbook.close()
+                  oews_entries.append(entry)
+
+          oews_manifest = {
+              'status': 'downloaded_and_schema_inspected',
+              'provider': 'U.S. Bureau of Labor Statistics',
+              'dataset': 'May 2025 OEWS national industry-specific occupational employment and wage estimates',
+              'source_url': oews_url,
+              'final_url': oews_response.url,
+              'http_status': oews_response.status_code,
+              'headers': safe_headers(oews_response),
+              'archive_size_bytes': len(oews_bytes),
+              'archive_sha256': sha256(oews_bytes),
+              'archive_entries': oews_entries,
+              'generated_at_utc': generated_at,
+              'source_build_commit': os.environ['SOURCE_BUILD_COMMIT'],
+              'raw_retained_in_repository': False,
+          }
+          (OUT / 'oews_may_2025_source_schema.json').write_text(
+              json.dumps(oews_manifest, indent=2, sort_keys=True) + '\n'
+          )
+
+          rps_url = 'https://services.informs.org/dataset/download.php?doi=mnsc.2025.02523'
+          rps_response, rps_error = fetch(rps_url)
+          rps_manifest: dict[str, object] = {
+              'provider_surface': 'INFORMS Management Science replication-files endpoint',
+              'article_doi': '10.1287/mnsc.2025.02523',
+              'source_url': rps_url,
+              'generated_at_utc': generated_at,
+              'source_build_commit': os.environ['SOURCE_BUILD_COMMIT'],
+              'raw_retained_in_repository': False,
+              'rights_conclusion': 'none; technical accessibility does not establish reuse or redistribution permission',
+          }
+          if rps_response is None:
+              rps_manifest.update({'status': 'request_error', 'request_error': rps_error})
+          else:
+              rps_bytes = rps_response.content
+              rps_manifest.update(
+                  {
+                      'status': 'http_response_received',
+                      'http_status': rps_response.status_code,
+                      'final_url': rps_response.url,
+                      'headers': safe_headers(rps_response),
+                      'response_size_bytes': len(rps_bytes),
+                      'response_sha256': sha256(rps_bytes),
+                      'is_zip_archive': zipfile.is_zipfile(io.BytesIO(rps_bytes)),
+                  }
+              )
+              if zipfile.is_zipfile(io.BytesIO(rps_bytes)):
+                  with zipfile.ZipFile(io.BytesIO(rps_bytes)) as archive:
+                      rps_manifest['archive_entries'] = [
+                          {
+                              'path': info.filename,
+                              'size_bytes': info.file_size,
+                              'compressed_size_bytes': info.compress_size,
+                          }
+                          for info in archive.infolist()
+                      ]
+          (OUT / 'rps_replication_endpoint_probe.json').write_text(
+              json.dumps(rps_manifest, indent=2, sort_keys=True) + '\n'
+          )
+
+          summary = f'''# Source-unlock reconnaissance — 2026-09-01
+
+## OEWS
+
+The official May 2025 BLS national industry-specific OEWS ZIP was downloaded successfully in the networked research runner and inspected in memory. The committed JSON manifest records archive identity, cryptographic hash, contained workbook names, workbook hashes, sheet names, dimensions, and the first six rows needed to establish the observed schema. Raw source bytes are not retained in the repository.
+
+## Historical RPS replication package
+
+The INFORMS replication-files endpoint was probed independently from the networked research runner. The committed JSON record captures the HTTP/access result and archive directory only if the response is a valid ZIP. Technical accessibility is explicitly not treated as evidence of reuse or redistribution permission.
+
+## Next decision
+
+Use the observed OEWS workbook schema to implement a versioned May-2025 OEWS occupation-composition parser and CPS-vs-OEWS robustness comparison. If the RPS replication endpoint yields a valid package, inspect its documentation and license before any microdata analysis; otherwise retain the access block as a reproducible source-gate result and pursue the authors/INFORMS access route.
+'''
+          (OUT / 'README.md').write_text(summary)
+          PY
+
+      - name: Verify no raw source packages entered the worktree
+        run: |
+          set -euo pipefail
+          if find . -type f \( -name 'oesm25in4.zip' -o -name '*.dta' -o -name '*.sav' -o -name '*.sas7bdat' \) | grep -q .; then
+            echo 'Raw source package or microdata unexpectedly entered repository worktree.' >&2
+            exit 1
+          fi
+
+      - name: Commit source reconnaissance manifests
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/validation/source-unlock-2026-09-01
+          if git diff --cached --quiet; then
+            echo 'No source reconnaissance changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Inspect OEWS and RPS source packages'
+          git push origin HEAD:research/oews-rps-source-unlock
