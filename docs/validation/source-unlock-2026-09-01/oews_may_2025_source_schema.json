@@ -26,14 +26,14 @@
         "Series does not exist for Series OEUN000000054000000000001",
         "Series does not exist for Series OEUN000000054000011000001"
       ],
-      "responseTime": 69,
+      "responseTime": 81,
       "status": "REQUEST_SUCCEEDED"
     },
     "requested_series": [
       "OEUN000000054000000000001",
       "OEUN000000054000011000001"
     ],
-    "response_sha256": "e3ef9320d5b63e62cb9fafc153ed6aa9475c544956133e592bad2b2253d956b6",
+    "response_sha256": "840bc33be9f916de0c743e38792fe3cbe21ba1da2ef966888cc1fa99bd74be57",
     "response_size_bytes": 311,
     "source_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/",
     "status": "http_response_received"
@@ -49,13 +49,13 @@
     },
     "http_status": 403,
     "is_zip_archive": false,
-    "response_sha256": "e4bcb93c2466479e6268360b46d917bba33f8a607480b230f1a25d20751aff86",
+    "response_sha256": "68863395380c1b04b7f7870fdb7837331ee8c63a62b693c9f4b4335ef4a97b1f",
     "response_size_bytes": 1325,
     "source_url": "https://www.bls.gov/oes/special-requests/oesm25in4.zip",
     "status": "http_response_received"
   },
   "dataset": "May 2025 Occupational Employment and Wage Statistics",
-  "generated_at_utc": "2026-09-01T07:32:44.011340+00:00",
+  "generated_at_utc": "2026-09-01T07:38:46.451888+00:00",
   "observed_mapping_summary": {
     "datatype_rows": [],
     "industry_row_count": 0,
@@ -64,7 +64,7 @@
   },
   "provider": "U.S. Bureau of Labor Statistics",
   "raw_retained_in_repository": false,
-  "source_build_commit": "b0bcf9965b9926f3fe875cbe748721fea212f693",
+  "source_build_commit": "ccadf8af5bda3f32e41c2b41549109967a7e3643",
   "status": "source_paths_probed",
   "text_interface": {
     "area": {
@@ -77,7 +77,7 @@
         "last_modified": null
       },
       "http_status": 403,
-      "response_sha256": "24ed1702b6204e30da36eca66c67fd87bb39b00d01a72b89f0366e614dd84c41",
+      "response_sha256": "4c2ab114bc9febea338be0fdc80167b1170ef4d8a9175b563327f664e6119e57",
       "response_size_bytes": 1325,
       "source_url": "https://download.bls.gov/pub/time.series/oe/oe.area",
       "status": "http_response_received"
@@ -92,7 +92,7 @@
         "last_modified": null
       },
       "http_status": 403,
-      "response_sha256": "a410059bc012971010d368a557141e794ce62a6982ae31a80558fe2219276f2c",
+      "response_sha256": "a9602c61a6e772f29272f7a78075b16800d38e7decc5b61b8ada8c133dae2c57",
       "response_size_bytes": 1325,
       "source_url": "https://download.bls.gov/pub/time.series/oe/oe.datatype",
       "status": "http_response_received"
@@ -107,7 +107,7 @@
         "last_modified": null
       },
       "http_status": 403,
-      "response_sha256": "e76d7bd2fe35ad7094e21cbbc241fad5517f2f818b3b5ebeff6ba07f0eca01a6",
+      "response_sha256": "5f5ea596a37b57d388563aed7c5848300d5260922371c965201be65e39d3ced5",
       "response_size_bytes": 1325,
       "source_url": "https://download.bls.gov/pub/time.series/oe/oe.txt",
       "status": "http_response_received"
@@ -122,7 +122,7 @@
         "last_modified": null
       },
       "http_status": 403,
-      "response_sha256": "a6187fd38a26cf21219670caabae99f6c81f4aec52814631f8cfd472259a334c",
+      "response_sha256": "062718d18846cfadefbe4d08f730e7c4951a8b5aa86d1095a2650e16ada39de1",
       "response_size_bytes": 1325,
       "source_url": "https://download.bls.gov/pub/time.series/oe/oe.industry",
       "status": "http_response_received"
@@ -137,7 +137,7 @@
         "last_modified": null
       },
       "http_status": 403,
-      "response_sha256": "e8e21026baf4b7a5203f949674f513cdae86f0d7b42c3b46f8489d615381e8b5",
+      "response_sha256": "8193a6f027b4836b74161886d224de2d2d3959ca1501165e7be980bc2cfbfc7e",
       "response_size_bytes": 1325,
       "source_url": "https://download.bls.gov/pub/time.series/oe/oe.occupation",
       "status": "http_response_received"

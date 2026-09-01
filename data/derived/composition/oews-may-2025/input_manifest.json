@@ -1,0 +1,210 @@
+{
+  "api_url": "https://api.bls.gov/publicAPI/v1/timeseries/data/",
+  "cps_comparison_artifact": "data/derived/composition/cps-q2-2026/cps_composition.json",
+  "cps_comparison_period": "2026-Q2",
+  "dataset": "May 2025 Occupational Employment and Wage Statistics",
+  "datatype": "01 Employment",
+  "generated_at_utc": "2026-09-01T07:38:53.691193+00:00",
+  "industry_crosswalk_version": "oews-2022-naics-rps-v1",
+  "occupation_crosswalk_version": "oews-2018-soc-rps-v1",
+  "provider": "U.S. Bureau of Labor Statistics",
+  "raw_api_responses_retained": false,
+  "reference_period": "A01",
+  "reference_year": 2025,
+  "request_count": 19,
+  "request_manifest": [
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 1,
+      "first_series_id": "OEUN000000011--1200000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000021--2211000001",
+      "messages": [
+        "Series does not exist for Series OEUN000000011--1221000001",
+        "Series does not exist for Series OEUN000000011--1223000001",
+        "Series does not exist for Series OEUN000000011--1227000001",
+        "Series does not exist for Series OEUN000000011--1231000001"
+      ],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 2,
+      "first_series_id": "OEUN000000021--2213000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000023--2415000001",
+      "messages": [
+        "Series does not exist for Series OEUN000000021--2221000001"
+      ],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 3,
+      "first_series_id": "OEUN000000023--2417000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000031--3419000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 4,
+      "first_series_id": "OEUN000000031--3421000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000042--4323000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 5,
+      "first_series_id": "OEUN000000042--4325000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000044--4627000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 6,
+      "first_series_id": "OEUN000000044--4629000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000048--5031000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 7,
+      "first_series_id": "OEUN000000048--5033000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000022--2335000001",
+      "messages": [
+        "Series does not exist for Series OEUN000000022--2321000001",
+        "Series does not exist for Series OEUN000000022--2325000001",
+        "Series does not exist for Series OEUN000000022--2331000001",
+        "Series does not exist for Series OEUN000000022--2335000001"
+      ],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 8,
+      "first_series_id": "OEUN000000022--2337000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000051--5239000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 9,
+      "first_series_id": "OEUN000000051--5241000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000052--5343000001",
+      "messages": [
+        "Series does not exist for Series OEUN000000051--5245000001"
+      ],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 10,
+      "first_series_id": "OEUN000000052--5345000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000053--5447000001",
+      "messages": [
+        "Series does not exist for Series OEUN000000053--5431000001",
+        "Series does not exist for Series OEUN000000053--5445000001"
+      ],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 11,
+      "first_series_id": "OEUN000000053--5449000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000054--5551000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 12,
+      "first_series_id": "OEUN000000054--5553000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000056--5700000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 13,
+      "first_series_id": "OEUN000000056--5711000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000061--6213000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 14,
+      "first_series_id": "OEUN000000061--6215000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000062--6317000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 15,
+      "first_series_id": "OEUN000000062--6319000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000071--7221000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 16,
+      "first_series_id": "OEUN000000071--7223000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000072--7325000001",
+      "messages": [
+        "Series does not exist for Series OEUN000000072--7321000001"
+      ],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 17,
+      "first_series_id": "OEUN000000072--7327000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000081--8229000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 18,
+      "first_series_id": "OEUN000000081--8231000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000099-10033000001",
+      "messages": [],
+      "series_count": 25
+    },
+    {
+      "api_status": "REQUEST_SUCCEEDED",
+      "batch_index": 19,
+      "first_series_id": "OEUN000000099-10035000001",
+      "http_status": 200,
+      "last_series_id": "OEUN000000099-10053000001",
+      "messages": [],
+      "series_count": 10
+    }
+  ],
+  "scope_boundary": "OEWS covers wage and salary workers in covered nonfarm establishments and excludes self-employed workers. CPS/RPS worker composition has a broader worker universe, so even primary rows are an independent-source robustness comparison, not a synchronized-universe validation.",
+  "series_count": 460,
+  "source_build_commit": "ccadf8af5bda3f32e41c2b41549109967a7e3643"
+}
