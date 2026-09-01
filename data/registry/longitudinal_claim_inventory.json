@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "policy": "Any changed longitudinal publication artifact triggers review of every registered dependent public claim unless a future dependency map proves narrower scope.",
+  "claims": [
+    {
+      "claim_id": "home-five-wave-summary",
+      "surface": "apps/web/app/page.tsx",
+      "description": "Homepage five-wave longitudinal evidence summary and interpretive framing."
+    },
+    {
+      "claim_id": "industry-explorer-longitudinal",
+      "surface": "apps/web/app/explore/industries/page.tsx",
+      "description": "Industry longitudinal diagnostics and stability interpretation."
+    },
+    {
+      "claim_id": "occupation-explorer-longitudinal",
+      "surface": "apps/web/app/explore/occupations/page.tsx",
+      "description": "Occupation longitudinal diagnostics and stability interpretation."
+    },
+    {
+      "claim_id": "after-adoption-essay",
+      "surface": "apps/web/app/blog/after-adoption/page.tsx",
+      "description": "Technical essay claims derived from the five-wave RPS subgroup audit."
+    },
+    {
+      "claim_id": "readme-longitudinal-status",
+      "surface": "README.md",
+      "description": "Repository-level summary of longitudinal findings and validation state."
+    }
+  ]
+}
