@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Execute and validate an official CPS occupation-composition vintage.
 
-This script turns official Basic Monthly CPS CSV files into a versioned composition
-package. It deliberately stops at composition weights: it does not join RPS occupation
-observations and therefore does not produce occupation-adjusted industry residuals.
+This script turns official Basic Monthly CPS fixed-width public-use files into a
+versioned composition package. It deliberately stops at composition weights: it does
+not join RPS occupation observations and therefore does not produce occupation-adjusted
+industry residuals.
 """
 
 from __future__ import annotations
@@ -21,10 +22,11 @@ from typing import Any
 from genai_at_work.cps import (
     IndustryComposition,
     build_composition,
-    download_official_month,
-    official_month_filename,
+    download_official_fixed_width_month,
+    official_fixed_width_filename,
+    official_record_layout_url,
     quarter_months,
-    read_quarter_csvs,
+    read_quarter_fixed_width_gz,
 )
 
 
@@ -183,7 +185,7 @@ def _validation_checks(
     if population_sanity_max is not None:
         population_sanity = population_sanity and weighted_worker_population <= population_sanity_max
 
-    checks = {
+    sanity_checks = {
         "industry_count_is_20": len(composition) == 20,
         "weighted_worker_population_within_configured_sanity_range": population_sanity,
         "all_supported_weight_vectors_sum_to_one": all_weight_sums_valid,
@@ -231,7 +233,7 @@ def _validation_checks(
         ),
         "median_worker_vs_actual_hour_weights_l1": _median(worker_actual_differences),
         "median_actual_vs_usual_hour_weights_l1": _median(actual_usual_differences),
-        "sanity_checks": checks,
+        "sanity_checks": sanity_checks,
         "remaining_gate": (
             "Occupation-composition counterfactuals/residuals require a compatible authorized "
             "RPS occupation observation vintage; the public repository intentionally contains no "
@@ -253,7 +255,7 @@ def _write_report(
 ## Status
 
 This record documents execution of the occupation-composition **weighting layer** on official
-Basic Monthly CPS public-use CSV files for {period}.
+Basic Monthly CPS fixed-width public-use files for {period}.
 
 It does **not** claim completed RPS occupation-composition counterfactuals or
 occupation-adjusted industry-context residuals. Those require a compatible authorized RPS
@@ -270,8 +272,9 @@ occupation observation vintage, which is intentionally absent from the public re
 
 ## Source inputs
 
-Exact official source URLs, SHA-256 checksums, file sizes, row counts, and the execution
-retrieval/validation timestamp are frozen in the adjacent `input_manifest.json`.
+Official compressed fixed-width Basic CPS files were used. Exact source URLs, record-layout URL,
+SHA-256 checksums, file sizes, row counts, and the execution retrieval/validation timestamp are
+frozen in the adjacent `input_manifest.json`.
 
 ## Weighting contract executed
 
@@ -320,11 +323,11 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
 
     if args.download_missing:
         for month in months:
-            destination = args.input_dir / official_month_filename(args.year, month)
+            destination = args.input_dir / official_fixed_width_filename(args.year, month)
             if not destination.exists():
-                download_official_month(args.year, month, destination)
+                download_official_fixed_width_month(args.year, month, destination)
 
-    people, provenance = read_quarter_csvs(
+    people, provenance = read_quarter_fixed_width_gz(
         args.input_dir,
         year=args.year,
         quarter=args.quarter,
@@ -367,6 +370,8 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "dataset": "U.S. Census Bureau Current Population Survey Basic Monthly public-use data",
         "period": period,
         "months": list(months),
+        "input_format": "official_fixed_width_gzip",
+        "record_layout_url": official_record_layout_url(args.year),
         "population": "employed adults age 18-64 under PREMPNOT=1 project filter",
         "month_factor": 1 / len(months),
         "weight_variable": "PWSSWGT",
