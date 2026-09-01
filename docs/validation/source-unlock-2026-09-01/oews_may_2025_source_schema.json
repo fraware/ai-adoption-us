@@ -1,0 +1,110 @@
+{
+  "api_probe": {},
+  "archive_probe": {
+    "final_url": "https://www.bls.gov/oes/special-requests/oesm25in4.zip",
+    "headers": {
+      "content_disposition": null,
+      "content_length": "1325",
+      "content_type": "text/html",
+      "etag": null,
+      "last_modified": null
+    },
+    "http_status": 403,
+    "is_zip_archive": false,
+    "response_sha256": "651390e99f9d980ed919dbb7032445af0f50deaec0b791c4db639714786dc299",
+    "response_size_bytes": 1325,
+    "source_url": "https://www.bls.gov/oes/special-requests/oesm25in4.zip",
+    "status": "http_response_received"
+  },
+  "dataset": "May 2025 Occupational Employment and Wage Statistics",
+  "generated_at_utc": "2026-09-01T07:22:51.113138+00:00",
+  "observed_mapping_summary": {
+    "datatype_rows": [],
+    "industry_row_count": 0,
+    "major_occupation_candidates": [],
+    "national_area_rows": [],
+    "occupation_row_count": 0,
+    "sector_level_candidates": []
+  },
+  "provider": "U.S. Bureau of Labor Statistics",
+  "raw_retained_in_repository": false,
+  "source_build_commit": "7129e4b5c04d3ab401b1b81e3421af6f63570e5d",
+  "status": "source_paths_probed",
+  "text_interface": {
+    "area": {
+      "final_url": "https://download.bls.gov/pub/time.series/oe/oe.area",
+      "headers": {
+        "content_disposition": null,
+        "content_length": "1325",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": null
+      },
+      "http_status": 403,
+      "response_sha256": "9bef4ec31f56581ed01693bc716c51a972fc0a3838d3e568af41ce237cf335b3",
+      "response_size_bytes": 1325,
+      "source_url": "https://download.bls.gov/pub/time.series/oe/oe.area",
+      "status": "http_response_received"
+    },
+    "datatype": {
+      "final_url": "https://download.bls.gov/pub/time.series/oe/oe.datatype",
+      "headers": {
+        "content_disposition": null,
+        "content_length": "1325",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": null
+      },
+      "http_status": 403,
+      "response_sha256": "3d524be4f52063589d487593f51b7bc01d23e07d53451327f42e968b7ccac624",
+      "response_size_bytes": 1325,
+      "source_url": "https://download.bls.gov/pub/time.series/oe/oe.datatype",
+      "status": "http_response_received"
+    },
+    "documentation": {
+      "final_url": "https://download.bls.gov/pub/time.series/oe/oe.txt",
+      "headers": {
+        "content_disposition": null,
+        "content_length": "1325",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": null
+      },
+      "http_status": 403,
+      "response_sha256": "ae4f0ed0e948141d24cc3a8c68196e0a51f843c2d79e475474a985ee8a716812",
+      "response_size_bytes": 1325,
+      "source_url": "https://download.bls.gov/pub/time.series/oe/oe.txt",
+      "status": "http_response_received"
+    },
+    "industry": {
+      "final_url": "https://download.bls.gov/pub/time.series/oe/oe.industry",
+      "headers": {
+        "content_disposition": null,
+        "content_length": "1325",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": null
+      },
+      "http_status": 403,
+      "response_sha256": "7ed4ad7c3d652f994ccdedd8904d5b2b482c75213e42d882aed00c0dd9e7eda8",
+      "response_size_bytes": 1325,
+      "source_url": "https://download.bls.gov/pub/time.series/oe/oe.industry",
+      "status": "http_response_received"
+    },
+    "occupation": {
+      "final_url": "https://download.bls.gov/pub/time.series/oe/oe.occupation",
+      "headers": {
+        "content_disposition": null,
+        "content_length": "1325",
+        "content_type": "text/html",
+        "etag": null,
+        "last_modified": null
+      },
+      "http_status": 403,
+      "response_sha256": "cbe913ef66daafa40f47ce1fb4c02d28d15531c755169b74d99989683a4bc859",
+      "response_size_bytes": 1325,
+      "source_url": "https://download.bls.gov/pub/time.series/oe/oe.occupation",
+      "status": "http_response_received"
+    }
+  }
+}
