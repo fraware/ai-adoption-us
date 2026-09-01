@@ -1,0 +1,65 @@
+name: Normalize composition evidence schema
+
+on:
+  push:
+    branches:
+      - research/oews-rps-source-unlock
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out research branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install package and development checks
+        run: python -m pip install -e '.[dev]'
+
+      - name: Normalize generator schema
+        run: sed -i 's/oeWS_/oews_/g' scripts/build_composition_evidence_tiers.py
+
+      - name: Validate and rebuild
+        env:
+          SOURCE_BUILD_COMMIT: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src pytest -q \
+            tests/test_composition_evidence.py \
+            tests/test_cps_reliability.py \
+            tests/test_oews.py \
+            tests/test_oews_partial.py
+          ruff check src tests scripts
+          mypy src
+          PYTHONPATH=src python scripts/build_composition_evidence_tiers.py \
+            --policy data/registry/cps_composition_evidence_policy_v1.json \
+            --period-reliability data/derived/composition/cps-q2-reliability/period_reliability.csv \
+            --exact-2025 data/derived/composition/oews-may-2025-cross-vintage/oews_vs_cps_q2_2025_exact.csv \
+            --exact-2026 data/derived/composition/oews-may-2025-cross-vintage/oews_vs_cps_q2_2026_exact.csv \
+            --bounds-2025 data/derived/composition/oews-may-2025-cross-vintage/oews_vs_cps_q2_2025_l1_bounds.csv \
+            --bounds-2026 data/derived/composition/oews-may-2025-cross-vintage/oews_vs_cps_q2_2026_l1_bounds.csv \
+            --cps-vintage-comparison data/derived/composition/oews-may-2025-cross-vintage/cps_q2_2025_vs_q2_2026.csv \
+            --output-dir data/derived/composition/composition-evidence-v1 \
+            --validation-report docs/validation/COMPOSITION_EVIDENCE_POLICY_V1.md \
+            --source-build-commit "$SOURCE_BUILD_COMMIT"
+
+      - name: Commit normalized schema and evidence
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            scripts/build_composition_evidence_tiers.py \
+            data/derived/composition/composition-evidence-v1 \
+            docs/validation/COMPOSITION_EVIDENCE_POLICY_V1.md
+          git commit -m 'Normalize composition evidence schema'
+          git push origin HEAD:research/oews-rps-source-unlock
