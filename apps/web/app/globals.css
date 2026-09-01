@@ -183,7 +183,11 @@ tbody th { font-weight: 500; }
 .site-footer > div { max-width: var(--max); margin: 0 auto; padding: 28px; display: grid; grid-template-columns: 1fr 2fr auto; gap: 26px; align-items: start; }
 .site-footer p { margin: 0; }
 .footer-links { display: flex; gap: 14px; flex-wrap: wrap; }
-code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .92em;
+  overflow-wrap: anywhere;
+}
 
 @media (max-width: 860px) {
   .measurement-ladder { grid-template-columns: repeat(2, 1fr); }
