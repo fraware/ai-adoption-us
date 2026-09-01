@@ -14,7 +14,7 @@ import json
 import math
 import os
 from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +29,7 @@ from genai_at_work.cps import (
 
 
 def _utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -248,7 +248,7 @@ def _write_report(
     source_build_commit: str,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    report = f"""# CPS {period} composition execution — official-data checkpoint
+    report = f"""# CPS {period} composition execution - official-data checkpoint
 
 ## Status
 
@@ -264,7 +264,7 @@ occupation observation vintage, which is intentionally absent from the public re
 - source build commit: `{source_build_commit}`
 - generated at: `{checks['generated_at_utc']}`
 - in-scope CPS person-month rows: **{int(checks['sample_rows']):,}**
-- pooled weighted employed population age 18–64: **{float(checks['weighted_worker_population_age_18_64_employed']):,.0f}**
+- pooled weighted employed population age 18-64: **{float(checks['weighted_worker_population_age_18_64_employed']):,.0f}**
 - industry groups produced: **{checks['industry_count']}**
 - coverage gate: **{float(checks['coverage_gate']):.1%}**
 
