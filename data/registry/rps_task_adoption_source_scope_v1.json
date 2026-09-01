@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "verified_date": "2026-09-02",
+  "issue": 17,
+  "measurement_program": "What Work Does Generative AI Do?",
+  "canonical_publication": {
+    "title": "What Work Does Generative AI Do?",
+    "authors": [
+      "Alexander Bick",
+      "Adam Blandin",
+      "David J. Deming",
+      "Tyler Schumacher"
+    ],
+    "publisher": "Federal Reserve Bank of St. Louis",
+    "working_paper_number": "2026-017",
+    "publication_date": "2026-08-25",
+    "doi": "10.20955/wp.2026.017"
+  },
+  "canonical_discovery": {
+    "rps_data_page": "https://sites.google.com/view/covid-rps/data",
+    "rps_generai_page": "https://sites.google.com/view/covid-rps/generative-ai",
+    "st_louis_fed_summary": "https://www.stlouisfed.org/on-the-economy/2026/sep/what-work-does-generative-ai-do"
+  },
+  "assets": [
+    {
+      "asset_id": "rps_genai_occupation_adoption_indices_2026_08_06",
+      "asset_type": "occupation_adoption_indices",
+      "title": "adoption_rates_by_occupation.xlsx",
+      "google_sheet_id": "1_JfNtZVoBi5W_jHEJ1UOs2rhHYRtLXGM",
+      "canonical_url": "https://docs.google.com/spreadsheets/d/1_JfNtZVoBi5W_jHEJ1UOs2rhHYRtLXGM/edit",
+      "workbook_generation_date": "2026-08-06",
+      "byte_sha256": null,
+      "byte_hash_status": "unresolved: canonical workbook bytes were not acquired during this source review; no hash is inferred from a rendered web view",
+      "survey_waves": [
+        "2025-08",
+        "2025-11",
+        "2026-02",
+        "2026-05"
+      ],
+      "population": "Employed respondents with valid occupation, overall at-work GenAI-use, last-week GenAI-use, and survey-weight information.",
+      "weighting": "Survey weights after pooling the four survey dates.",
+      "taxonomy": {
+        "detailed_occupation": "2018 Standard Occupational Classification",
+        "census_occupation": "2018 Census occupation codes",
+        "levels_reported": [
+          "SOC Major Group",
+          "SOC Minor Group",
+          "SOC Broad Occupation",
+          "2018 Census Occupation Code"
+        ]
+      },
+      "measure": "Survey-weighted share of respondents in the occupation who answer yes to whether they use Generative AI for their job; stored on a 0-1 scale.",
+      "suppression": "Adoption rate blank when the unweighted respondent observation count is below 20.",
+      "visible_uncertainty_fields": [],
+      "uncertainty_status": "not established from the released workbook metadata reviewed on 2026-09-02",
+      "release_metadata_defect": "Citation field still contains a pre-release placeholder although a current working-paper citation now exists."
+    },
+    {
+      "asset_id": "rps_genai_work_activity_adoption_indices_2026_08_06",
+      "asset_type": "task_adoption_indices",
+      "title": "adoption_rates_by_work_activity.xlsx",
+      "google_sheet_id": "17OI5xRALkN4lDZ1fHw2R9xPJUdDgWyFU",
+      "canonical_url": "https://docs.google.com/spreadsheets/d/17OI5xRALkN4lDZ1fHw2R9xPJUdDgWyFU/edit",
+      "workbook_generation_date": "2026-08-06",
+      "byte_sha256": null,
+      "byte_hash_status": "unresolved: canonical workbook bytes were not acquired during this source review; no hash is inferred from a rendered web view",
+      "survey_waves": [
+        "2025-08",
+        "2025-11",
+        "2026-02",
+        "2026-05"
+      ],
+      "population": "Employed respondents with valid occupation, overall at-work GenAI-use, last-week GenAI-use, and survey-weight information.",
+      "weighting": "Survey weights after pooling the four survey dates.",
+      "taxonomy": {
+        "framework": "O*NET work activities",
+        "database_release": null,
+        "database_release_status": "unresolved: the released workbook contains the literal placeholder [INSERT EXACT O*NET DATABASE RELEASE BEFORE PUBLIC RELEASE]",
+        "levels_reported": [
+          "Detailed Work Activity",
+          "Intermediate Work Activity",
+          "Broad Work Activity"
+        ]
+      },
+      "assignment": "Respondents are linked to up to 10 O*NET Detailed Work Activities associated with their occupation and report which activities they perform.",
+      "measure": "Survey-weighted share of performed work-activity observations for which the respondent reports using GenAI; respondents who do not use GenAI for their job are coded 0 for task-level use; stored on a 0-1 scale.",
+      "observation_unit_caveat": "At Intermediate and Broad Work Activity levels, one respondent may contribute multiple work-activity observations.",
+      "suppression": "Adoption rate blank when the unweighted work-activity observation count is below 20 for DWA, IWA, and BWA.",
+      "visible_uncertainty_fields": [],
+      "uncertainty_status": "not established from the released workbook metadata reviewed on 2026-09-02",
+      "release_metadata_defects": [
+        "Exact O*NET database release remains a pre-release placeholder.",
+        "Citation field remains a pre-release placeholder although a current working-paper citation now exists."
+      ]
+    }
+  ],
+  "construct_contract": {
+    "E_task": "theoretical or model-based task exposure/capability measure",
+    "E_occ": "theoretical or model-based occupation exposure/capability measure",
+    "A_task": "realized worker-reported GenAI adoption for a performed work activity",
+    "A_occ": "realized occupation-level worker-reported GenAI adoption",
+    "H": "share of work hours actively using GenAI",
+    "S": "self-reported counterfactual hours-saved share",
+    "prohibited_collapses": [
+      "exposure is not adoption",
+      "adoption is not exposure",
+      "exposure is not productivity",
+      "adoption is not productivity",
+      "reported time savings is not measured productivity"
+    ]
+  },
+  "rights": {
+    "public_download_advertised": true,
+    "public_download_evidence": "The official St. Louis Fed summary states that the data are publicly available for download through the RPS, and the official RPS Data page links the occupation and task workbooks.",
+    "explicit_asset_license_found": false,
+    "explicit_redistribution_permission_found": false,
+    "explicit_persistent_storage_permission_found": false,
+    "source_owner_permission_status": "unresolved",
+    "fred_terms_scope": "not treated as governing these Google-hosted RPS workbook assets",
+    "production_consequence": "Do not mirror workbook bytes or ingest/publish observation values in the public repository until source-owner terms or permission explicitly resolve storage, redistribution, derivative publication, attribution, and future-vintage retention."
+  },
+  "reproducibility": {
+    "mutable_delivery_surface": true,
+    "reason": "The official St. Louis Fed summary says the indices will be updated with future survey waves; a stable Google Sheet identifier is therefore not treated as an immutable data vintage.",
+    "required_before_ingestion": [
+      "Acquire canonical workbook bytes through an authorized path and record SHA-256 hashes.",
+      "Resolve the exact O*NET database release used for the task crosswalk.",
+      "Record explicit reuse/storage/redistribution terms or source-owner permission.",
+      "Identify any uncertainty/variance information supplied with the release or paper.",
+      "Freeze the applicable survey-wave and taxonomy vintage before crosswalking exposure measures."
+    ]
+  },
+  "observation_values_included": false,
+  "analysis_status": "source-gated",
+  "public_product_status": "blocked",
+  "sources": {
+    "rps_data": "https://sites.google.com/view/covid-rps/data",
+    "rps_generai": "https://sites.google.com/view/covid-rps/generative-ai",
+    "occupation_workbook": "https://docs.google.com/spreadsheets/d/1_JfNtZVoBi5W_jHEJ1UOs2rhHYRtLXGM/edit",
+    "task_workbook": "https://docs.google.com/spreadsheets/d/17OI5xRALkN4lDZ1fHw2R9xPJUdDgWyFU/edit",
+    "st_louis_fed_summary": "https://www.stlouisfed.org/on-the-economy/2026/sep/what-work-does-generative-ai-do",
+    "fed_working_paper_record": "https://www.fedinprint.org/item/fedlwp/103693/original",
+    "doi": "https://doi.org/10.20955/wp.2026.017"
+  }
+}
