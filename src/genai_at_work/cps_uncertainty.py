@@ -1,15 +1,17 @@
 """Uncertainty primitives for custom CPS occupation-composition vectors.
 
 The observatory keeps inferential uncertainty separate from descriptive reliability diagnostics.
-This module supports two deliberately different evidence classes:
+This module supports two deliberately different computational evidence classes:
 
-* covariance-aware composition uncertainty, when a defensible design covariance for the
-  underlying CPS weighted levels (or composition shares) is supplied; and
+* covariance-aware composition uncertainty, when a full covariance for the underlying CPS
+  weighted levels (or composition shares) is supplied; and
 * BLS-style generalized-variance-function (GVF) marginal standard-error approximations,
   which are useful for benchmarking but do not identify the covariance matrix of a composition.
 
-No function in this module interprets Kish weight dispersion, month-to-month perturbations, or
-leave-one-month-out diagnostics as design-based sampling uncertainty.
+A covariance-aware result is a mathematical capability, not an automatic claim of CPS
+survey-design validity. Whether an input covariance is design-based must be established by its
+provenance and the release gate. No function in this module interprets Kish weight dispersion,
+month-to-month perturbations, or leave-one-month-out diagnostics as design-based uncertainty.
 """
 
 from __future__ import annotations
@@ -18,12 +20,13 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import ClassVar
 
 
 class UncertaintySupport(StrEnum):
-    """Evidence class for an uncertainty result."""
+    """Computational support class for an uncertainty result."""
 
-    DESIGN_COVARIANCE = "design_covariance"
+    COVARIANCE_AWARE = "covariance_aware"
     GVF_MARGINAL_APPROXIMATION = "gvf_marginal_approximation"
     UNSUPPORTED = "unsupported"
 
@@ -52,19 +55,24 @@ class GVFMarginalCompositionUncertainty:
     occupation_ids: tuple[str, ...]
     shares: tuple[float, ...]
     standard_errors: tuple[float, ...]
-    support: UncertaintySupport = UncertaintySupport.GVF_MARGINAL_APPROXIMATION
-    covariance_available: bool = False
+    support: ClassVar[UncertaintySupport] = UncertaintySupport.GVF_MARGINAL_APPROXIMATION
+    covariance_available: ClassVar[bool] = False
 
 
 @dataclass(frozen=True)
 class CompositionCovariance:
-    """Validated covariance matrix for a probability/composition vector."""
+    """Structurally validated covariance matrix for a probability/composition vector.
+
+    Instances returned by :func:`build_composition_covariance` satisfy the numerical covariance
+    and simplex constraints enforced by this module. ``support`` deliberately says only that a
+    full covariance is available. It does not certify the survey-design provenance of that matrix.
+    """
 
     occupation_ids: tuple[str, ...]
     shares: tuple[float, ...]
     covariance: tuple[tuple[float, ...], ...]
     source_method: str
-    support: UncertaintySupport = UncertaintySupport.DESIGN_COVARIANCE
+    support: ClassVar[UncertaintySupport] = UncertaintySupport.COVARIANCE_AWARE
 
 
 def _require_finite(value: float, *, field: str) -> float:
@@ -239,7 +247,12 @@ def build_composition_covariance(
     source_method: str,
     tolerance: float = 1e-10,
 ) -> CompositionCovariance:
-    """Validate and construct a covariance-aware composition uncertainty object."""
+    """Validate and construct a covariance-aware composition uncertainty object.
+
+    Structural validation does not establish survey-design validity. ``source_method`` must record
+    the covariance provenance so an upstream methodological/release gate can decide whether a
+    design-based claim is warranted.
+    """
 
     labels, vector = _validate_labels_and_values(occupation_ids, shares, field="shares")
     if any(value < -tolerance or value > 1.0 + tolerance for value in vector):
@@ -392,10 +405,11 @@ def composition_counterfactual_standard_error(
 ) -> float:
     """Propagate composition covariance to a fixed occupation-weighted counterfactual.
 
-    This is the CPS-composition component only: occupation outcome values are treated as fixed.
-    RPS sampling uncertainty, covariance between RPS occupation estimates, and cross-source
-    dependence are outside this function and must be handled separately before a total inferential
-    standard error is claimed.
+    This is the composition-covariance component only: occupation outcome values are treated as
+    fixed. Whether ``composition`` is CPS design-based is an upstream provenance question. RPS
+    sampling uncertainty, covariance between RPS occupation estimates, and cross-source dependence
+    are outside this function and must be handled separately before a total inferential standard
+    error is claimed.
     """
 
     if set(occupation_values) != set(composition.occupation_ids):
