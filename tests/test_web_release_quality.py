@@ -23,6 +23,7 @@ def test_css_has_keyboard_reduced_motion_and_small_screen_rules():
     assert "prefers-reduced-motion" in css
     assert "@media (max-width: 680px)" in css
     assert ".table-wrap:focus-visible" in css
+    assert "overflow-wrap: anywhere" in css
 
 
 def test_plots_expose_nonvisual_data_tables():
@@ -47,10 +48,12 @@ def test_plots_reflow_with_resize_observer():
         assert "observer.disconnect()" in text
 
 
-def test_public_sources_page_states_unproduced_cps_evidence():
+def test_public_sources_page_states_current_composition_evidence_boundary():
     page = read("apps/web/app/sources/page.tsx")
-    assert "no real CPS composition outputs are claimed yet" in page
-    assert "Not yet produced" in page
+    assert "Official Q2 2025 and Q2 2026 Basic Monthly" in page
+    assert "composition inputs, not RPS residuals" in page
+    assert "Robustness input validated" in page
+    assert "Still gated" in page
     assert "organizational effects" in page
     assert "Sources, provenance" in page
 
@@ -59,7 +62,8 @@ def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     assert "Reported time savings are not an observed measure of labor productivity" in page
     assert "occupation_adjusted_industry_context_residual" in page
-    assert "No empirical CPS residual values are published" in page
+    assert "CPS composition foundation has been executed and validated" in page
+    assert "RPS observation path remains rights-gated" in page
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():
@@ -77,8 +81,9 @@ def test_source_provenance_matches_rights_safe_architecture():
     assert "rights-safe release" in text
     assert "does not redistribute that raw audit fixture" in text
     assert "fred_live_no_store" in text
-    assert "no real CPS composition values or residuals are claimed" in text
-    assert "rejected as empirical inputs" in text
+    assert "Official Q2 2025 and Q2 2026 Basic Monthly CPS inputs have been executed" in text
+    assert "Official May 2025 staffing data have been executed" in text
+    assert "does **not** yet publish the RPS-dependent occupation-adjusted industry residual" in text
 
 
 def test_navigation_routes_exist():
