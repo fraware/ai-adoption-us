@@ -99,31 +99,19 @@ def _series_id(*, industry_code: str, occupation_code: str, datatype: str = "01"
     return f"OEUN0000000{industry_code}{occupation_code}{datatype}"
 
 
-def inspect_oews(*, generated_at: str, source_build_commit: str) -> dict[str, Any]:
-    result: dict[str, Any] = {
-        "status": "source_paths_probed",
-        "provider": "U.S. Bureau of Labor Statistics",
-        "dataset": "May 2025 Occupational Employment and Wage Statistics",
-        "generated_at_utc": generated_at,
-        "source_build_commit": source_build_commit,
-        "raw_retained_in_repository": False,
-        "archive_probe": {},
-        "text_interface": {},
-        "api_probe": {},
-    }
-
-    archive_response, archive_error = _fetch(OEWS_ARCHIVE_URL)
-    archive_record = _transport_record(
-        url=OEWS_ARCHIVE_URL, response=archive_response, error=archive_error
+def _inspect_archive() -> dict[str, Any]:
+    response, error = _fetch(OEWS_ARCHIVE_URL)
+    record = _transport_record(
+        url=OEWS_ARCHIVE_URL, response=response, error=error
     )
     if (
-        archive_response is not None
-        and archive_response.status_code == 200
-        and zipfile.is_zipfile(io.BytesIO(archive_response.content))
+        response is not None
+        and response.status_code == 200
+        and zipfile.is_zipfile(io.BytesIO(response.content))
     ):
-        archive_record["is_zip_archive"] = True
+        record["is_zip_archive"] = True
         entries: list[dict[str, Any]] = []
-        with zipfile.ZipFile(io.BytesIO(archive_response.content)) as archive:
+        with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
             for info in archive.infolist():
                 entry: dict[str, Any] = {
                     "path": info.filename,
@@ -152,11 +140,13 @@ def inspect_oews(*, generated_at: str, source_build_commit: str) -> dict[str, An
                     ]
                     workbook.close()
                 entries.append(entry)
-        archive_record["archive_entries"] = entries
+        record["archive_entries"] = entries
     else:
-        archive_record["is_zip_archive"] = False
-    result["archive_probe"] = archive_record
+        record["is_zip_archive"] = False
+    return record
 
+
+def _inspect_text_interface() -> tuple[dict[str, Any], dict[str, bytes]]:
     mapping_specs = {
         "industry": "oe.industry",
         "occupation": "oe.occupation",
@@ -164,16 +154,31 @@ def inspect_oews(*, generated_at: str, source_build_commit: str) -> dict[str, An
         "area": "oe.area",
         "documentation": "oe.txt",
     }
-    mapping_payloads: dict[str, bytes] = {}
-    text_interface: dict[str, Any] = {}
+    payloads: dict[str, bytes] = {}
+    records: dict[str, Any] = {}
     for key, filename in mapping_specs.items():
         url = f"{OEWS_TEXT_ROOT}/{filename}"
         response, error = _fetch(url)
         record = _transport_record(url=url, response=response, error=error)
         if response is not None and response.status_code == 200:
-            mapping_payloads[key] = response.content
+            payloads[key] = response.content
             record["first_lines"] = response.text.splitlines()[:8]
-        text_interface[key] = record
+        records[key] = record
+    return records, payloads
+
+
+def inspect_oews(*, generated_at: str, source_build_commit: str) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "status": "source_paths_probed",
+        "provider": "U.S. Bureau of Labor Statistics",
+        "dataset": "May 2025 Occupational Employment and Wage Statistics",
+        "generated_at_utc": generated_at,
+        "source_build_commit": source_build_commit,
+        "raw_retained_in_repository": False,
+        "archive_probe": _inspect_archive(),
+    }
+
+    text_interface, mapping_payloads = _inspect_text_interface()
     result["text_interface"] = text_interface
 
     industry_rows = (
@@ -188,102 +193,41 @@ def inspect_oews(*, generated_at: str, source_build_commit: str) -> dict[str, An
         _parse_tsv(mapping_payloads["datatype"]) if "datatype" in mapping_payloads else []
     )
     area_rows = _parse_tsv(mapping_payloads["area"]) if "area" in mapping_payloads else []
-
-    sector_prefixes = {
-        "11",
-        "21",
-        "22",
-        "23",
-        "31",
-        "42",
-        "44",
-        "48",
-        "51",
-        "52",
-        "53",
-        "54",
-        "55",
-        "56",
-        "61",
-        "62",
-        "71",
-        "72",
-        "81",
-        "99",
-    }
-    sector_candidates = [
-        row
-        for row in industry_rows
-        if len(row.get("industry_code", "")) == 6
-        and row["industry_code"][:2] in sector_prefixes
-        and row["industry_code"].endswith("0000")
-    ]
-    major_occupations = [
-        row
-        for row in occupation_rows
-        if len(row.get("occupation_code", "")) == 6
-        and row["occupation_code"].endswith("0000")
-        and row["occupation_code"] != "000000"
-    ]
     result["observed_mapping_summary"] = {
         "industry_row_count": len(industry_rows),
-        "sector_level_candidates": sector_candidates,
         "occupation_row_count": len(occupation_rows),
-        "major_occupation_candidates": major_occupations,
         "datatype_rows": datatype_rows,
         "national_area_rows": [
             row for row in area_rows if row.get("area_code") == "0000000"
         ],
     }
 
-    sector_54 = next(
-        (
-            row
-            for row in industry_rows
-            if row.get("industry_name")
-            == "Professional, Scientific, and Technical Services"
-        ),
-        None,
+    # BLS documents the series-ID decomposition as
+    # OE + U + N + national area + 6-digit industry + 6-digit occupation + datatype.
+    # The two probe codes below are standard 2022 NAICS/SOC aggregates shown on the
+    # official May-2025 OEWS industry and occupation surfaces. They deliberately do
+    # not depend on the cloud-blocked convenience mapping files.
+    probe_series = [
+        _series_id(industry_code="540000", occupation_code="000000"),
+        _series_id(industry_code="540000", occupation_code="110000"),
+    ]
+    response, error = _fetch(
+        OEWS_API_URL,
+        method="POST",
+        json_payload={
+            "seriesid": probe_series,
+            "startyear": "2025",
+            "endyear": "2025",
+        },
     )
-    management = next(
-        (
-            row
-            for row in occupation_rows
-            if row.get("occupation_name") == "Management Occupations"
-        ),
-        None,
-    )
-    if sector_54 and management:
-        probe_series = [
-            _series_id(
-                industry_code=sector_54["industry_code"],
-                occupation_code="000000",
-            ),
-            _series_id(
-                industry_code=sector_54["industry_code"],
-                occupation_code=management["occupation_code"],
-            ),
-        ]
-        response, error = _fetch(
-            OEWS_API_URL,
-            method="POST",
-            json_payload={
-                "seriesid": probe_series,
-                "startyear": "2025",
-                "endyear": "2025",
-            },
-        )
-        api_record = _transport_record(
-            url=OEWS_API_URL, response=response, error=error
-        )
-        api_record["requested_series"] = probe_series
-        if response is not None and response.status_code == 200:
-            try:
-                api_record["json"] = response.json()
-            except requests.JSONDecodeError:
-                api_record["json_decode_error"] = True
-        result["api_probe"] = api_record
-
+    api_record = _transport_record(url=OEWS_API_URL, response=response, error=error)
+    api_record["requested_series"] = probe_series
+    if response is not None and response.status_code == 200:
+        try:
+            api_record["json"] = response.json()
+        except requests.JSONDecodeError:
+            api_record["json_decode_error"] = True
+    result["api_probe"] = api_record
     return result
 
 
@@ -332,8 +276,6 @@ def main() -> int:
     source_build_commit = os.environ.get("SOURCE_BUILD_COMMIT", "unknown")
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Keep the probes independent: one blocked source surface must not prevent the
-    # other source from being tested and recorded.
     rps = inspect_rps(generated_at=generated_at, source_build_commit=source_build_commit)
     oews = inspect_oews(
         generated_at=generated_at, source_build_commit=source_build_commit
@@ -347,9 +289,9 @@ def main() -> int:
     )
     (args.output_dir / "README.md").write_text(
         "# Source-unlock reconnaissance - 2026-09-01\n\n"
-        "OEWS is probed through both the convenience ZIP surface and BLS's official "
-        "time-series mapping/API interfaces. A convenience-download transport block "
-        "does not invalidate an independently functioning official interface.\n\n"
+        "OEWS is probed through the convenience ZIP, BLS text mappings, and the "
+        "sanctioned Public Data API. Cloud transport blocks are recorded instead of "
+        "being bypassed.\n\n"
         "The INFORMS historical RPS replication-files endpoint is probed independently. "
         "Its result establishes technical accessibility only. No reuse, storage, or "
         "redistribution rights are inferred from a successful response. Raw source "
