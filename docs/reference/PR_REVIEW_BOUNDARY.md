@@ -1,0 +1,1 @@
+Permanent PR CI is the next gate; no additional research claims are introduced here.
