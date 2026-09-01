@@ -27,8 +27,8 @@ Release 1 production QA and the RPS source-rights decision remain the two immedi
 | R1.1-G4 | **Blocked** | Experimental composition explorer | D-G1 + R1.1-G2 | UI exposes only supported, stability-qualified residual evidence |
 | R1.2 | **Future** | BTOS firm-side triangulation | construct alignment | firm-side evidence added only where measurement objects are explicit |
 | R1.3-G1 | **New — source/provenance gated** | Realized task adoption versus AI exposure | occupation/task index provenance + rights | lawful, versioned aggregate task/occupation measurement layer |
-| O-G1 | **Open** | Versioned new-wave/revision release pipeline | stable source paths + #11 | tested pipeline produces revision diffs and blocks contract-breaking releases |
-| O-G2 | **Open** | Private-fixture regeneration governance | authorized private fixture + #12 | any fixture revision forces full dependent regeneration/review |
+| O-G1 | **Complete — engineering/governance gate** | Versioned new-wave/revision release pipeline | none for the generic release gate; source-specific releases still require rights-approved source paths | tested pipeline produces revision diffs and blocks contract-breaking releases |
+| O-G2 | **Complete — governance gate** | Private-fixture regeneration governance | none for the governance contract; private execution requires an authorized fixture | any fixture revision forces full dependent regeneration/review with an auditable record |
 | V2 | **Future research** | Worker/task/occupation/industry mechanisms | authorized richer microdata + inference | pre-specified respondent-level design separates composition from context |
 
 ## Canonical progress checkpoint
@@ -476,7 +476,7 @@ Do not label an aggregate industry-context residual organizational complementari
 
 ## O-G1 — versioned new-wave and revision pipeline
 
-Issue #11 converts the project from a one-time validated release into a controlled longitudinal observatory.
+Engineering/governance status: **complete**. Issue #11 defines this generic longitudinal release gate; completing it does not authorize any source, create an empirical RPS join, or promote a real observatory release.
 
 For every new source wave or revision, the production/research process must:
 
@@ -492,13 +492,15 @@ For every new source wave or revision, the production/research process must:
 10. publish a versioned release only after CI and review;
 11. retain immutable analytical history and provenance.
 
-Engineering requirements include deterministic inputs/outputs, no silent data-mode fallback, a structured revision-diff artifact, claim-to-number traceability, and fail-closed behavior on source-definition, rights, missing-series, or coverage changes.
+The implemented release engine verifies deterministic input/output hashes, explicit data mode, source vintages, transition semantics, artifact/claim dependencies, diagnostic coverage, review-package integrity, and fail-closed rights/definition/missing-history/coverage/diagnostic gates. Promotion records distinguish review time from promotion time, require review attestation bound to the candidate builder commit, never copy source input bytes into the public release archive, and constrain release identifiers to safe immutable directory slugs.
 
-Definition of done: a documented/tested update command can process a synthetic/new test vintage, generate an auditable revision diff, and block publication when a contract changes.
+Definition of done is satisfied by the documented/tested synthetic baseline and new-wave workflow: it generates auditable release/review diffs, requires explicit review before promotion, and blocks contract-breaking candidates. The public observatory release registry intentionally remains empty until a real source-specific candidate independently satisfies its rights, evidence, CI, and review requirements.
 
 ## O-G2 — private fixture revision and regeneration gate
 
-Issue #12 governs the private RPS audit fixture. The fixture remains outside the public repository, while public CI must continue to pass without it.
+Governance status: **complete**; issue #12 is closed. This status means the mandatory regeneration/review contract exists. It does not mean the private RPS fixture is present in the public repository or that its contents are publishable.
+
+The fixture remains outside the public repository, while public CI must continue to pass without it.
 
 Whenever an authorized private fixture is added or revised:
 
