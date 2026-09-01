@@ -1,0 +1,104 @@
+{
+  "excluded_industry_count": 2,
+  "generated_at_utc": "2026-09-01T08:50:06.635271+00:00",
+  "limited_industry_count": 1,
+  "noninferential_boundary": "The 0.10 L1 threshold is a project robustness standard, not a BLS/Census significance threshold. L1=0.10 corresponds to total-variation distance 0.05. Kish weight-dispersion effective n and monthly perturbation diagnostics do not incorporate CPS clustering, stratification, or rotation-group covariance and are not design-based uncertainty estimates.",
+  "policy_status": "post-diagnostic governance rule for future primary-evidence use",
+  "policy_version": "cps-composition-evidence-v1",
+  "primary_stable_industry_count": 16,
+  "required_periods": [
+    "2025-Q2",
+    "2026-Q2"
+  ],
+  "retrospective_disclosure": "This v1 threshold was adopted after the Q2-2025/Q2-2026 reliability diagnostics exposed a highly unstable thin domain. It is therefore not described as preregistered for this checkpoint. Full unfiltered results remain preserved, and filtered summaries must be presented as a governance/sensitivity layer.",
+  "sample_redesign_caveat": "Both Q2 2025 and Q2 2026 fall inside the CPS 2020-Census-based sample redesign phase-in, which began in April 2025 and is scheduled to complete in July 2026. BLS expects negligible effects on published estimates, but the transition is retained as a comparability caveat for custom thin-domain composition estimates.",
+  "scientific_boundary": "This evidence-tier layer qualifies the reliability of CPS composition inputs. It does not identify an RPS industry-context effect and does not convert descriptive stability diagnostics into design-based uncertainty estimates.",
+  "sensitivity_unstable_industries": [
+    "management-of-companies-and-enterprises"
+  ],
+  "sensitivity_unstable_industry_count": 1,
+  "source_build_commit": "2e1646662b94232b81e6f21689cb4acec4958fc1",
+  "stability_qualified_primary_summary": {
+    "cps_2025_vs_2026": {
+      "industry_count": 16,
+      "median_cosine_similarity": 0.9975852921724357,
+      "median_l1_distance": 0.07947241769895491,
+      "median_spearman_rank_correlation": 0.9618644067796611,
+      "top_occupation_agreement_count": 14,
+      "top_occupation_agreement_rate": 0.875
+    },
+    "oeWS_vs_cps_2025_bounds": {
+      "industry_count": 16,
+      "maximum_l1_bound_width": 0.0011404111812703954,
+      "median_l1_lower_bound": 0.28787170952905655,
+      "median_l1_upper_bound": 0.28787170952905655,
+      "partially_identified_count": 6
+    },
+    "oeWS_vs_cps_2025_exact": {
+      "industry_count": 10,
+      "median_cosine_similarity": 0.9745740343570712,
+      "median_l1_distance": 0.2621780573100409,
+      "median_spearman_rank_correlation": 0.9614571676914954,
+      "top_occupation_agreement_count": 6,
+      "top_occupation_agreement_rate": 0.6
+    },
+    "oeWS_vs_cps_2026_bounds": {
+      "industry_count": 16,
+      "maximum_l1_bound_width": 0.0032471856122205933,
+      "median_l1_lower_bound": 0.3100537486665398,
+      "median_l1_upper_bound": 0.3100537486665398,
+      "partially_identified_count": 6
+    },
+    "oeWS_vs_cps_2026_exact": {
+      "industry_count": 10,
+      "median_cosine_similarity": 0.9740763189185622,
+      "median_l1_distance": 0.2474364292963317,
+      "median_spearman_rank_correlation": 0.9553924336533033,
+      "top_occupation_agreement_count": 7,
+      "top_occupation_agreement_rate": 0.7
+    }
+  },
+  "stability_threshold_l1": 0.1,
+  "stability_threshold_total_variation": 0.05,
+  "status": "stability-qualified CPS/OEWS composition evidence tiers built",
+  "unfiltered_primary_summary": {
+    "cps_2025_vs_2026": {
+      "industry_count": 17,
+      "median_cosine_similarity": 0.9972584734339354,
+      "median_l1_distance": 0.08960026006702666,
+      "median_spearman_rank_correlation": 0.9607344632768362,
+      "top_occupation_agreement_count": 15,
+      "top_occupation_agreement_rate": 0.8823529411764706
+    },
+    "oeWS_vs_cps_2025_bounds": {
+      "industry_count": 17,
+      "maximum_l1_bound_width": 0.0011404111812703954,
+      "median_l1_lower_bound": 0.2980375879144468,
+      "median_l1_upper_bound": 0.2980375879144468,
+      "partially_identified_count": 6
+    },
+    "oeWS_vs_cps_2025_exact": {
+      "industry_count": 11,
+      "median_cosine_similarity": 0.9724645398102251,
+      "median_l1_distance": 0.2772387012212034,
+      "median_spearman_rank_correlation": 0.9604743083003953,
+      "top_occupation_agreement_count": 6,
+      "top_occupation_agreement_rate": 0.5454545454545454
+    },
+    "oeWS_vs_cps_2026_bounds": {
+      "industry_count": 17,
+      "maximum_l1_bound_width": 0.0032471856122205933,
+      "median_l1_lower_bound": 0.3209737915610507,
+      "median_l1_upper_bound": 0.3209737915610507,
+      "partially_identified_count": 6
+    },
+    "oeWS_vs_cps_2026_exact": {
+      "industry_count": 11,
+      "median_cosine_similarity": 0.973706182811574,
+      "median_l1_distance": 0.25325221201813486,
+      "median_spearman_rank_correlation": 0.9491812535290797,
+      "top_occupation_agreement_count": 7,
+      "top_occupation_agreement_rate": 0.6363636363636364
+    }
+  }
+}
