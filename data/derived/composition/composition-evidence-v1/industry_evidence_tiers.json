@@ -1,0 +1,382 @@
+[
+  {
+    "evidence_tier": "excluded",
+    "industry_id": "agriculture-forestry-fishing-and-hunting",
+    "industry_index": 1,
+    "industry_name": "Agriculture, Forestry, Fishing, and Hunting",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.051617101771200206,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.051617101771200206,
+      "2026-Q2": 0.04417917349422832
+    },
+    "passes_stability_rule": null,
+    "reason": "source-universe definitions are excluded from the primary OEWS-CPS comparison",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "excluded",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "mining-quarrying-and-oil-and-gas-extraction",
+    "industry_index": 2,
+    "industry_name": "Mining, Quarrying, and Oil and Gas Extraction",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.09624552461216886,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.07097920537308554,
+      "2026-Q2": 0.09624552461216886
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "construction",
+    "industry_index": 3,
+    "industry_name": "Construction",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.015127871474756645,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.015127871474756645,
+      "2026-Q2": 0.01463355803091431
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "manufacturing",
+    "industry_index": 4,
+    "industry_name": "Manufacturing",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.022493611945825564,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.022493611945825564,
+      "2026-Q2": 0.0133234934116988
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "wholesale-trade",
+    "industry_index": 5,
+    "industry_name": "Wholesale Trade",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.045126124955857876,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.04331714359931562,
+      "2026-Q2": 0.045126124955857876
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "retail-trade",
+    "industry_index": 6,
+    "industry_name": "Retail Trade",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.01480325263386973,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.012666128284590027,
+      "2026-Q2": 0.01480325263386973
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "transportation-and-warehousing",
+    "industry_index": 7,
+    "industry_name": "Transportation and Warehousing",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.019717324644963126,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.01441363761324013,
+      "2026-Q2": 0.019717324644963126
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "utilities",
+    "industry_index": 8,
+    "industry_name": "Utilities",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.07349444291533794,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.06095092425837385,
+      "2026-Q2": 0.07349444291533794
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "information",
+    "industry_index": 9,
+    "industry_name": "Information",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.04557251077659504,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.04557251077659504,
+      "2026-Q2": 0.0412963732922908
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "finance-and-insurance",
+    "industry_index": 10,
+    "industry_name": "Finance and Insurance",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.025960041129277755,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.016300413567258636,
+      "2026-Q2": 0.025960041129277755
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "real-estate-and-rental-and-leasing",
+    "industry_index": 11,
+    "industry_name": "Real Estate and Rental and Leasing",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.0356470136491595,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.034034610756362486,
+      "2026-Q2": 0.0356470136491595
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "professional-scientific-and-technical-services",
+    "industry_index": 12,
+    "industry_name": "Professional, Scientific, and Technical Services",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.019651802981286107,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.019651802981286107,
+      "2026-Q2": 0.018752448235024123
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "sensitivity_unstable",
+    "industry_id": "management-of-companies-and-enterprises",
+    "industry_index": 13,
+    "industry_name": "Management of Companies and Enterprises",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.14218063065667338,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.12892317338798942,
+      "2026-Q2": 0.14218063065667338
+    },
+    "passes_stability_rule": false,
+    "reason": "fails the versioned leave-one-month-out stability rule in at least one required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "administrative-and-support-and-waste-management-services",
+    "industry_index": 14,
+    "industry_name": "Administrative and Support and Waste Management Services",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.029770097739432337,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.02195926223516668,
+      "2026-Q2": 0.029770097739432337
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "educational-services",
+    "industry_index": 15,
+    "industry_name": "Educational Services",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.017091424965664362,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.01663581396667788,
+      "2026-Q2": 0.017091424965664362
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "health-care-and-social-assistance",
+    "industry_index": 16,
+    "industry_name": "Health Care and Social Assistance",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.017662850260485294,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.012354133052320656,
+      "2026-Q2": 0.017662850260485294
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "arts-entertainment-and-recreation",
+    "industry_index": 17,
+    "industry_name": "Arts, Entertainment, and Recreation",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.042538162570763385,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.03551884505102709,
+      "2026-Q2": 0.042538162570763385
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "primary_stable",
+    "industry_id": "accommodation-and-food-services",
+    "industry_index": 18,
+    "industry_name": "Accommodation and Food Services",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.02291969843872312,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.021519166778860885,
+      "2026-Q2": 0.02291969843872312
+    },
+    "passes_stability_rule": true,
+    "reason": "passes the versioned leave-one-month-out stability rule in every required period",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "primary",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "limited",
+    "industry_id": "other-services-except-public-administration",
+    "industry_index": 19,
+    "industry_name": "Other Services, Except Public Administration",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.02783262205431299,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.02355365577203949,
+      "2026-Q2": 0.02783262205431299
+    },
+    "passes_stability_rule": null,
+    "reason": "source-universe comparability is limited under the OEWS crosswalk",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "limited",
+    "stability_threshold_l1": 0.1
+  },
+  {
+    "evidence_tier": "excluded",
+    "industry_id": "public-administration",
+    "industry_index": 20,
+    "industry_name": "Public Administration",
+    "maximum_leave_one_month_out_l1_across_required_periods": 0.03608590902847846,
+    "maximum_leave_one_month_out_l1_by_period": {
+      "2025-Q2": 0.03608590902847846,
+      "2026-Q2": 0.023510050483642422
+    },
+    "passes_stability_rule": null,
+    "reason": "source-universe definitions are excluded from the primary OEWS-CPS comparison",
+    "required_periods": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "source_comparability": "excluded",
+    "stability_threshold_l1": 0.1
+  }
+]

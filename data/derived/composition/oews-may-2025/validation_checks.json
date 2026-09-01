@@ -1,0 +1,55 @@
+{
+  "api_request_count": 19,
+  "coverage_gate": 0.98,
+  "excluded_from_primary_industries": [
+    "agriculture-forestry-fishing-and-hunting",
+    "public-administration"
+  ],
+  "generated_at_utc": "2026-09-01T08:29:30.956807+00:00",
+  "industry_count": 20,
+  "interpretation_boundary": "OEWS is an employer-based wage-and-salary employment source with a May-2025 model-based vintage; CPS is a household worker source pooled over 2026-Q2. The comparison tests occupation-composition robustness across independent sources and vintages and does not establish population identity or causality.",
+  "limited_comparability_industries": [
+    "other-services-except-public-administration"
+  ],
+  "median_primary_cosine_similarity": 0.973706182811574,
+  "median_primary_l1_distance": 0.25325221201813486,
+  "median_primary_spearman_rank_correlation": 0.9491812535290797,
+  "minimum_oews_coverage": 0.998023023538376,
+  "missing_series_count": 16,
+  "missing_series_ids": [
+    "OEUN000000011--1221000001",
+    "OEUN000000011--1223000001",
+    "OEUN000000011--1227000001",
+    "OEUN000000011--1231000001",
+    "OEUN000000021--2221000001",
+    "OEUN000000021--2231000001",
+    "OEUN000000022--2321000001",
+    "OEUN000000022--2325000001",
+    "OEUN000000022--2331000001",
+    "OEUN000000022--2335000001",
+    "OEUN000000022--2339000001",
+    "OEUN000000051--5245000001",
+    "OEUN000000053--5431000001",
+    "OEUN000000053--5445000001",
+    "OEUN000000056--5745000001",
+    "OEUN000000072--7321000001"
+  ],
+  "occupation_count": 22,
+  "primary_comparable_industries": 17,
+  "primary_supported_comparisons": 11,
+  "primary_top_occupation_agreement_count": 7,
+  "primary_top_occupation_agreement_rate": 0.6363636363636364,
+  "sanity_checks": {
+    "industry_count_is_20": true,
+    "occupation_count_is_22": true,
+    "request_count_within_unregistered_daily_limit": true,
+    "series_count_is_460": true,
+    "series_ids_unique": true,
+    "supported_vectors_sum_to_one": true,
+    "supported_weights_nonnegative": true
+  },
+  "series_count": 460,
+  "source_build_commit": "4893fe8088f811351d4b219d481c866e47018546",
+  "status": "May-2025 OEWS composition robustness executed",
+  "supported_oews_industries": 20
+}

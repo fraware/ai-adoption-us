@@ -1,0 +1,21 @@
+industry_index,industry_id,industry_name,worker_coverage,actual_hours_valid_worker_coverage,actual_hours_mapping_coverage,usual_hours_valid_worker_coverage,usual_hours_mapping_coverage,worker_suppressed
+1,agriculture-forestry-fishing-and-hunting,"Agriculture, Forestry, Fishing, and Hunting",1.0,1.0,1.0,0.9073983715328263,1.0,False
+2,mining-quarrying-and-oil-and-gas-extraction,"Mining, Quarrying, and Oil and Gas Extraction",1.0,1.0,1.0,0.9425632638622586,1.0,False
+3,construction,Construction,1.0,1.0,1.0,0.9385558009503893,1.0,False
+4,manufacturing,Manufacturing,1.0,1.0,1.0,0.9711084757152958,1.0,False
+5,wholesale-trade,Wholesale Trade,1.0,1.0,1.0,0.9621412995216241,1.0,False
+6,retail-trade,Retail Trade,1.0,1.0,1.0,0.9582674360465802,1.0,False
+7,transportation-and-warehousing,Transportation and Warehousing,1.0,1.0,1.0,0.9255365627130165,1.0,False
+8,utilities,Utilities,1.0,1.0,1.0,0.9684091996370988,1.0,False
+9,information,Information,1.0,1.0,1.0,0.9569016540478671,1.0,False
+10,finance-and-insurance,Finance and Insurance,1.0,1.0,1.0,0.9715683757447438,1.0,False
+11,real-estate-and-rental-and-leasing,Real Estate and Rental and Leasing,1.0,1.0,1.0,0.9203022958809709,1.0,False
+12,professional-scientific-and-technical-services,"Professional, Scientific, and Technical Services",1.0,1.0,1.0,0.9585886371368637,1.0,False
+13,management-of-companies-and-enterprises,Management of Companies and Enterprises,1.0,1.0,1.0,0.9391177910552754,1.0,False
+14,administrative-and-support-and-waste-management-services,Administrative and Support and Waste Management Services,1.0,1.0,1.0,0.9359562505253737,1.0,False
+15,educational-services,Educational Services,1.0,1.0,1.0,0.9704587626030369,1.0,False
+16,health-care-and-social-assistance,Health Care and Social Assistance,1.0,1.0,1.0,0.9637735738496452,1.0,False
+17,arts-entertainment-and-recreation,"Arts, Entertainment, and Recreation",1.0,1.0,1.0,0.9123502655773005,1.0,False
+18,accommodation-and-food-services,Accommodation and Food Services,1.0,1.0,1.0,0.9307998144911264,1.0,False
+19,other-services-except-public-administration,"Other Services, Except Public Administration",1.0,1.0,1.0,0.9222832435813307,1.0,False
+20,public-administration,Public Administration,1.0,1.0,1.0,0.9765695823413343,1.0,False

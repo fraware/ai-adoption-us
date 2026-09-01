@@ -1,0 +1,19 @@
+{
+  "version": "cps-basic-fixed-width-2025-v1",
+  "year": 2025,
+  "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/2025_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+  "verification_techdoc_url": "https://www2.census.gov/programs-surveys/cps/techdocs/cpsaug25.pdf",
+  "position_convention": "1-based inclusive Census locations; parser converts to 0-based half-open Python slices",
+  "weight_implied_decimals": 4,
+  "fields": {
+    "PRTAGE": {"start": 122, "end": 123},
+    "PEMLR": {"start": 180, "end": 181},
+    "PEHRUSL1": {"start": 218, "end": 219},
+    "PEHRACT1": {"start": 243, "end": 244},
+    "PREMPNOT": {"start": 393, "end": 394},
+    "PRDTIND1": {"start": 472, "end": 473},
+    "PRDTOCC1": {"start": 476, "end": 477},
+    "PWSSWGT": {"start": 613, "end": 622}
+  },
+  "verification_note": "The required 2025 Basic CPS field locations were checked against the Census August 2025 technical documentation. They match the project's separately audited 2026 locations for these eight variables; the 2025 layout remains versioned independently so future layout changes do not propagate implicitly."
+}

@@ -1,0 +1,25 @@
+{
+  "version": "cps-composition-evidence-v1",
+  "status": "post-diagnostic governance rule for future primary-evidence use",
+  "adopted_date": "2026-09-01",
+  "scope": "CPS worker-share occupation composition used as an industry standardization or independent-source robustness input",
+  "primary_stability_rule": {
+    "diagnostic": "maximum_leave_one_month_out_l1_to_quarter",
+    "threshold_l1": 0.1,
+    "equivalent_total_variation": 0.05,
+    "required_periods_for_current_cross-vintage_checkpoint": [
+      "2025-Q2",
+      "2026-Q2"
+    ],
+    "decision": "A primary-comparability industry is primary_stable only when the diagnostic is <= 0.10 in every required period; otherwise it is sensitivity_unstable."
+  },
+  "evidence_tiers": {
+    "primary_stable": "Definitionally primary-comparable and passes the empirical leave-one-month-out stability rule in every required period.",
+    "sensitivity_unstable": "Definitionally primary-comparable but fails the empirical leave-one-month-out stability rule in at least one required period. Retain and report; do not use as equal-weight primary evidence without additional uncertainty work.",
+    "limited": "Source-universe comparability is limited under the OEWS industry crosswalk; retain only as a diagnostic.",
+    "excluded": "Source-universe definitions are not sufficiently comparable for the primary OEWS-CPS summary."
+  },
+  "noninferential_boundary": "The 0.10 L1 threshold is a project robustness standard, not a BLS/Census significance threshold. L1=0.10 corresponds to total-variation distance 0.05. Kish weight-dispersion effective n and monthly perturbation diagnostics do not incorporate CPS clustering, stratification, or rotation-group covariance and are not design-based uncertainty estimates.",
+  "retrospective_disclosure": "This v1 threshold was adopted after the Q2-2025/Q2-2026 reliability diagnostics exposed a highly unstable thin domain. It is therefore not described as preregistered for this checkpoint. Full unfiltered results remain preserved, and filtered summaries must be presented as a governance/sensitivity layer.",
+  "future_rule": "Apply the versioned rule before interpreting future CPS composition vintages as primary evidence. Changes to the threshold or diagnostic require a new policy version and must not rewrite historical classifications."
+}

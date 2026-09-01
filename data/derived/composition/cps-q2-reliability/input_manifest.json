@@ -1,0 +1,82 @@
+{
+  "2025_files": [
+    {
+      "filename": "apr25pub.dat.gz",
+      "in_scope_rows": 40895,
+      "input_format": "official_fixed_width_gzip",
+      "layout_version": "cps-basic-fixed-width-2025-v1",
+      "month": "apr",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/2025_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "rows_read": 123702,
+      "sha256": "7fc5601f2e8075353669e15f9c6a23be889bc8ba071b0e036830eeecb79fdde5",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/apr25pub.dat.gz"
+    },
+    {
+      "filename": "may25pub.dat.gz",
+      "in_scope_rows": 40312,
+      "input_format": "official_fixed_width_gzip",
+      "layout_version": "cps-basic-fixed-width-2025-v1",
+      "month": "may",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/2025_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "rows_read": 123461,
+      "sha256": "7acb937f529a49052fcfc9d4b95154ae9f4cb314385adfa21d14ec1355800f33",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/may25pub.dat.gz"
+    },
+    {
+      "filename": "jun25pub.dat.gz",
+      "in_scope_rows": 40124,
+      "input_format": "official_fixed_width_gzip",
+      "layout_version": "cps-basic-fixed-width-2025-v1",
+      "month": "jun",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/2025_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "rows_read": 122908,
+      "sha256": "44315f3d90b9b0c747b590b43e32a5fabd45930932b7ddfc5d0dd85af144801a",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2025/basic/jun25pub.dat.gz"
+    }
+  ],
+  "2026_files": [
+    {
+      "filename": "apr26pub.dat.gz",
+      "in_scope_rows": 39168,
+      "input_format": "official_fixed_width_gzip",
+      "month": "apr",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "rows_read": 122216,
+      "sha256": "a1b38258ae1012badcbd7ff557ff5e2ddf5c01c54478dbd2c2144e221906e095",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/apr26pub.dat.gz"
+    },
+    {
+      "filename": "may26pub.dat.gz",
+      "in_scope_rows": 39688,
+      "input_format": "official_fixed_width_gzip",
+      "month": "may",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "rows_read": 122338,
+      "sha256": "02a67a81aaa64d7007730cab67fa29f5e23db3a6d7a7e876af31208961f4a666",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/may26pub.dat.gz"
+    },
+    {
+      "filename": "jun26pub.dat.gz",
+      "in_scope_rows": 38831,
+      "input_format": "official_fixed_width_gzip",
+      "month": "jun",
+      "month_factor": 0.3333333333333333,
+      "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+      "rows_read": 121618,
+      "sha256": "f20d53bcaab977033ff7c7b48b9bafb675c61d7d78bfca73d6853f18325369ae",
+      "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/jun26pub.dat.gz"
+    }
+  ],
+  "dataset": "U.S. Census Bureau Current Population Survey Basic Monthly public-use data",
+  "generated_at_utc": "2026-09-01T08:39:52.908129+00:00",
+  "purpose": "empirical occupation-composition reliability diagnostics",
+  "raw_files_retained_in_repository": false,
+  "reference_2025": "data/derived/composition/cps-q2-2025/cps_composition.json",
+  "reference_2026": "data/derived/composition/cps-q2-2026/cps_composition.json",
+  "source_build_commit": "26e7c68d886c48035b750f5d1a99cd0b3df79ee2"
+}

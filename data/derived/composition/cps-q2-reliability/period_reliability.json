@@ -1,0 +1,1486 @@
+{
+  "2025-Q2": [
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "agriculture-forestry-fishing-and-hunting",
+      "industry_index": 1,
+      "kish_weight_dispersion_effective_n": 1198.9203926002735,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.051617101771200206,
+        "jun": 0.05154287407871879,
+        "may": 0.02291980494879424
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.051617101771200206,
+      "maximum_monthly_l1_to_quarter": 0.10145528849945086,
+      "maximum_pairwise_month_l1": 0.1908725417559737,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 406.5194872537857,
+        "jun": 400.7244006159847,
+        "may": 393.0658711168092
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.10145528849945086,
+        "jun": 0.09640857345188224,
+        "may": 0.049976647440331486
+      },
+      "monthly_person_month_counts": {
+        "apr": 583,
+        "jun": 595,
+        "may": 582
+      },
+      "monthly_top_occupations": {
+        "apr": "farming-fishing-and-forestry-occupations",
+        "jun": "farming-fishing-and-forestry-occupations",
+        "may": "farming-fishing-and-forestry-occupations"
+      },
+      "person_month_count": 1760,
+      "quarter_top_occupation": "farming-fishing-and-forestry-occupations",
+      "weighted_worker_population": 1743155.3055666666
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "mining-quarrying-and-oil-and-gas-extraction",
+      "industry_index": 2,
+      "kish_weight_dispersion_effective_n": 375.3141939668645,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.062057144783759184,
+        "jun": 0.07097920537308554,
+        "may": 0.05816968899121971
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.07097920537308554,
+      "maximum_monthly_l1_to_quarter": 0.14957173848045385,
+      "maximum_pairwise_month_l1": 0.23434088521841145,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 126.13551382080746,
+        "jun": 124.67388823817306,
+        "may": 124.73890299674638
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.12273578663316913,
+        "jun": 0.14957173848045385,
+        "may": 0.11174160036153662
+      },
+      "monthly_person_month_counts": {
+        "apr": 212,
+        "jun": 227,
+        "may": 218
+      },
+      "monthly_top_occupations": {
+        "apr": "construction-and-extraction-occupations",
+        "jun": "construction-and-extraction-occupations",
+        "may": "construction-and-extraction-occupations"
+      },
+      "person_month_count": 657,
+      "quarter_top_occupation": "construction-and-extraction-occupations",
+      "weighted_worker_population": 501589.0462666666
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "construction",
+      "industry_index": 3,
+      "kish_weight_dispersion_effective_n": 7022.897940134758,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.012389814255369972,
+        "jun": 0.015127871474756645,
+        "may": 0.013283501869492065
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.015127871474756645,
+      "maximum_monthly_l1_to_quarter": 0.02977120473602516,
+      "maximum_pairwise_month_l1": 0.05114082921539645,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2370.027432795573,
+        "jun": 2304.452645162606,
+        "may": 2351.776446825731
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.02533461212589334,
+        "jun": 0.02977120473602516,
+        "may": 0.02641140763275772
+      },
+      "monthly_person_month_counts": {
+        "apr": 3059,
+        "jun": 3029,
+        "may": 3044
+      },
+      "monthly_top_occupations": {
+        "apr": "construction-and-extraction-occupations",
+        "jun": "construction-and-extraction-occupations",
+        "may": "construction-and-extraction-occupations"
+      },
+      "person_month_count": 9132,
+      "quarter_top_occupation": "construction-and-extraction-occupations",
+      "weighted_worker_population": 11517446.5056
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "manufacturing",
+      "industry_index": 4,
+      "kish_weight_dispersion_effective_n": 8916.943490228947,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.022493611945825564,
+        "jun": 0.021469841040251476,
+        "may": 0.01347026315252811
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.022493611945825564,
+      "maximum_monthly_l1_to_quarter": 0.043786042274335156,
+      "maximum_pairwise_month_l1": 0.07816933731451074,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 3059.2559910013097,
+        "jun": 2906.325364097698,
+        "may": 2951.846219538686
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.04363534033824368,
+        "jun": 0.043786042274335156,
+        "may": 0.027244801130526936
+      },
+      "monthly_person_month_counts": {
+        "apr": 3842,
+        "jun": 3672,
+        "may": 3725
+      },
+      "monthly_top_occupations": {
+        "apr": "production-occupations",
+        "jun": "production-occupations",
+        "may": "production-occupations"
+      },
+      "person_month_count": 11239,
+      "quarter_top_occupation": "production-occupations",
+      "weighted_worker_population": 14163394.303266667
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "wholesale-trade",
+      "industry_index": 5,
+      "kish_weight_dispersion_effective_n": 1728.9944022114944,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.04331714359931562,
+        "jun": 0.03408131055114255,
+        "may": 0.0192556841569403
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.04331714359931562,
+      "maximum_monthly_l1_to_quarter": 0.08430580055465903,
+      "maximum_pairwise_month_l1": 0.14841156106171022,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 591.1831150110847,
+        "jun": 576.7682740764434,
+        "may": 561.0911654240888
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.08430580055465903,
+        "jun": 0.0676616112902469,
+        "may": 0.03988153747502994
+      },
+      "monthly_person_month_counts": {
+        "apr": 756,
+        "jun": 755,
+        "may": 732
+      },
+      "monthly_top_occupations": {
+        "apr": "sales-and-related-occupations",
+        "jun": "sales-and-related-occupations",
+        "may": "sales-and-related-occupations"
+      },
+      "person_month_count": 2243,
+      "quarter_top_occupation": "sales-and-related-occupations",
+      "weighted_worker_population": 2866425.052333333
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "retail-trade",
+      "industry_index": 6,
+      "kish_weight_dispersion_effective_n": 9127.765110706217,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.012666128284590027,
+        "jun": 0.009920367910391541,
+        "may": 0.009232656298554891
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.012666128284590027,
+      "maximum_monthly_l1_to_quarter": 0.025409457450876097,
+      "maximum_pairwise_month_l1": 0.04151169310975718,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 3045.0541106884984,
+        "jun": 3050.462399912278,
+        "may": 3032.664798959739
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.025409457450876097,
+        "jun": 0.019492203215867115,
+        "may": 0.018740066683800877
+      },
+      "monthly_person_month_counts": {
+        "apr": 4028,
+        "jun": 4042,
+        "may": 3995
+      },
+      "monthly_top_occupations": {
+        "apr": "sales-and-related-occupations",
+        "jun": "sales-and-related-occupations",
+        "may": "sales-and-related-occupations"
+      },
+      "person_month_count": 12065,
+      "quarter_top_occupation": "sales-and-related-occupations",
+      "weighted_worker_population": 15082083.679366665
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "transportation-and-warehousing",
+      "industry_index": 7,
+      "kish_weight_dispersion_effective_n": 4613.337917084378,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.01441363761324013,
+        "jun": 0.013533715794959334,
+        "may": 0.011384840895836981
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.01441363761324013,
+      "maximum_monthly_l1_to_quarter": 0.029188118286986895,
+      "maximum_pairwise_month_l1": 0.05481555244896115,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1540.8529841553466,
+        "jun": 1533.9010289249923,
+        "may": 1539.0043607322602
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.029188118286986895,
+        "jun": 0.02665953902561959,
+        "may": 0.022833752696497213
+      },
+      "monthly_person_month_counts": {
+        "apr": 2023,
+        "jun": 2028,
+        "may": 2022
+      },
+      "monthly_top_occupations": {
+        "apr": "transportation-and-material-moving-occupations",
+        "jun": "transportation-and-material-moving-occupations",
+        "may": "transportation-and-material-moving-occupations"
+      },
+      "person_month_count": 6073,
+      "quarter_top_occupation": "transportation-and-material-moving-occupations",
+      "weighted_worker_population": 8047935.949966666
+    },
+    {
+      "all_monthly_tops_match_quarter": false,
+      "industry_id": "utilities",
+      "industry_index": 8,
+      "kish_weight_dispersion_effective_n": 1002.005984951478,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.05102767427555606,
+        "jun": 0.06095092425837385,
+        "may": 0.03237896426484295
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.06095092425837385,
+      "maximum_monthly_l1_to_quarter": 0.12143584441298647,
+      "maximum_pairwise_month_l1": 0.1896852842992886,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 339.7820645706218,
+        "jun": 336.5562569701423,
+        "may": 325.70422642415036
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.09820417344469252,
+        "jun": 0.12143584441298647,
+        "may": 0.06759331115317757
+      },
+      "monthly_person_month_counts": {
+        "apr": 456,
+        "jun": 450,
+        "may": 431
+      },
+      "monthly_top_occupations": {
+        "apr": "installation-maintenance-and-repair-occupations",
+        "jun": "management-occupations",
+        "may": "management-occupations"
+      },
+      "person_month_count": 1337,
+      "quarter_top_occupation": "management-occupations",
+      "weighted_worker_population": 1564677.4039333332
+    },
+    {
+      "all_monthly_tops_match_quarter": false,
+      "industry_id": "information",
+      "industry_index": 9,
+      "kish_weight_dispersion_effective_n": 1534.9440441552792,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.04557251077659504,
+        "jun": 0.03548802230239237,
+        "may": 0.02927750437746801
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.04557251077659504,
+      "maximum_monthly_l1_to_quarter": 0.08997616548142998,
+      "maximum_pairwise_month_l1": 0.14910787798219455,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 520.7801306438251,
+        "jun": 496.5941732497274,
+        "may": 518.1504159085196
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.08997616548142998,
+        "jun": 0.07129621032321619,
+        "may": 0.05905185231879734
+      },
+      "monthly_person_month_counts": {
+        "apr": 667,
+        "jun": 654,
+        "may": 669
+      },
+      "monthly_top_occupations": {
+        "apr": "management-occupations",
+        "jun": "arts-design-entertainment-sports-and-media-occupations",
+        "may": "arts-design-entertainment-sports-and-media-occupations"
+      },
+      "person_month_count": 1990,
+      "quarter_top_occupation": "management-occupations",
+      "weighted_worker_population": 2600891.7447666666
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "finance-and-insurance",
+      "industry_index": 10,
+      "kish_weight_dispersion_effective_n": 4548.07584624854,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.015684420650584813,
+        "jun": 0.016300413567258636,
+        "may": 0.007827464448692015
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.016300413567258636,
+      "maximum_monthly_l1_to_quarter": 0.03183021738903721,
+      "maximum_pairwise_month_l1": 0.061193635915156495,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1528.5667565200026,
+        "jun": 1530.6482532251573,
+        "may": 1489.015235229188
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.03134548932408874,
+        "jun": 0.03183021738903721,
+        "may": 0.016049066706328146
+      },
+      "monthly_person_month_counts": {
+        "apr": 1985,
+        "jun": 1992,
+        "may": 1934
+      },
+      "monthly_top_occupations": {
+        "apr": "business-and-financial-operations-occupations",
+        "jun": "business-and-financial-operations-occupations",
+        "may": "business-and-financial-operations-occupations"
+      },
+      "person_month_count": 5911,
+      "quarter_top_occupation": "business-and-financial-operations-occupations",
+      "weighted_worker_population": 7420548.213233333
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "real-estate-and-rental-and-leasing",
+      "industry_index": 11,
+      "kish_weight_dispersion_effective_n": 1703.2370828801252,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.034034610756362486,
+        "jun": 0.029793666816261794,
+        "may": 0.021214489987073995
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.034034610756362486,
+      "maximum_monthly_l1_to_quarter": 0.06957310342985058,
+      "maximum_pairwise_month_l1": 0.12030030536240312,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 571.0538655078964,
+        "jun": 553.2128141851105,
+        "may": 579.5541260231275
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.06957310342985058,
+        "jun": 0.059724078768912094,
+        "may": 0.04142408623060241
+      },
+      "monthly_person_month_counts": {
+        "apr": 733,
+        "jun": 698,
+        "may": 736
+      },
+      "monthly_top_occupations": {
+        "apr": "sales-and-related-occupations",
+        "jun": "sales-and-related-occupations",
+        "may": "sales-and-related-occupations"
+      },
+      "person_month_count": 2167,
+      "quarter_top_occupation": "sales-and-related-occupations",
+      "weighted_worker_population": 2809362.6105666663
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "professional-scientific-and-technical-services",
+      "industry_index": 12,
+      "kish_weight_dispersion_effective_n": 7921.104340274328,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.019651802981286107,
+        "jun": 0.015269828966306716,
+        "may": 0.010986134570866751
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.019651802981286107,
+      "maximum_monthly_l1_to_quarter": 0.03900459376889323,
+      "maximum_pairwise_month_l1": 0.06491549486053776,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2705.268757359667,
+        "jun": 2613.498869811491,
+        "may": 2604.4947149167997
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.03900459376889323,
+        "jun": 0.03005315756543193,
+        "may": 0.02250245264526106
+      },
+      "monthly_person_month_counts": {
+        "apr": 3524,
+        "jun": 3428,
+        "may": 3389
+      },
+      "monthly_top_occupations": {
+        "apr": "computer-and-mathematical-occupations",
+        "jun": "computer-and-mathematical-occupations",
+        "may": "computer-and-mathematical-occupations"
+      },
+      "person_month_count": 10341,
+      "quarter_top_occupation": "computer-and-mathematical-occupations",
+      "weighted_worker_population": 13240287.2052
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "management-of-companies-and-enterprises",
+      "industry_index": 13,
+      "kish_weight_dispersion_effective_n": 118.37416044914764,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.07854390115271656,
+        "jun": 0.12892317338798942,
+        "may": 0.07727823980170113
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.12892317338798942,
+      "maximum_monthly_l1_to_quarter": 0.28070871325885954,
+      "maximum_pairwise_month_l1": 0.46197544733513746,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 35.7834426102867,
+        "jun": 37.28623656230548,
+        "may": 45.307408062887525
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.18295365197460078,
+        "jun": 0.28070871325885954,
+        "may": 0.12349203951239829
+      },
+      "monthly_person_month_counts": {
+        "apr": 45,
+        "jun": 46,
+        "may": 54
+      },
+      "monthly_top_occupations": {
+        "apr": "management-occupations",
+        "jun": "management-occupations",
+        "may": "management-occupations"
+      },
+      "person_month_count": 145,
+      "quarter_top_occupation": "management-occupations",
+      "weighted_worker_population": 195891.94566666667
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "administrative-and-support-and-waste-management-services",
+      "industry_index": 14,
+      "kish_weight_dispersion_effective_n": 4039.0236969499038,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.02195926223516668,
+        "jun": 0.02137503744346292,
+        "may": 0.01249479335276795
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.02195926223516668,
+      "maximum_monthly_l1_to_quarter": 0.046087138522966954,
+      "maximum_pairwise_month_l1": 0.0850376410572513,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1327.5069283613782,
+        "jun": 1371.7831472283237,
+        "may": 1340.3788754538796
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.046087138522966954,
+        "jun": 0.04092843377271624,
+        "may": 0.02489120767763714
+      },
+      "monthly_person_month_counts": {
+        "apr": 1716,
+        "jun": 1774,
+        "may": 1723
+      },
+      "monthly_top_occupations": {
+        "apr": "building-and-grounds-cleaning-and-maintenance-occupations",
+        "jun": "building-and-grounds-cleaning-and-maintenance-occupations",
+        "may": "building-and-grounds-cleaning-and-maintenance-occupations"
+      },
+      "person_month_count": 5213,
+      "quarter_top_occupation": "building-and-grounds-cleaning-and-maintenance-occupations",
+      "weighted_worker_population": 6836770.776099999
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "educational-services",
+      "industry_index": 15,
+      "kish_weight_dispersion_effective_n": 8527.288699600054,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.012346717555896194,
+        "jun": 0.01663581396667788,
+        "may": 0.013936616548438946
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.01663581396667788,
+      "maximum_monthly_l1_to_quarter": 0.03663272611606034,
+      "maximum_pairwise_month_l1": 0.055918860648774764,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2982.880371367344,
+        "jun": 2640.1633866184484,
+        "may": 2904.576539176321
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.023182052268584753,
+        "jun": 0.03663272611606034,
+        "may": 0.027031038222918746
+      },
+      "monthly_person_month_counts": {
+        "apr": 4002,
+        "jun": 3536,
+        "may": 3890
+      },
+      "monthly_top_occupations": {
+        "apr": "educational-instruction-and-library-occupations",
+        "jun": "educational-instruction-and-library-occupations",
+        "may": "educational-instruction-and-library-occupations"
+      },
+      "person_month_count": 11428,
+      "quarter_top_occupation": "educational-instruction-and-library-occupations",
+      "weighted_worker_population": 13404388.087933332
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "health-care-and-social-assistance",
+      "industry_index": 16,
+      "kish_weight_dispersion_effective_n": 13319.232540822833,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.011800609223327247,
+        "jun": 0.012354133052320656,
+        "may": 0.011019230015021702
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.012354133052320656,
+      "maximum_monthly_l1_to_quarter": 0.024635542529298452,
+      "maximum_pairwise_month_l1": 0.045525960435630744,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 4494.032443978279,
+        "jun": 4411.601706095836,
+        "may": 4414.4827908455
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.023563011835822194,
+        "jun": 0.024635542529298452,
+        "may": 0.022139476161608645
+      },
+      "monthly_person_month_counts": {
+        "apr": 5920,
+        "jun": 5871,
+        "may": 5862
+      },
+      "monthly_top_occupations": {
+        "apr": "healthcare-practitioners-and-technical-occupations",
+        "jun": "healthcare-practitioners-and-technical-occupations",
+        "may": "healthcare-practitioners-and-technical-occupations"
+      },
+      "person_month_count": 17653,
+      "quarter_top_occupation": "healthcare-practitioners-and-technical-occupations",
+      "weighted_worker_population": 21922552.889166664
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "arts-entertainment-and-recreation",
+      "industry_index": 17,
+      "kish_weight_dispersion_effective_n": 1866.4929001685805,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.03551884505102709,
+        "jun": 0.030258445515297883,
+        "may": 0.02103454453476965
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.03551884505102709,
+      "maximum_monthly_l1_to_quarter": 0.07629710091182804,
+      "maximum_pairwise_month_l1": 0.12553163142087656,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 606.7660984026302,
+        "jun": 618.367029874069,
+        "may": 641.8574012858559
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.07629710091182804,
+        "jun": 0.05961200765997419,
+        "may": 0.039819464298476916
+      },
+      "monthly_person_month_counts": {
+        "apr": 792,
+        "jun": 806,
+        "may": 833
+      },
+      "monthly_top_occupations": {
+        "apr": "arts-design-entertainment-sports-and-media-occupations",
+        "jun": "arts-design-entertainment-sports-and-media-occupations",
+        "may": "arts-design-entertainment-sports-and-media-occupations"
+      },
+      "person_month_count": 2431,
+      "quarter_top_occupation": "arts-design-entertainment-sports-and-media-occupations",
+      "weighted_worker_population": 3070276.7860333333
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "accommodation-and-food-services",
+      "industry_index": 18,
+      "kish_weight_dispersion_effective_n": 5572.452629493882,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.021519166778860885,
+        "jun": 0.017679386029351134,
+        "may": 0.008422337037343793
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.021519166778860885,
+      "maximum_monthly_l1_to_quarter": 0.042408974018462955,
+      "maximum_pairwise_month_l1": 0.07607115657735757,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1887.9374771271948,
+        "jun": 1840.2098733969858,
+        "may": 1844.4397064511363
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.042408974018462955,
+        "jun": 0.035569177589911405,
+        "may": 0.01699446577483053
+      },
+      "monthly_person_month_counts": {
+        "apr": 2470,
+        "jun": 2433,
+        "may": 2425
+      },
+      "monthly_top_occupations": {
+        "apr": "food-preparation-and-serving-related-occupations",
+        "jun": "food-preparation-and-serving-related-occupations",
+        "may": "food-preparation-and-serving-related-occupations"
+      },
+      "person_month_count": 7328,
+      "quarter_top_occupation": "food-preparation-and-serving-related-occupations",
+      "weighted_worker_population": 9518808.973166667
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "other-services-except-public-administration",
+      "industry_index": 19,
+      "kish_weight_dispersion_effective_n": 4330.714599603079,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.02355365577203949,
+        "jun": 0.022272576781832462,
+        "may": 0.0126014672397218
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.02355365577203949,
+      "maximum_monthly_l1_to_quarter": 0.04942600049900044,
+      "maximum_pairwise_month_l1": 0.08870769366220448,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1433.58811937779,
+        "jun": 1433.3416659475442,
+        "may": 1465.4197101703357
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.04942600049900044,
+        "jun": 0.04353228626295208,
+        "may": 0.02459368773223193
+      },
+      "monthly_person_month_counts": {
+        "apr": 1881,
+        "jun": 1911,
+        "may": 1907
+      },
+      "monthly_top_occupations": {
+        "apr": "personal-care-and-service-occupations",
+        "jun": "personal-care-and-service-occupations",
+        "may": "personal-care-and-service-occupations"
+      },
+      "person_month_count": 5699,
+      "quarter_top_occupation": "personal-care-and-service-occupations",
+      "weighted_worker_population": 7145266.110633333
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "public-administration",
+      "industry_index": 20,
+      "kish_weight_dispersion_effective_n": 4535.218877841365,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.03608590902847846,
+        "jun": 0.03592464862271182,
+        "may": 0.018725901985956077
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.03608590902847846,
+      "maximum_monthly_l1_to_quarter": 0.07231329221084001,
+      "maximum_pairwise_month_l1": 0.13603591666671863,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1534.1398254933918,
+        "jun": 1514.382413437717,
+        "may": 1487.4926753590137
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.07231329221084001,
+        "jun": 0.06992440094506974,
+        "may": 0.03841637557633845
+      },
+      "monthly_person_month_counts": {
+        "apr": 2201,
+        "jun": 2177,
+        "may": 2141
+      },
+      "monthly_top_occupations": {
+        "apr": "protective-service-occupations",
+        "jun": "protective-service-occupations",
+        "may": "protective-service-occupations"
+      },
+      "person_month_count": 6519,
+      "quarter_top_occupation": "protective-service-occupations",
+      "weighted_worker_population": 7249221.223499999
+    }
+  ],
+  "2026-Q2": [
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "agriculture-forestry-fishing-and-hunting",
+      "industry_index": 1,
+      "kish_weight_dispersion_effective_n": 1232.3506637929884,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.04417917349422832,
+        "jun": 0.04065258245297321,
+        "may": 0.025721043153924695
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.04417917349422832,
+      "maximum_monthly_l1_to_quarter": 0.09338557604333371,
+      "maximum_pairwise_month_l1": 0.15923644467814224,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 404.7949831201471,
+        "jun": 410.4872994546597,
+        "may": 419.48803325871563
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.09338557604333371,
+        "jun": 0.07452855876238369,
+        "may": 0.053201254916961385
+      },
+      "monthly_person_month_counts": {
+        "apr": 603,
+        "jun": 611,
+        "may": 592
+      },
+      "monthly_top_occupations": {
+        "apr": "farming-fishing-and-forestry-occupations",
+        "jun": "farming-fishing-and-forestry-occupations",
+        "may": "farming-fishing-and-forestry-occupations"
+      },
+      "person_month_count": 1806,
+      "quarter_top_occupation": "farming-fishing-and-forestry-occupations",
+      "weighted_worker_population": 1846178.9967
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "mining-quarrying-and-oil-and-gas-extraction",
+      "industry_index": 2,
+      "kish_weight_dispersion_effective_n": 374.18687580091887,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.07441472027864543,
+        "jun": 0.09624552461216886,
+        "may": 0.044828044497108
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.09624552461216886,
+      "maximum_monthly_l1_to_quarter": 0.20418601359703137,
+      "maximum_pairwise_month_l1": 0.3138446214276028,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 135.0627551418054,
+        "jun": 117.06770776922305,
+        "may": 122.16160562766329
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.13499636371389037,
+        "jun": 0.20418601359703137,
+        "may": 0.09340636403677643
+      },
+      "monthly_person_month_counts": {
+        "apr": 251,
+        "jun": 236,
+        "may": 239
+      },
+      "monthly_top_occupations": {
+        "apr": "construction-and-extraction-occupations",
+        "jun": "construction-and-extraction-occupations",
+        "may": "construction-and-extraction-occupations"
+      },
+      "person_month_count": 726,
+      "quarter_top_occupation": "construction-and-extraction-occupations",
+      "weighted_worker_population": 549624.0493
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "construction",
+      "industry_index": 3,
+      "kish_weight_dispersion_effective_n": 6445.8655197280905,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.012310457495923416,
+        "jun": 0.01463355803091431,
+        "may": 0.009223737312718517
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.01463355803091431,
+      "maximum_monthly_l1_to_quarter": 0.02863988554361034,
+      "maximum_pairwise_month_l1": 0.04994882447786074,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2118.34264564633,
+        "jun": 2138.6966841913163,
+        "may": 2190.039165412326
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.025462737283912604,
+        "jun": 0.02863988554361034,
+        "may": 0.01823353710001392
+      },
+      "monthly_person_month_counts": {
+        "apr": 2903,
+        "jun": 3002,
+        "may": 3029
+      },
+      "monthly_top_occupations": {
+        "apr": "construction-and-extraction-occupations",
+        "jun": "construction-and-extraction-occupations",
+        "may": "construction-and-extraction-occupations"
+      },
+      "person_month_count": 8934,
+      "quarter_top_occupation": "construction-and-extraction-occupations",
+      "weighted_worker_population": 11150336.8709
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "manufacturing",
+      "industry_index": 4,
+      "kish_weight_dispersion_effective_n": 8172.542703798986,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.011563355065373135,
+        "jun": 0.012495430040958449,
+        "may": 0.0133234934116988
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.0133234934116988,
+      "maximum_monthly_l1_to_quarter": 0.0265335331921616,
+      "maximum_pairwise_month_l1": 0.04619508056022144,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2747.718803560357,
+        "jun": 2666.3844139501925,
+        "may": 2759.355589459635
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.022992012628949177,
+        "jun": 0.0252454044541205,
+        "may": 0.0265335331921616
+      },
+      "monthly_person_month_counts": {
+        "apr": 3582,
+        "jun": 3507,
+        "may": 3609
+      },
+      "monthly_top_occupations": {
+        "apr": "production-occupations",
+        "jun": "production-occupations",
+        "may": "production-occupations"
+      },
+      "person_month_count": 10698,
+      "quarter_top_occupation": "production-occupations",
+      "weighted_worker_population": 13898940.905833332
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "wholesale-trade",
+      "industry_index": 5,
+      "kish_weight_dispersion_effective_n": 1610.3945968363273,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.045126124955857876,
+        "jun": 0.03827597608514752,
+        "may": 0.03163747711525282
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.045126124955857876,
+      "maximum_monthly_l1_to_quarter": 0.09237339526415993,
+      "maximum_pairwise_month_l1": 0.15843795886359427,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 524.3109774759433,
+        "jun": 565.5287386859557,
+        "may": 520.6689780410445
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.09237339526415993,
+        "jun": 0.07196348295385316,
+        "may": 0.06582818243119799
+      },
+      "monthly_person_month_counts": {
+        "apr": 725,
+        "jun": 769,
+        "may": 729
+      },
+      "monthly_top_occupations": {
+        "apr": "sales-and-related-occupations",
+        "jun": "sales-and-related-occupations",
+        "may": "sales-and-related-occupations"
+      },
+      "person_month_count": 2223,
+      "quarter_top_occupation": "sales-and-related-occupations",
+      "weighted_worker_population": 2697919.459
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "retail-trade",
+      "industry_index": 6,
+      "kish_weight_dispersion_effective_n": 8294.194086227115,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.01480325263386973,
+        "jun": 0.014222054470567637,
+        "may": 0.009780875184322985
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.01480325263386973,
+      "maximum_monthly_l1_to_quarter": 0.029965942002758476,
+      "maximum_pairwise_month_l1": 0.05422197447703861,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2743.3973374407065,
+        "jun": 2772.6377639837347,
+        "may": 2778.249963694969
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.029965942002758476,
+        "jun": 0.028145212436134836,
+        "may": 0.019533205203188752
+      },
+      "monthly_person_month_counts": {
+        "apr": 3839,
+        "jun": 3870,
+        "may": 3878
+      },
+      "monthly_top_occupations": {
+        "apr": "sales-and-related-occupations",
+        "jun": "sales-and-related-occupations",
+        "may": "sales-and-related-occupations"
+      },
+      "person_month_count": 11587,
+      "quarter_top_occupation": "sales-and-related-occupations",
+      "weighted_worker_population": 14987625.663933333
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "transportation-and-warehousing",
+      "industry_index": 7,
+      "kish_weight_dispersion_effective_n": 4336.674078999504,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.015090378661663307,
+        "jun": 0.019717324644963126,
+        "may": 0.011145274102041495
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.019717324644963126,
+      "maximum_monthly_l1_to_quarter": 0.040579193138441494,
+      "maximum_pairwise_month_l1": 0.06759023496666207,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1486.9536400798443,
+        "jun": 1405.3998806136938,
+        "may": 1444.496224480427
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.029165073512786372,
+        "jun": 0.040579193138441494,
+        "may": 0.022423768824395854
+      },
+      "monthly_person_month_counts": {
+        "apr": 2060,
+        "jun": 1991,
+        "may": 2028
+      },
+      "monthly_top_occupations": {
+        "apr": "transportation-and-material-moving-occupations",
+        "jun": "transportation-and-material-moving-occupations",
+        "may": "transportation-and-material-moving-occupations"
+      },
+      "person_month_count": 6079,
+      "quarter_top_occupation": "transportation-and-material-moving-occupations",
+      "weighted_worker_population": 8305536.225333333
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "utilities",
+      "industry_index": 8,
+      "kish_weight_dispersion_effective_n": 907.6522804912561,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.07349444291533794,
+        "jun": 0.05563011295216262,
+        "may": 0.05666675501903057
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.07349444291533794,
+      "maximum_monthly_l1_to_quarter": 0.1340093060055236,
+      "maximum_pairwise_month_l1": 0.2268440449724102,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 314.88254697626644,
+        "jun": 294.0801323524101,
+        "may": 298.94656066644313
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.1340093060055236,
+        "jun": 0.11953727019339606,
+        "may": 0.11597472816625078
+      },
+      "monthly_person_month_counts": {
+        "apr": 434,
+        "jun": 408,
+        "may": 408
+      },
+      "monthly_top_occupations": {
+        "apr": "management-occupations",
+        "jun": "management-occupations",
+        "may": "management-occupations"
+      },
+      "person_month_count": 1250,
+      "quarter_top_occupation": "management-occupations",
+      "weighted_worker_population": 1511660.6927666666
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "information",
+      "industry_index": 9,
+      "kish_weight_dispersion_effective_n": 1481.2452058158556,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.0412963732922908,
+        "jun": 0.03517205974452258,
+        "may": 0.026418444421832693
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.0412963732922908,
+      "maximum_monthly_l1_to_quarter": 0.08769646897169055,
+      "maximum_pairwise_month_l1": 0.13496927377527546,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 475.9450646581069,
+        "jun": 514.5639147107747,
+        "may": 490.74703895853446
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.08769646897169055,
+        "jun": 0.06578003180204219,
+        "may": 0.05328678479989548
+      },
+      "monthly_person_month_counts": {
+        "apr": 643,
+        "jun": 703,
+        "may": 680
+      },
+      "monthly_top_occupations": {
+        "apr": "arts-design-entertainment-sports-and-media-occupations",
+        "jun": "arts-design-entertainment-sports-and-media-occupations",
+        "may": "arts-design-entertainment-sports-and-media-occupations"
+      },
+      "person_month_count": 2026,
+      "quarter_top_occupation": "arts-design-entertainment-sports-and-media-occupations",
+      "weighted_worker_population": 2699678.7876
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "finance-and-insurance",
+      "industry_index": 10,
+      "kish_weight_dispersion_effective_n": 4241.852454502261,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.021508261351319037,
+        "jun": 0.025960041129277755,
+        "may": 0.012981729364702975
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.025960041129277755,
+      "maximum_monthly_l1_to_quarter": 0.05374289520440019,
+      "maximum_pairwise_month_l1": 0.09164452602174879,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1428.0927328762662,
+        "jun": 1381.410662334845,
+        "may": 1432.5438426194546
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.0418627476341556,
+        "jun": 0.05374289520440019,
+        "may": 0.025782684185875857
+      },
+      "monthly_person_month_counts": {
+        "apr": 1894,
+        "jun": 1866,
+        "may": 1905
+      },
+      "monthly_top_occupations": {
+        "apr": "business-and-financial-operations-occupations",
+        "jun": "business-and-financial-operations-occupations",
+        "may": "business-and-financial-operations-occupations"
+      },
+      "person_month_count": 5665,
+      "quarter_top_occupation": "business-and-financial-operations-occupations",
+      "weighted_worker_population": 7486321.9743
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "real-estate-and-rental-and-leasing",
+      "industry_index": 11,
+      "kish_weight_dispersion_effective_n": 1653.2000172793462,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.0356470136491595,
+        "jun": 0.023539583398764156,
+        "may": 0.02267201089383334
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.0356470136491595,
+      "maximum_monthly_l1_to_quarter": 0.07077884642652413,
+      "maximum_pairwise_month_l1": 0.11161654067660597,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 524.9471010175333,
+        "jun": 565.1738587704706,
+        "may": 565.7943506500918
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.07077884642652413,
+        "jun": 0.04841037684575417,
+        "may": 0.044427367898610286
+      },
+      "monthly_person_month_counts": {
+        "apr": 711,
+        "jun": 738,
+        "may": 754
+      },
+      "monthly_top_occupations": {
+        "apr": "sales-and-related-occupations",
+        "jun": "sales-and-related-occupations",
+        "may": "sales-and-related-occupations"
+      },
+      "person_month_count": 2203,
+      "quarter_top_occupation": "sales-and-related-occupations",
+      "weighted_worker_population": 2849707.5842666663
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "professional-scientific-and-technical-services",
+      "industry_index": 12,
+      "kish_weight_dispersion_effective_n": 7743.05745494127,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.018752448235024123,
+        "jun": 0.014026462525726213,
+        "may": 0.013236780289543598
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.018752448235024123,
+      "maximum_monthly_l1_to_quarter": 0.03701948592440246,
+      "maximum_pairwise_month_l1": 0.06426470583492395,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2605.701307084221,
+        "jun": 2499.8734445892383,
+        "may": 2639.3612943265202
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.03701948592440246,
+        "jun": 0.02857942571797009,
+        "may": 0.02632898840089115
+      },
+      "monthly_person_month_counts": {
+        "apr": 3453,
+        "jun": 3380,
+        "may": 3490
+      },
+      "monthly_top_occupations": {
+        "apr": "computer-and-mathematical-occupations",
+        "jun": "computer-and-mathematical-occupations",
+        "may": "computer-and-mathematical-occupations"
+      },
+      "person_month_count": 10323,
+      "quarter_top_occupation": "computer-and-mathematical-occupations",
+      "weighted_worker_population": 13494513.223499998
+    },
+    {
+      "all_monthly_tops_match_quarter": false,
+      "industry_id": "management-of-companies-and-enterprises",
+      "industry_index": 13,
+      "kish_weight_dispersion_effective_n": 60.39158432205465,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.08203313517865288,
+        "jun": 0.10117896594932554,
+        "may": 0.14218063065667338
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.14218063065667338,
+      "maximum_monthly_l1_to_quarter": 0.3104541015042085,
+      "maximum_pairwise_month_l1": 0.4690574043432125,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 15.914906540594663,
+        "jun": 25.794557231378516,
+        "may": 18.71567741377764
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.2213224556628479,
+        "jun": 0.1423539969980999,
+        "may": 0.3104541015042085
+      },
+      "monthly_person_month_counts": {
+        "apr": 22,
+        "jun": 34,
+        "may": 25
+      },
+      "monthly_top_occupations": {
+        "apr": "management-occupations",
+        "jun": "management-occupations",
+        "may": "office-and-administrative-support-occupations"
+      },
+      "person_month_count": 81,
+      "quarter_top_occupation": "management-occupations",
+      "weighted_worker_population": 99904.19506666667
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "administrative-and-support-and-waste-management-services",
+      "industry_index": 14,
+      "kish_weight_dispersion_effective_n": 3768.1362519591135,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.018718701483941457,
+        "jun": 0.029770097739432337,
+        "may": 0.021366961521557693
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.029770097739432337,
+      "maximum_monthly_l1_to_quarter": 0.05724532524604376,
+      "maximum_pairwise_month_l1": 0.09115865124595454,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1226.5965157747203,
+        "jun": 1279.5746159718758,
+        "may": 1262.0847448000866
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.03889509464259731,
+        "jun": 0.05724532524604376,
+        "may": 0.04280271655317384
+      },
+      "monthly_person_month_counts": {
+        "apr": 1684,
+        "jun": 1738,
+        "may": 1737
+      },
+      "monthly_top_occupations": {
+        "apr": "building-and-grounds-cleaning-and-maintenance-occupations",
+        "jun": "building-and-grounds-cleaning-and-maintenance-occupations",
+        "may": "building-and-grounds-cleaning-and-maintenance-occupations"
+      },
+      "person_month_count": 5159,
+      "quarter_top_occupation": "building-and-grounds-cleaning-and-maintenance-occupations",
+      "weighted_worker_population": 6845115.326166666
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "educational-services",
+      "industry_index": 15,
+      "kish_weight_dispersion_effective_n": 7697.186252822272,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.010446558704206133,
+        "jun": 0.017091424965664362,
+        "may": 0.013526565781815028
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.017091424965664362,
+      "maximum_monthly_l1_to_quarter": 0.03575935694994698,
+      "maximum_pairwise_month_l1": 0.058732635255309903,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 2633.0459133510853,
+        "jun": 2430.7734360879526,
+        "may": 2636.049621101222
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.02012825203788883,
+        "jun": 0.03575935694994698,
+        "may": 0.026858748763273075
+      },
+      "monthly_person_month_counts": {
+        "apr": 3670,
+        "jun": 3402,
+        "may": 3659
+      },
+      "monthly_top_occupations": {
+        "apr": "educational-instruction-and-library-occupations",
+        "jun": "educational-instruction-and-library-occupations",
+        "may": "educational-instruction-and-library-occupations"
+      },
+      "person_month_count": 10731,
+      "quarter_top_occupation": "educational-instruction-and-library-occupations",
+      "weighted_worker_population": 13000449.431799999
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "health-care-and-social-assistance",
+      "industry_index": 16,
+      "kish_weight_dispersion_effective_n": 12106.131661471998,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.017662850260485294,
+        "jun": 0.014894978695870809,
+        "may": 0.0072774050907240045
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.017662850260485294,
+      "maximum_monthly_l1_to_quarter": 0.03449310642571256,
+      "maximum_pairwise_month_l1": 0.0630912918948107,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 4078.980937757227,
+        "jun": 3921.222437411516,
+        "may": 4107.795417586256
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.03449310642571256,
+        "jun": 0.030543105892771188,
+        "may": 0.014541463099494832
+      },
+      "monthly_person_month_counts": {
+        "apr": 5727,
+        "jun": 5511,
+        "may": 5747
+      },
+      "monthly_top_occupations": {
+        "apr": "healthcare-practitioners-and-technical-occupations",
+        "jun": "healthcare-practitioners-and-technical-occupations",
+        "may": "healthcare-practitioners-and-technical-occupations"
+      },
+      "person_month_count": 16985,
+      "quarter_top_occupation": "healthcare-practitioners-and-technical-occupations",
+      "weighted_worker_population": 21619329.2709
+    },
+    {
+      "all_monthly_tops_match_quarter": false,
+      "industry_id": "arts-entertainment-and-recreation",
+      "industry_index": 17,
+      "kish_weight_dispersion_effective_n": 1594.4581009893805,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.03303213402420337,
+        "jun": 0.042538162570763385,
+        "may": 0.030560676247799765
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.042538162570763385,
+      "maximum_monthly_l1_to_quarter": 0.07883186078734442,
+      "maximum_pairwise_month_l1": 0.15019920015013863,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 502.41380751203684,
+        "jun": 546.6196431651839,
+        "may": 545.9018968861373
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.07386865789618668,
+        "jun": 0.07883186078734442,
+        "may": 0.059186747626225514
+      },
+      "monthly_person_month_counts": {
+        "apr": 699,
+        "jun": 774,
+        "may": 761
+      },
+      "monthly_top_occupations": {
+        "apr": "personal-care-and-service-occupations",
+        "jun": "personal-care-and-service-occupations",
+        "may": "arts-design-entertainment-sports-and-media-occupations"
+      },
+      "person_month_count": 2234,
+      "quarter_top_occupation": "personal-care-and-service-occupations",
+      "weighted_worker_population": 2897192.3891999996
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "accommodation-and-food-services",
+      "industry_index": 18,
+      "kish_weight_dispersion_effective_n": 5033.126059806951,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.013548532457656332,
+        "jun": 0.02291969843872312,
+        "may": 0.016759778533447633
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.02291969843872312,
+      "maximum_monthly_l1_to_quarter": 0.04713140777224922,
+      "maximum_pairwise_month_l1": 0.07618771999738068,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1702.978573114785,
+        "jun": 1632.0794691543013,
+        "may": 1698.2687635381126
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.02671059931846178,
+        "jun": 0.04713140777224922,
+        "may": 0.033078765989823185
+      },
+      "monthly_person_month_counts": {
+        "apr": 2360,
+        "jun": 2313,
+        "may": 2388
+      },
+      "monthly_top_occupations": {
+        "apr": "food-preparation-and-serving-related-occupations",
+        "jun": "food-preparation-and-serving-related-occupations",
+        "may": "food-preparation-and-serving-related-occupations"
+      },
+      "person_month_count": 7061,
+      "quarter_top_occupation": "food-preparation-and-serving-related-occupations",
+      "weighted_worker_population": 9523033.359733332
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "other-services-except-public-administration",
+      "industry_index": 19,
+      "kish_weight_dispersion_effective_n": 3846.644334927734,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.019552834729899923,
+        "jun": 0.02783262205431299,
+        "may": 0.027716895221713677
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.02783262205431299,
+      "maximum_monthly_l1_to_quarter": 0.055729035496657586,
+      "maximum_pairwise_month_l1": 0.09709371045686993,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1252.3974108999814,
+        "jun": 1287.2996105581146,
+        "may": 1307.222235484366
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.040955526050978054,
+        "jun": 0.055729035496657586,
+        "may": 0.05290740211445443
+      },
+      "monthly_person_month_counts": {
+        "apr": 1786,
+        "jun": 1858,
+        "may": 1875
+      },
+      "monthly_top_occupations": {
+        "apr": "personal-care-and-service-occupations",
+        "jun": "personal-care-and-service-occupations",
+        "may": "personal-care-and-service-occupations"
+      },
+      "person_month_count": 5519,
+      "quarter_top_occupation": "personal-care-and-service-occupations",
+      "weighted_worker_population": 6958514.413566667
+    },
+    {
+      "all_monthly_tops_match_quarter": true,
+      "industry_id": "public-administration",
+      "industry_index": 20,
+      "kish_weight_dispersion_effective_n": 4205.187372215435,
+      "leave_one_month_out_l1_to_quarter": {
+        "apr": 0.02057586051630072,
+        "jun": 0.023510050483642422,
+        "may": 0.01984864936533015
+      },
+      "maximum_leave_one_month_out_l1_to_quarter": 0.023510050483642422,
+      "maximum_monthly_l1_to_quarter": 0.04656091005453787,
+      "maximum_pairwise_month_l1": 0.08268986890762826,
+      "monthly_kish_weight_dispersion_effective_n": {
+        "apr": 1380.07283930508,
+        "jun": 1391.6362450015615,
+        "may": 1435.6868782541253
+      },
+      "monthly_l1_to_quarter": {
+        "apr": 0.041012051173735825,
+        "jun": 0.04656091005453787,
+        "may": 0.04022723046386811
+      },
+      "monthly_person_month_counts": {
+        "apr": 2122,
+        "jun": 2120,
+        "may": 2155
+      },
+      "monthly_top_occupations": {
+        "apr": "protective-service-occupations",
+        "jun": "protective-service-occupations",
+        "may": "protective-service-occupations"
+      },
+      "person_month_count": 6397,
+      "quarter_top_occupation": "protective-service-occupations",
+      "weighted_worker_population": 7184356.318566666
+    }
+  ]
+}
