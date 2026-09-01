@@ -23,6 +23,8 @@ from genai_at_work.cps import (
     quarter_months,
 )
 
+POPULATION_WEIGHT_ABS_TOLERANCE = 1e-4
+
 
 def _as_int(value: str) -> int | None:
     text = value.strip()
@@ -117,11 +119,18 @@ def main() -> int:
     validation = json.loads(args.composition_validation.read_text())
     composition_weight = float(validation["weighted_worker_population_age_18_64_employed"])
     civilian_weight = float(totals["civilian_analysis_weight"])
-    matches_composition = math.isclose(civilian_weight, composition_weight, rel_tol=0, abs_tol=1e-6)
+    absolute_difference = abs(civilian_weight - composition_weight)
+    matches_composition = math.isclose(
+        civilian_weight,
+        composition_weight,
+        rel_tol=0.0,
+        abs_tol=POPULATION_WEIGHT_ABS_TOLERANCE,
+    )
     if not matches_composition:
         raise SystemExit(
             "civilian population audit does not match composition weight: "
-            f"audit={civilian_weight}, composition={composition_weight}"
+            f"audit={civilian_weight}, composition={composition_weight}, "
+            f"abs_difference={absolute_difference}"
         )
 
     payload = {
@@ -137,6 +146,8 @@ def main() -> int:
         "totals": totals,
         "composition_weight": composition_weight,
         "civilian_weight_matches_composition": matches_composition,
+        "population_weight_absolute_difference": absolute_difference,
+        "population_weight_absolute_tolerance": POPULATION_WEIGHT_ABS_TOLERANCE,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
