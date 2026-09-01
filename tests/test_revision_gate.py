@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -28,6 +31,12 @@ def _fixture() -> dict[str, object]:
             for metric_index, metric_id in enumerate(metrics, start=1):
                 series_id = f"S-{entity_type}-{entity_index:02d}-{metric_index}"
                 for period_index, period in enumerate(periods):
+                    if metric_index == 1:
+                        value = 8.0 + entity_index * 1.7 + period_index * 1.2
+                    elif metric_index == 2:
+                        value = 5.0 + (entity_index**2) * 0.12 + period_index * 1.9
+                    else:
+                        value = 7.0 + entity_index * 1.1 + (entity_index % 4) * 2.3 + period_index * 1.4
                     records.append(
                         {
                             "entity_type": entity_type,
@@ -35,7 +44,7 @@ def _fixture() -> dict[str, object]:
                             "entity_index": entity_index,
                             "metric_id": metric_id,
                             "period": period,
-                            "value": float(entity_index + metric_index + period_index),
+                            "value": value,
                             "series_id": series_id,
                             "audit_scope": "private_research_only",
                             "rights_status": "Copyrighted: Citation Required",
@@ -184,6 +193,89 @@ def test_review_attestation_is_bound_to_exact_stage_hashes_and_claims():
             artifact_diff=artifact_diff,
             affected=affected,
         )
+
+
+def test_stage_command_archives_current_and_never_silently_promotes(tmp_path: Path):
+    root = Path(__file__).parents[1]
+    current = tmp_path / "current.json"
+    candidate = tmp_path / "candidate.json"
+    current.write_text(json.dumps(_fixture()))
+    candidate_payload = _fixture()
+    candidate_payload["records"][0]["value"] = 18.25  # type: ignore[index]
+    candidate.write_text(json.dumps(candidate_payload))
+    registry = tmp_path / "registry.json"
+    registry.write_text(json.dumps(_registry(current)))
+    inventory = tmp_path / "claims.json"
+    inventory.write_text(json.dumps({"claims": [{"claim_id": "public-claim", "surface": "surface"}]}))
+    source_vintage = tmp_path / "source-vintage.json"
+    source_vintage.write_text(
+        json.dumps(
+            {
+                "source_vintage_id": "rps-v2",
+                "new_freeze_id": "freeze-2",
+                "retrieved_at": "2026-09-01T12:00:00Z",
+                "checkpoint_date": "2026-09-01",
+                "rights_status": "Copyrighted: Citation Required",
+                "definitions_status": "unchanged",
+            }
+        )
+    )
+    canonical = tmp_path / "canonical"
+    canonical.mkdir()
+    for name in (
+        "longitudinal_diagnostics.json",
+        "validation_checks.json",
+        "quarter_diagnostics.csv",
+        "rank_stability.csv",
+    ):
+        (canonical / name).write_text(f"current-{name}\n")
+    staging = tmp_path / "stage"
+    archive = tmp_path / "archive"
+    before_sha = sha256_file(current)
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(root / "src")
+    subprocess.run(
+        [
+            sys.executable,
+            str(root / "scripts/private_fixture_revision_gate.py"),
+            "stage",
+            "--current-fixture",
+            str(current),
+            "--candidate-fixture",
+            str(candidate),
+            "--registry",
+            str(registry),
+            "--claim-inventory",
+            str(inventory),
+            "--canonical-derived",
+            str(canonical),
+            "--source-vintage",
+            str(source_vintage),
+            "--staging-dir",
+            str(staging),
+            "--private-archive-root",
+            str(archive),
+        ],
+        cwd=root,
+        env=env,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert sha256_file(current) == before_sha
+    assert sha256_file(archive / "freeze-1/rps_subgroup_5q_audit.json") == before_sha
+    gate = json.loads((staging / "publication_gate.json").read_text())
+    assert gate["status"] == "BLOCKED_DIAGNOSTICS_FAILED"
+    private_diff = json.loads((staging / "fixture_diff.private.json").read_text())
+    assert private_diff["changed_cell_count"] == 1
+    claim_review = json.loads((staging / "claim_review.json").read_text())
+    assert claim_review["claims"][0]["review_status"] == "PENDING"
+    assert all((staging / "derived" / name).exists() for name in (
+        "longitudinal_diagnostics.json",
+        "validation_checks.json",
+        "quarter_diagnostics.csv",
+        "rank_stability.csv",
+    ))
 
 
 def test_public_registry_matches_private_boundary():
