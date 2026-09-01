@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import gzip
 import json
 from pathlib import Path
 
@@ -8,15 +9,20 @@ import pytest
 
 from genai_at_work.cps import (
     CPSPerson,
+    FIXED_WIDTH_FIELDS_2026,
     UnavailableQuarter,
     build_composition,
+    decode_fixed_width_record_2026,
     decode_person,
     load_crosswalks,
+    official_fixed_width_filename,
+    official_fixed_width_url,
     official_month_filename,
     official_month_url,
     parse_final_weight,
     quarter_months,
     read_quarter_csvs,
+    read_quarter_fixed_width_gz,
 )
 
 ROOT = Path(__file__).parents[1]
@@ -114,7 +120,16 @@ def test_decode_person_applies_population_and_hours_rules():
 def test_worker_and_hour_weights_use_different_denominators():
     people = [
         CPSPerson("apr", "information", 9, "management-occupations", 1, 1.0, 10.0, 20.0),
-        CPSPerson("apr", "information", 9, "computer-and-mathematical-occupations", 3, 1.0, 30.0, 40.0),
+        CPSPerson(
+            "apr",
+            "information",
+            9,
+            "computer-and-mathematical-occupations",
+            3,
+            1.0,
+            30.0,
+            40.0,
+        ),
     ]
     result = build_composition(people)[0]
     assert result.worker_suppressed is False
@@ -150,7 +165,16 @@ def test_coverage_gate_suppresses_instead_of_silently_renormalizing():
 def test_invalid_actual_hours_trigger_hour_gate_but_not_worker_gate():
     people = [
         CPSPerson("apr", "information", 9, "management-occupations", 1, 97.0, 40.0, 40.0),
-        CPSPerson("apr", "information", 9, "computer-and-mathematical-occupations", 3, 3.0, None, 40.0),
+        CPSPerson(
+            "apr",
+            "information",
+            9,
+            "computer-and-mathematical-occupations",
+            3,
+            3.0,
+            None,
+            40.0,
+        ),
     ]
     result = build_composition(people, coverage_gate=0.98)[0]
     assert result.worker_suppressed is False
@@ -165,6 +189,8 @@ def test_quarter_availability_and_official_paths():
         quarter_months(2025, 4, REGISTRY)
     assert official_month_filename(2026, "apr") == "apr26pub.csv"
     assert official_month_url(2026, "jun").endswith("/2026/basic/jun26pub.csv")
+    assert official_fixed_width_filename(2026, "apr") == "apr26pub.dat.gz"
+    assert official_fixed_width_url(2026, "jun").endswith("/2026/basic/jun26pub.dat.gz")
 
 
 def _write_csv(path: Path, rows: list[dict[str, object]]) -> None:
@@ -175,7 +201,9 @@ def _write_csv(path: Path, rows: list[dict[str, object]]) -> None:
         writer.writerows(rows)
 
 
-def test_read_quarter_csvs_applies_equal_month_factors_and_records_provenance(tmp_path: Path):
+def test_read_quarter_csvs_applies_equal_month_factors_and_records_provenance(
+    tmp_path: Path,
+):
     for month in ("apr", "may", "jun"):
         _write_csv(tmp_path / f"{month}26pub.csv", [_row()])
     people, provenance = read_quarter_csvs(
@@ -198,6 +226,67 @@ def test_read_quarter_csvs_fails_on_missing_month(tmp_path: Path):
         read_quarter_csvs(tmp_path, year=2026, quarter=2, registry_dir=REGISTRY)
 
 
+def _fixed_width_record(**overrides: object) -> str:
+    values: dict[str, object] = {
+        "PRTAGE": 35,
+        "PREMPNOT": 1,
+        "PEMLR": 1,
+        "PWSSWGT": 10000,
+        "PRDTIND1": 25,
+        "PRDTOCC1": 3,
+        "PEHRACT1": 40,
+        "PEHRUSL1": 40,
+    }
+    values.update(overrides)
+    chars = [" "] * 950
+    for name, value in values.items():
+        start, end = FIXED_WIDTH_FIELDS_2026[name]
+        width = end - start
+        text = str(value).rjust(width)
+        if len(text) != width:
+            raise AssertionError(f"fixture value {value!r} does not fit {name} width {width}")
+        chars[start:end] = text
+    return "".join(chars) + "\n"
+
+
+def test_fixed_width_2026_locations_decode_required_fields():
+    row = decode_fixed_width_record_2026(_fixed_width_record())
+    assert row["PRTAGE"].strip() == "35"
+    assert row["PREMPNOT"].strip() == "1"
+    assert row["PEMLR"].strip() == "1"
+    assert row["PWSSWGT"].strip() == "10000"
+    assert row["PRDTIND1"].strip() == "25"
+    assert row["PRDTOCC1"].strip() == "3"
+    assert row["PEHRACT1"].strip() == "40"
+    assert row["PEHRUSL1"].strip() == "40"
+
+
+def test_read_official_fixed_width_quarter_applies_equal_month_factors(tmp_path: Path):
+    for month in ("apr", "may", "jun"):
+        with gzip.open(tmp_path / f"{month}26pub.dat.gz", "wt", encoding="ascii") as handle:
+            handle.write(_fixed_width_record())
+    people, provenance = read_quarter_fixed_width_gz(
+        tmp_path,
+        year=2026,
+        quarter=2,
+        registry_dir=REGISTRY,
+    )
+    assert len(people) == 3
+    assert all(person.worker_weight == pytest.approx(1 / 3) for person in people)
+    assert all(item["input_format"] == "official_fixed_width_gzip" for item in provenance)
+    assert all(len(str(item["sha256"])) == 64 for item in provenance)
+
+
+def test_fixed_width_reader_rejects_non_2026_layout(tmp_path: Path):
+    with pytest.raises(ValueError, match="pinned to the audited 2026 layout"):
+        read_quarter_fixed_width_gz(
+            tmp_path,
+            year=2024,
+            quarter=2,
+            registry_dir=REGISTRY,
+        )
+
+
 def test_suppressed_weights_serialize_as_json_null():
     result = build_composition(
         [CPSPerson("apr", "information", 9, None, None, 1.0, 40.0, 40.0)]
@@ -218,10 +307,14 @@ def test_cli_q4_2025_fails_cleanly_before_file_access(tmp_path: Path):
         [
             sys.executable,
             str(ROOT / "scripts" / "build_cps_composition.py"),
-            "--year", "2025",
-            "--quarter", "4",
-            "--input-dir", str(tmp_path),
-            "--output", str(tmp_path / "out.json"),
+            "--year",
+            "2025",
+            "--quarter",
+            "4",
+            "--input-dir",
+            str(tmp_path),
+            "--output",
+            str(tmp_path / "out.json"),
         ],
         cwd=ROOT,
         env=env,
@@ -245,10 +338,14 @@ def test_cli_missing_q2_file_fails_cleanly(tmp_path: Path):
         [
             sys.executable,
             str(ROOT / "scripts" / "build_cps_composition.py"),
-            "--year", "2026",
-            "--quarter", "2",
-            "--input-dir", str(tmp_path),
-            "--output", str(tmp_path / "out.json"),
+            "--year",
+            "2026",
+            "--quarter",
+            "2",
+            "--input-dir",
+            str(tmp_path),
+            "--output",
+            str(tmp_path / "out.json"),
         ],
         cwd=ROOT,
         env=env,
