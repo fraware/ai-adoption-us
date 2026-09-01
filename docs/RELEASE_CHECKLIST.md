@@ -9,7 +9,7 @@ A release is not launch-ready until every applicable item below is explicitly re
 - [x] The occupation-adjusted industry-context residual is not presented as an identified organizational effect.
 - [x] Latest-quarter subgroup presentation is accompanied by multi-wave stability context in the Release 1 design.
 - [x] Current displayed longitudinal statistics come from generated rights-safe artifacts or directly defined transformations.
-- [ ] Establish an explicit operational procedure that forces full longitudinal regeneration/review whenever the private source fixture is revised.
+- [x] Private fixture revisions are governed by `scripts/private_fixture_revision_gate.py` and `docs/PRIVATE_FIXTURE_REVISION_PROTOCOL.md`: a changed candidate is staged separately, the current freeze is checksum-verified and privately archived, the applicable fixture-present analytical suite runs against the candidate, longitudinal artifacts are regenerated/diffed, affected public claims require explicit hash-bound review attestation, and promotion fails closed on private-suite, rights, definition, or publication-diagnostic failure. This records the implemented/tested control; no real private source revision is claimed to have occurred.
 - [x] Official CPS composition inputs are executed and validated as composition evidence; the RPS-dependent counterfactual/residual remains disabled until a compatible authorized RPS occupation observation vintage exists.
 
 ## B. Data rights and provenance
