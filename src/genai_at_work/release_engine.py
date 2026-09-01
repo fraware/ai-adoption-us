@@ -628,7 +628,7 @@ def validate_review_attestation(
 
 def sanitized_public_manifest(candidate: Mapping[str, Any]) -> dict[str, Any]:
     """Remove local source paths while retaining identity and provenance."""
-    public = json.loads(json.dumps(candidate))
+    public: dict[str, Any] = json.loads(json.dumps(candidate))
     sources = public.get("sources")
     if isinstance(sources, list):
         for source in sources:
