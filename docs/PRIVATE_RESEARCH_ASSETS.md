@@ -44,11 +44,12 @@ Any revised candidate must go through `scripts/private_fixture_revision_gate.py`
 - verifies the current fixture against the registered checksum before any mutation;
 - preserves the current fixture and current derived freeze in a private archive;
 - validates the candidate under the existing scope/rights/definition contract;
+- runs the fixture-present longitudinal analytical suite against the separate candidate path and retains the result privately; only the same-freeze byte-for-byte canonical reproduction assertion is inapplicable during revision staging;
 - regenerates all four longitudinal artifacts into a separate staging directory;
 - produces a private cell-level diff and public-artifact hash diff;
 - marks all registered dependent claims for review when derived evidence changes;
-- blocks promotion until an attestation is bound to the exact candidate checksum, stage fingerprint, staged artifact hashes, and every affected claim;
-- fails closed when rights or construct definitions change or when publication diagnostics fail;
+- blocks promotion until the applicable candidate private suite and publication diagnostics pass and an attestation is bound to the exact candidate checksum, stage fingerprint, staged artifact hashes, and every affected claim;
+- fails closed when rights or construct definitions change or when analytical/private-suite or publication diagnostics fail;
 - emits a public validation record without raw private observations only after explicit reviewed promotion.
 
 A new wave is not a fixture revision. New-wave ingestion belongs to the versioned update/release pipeline and must not use the revision gate to bypass the broader measurement and publication review.
