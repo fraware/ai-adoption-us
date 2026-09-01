@@ -5,7 +5,7 @@ import argparse
 import json
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -115,7 +115,7 @@ def _gate_payload(stage_id: str, status: str, failures: list[dict[str, str]]) ->
 
 
 def _promotion_timestamp() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def stage(args: argparse.Namespace) -> int:
