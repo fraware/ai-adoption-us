@@ -93,6 +93,16 @@ def _digest(value: object, context: str) -> str:
     return value.lower()
 
 
+def _commit_sha(value: object, context: str) -> str:
+    if not isinstance(value, str) or len(value) not in {40, 64}:
+        raise ValueError(f"{context} must be a 40- or 64-character Git commit hex digest")
+    try:
+        int(value, 16)
+    except ValueError as exc:
+        raise ValueError(f"{context} must be hexadecimal") from exc
+    return value.lower()
+
+
 def _safe_relative(root: Path, relative: str, *, required_prefix: str) -> Path:
     posix = PurePosixPath(relative)
     if posix.is_absolute() or ".." in posix.parts or not posix.parts:
@@ -210,6 +220,7 @@ def validate_release_manifest(manifest: Mapping[str, Any], candidate_root: Path)
             input_hashes[key] = expected_sha
 
     artifact_ids: set[str] = set()
+    artifact_paths: set[str] = set()
     output_hashes: dict[str, str] = {}
     for index, artifact in enumerate(_rows(manifest, "artifacts", "release")):
         context = f"artifacts[{index}]"
@@ -218,6 +229,9 @@ def validate_release_manifest(manifest: Mapping[str, Any], candidate_root: Path)
             raise ValueError(f"Duplicate artifact_id: {artifact_id}")
         artifact_ids.add(artifact_id)
         relative = _string(artifact, "path", context)
+        if relative in artifact_paths:
+            raise ValueError(f"Duplicate artifact path: {relative}")
+        artifact_paths.add(relative)
         path = _safe_relative(candidate_root, relative, required_prefix="artifacts")
         if not path.is_file():
             raise ValueError(f"Candidate artifact is missing: {relative}")
@@ -277,7 +291,7 @@ def validate_release_manifest(manifest: Mapping[str, Any], candidate_root: Path)
 
     build = _mapping(manifest, "build", "release")
     _string(build, "builder_id", "release.build")
-    _string(build, "builder_commit", "release.build")
+    _commit_sha(_string(build, "builder_commit", "release.build"), "release.build.builder_commit")
     if build.get("deterministic") is not True:
         raise ValueError("release.build.deterministic must be true")
     declared_inputs = {str(k): str(v) for k, v in _mapping(build, "input_sha256", "release.build").items()}
@@ -328,8 +342,11 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
                     "new_source_vintage_id": new.get("source_vintage_id"),
                 }
             )
+            if new.get("revision_status") != "new_wave":
+                failures.append({"code": "REVISION_STATUS_MISMATCH", "source_id": source_id})
             continue
         if new is None and old is not None:
+            has_revision_change = True
             source_changes.append(
                 {
                     "source_id": source_id,
@@ -352,10 +369,6 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
         new_periods = {str(v) for v in new.get("reference_periods", [])}
         added_periods = sorted(new_periods - old_periods)
         removed_periods = sorted(old_periods - new_periods)
-        if added_periods:
-            has_new_wave_change = True
-        if removed_periods:
-            failures.append({"code": "MISSING_PERIOD", "source_id": source_id})
         old_objects = _source_objects(old)
         new_objects = _source_objects(new)
         added_objects = sorted(new_objects.keys() - old_objects.keys())
@@ -365,10 +378,14 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
             for object_id in old_objects.keys() & new_objects.keys()
             if old_objects[object_id].get("sha256") != new_objects[object_id].get("sha256")
         )
-        if added_objects:
-            has_new_wave_change = True
-        if modified_objects:
-            has_revision_change = True
+        source_has_new_wave = bool(added_periods)
+        source_has_revision = bool(
+            modified_objects or removed_periods or removed_objects or (added_objects and not added_periods)
+        )
+        has_new_wave_change = has_new_wave_change or source_has_new_wave
+        has_revision_change = has_revision_change or source_has_revision
+        if removed_periods:
+            failures.append({"code": "MISSING_PERIOD", "source_id": source_id})
         if removed_objects:
             failures.append({"code": "MISSING_SOURCE_OBJECT", "source_id": source_id})
         changed = bool(added_periods or removed_periods or added_objects or removed_objects or modified_objects)
@@ -388,16 +405,16 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
             )
             if new.get("source_vintage_id") == old.get("source_vintage_id"):
                 failures.append({"code": "SOURCE_VINTAGE_ID_NOT_ADVANCED", "source_id": source_id})
-            if new.get("revision_status") == "unchanged":
+            if source_has_new_wave and source_has_revision:
+                expected_revision_status = "mixed"
+            elif source_has_new_wave:
+                expected_revision_status = "new_wave"
+            else:
+                expected_revision_status = "revision"
+            if new.get("revision_status") != expected_revision_status:
                 failures.append({"code": "REVISION_STATUS_MISMATCH", "source_id": source_id})
-
-    release_type = candidate.get("release_type")
-    if previous is not None and release_type == "new_wave" and has_revision_change:
-        failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
-    if previous is not None and release_type == "revision" and has_new_wave_change:
-        failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
-    if previous is not None and release_type == "new_wave" and not has_new_wave_change:
-        failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
+        elif new.get("revision_status") != "unchanged":
+            failures.append({"code": "REVISION_STATUS_MISMATCH", "source_id": source_id})
 
     artifact_changes: list[dict[str, Any]] = []
     changed_artifacts: set[str] = set()
@@ -495,6 +512,19 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
                 }
             )
 
+    if previous is not None:
+        has_derived_change = bool(artifact_changes or diagnostic_changes or claim_changes)
+        if has_new_wave_change and has_revision_change:
+            expected_release_type = "mixed"
+        elif has_new_wave_change:
+            expected_release_type = "new_wave"
+        elif has_revision_change or has_derived_change:
+            expected_release_type = "revision"
+        else:
+            expected_release_type = None
+        if expected_release_type is not None and candidate.get("release_type") != expected_release_type:
+            failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
+
     return {
         "source_changes": source_changes,
         "artifact_changes": artifact_changes,
@@ -578,6 +608,7 @@ def review_package(candidate: Mapping[str, Any], release_diff: Mapping[str, Any]
     return {
         "data_mode": candidate.get("data_mode"),
         "changed_source_ids": list(release_diff.get("changed_source_ids", [])),
+        "changed_artifact_ids": list(release_diff.get("changed_artifact_ids", [])),
         "changed_diagnostic_ids": list(release_diff.get("changed_diagnostic_ids", [])),
         "affected_claims": affected,
     }
@@ -603,8 +634,11 @@ def validate_review_attestation(
     for key in ("scientific_reviewed", "editorial_reviewed", "source_rights_reviewed", "ci_passed"):
         if attestation.get(key) is not True:
             raise ValueError(f"Review attestation requires {key}=true")
-    if not isinstance(attestation.get("candidate_commit"), str) or not attestation.get("candidate_commit"):
-        raise ValueError("Review attestation requires candidate_commit")
+    build = _mapping(candidate, "build", "release")
+    expected_commit = _commit_sha(build.get("builder_commit"), "release.build.builder_commit")
+    candidate_commit = _commit_sha(attestation.get("candidate_commit"), "review.candidate_commit")
+    if candidate_commit != expected_commit:
+        raise ValueError("Review attestation candidate_commit must equal release.build.builder_commit")
     ci_run_ids = attestation.get("ci_run_ids")
     if not isinstance(ci_run_ids, list) or not ci_run_ids or not all(isinstance(v, int) and not isinstance(v, bool) and v > 0 for v in ci_run_ids):
         raise ValueError("Review attestation requires one or more positive integer ci_run_ids")
@@ -616,6 +650,7 @@ def validate_review_attestation(
         raise ValueError("Review attestation artifact hashes do not match the candidate release")
     exact_lists = (
         ("reviewed_source_ids", release_diff.get("changed_source_ids", [])),
+        ("reviewed_artifact_ids", release_diff.get("changed_artifact_ids", [])),
         ("reviewed_diagnostic_ids", release_diff.get("changed_diagnostic_ids", [])),
         ("reviewed_claim_ids", release_diff.get("affected_claim_ids", [])),
     )
