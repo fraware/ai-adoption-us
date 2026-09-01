@@ -59,10 +59,19 @@ def verify_current_fixture(path: Path, registry: Mapping[str, Any]) -> str:
 
 
 def validate_source_vintage(source_vintage: Mapping[str, Any], registry: Mapping[str, Any]) -> None:
-    required = ("source_vintage_id", "retrieved_at", "checkpoint_date", "rights_status", "definitions_status")
+    required = (
+        "source_vintage_id",
+        "new_freeze_id",
+        "retrieved_at",
+        "checkpoint_date",
+        "rights_status",
+        "definitions_status",
+    )
     missing = [key for key in required if not source_vintage.get(key)]
     if missing:
         raise ValueError(f"Source-vintage record missing required fields: {missing}")
+    if source_vintage["new_freeze_id"] == registry.get("freeze_id"):
+        raise ValueError("A revised source must receive a new freeze ID; silent freeze reuse is forbidden")
     contract = registry.get("contract")
     if not isinstance(contract, Mapping):
         raise ValueError("Freeze registry is missing contract metadata")
