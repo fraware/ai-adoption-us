@@ -11,8 +11,8 @@ occupation observation vintage, which is intentionally absent from the public re
 
 ## Execution identity
 
-- source build commit: `cf21334a537026636abdb9180a23d05e9d9c27bd`
-- generated at: `2026-09-01T06:51:29.490782+00:00`
+- source build commit: `83bef14096fe2068d59d6547d1db5bf8e544178b`
+- generated at: `2026-09-01T07:01:20.752270+00:00`
 - in-scope CPS person-month rows: **117,687**
 - pooled weighted employed population age 18-64: **149,605,939**
 - industry groups produced: **20**

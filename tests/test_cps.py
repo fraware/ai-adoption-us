@@ -354,5 +354,5 @@ def test_cli_missing_q2_file_fails_cleanly(tmp_path: Path):
     )
     assert proc.returncode != 0
     assert "CPS composition build blocked" in proc.stderr
-    assert "apr26pub.csv" in proc.stderr
+    assert "apr26pub.dat.gz" in proc.stderr
     assert "Traceback" not in proc.stderr

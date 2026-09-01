@@ -2,7 +2,7 @@
   "all_supported_weight_vectors_sum_to_one": true,
   "all_weights_nonnegative": true,
   "coverage_gate": 0.98,
-  "generated_at_utc": "2026-09-01T06:51:29.490782+00:00",
+  "generated_at_utc": "2026-09-01T07:01:20.752270+00:00",
   "industries_with_worker_vs_actual_hour_weight_difference_gt_1e_6": 20,
   "industry_count": 20,
   "median_actual_vs_usual_hour_weights_l1": 0.01900250343917377,
@@ -20,7 +20,7 @@
     "industry_count_is_20": true,
     "weighted_worker_population_within_configured_sanity_range": true
   },
-  "source_build_commit": "cf21334a537026636abdb9180a23d05e9d9c27bd",
+  "source_build_commit": "83bef14096fe2068d59d6547d1db5bf8e544178b",
   "status": "official CPS composition weights executed; RPS occupation counterfactual join not executed",
   "supported_actual_hours_industries": 20,
   "supported_usual_hours_industries": 1,
