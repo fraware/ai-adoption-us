@@ -1,0 +1,123 @@
+name: Rendered browser and accessibility QA
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/browser-qa.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/browser-qa.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-qa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rendered-qa:
+    name: Chrome, Firefox, WebKit, axe, and Lighthouse
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      DATA_MODE: derived_only
+      NEXT_TELEMETRY_DISABLED: '1'
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+      MIN_LIGHTHOUSE_ACCESSIBILITY: '0.95'
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Firefox and WebKit browser dependencies
+        run: npx playwright install --with-deps firefox webkit
+
+      - name: Validate TypeScript and production build
+        run: |
+          set -euo pipefail
+          npm run lint
+          npm run build
+
+      - name: Run rendered QA and Lighthouse
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa-results/lighthouse
+          npm run start -- -H 127.0.0.1 -p 3000 >qa-results/server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "$PLAYWRIGHT_BASE_URL/" >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Production server did not become ready.' >&2
+              cat qa-results/server.log >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          node scripts/browser-version-report.mjs qa-results
+          npm run qa:browser
+
+          export CHROME_PATH="$(command -v google-chrome)"
+          google-chrome --version | tee qa-results/google-chrome-version.txt
+
+          while read -r name route; do
+            npx lighthouse "$PLAYWRIGHT_BASE_URL$route" \
+              --quiet \
+              --chrome-flags='--headless --no-sandbox' \
+              --preset=desktop \
+              --only-categories=accessibility,performance \
+              --output=json \
+              --output-path="qa-results/lighthouse/${name}-desktop.json"
+          done <<'ROUTES'
+          home /
+          industries /explore/industries
+          occupations /explore/occupations
+          methodology /methodology
+          sources /sources
+          after-adoption /blog/after-adoption
+          ROUTES
+
+          npx lighthouse "$PLAYWRIGHT_BASE_URL/" \
+            --quiet \
+            --chrome-flags='--headless --no-sandbox' \
+            --only-categories=accessibility,performance \
+            --output=json \
+            --output-path=qa-results/lighthouse/home-mobile.json
+
+          node scripts/summarize-lighthouse.mjs qa-results/lighthouse
+          du -sh .next | tee qa-results/next-build-size.txt
+          find .next/static -type f -printf '%s %p\n' \
+            | sort -nr \
+            | head -50 \
+            > qa-results/largest-static-files.txt
+
+      - name: Upload rendered QA evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: r1-g2-browser-qa-${{ github.sha }}
+          path: apps/web/qa-results
+          if-no-files-found: warn
+          retention-days: 30
