@@ -32,6 +32,8 @@ jobs:
           set -euo pipefail
           python scripts/inspect_external_source_packages.py \
             --output-dir docs/validation/source-unlock-2026-09-01
+          python scripts/probe_oews_series_ids.py \
+            --output docs/validation/source-unlock-2026-09-01/oews_series_id_probe.json
 
       - name: Verify no raw source packages entered the worktree
         run: |
@@ -51,5 +53,5 @@ jobs:
             echo 'No source reconnaissance changes to commit.'
             exit 0
           fi
-          git commit -m 'Inspect OEWS and RPS source packages'
+          git commit -m 'Resolve OEWS source identifiers'
           git push origin HEAD:research/oews-rps-source-unlock
