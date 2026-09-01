@@ -62,10 +62,17 @@ def _archive_current(
     return target
 
 
-def _run_builder(candidate_fixture: Path, output_dir: Path, checkpoint_date: str) -> None:
+def _base_private_env(candidate_fixture: Path) -> dict[str, str]:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT / "src")
     env["PYTHONDONTWRITEBYTECODE"] = "1"
+    env["RPS_PRIVATE_FIXTURE"] = str(candidate_fixture)
+    env["RPS_REVISION_CANDIDATE"] = "1"
+    return env
+
+
+def _run_builder(candidate_fixture: Path, output_dir: Path, checkpoint_date: str) -> None:
+    env = _base_private_env(candidate_fixture)
     subprocess.run(
         [
             sys.executable,
@@ -81,6 +88,32 @@ def _run_builder(candidate_fixture: Path, output_dir: Path, checkpoint_date: str
         env=env,
         check=True,
     )
+
+
+def _run_candidate_private_suite(candidate_fixture: Path, staging_dir: Path) -> dict[str, Any]:
+    env = _base_private_env(candidate_fixture)
+    completed = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "tests/test_longitudinal.py"],
+        cwd=ROOT,
+        env=env,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    result: dict[str, Any] = {
+        "returncode": completed.returncode,
+        "all_applicable_tests_passed": completed.returncode == 0,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+        "candidate_fixture_sha256": sha256_file(candidate_fixture),
+        "scope_note": (
+            "The candidate runs the fixture-present longitudinal analytical suite. "
+            "Only the same-freeze byte-for-byte canonical reproduction assertion is skipped, "
+            "because a separately staged revision is expected to be compared through artifact_diff.json instead."
+        ),
+    }
+    _write_json(staging_dir / "private_suite.private.json", result)
+    return result
 
 
 def stage(args: argparse.Namespace) -> int:
@@ -101,6 +134,7 @@ def stage(args: argparse.Namespace) -> int:
         raise SystemExit(f"Staging directory already exists; use a new immutable staging path: {args.staging_dir}")
     derived_dir = args.staging_dir / "derived"
     derived_dir.mkdir(parents=True)
+    private_suite = _run_candidate_private_suite(candidate_fixture, args.staging_dir)
     _run_builder(candidate_fixture, derived_dir, str(source_vintage["checkpoint_date"]))
     validation = load_json(derived_dir / "validation_checks.json")
     fixture_diff = diff_fixture_records(current_records, candidate_records)
@@ -116,11 +150,14 @@ def stage(args: argparse.Namespace) -> int:
         "private_archive_dir": str(archive_dir),
         "fixture_changed_cell_count": fixture_diff["changed_cell_count"],
         "changed_artifact_count": artifact_diff["changed_artifact_count"],
+        "private_suite_all_applicable_tests_passed": private_suite["all_applicable_tests_passed"] is True,
         "publication_validation_all_passed": validation.get("all_passed") is True,
     }
     stage_id = stage_fingerprint(manifest)
     manifest["stage_id"] = stage_id
-    if validation.get("all_passed") is not True:
+    if private_suite["all_applicable_tests_passed"] is not True:
+        status = "BLOCKED_PRIVATE_SUITE_FAILED"
+    elif validation.get("all_passed") is not True:
         status = "BLOCKED_DIAGNOSTICS_FAILED"
     elif candidate_sha == current_sha and not has_artifact_changes:
         status = "REPRODUCED_CURRENT_FREEZE"
@@ -136,7 +173,10 @@ def stage(args: argparse.Namespace) -> int:
             "stage_id": stage_id,
             "status": status,
             "promotion_allowed_without_review": status == "REPRODUCED_CURRENT_FREEZE",
-            "note": "Private cell-level diff remains in staging and must not be committed to the public repository.",
+            "note": (
+                "Private suite output and cell-level diff remain in staging and must not be committed "
+                "to the public repository."
+            ),
         },
     )
     print(json.dumps({"stage_id": stage_id, "status": status}, indent=2))
@@ -151,6 +191,10 @@ def promote(args: argparse.Namespace) -> int:
     gate = load_json(args.staging_dir / "publication_gate.json")
     if gate.get("status") != "BLOCKED_REVIEW_REQUIRED":
         raise SystemExit(f"Promotion requires a changed, diagnostically valid staged revision; found {gate.get('status')}")
+    if manifest.get("private_suite_all_applicable_tests_passed") is not True:
+        raise SystemExit("Staged candidate private suite did not pass; promotion remains blocked")
+    if manifest.get("publication_validation_all_passed") is not True:
+        raise SystemExit("Staged candidate publication diagnostics did not pass; promotion remains blocked")
     current_sha = verify_current_fixture(args.current_fixture, registry)
     if current_sha != manifest.get("current_fixture_sha256"):
         raise SystemExit("Current private fixture changed after staging; restage against the new baseline")
@@ -203,13 +247,15 @@ def promote(args: argparse.Namespace) -> int:
         "new_fixture_sha256": candidate_sha,
         "changed_cell_count": manifest["fixture_changed_cell_count"],
         "changed_artifact_count": manifest["changed_artifact_count"],
+        "private_suite_all_applicable_tests_passed": True,
+        "publication_validation_all_passed": True,
         "reviewed_at": attestation["reviewed_at"],
         "reviewer": attestation["reviewer"],
         "source_vintage_id": source_vintage["source_vintage_id"],
         "rights_status": source_vintage["rights_status"],
         "definitions_status": source_vintage["definitions_status"],
         "status": "PROMOTED_AFTER_EXPLICIT_REVIEW",
-        "privacy_note": "Raw fixture and cell-level revision diff remain private and are not included in this record.",
+        "privacy_note": "Raw fixture, private suite output, and cell-level revision diff remain private.",
     }
     _write_json(args.validation_record, public_record)
     print(json.dumps(public_record, indent=2, sort_keys=True))
