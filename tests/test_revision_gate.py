@@ -195,7 +195,7 @@ def test_review_attestation_is_bound_to_exact_stage_hashes_and_claims():
         )
 
 
-def test_stage_command_archives_current_and_never_silently_promotes(tmp_path: Path):
+def test_stage_command_archives_current_runs_candidate_suite_and_never_silently_promotes(tmp_path: Path):
     root = Path(__file__).parents[1]
     current = tmp_path / "current.json"
     candidate = tmp_path / "candidate.json"
@@ -265,17 +265,24 @@ def test_stage_command_archives_current_and_never_silently_promotes(tmp_path: Pa
     assert sha256_file(current) == before_sha
     assert sha256_file(archive / "freeze-1/rps_subgroup_5q_audit.json") == before_sha
     gate = json.loads((staging / "publication_gate.json").read_text())
-    assert gate["status"] == "BLOCKED_DIAGNOSTICS_FAILED"
+    assert gate["status"] == "BLOCKED_PRIVATE_SUITE_FAILED"
+    private_suite = json.loads((staging / "private_suite.private.json").read_text())
+    assert private_suite["all_applicable_tests_passed"] is False
+    assert private_suite["candidate_fixture_sha256"] == sha256_file(candidate)
+    assert "same-freeze byte-for-byte" in private_suite["scope_note"]
     private_diff = json.loads((staging / "fixture_diff.private.json").read_text())
     assert private_diff["changed_cell_count"] == 1
     claim_review = json.loads((staging / "claim_review.json").read_text())
     assert claim_review["claims"][0]["review_status"] == "PENDING"
-    assert all((staging / "derived" / name).exists() for name in (
-        "longitudinal_diagnostics.json",
-        "validation_checks.json",
-        "quarter_diagnostics.csv",
-        "rank_stability.csv",
-    ))
+    assert all(
+        (staging / "derived" / name).exists()
+        for name in (
+            "longitudinal_diagnostics.json",
+            "validation_checks.json",
+            "quarter_diagnostics.csv",
+            "rank_stability.csv",
+        )
+    )
 
 
 def test_public_registry_matches_private_boundary():
