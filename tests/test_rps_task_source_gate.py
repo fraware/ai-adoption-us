@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json
+from json import loads
 from pathlib import Path
 
 
@@ -8,7 +8,7 @@ REGISTRY = Path(__file__).parents[1] / "data" / "registry" / "rps_task_adoption_
 
 
 def _load_registry() -> dict[str, object]:
-    return json.loads(REGISTRY.read_text())
+    return loads(REGISTRY.read_text())
 
 
 def test_task_adoption_registry_is_fail_closed() -> None:
