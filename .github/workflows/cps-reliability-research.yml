@@ -72,3 +72,5 @@ jobs:
           fi
           git commit -m 'Execute CPS composition reliability diagnostics'
           git push origin HEAD:research/oews-rps-source-unlock
+
+# One-shot research workflow; remove after the derived checkpoint is committed.
