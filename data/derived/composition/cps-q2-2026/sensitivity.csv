@@ -1,0 +1,21 @@
+industry_index,industry_id,industry_name,worker_vs_actual_hour_weights_l1,actual_vs_usual_hour_weights_l1,worker_supported,actual_hours_supported,usual_hours_supported
+1,agriculture-forestry-fishing-and-hunting,"Agriculture, Forestry, Fishing, and Hunting",0.05802548479863483,,True,True,False
+2,mining-quarrying-and-oil-and-gas-extraction,"Mining, Quarrying, and Oil and Gas Extraction",0.0845640048835096,,True,True,False
+3,construction,Construction,0.025264076246885408,,True,True,False
+4,manufacturing,Manufacturing,0.023387382312645463,,True,True,False
+5,wholesale-trade,Wholesale Trade,0.033609955755819584,,True,True,False
+6,retail-trade,Retail Trade,0.037613347398275834,,True,True,False
+7,transportation-and-warehousing,Transportation and Warehousing,0.04461715921978562,,True,True,False
+8,utilities,Utilities,0.03594191859526991,,True,True,False
+9,information,Information,0.05043627914009904,,True,True,False
+10,finance-and-insurance,Finance and Insurance,0.0216833555665662,,True,True,False
+11,real-estate-and-rental-and-leasing,Real Estate and Rental and Leasing,0.03901093437658585,,True,True,False
+12,professional-scientific-and-technical-services,"Professional, Scientific, and Technical Services",0.029684758615387396,,True,True,False
+13,management-of-companies-and-enterprises,Management of Companies and Enterprises,0.10450900022982329,,True,True,False
+14,administrative-and-support-and-waste-management-services,Administrative and Support and Waste Management Services,0.05760496982438755,,True,True,False
+15,educational-services,Educational Services,0.050480368445887304,,True,True,False
+16,health-care-and-social-assistance,Health Care and Social Assistance,0.04893848819319798,,True,True,False
+17,arts-entertainment-and-recreation,"Arts, Entertainment, and Recreation",0.11469300210977153,,True,True,False
+18,accommodation-and-food-services,Accommodation and Food Services,0.11244056215877214,,True,True,False
+19,other-services-except-public-administration,"Other Services, Except Public Administration",0.09343152591687544,,True,True,False
+20,public-administration,Public Administration,0.05679113158484225,0.01900250343917377,True,True,True

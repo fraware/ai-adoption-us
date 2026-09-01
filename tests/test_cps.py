@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 
 from genai_at_work.cps import (
-    CPSPerson,
     FIXED_WIDTH_FIELDS_2026,
+    CPSPerson,
     UnavailableQuarter,
     build_composition,
     decode_fixed_width_record_2026,
