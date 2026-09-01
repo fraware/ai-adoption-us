@@ -44,11 +44,13 @@ def _candidate(
     artifact_text: str = '{"value": 1}\n',
     claim_text: str = "claim-v1",
     rights_status: str = "approved",
+    redistribution_scope: str = "derived_only",
     definition_id: str = "definition-v1",
     coverage_status: str = "pass",
     observed_units: int = 10,
     required_units: int = 10,
     revision_status: str = "new_wave",
+    data_mode: str = "derived_only",
 ) -> dict[str, Any]:
     periods = periods or ["2026-Q1"]
     source_sha, source_size = _write(root / "inputs/source-q1.csv", "series,value\na,1\n")
@@ -83,13 +85,12 @@ def _candidate(
             "source_ids": ["survey"],
         }
     ]
-    diagnostic_seed = artifact_sha
     diagnostics = [
         {
             "diagnostic_id": diagnostic_class,
             "diagnostic_class": diagnostic_class,
             "status": "pass",
-            "value_digest": _digest_text(f"{diagnostic_class}:{diagnostic_seed}"),
+            "value_digest": _digest_text(f"{diagnostic_class}:{artifact_sha}"),
         }
         for diagnostic_class in (
             "stability",
@@ -104,17 +105,17 @@ def _candidate(
             "surfaces": ["/", "/methodology"],
             "artifact_ids": ["result"],
             "value_digest": _digest_text(claim_text),
+            "value_summary": claim_text,
             "truth_state": "supported",
             "evidence_class": 2,
             "interpretation_boundary": "Descriptive synthetic test claim; no causal interpretation.",
         }
     ]
-    input_sha = {f"survey:{row['object_id']}": row["sha256"] for row in objects}
-    output_sha = {"result": artifact_sha}
     return {
         "schema_version": 1,
         "release_id": release_id,
         "release_type": "baseline" if supersedes is None else "new_wave",
+        "data_mode": data_mode,
         "created_at": "2026-09-01T13:00:00Z",
         "supersedes_release_id": supersedes,
         "sources": [
@@ -133,7 +134,7 @@ def _candidate(
                     "status": rights_status,
                     "storage_scope": "private",
                     "publication_scope": "derived_only",
-                    "redistribution_scope": "derived_only",
+                    "redistribution_scope": redistribution_scope,
                 },
                 "coverage": {
                     "status": coverage_status,
@@ -150,8 +151,8 @@ def _candidate(
             "builder_id": "synthetic-builder-v1",
             "builder_commit": "0123456789abcdef",
             "deterministic": True,
-            "input_sha256": input_sha,
-            "output_sha256": output_sha,
+            "input_sha256": {f"survey:{row['object_id']}": row["sha256"] for row in objects},
+            "output_sha256": {"result": artifact_sha},
         },
     }
 
@@ -169,6 +170,7 @@ def _registry(path: Path) -> Path:
                 "current_release_id": None,
                 "current_release_manifest_sha256": None,
                 "releases": [],
+                "status": "NO_OBSERVATORY_RELEASE_PROMOTED_YET",
             },
             indent=2,
             sort_keys=True,
@@ -214,48 +216,107 @@ def _attestation(stage_dir: Path, candidate_manifest: Path, candidate: dict[str,
     }
 
 
-def test_manifest_integrity_and_build_contract(tmp_path: Path):
+def test_manifest_integrity_namespaces_and_build_contract(tmp_path: Path):
     candidate = _candidate(tmp_path)
     validate_release_manifest(candidate, tmp_path)
-    candidate["build"]["input_sha256"]["survey:q1"] = "0" * 64
-    with pytest.raises(ValueError, match="exactly cover every verified source object"):
+    candidate["artifacts"][0]["path"] = "result.json"
+    with pytest.raises(ValueError, match="must live under artifacts"):
         validate_release_manifest(candidate, tmp_path)
 
-
-def test_unresolved_rights_and_failed_coverage_are_fail_closed(tmp_path: Path):
-    rights_candidate = _candidate(tmp_path / "rights", rights_status="unresolved")
-    validate_release_manifest(rights_candidate, tmp_path / "rights")
-    rights_diff = diff_releases(None, rights_candidate)
-    rights_failures = candidate_gate_failures(rights_candidate, rights_diff)
-    assert gate_status(rights_failures, True) == "BLOCKED_RIGHTS"
-
-    coverage_candidate = _candidate(tmp_path / "coverage", coverage_status="fail", observed_units=9)
-    validate_release_manifest(coverage_candidate, tmp_path / "coverage")
-    coverage_diff = diff_releases(None, coverage_candidate)
-    coverage_failures = candidate_gate_failures(coverage_candidate, coverage_diff)
-    assert gate_status(coverage_failures, True) == "BLOCKED_COVERAGE"
+    candidate = _candidate(tmp_path / "build")
+    candidate["build"]["input_sha256"]["survey:q1"] = "0" * 64
+    with pytest.raises(ValueError, match="exactly cover every verified source object"):
+        validate_release_manifest(candidate, tmp_path / "build")
 
 
-def test_definition_change_and_missing_historical_period_fail_closed(tmp_path: Path):
-    old_root = tmp_path / "old"
-    new_root = tmp_path / "new"
-    old = _candidate(old_root, periods=["2026-Q1"])
-    changed = _candidate(new_root, release_id="release-2", supersedes="release-1", definition_id="definition-v2")
-    diff = diff_releases(old, changed)
-    assert {row["code"] for row in diff["contract_failures"]} >= {"DEFINITION_CHANGE"}
-    assert gate_status(candidate_gate_failures(changed, diff), True) == "BLOCKED_DEFINITION_CHANGE"
+def test_unresolved_rights_nonredistributable_rights_and_failed_coverage_are_closed(tmp_path: Path):
+    unresolved = _candidate(tmp_path / "rights", rights_status="unresolved")
+    validate_release_manifest(unresolved, tmp_path / "rights")
+    diff = diff_releases(None, unresolved)
+    assert gate_status(candidate_gate_failures(unresolved, diff), True) == "BLOCKED_RIGHTS"
 
-    missing_root = tmp_path / "missing"
-    previous = _candidate(old_root, periods=["2026-Q1", "2026-Q2"], extra_object=True)
-    missing = _candidate(missing_root, release_id="release-2", supersedes="release-1", periods=["2026-Q1"])
-    missing_diff = diff_releases(previous, missing)
-    codes = {row["code"] for row in missing_diff["contract_failures"]}
-    assert "MISSING_PERIOD" in codes
-    assert "MISSING_SOURCE_OBJECT" in codes
-    assert gate_status(candidate_gate_failures(missing, missing_diff), True) == "BLOCKED_MISSING_SERIES"
+    nonredistributable = _candidate(tmp_path / "redist", redistribution_scope="none")
+    validate_release_manifest(nonredistributable, tmp_path / "redist")
+    diff = diff_releases(None, nonredistributable)
+    assert gate_status(candidate_gate_failures(nonredistributable, diff), True) == "BLOCKED_RIGHTS"
+
+    coverage = _candidate(tmp_path / "coverage", coverage_status="fail", observed_units=9)
+    validate_release_manifest(coverage, tmp_path / "coverage")
+    diff = diff_releases(None, coverage)
+    assert gate_status(candidate_gate_failures(coverage, diff), True) == "BLOCKED_COVERAGE"
 
 
-def test_new_wave_diff_identifies_sources_artifacts_diagnostics_and_claims(tmp_path: Path):
+def test_definition_data_mode_and_missing_history_fail_closed(tmp_path: Path):
+    old = _candidate(tmp_path / "old")
+    definition = _candidate(
+        tmp_path / "definition",
+        release_id="release-2",
+        supersedes="release-1",
+        definition_id="definition-v2",
+    )
+    diff = diff_releases(old, definition)
+    assert "DEFINITION_CHANGE" in {row["code"] for row in diff["contract_failures"]}
+    assert gate_status(candidate_gate_failures(definition, diff), True) == "BLOCKED_DEFINITION_CHANGE"
+
+    mode = _candidate(
+        tmp_path / "mode",
+        release_id="release-2",
+        supersedes="release-1",
+        data_mode="rights_cleared_direct",
+    )
+    diff = diff_releases(old, mode)
+    assert gate_status(candidate_gate_failures(mode, diff), True) == "BLOCKED_DATA_MODE_CHANGE"
+
+    previous = _candidate(tmp_path / "history-old", periods=["2026-Q1", "2026-Q2"], extra_object=True)
+    missing = _candidate(
+        tmp_path / "history-new",
+        release_id="release-2",
+        supersedes="release-1",
+        periods=["2026-Q1"],
+    )
+    diff = diff_releases(previous, missing)
+    codes = {row["code"] for row in diff["contract_failures"]}
+    assert {"MISSING_PERIOD", "MISSING_SOURCE_OBJECT"} <= codes
+    assert gate_status(candidate_gate_failures(missing, diff), True) == "BLOCKED_MISSING_SERIES"
+
+
+def test_release_type_revision_status_and_vintage_identity_are_explicit(tmp_path: Path):
+    old = _candidate(tmp_path / "old")
+    new = _candidate(
+        tmp_path / "new",
+        release_id="release-2",
+        supersedes="release-1",
+        periods=["2026-Q1", "2026-Q2"],
+        extra_object=True,
+    )
+    new["release_type"] = "revision"
+    diff = diff_releases(old, new)
+    assert "RELEASE_TYPE_MISMATCH" in {row["code"] for row in diff["contract_failures"]}
+
+    unchanged_status = _candidate(
+        tmp_path / "status",
+        release_id="release-2",
+        supersedes="release-1",
+        periods=["2026-Q1", "2026-Q2"],
+        extra_object=True,
+        revision_status="unchanged",
+    )
+    diff = diff_releases(old, unchanged_status)
+    assert "REVISION_STATUS_MISMATCH" in {row["code"] for row in diff["contract_failures"]}
+
+    stale_vintage = _candidate(
+        tmp_path / "vintage",
+        release_id="release-2",
+        supersedes="release-1",
+        periods=["2026-Q1", "2026-Q2"],
+        extra_object=True,
+    )
+    stale_vintage["sources"][0]["source_vintage_id"] = "release-1"
+    diff = diff_releases(old, stale_vintage)
+    assert "SOURCE_VINTAGE_ID_NOT_ADVANCED" in {row["code"] for row in diff["contract_failures"]}
+
+
+def test_new_wave_diff_exposes_magnitude_truth_and_all_dependency_layers(tmp_path: Path):
     old = _candidate(tmp_path / "old")
     new = _candidate(
         tmp_path / "new",
@@ -277,16 +338,19 @@ def test_new_wave_diff_identifies_sources_artifacts_diagnostics_and_claims(tmp_p
         "suppression_coverage",
     }
     assert diff["affected_claim_ids"] == ["claim-1"]
+    claim = diff["claim_changes"][0]
+    assert claim["old_value_summary"] == "claim-v1"
+    assert claim["new_value_summary"] == "claim-v2"
+    assert claim["surfaces"] == ["/", "/methodology"]
     assert gate_status(candidate_gate_failures(new, diff), True) == "BLOCKED_REVIEW_REQUIRED"
 
 
 def test_review_attestation_binds_ci_artifacts_sources_diagnostics_and_claims(tmp_path: Path):
     candidate = _candidate(tmp_path)
     diff = diff_releases(None, candidate)
-    stage_id = "stage-id"
     manifest_path = _manifest(tmp_path / "release.json", candidate)
     attestation = {
-        "stage_id": stage_id,
+        "stage_id": "stage-id",
         "release_id": "release-1",
         "candidate_manifest_sha256": sha256_file(manifest_path),
         "reviewer": "reviewer",
@@ -304,23 +368,32 @@ def test_review_attestation_binds_ci_artifacts_sources_diagnostics_and_claims(tm
     }
     validate_review_attestation(
         attestation,
-        stage_id=stage_id,
+        stage_id="stage-id",
         candidate_manifest_sha256=sha256_file(manifest_path),
         candidate=candidate,
         release_diff=diff,
     )
+    incomplete = dict(attestation, ci_run_ids=[])
+    with pytest.raises(ValueError, match="ci_run_ids"):
+        validate_review_attestation(
+            incomplete,
+            stage_id="stage-id",
+            candidate_manifest_sha256=sha256_file(manifest_path),
+            candidate=candidate,
+            release_diff=diff,
+        )
     incomplete = dict(attestation, reviewed_claim_ids=[])
     with pytest.raises(ValueError, match="reviewed_claim_ids"):
         validate_review_attestation(
             incomplete,
-            stage_id=stage_id,
+            stage_id="stage-id",
             candidate_manifest_sha256=sha256_file(manifest_path),
             candidate=candidate,
             release_diff=diff,
         )
 
 
-def test_stage_and_promote_baseline_then_stage_new_wave_without_source_redistribution(tmp_path: Path):
+def test_stage_promote_baseline_then_stage_new_wave_without_source_redistribution(tmp_path: Path):
     repo = Path(__file__).parents[1]
     registry = _registry(tmp_path / "registry.json")
     releases = tmp_path / "releases"
@@ -343,8 +416,7 @@ def test_stage_and_promote_baseline_then_stage_new_wave_without_source_redistrib
         "--staging-dir",
         str(baseline_stage),
     )
-    gate = json.loads((baseline_stage / "publication_gate.json").read_text())
-    assert gate["status"] == "BLOCKED_REVIEW_REQUIRED"
+    assert json.loads((baseline_stage / "publication_gate.json").read_text())["status"] == "BLOCKED_REVIEW_REQUIRED"
     attestation_path = tmp_path / "baseline-attestation.json"
     attestation_path.write_text(json.dumps(_attestation(baseline_stage, baseline_manifest, baseline)))
     _run(
@@ -370,6 +442,7 @@ def test_stage_and_promote_baseline_then_stage_new_wave_without_source_redistrib
     assert (releases / "release-1/artifacts/result.json").exists()
     registry_value = json.loads(registry.read_text())
     assert registry_value["current_release_id"] == "release-1"
+    assert registry_value["status"] == "CURRENT_RELEASE_PROMOTED"
 
     next_root = tmp_path / "next"
     next_release = _candidate(
@@ -402,7 +475,7 @@ def test_stage_and_promote_baseline_then_stage_new_wave_without_source_redistrib
     assert next_gate["status"] == "BLOCKED_REVIEW_REQUIRED"
     assert next_diff["changed_source_ids"] == ["survey"]
     assert next_diff["affected_claim_ids"] == ["claim-1"]
-    assert registry_value["current_release_id"] == "release-1"
+    assert json.loads(registry.read_text())["current_release_id"] == "release-1"
 
 
 def test_public_registry_has_no_synthetic_release_promoted():

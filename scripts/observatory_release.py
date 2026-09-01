@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Any
 
 from genai_at_work.release_engine import (
-    canonical_digest,
     candidate_gate_failures,
+    canonical_digest,
     diff_releases,
     gate_status,
     load_json_object,
@@ -90,6 +90,7 @@ def _stage_payload(
         "registry_current_release_id": _current_id(registry),
         "registry_current_manifest_sha256": registry.get("current_release_manifest_sha256"),
         "candidate_release_id": candidate["release_id"],
+        "candidate_data_mode": candidate["data_mode"],
         "candidate_manifest_path": str(candidate_manifest.resolve()),
         "candidate_manifest_sha256": sha256_file(candidate_manifest),
         "candidate_manifest_digest": canonical_digest(candidate),
@@ -201,6 +202,7 @@ def promote(args: argparse.Namespace) -> int:
             {
                 "stage_id": staged_manifest["stage_id"],
                 "release_id": release_id,
+                "data_mode": candidate["data_mode"],
                 "reviewer": attestation["reviewer"],
                 "reviewed_at": attestation["reviewed_at"],
                 "scientific_reviewed": True,
@@ -230,6 +232,7 @@ def promote(args: argparse.Namespace) -> int:
     updated = dict(registry)
     updated["current_release_id"] = release_id
     updated["current_release_manifest_sha256"] = manifest_sha
+    updated["status"] = "CURRENT_RELEASE_PROMOTED"
     updated["releases"] = [
         *releases,
         {

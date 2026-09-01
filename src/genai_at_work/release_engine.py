@@ -15,6 +15,7 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+ALLOWED_DATA_MODES = {"derived_only", "rights_cleared_direct"}
 ALLOWED_RELEASE_TYPES = {"baseline", "new_wave", "revision", "mixed"}
 ALLOWED_REVISION_STATUS = {"unchanged", "new_wave", "revision", "mixed"}
 ALLOWED_STORAGE_SCOPES = {"transient", "private", "public"}
@@ -125,13 +126,16 @@ def _source_objects(source: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
 
 
 def validate_release_manifest(manifest: Mapping[str, Any], candidate_root: Path) -> None:
-    """Validate schema, paths, bytes, and deterministic build coverage."""
+    """Validate schema, package namespaces, bytes, and build provenance."""
     if manifest.get("schema_version") != 1:
         raise ValueError("release.schema_version must equal 1")
     _string(manifest, "release_id", "release")
     release_type = _string(manifest, "release_type", "release")
     if release_type not in ALLOWED_RELEASE_TYPES:
         raise ValueError(f"Unsupported release_type: {release_type}")
+    data_mode = _string(manifest, "data_mode", "release")
+    if data_mode not in ALLOWED_DATA_MODES:
+        raise ValueError(f"Unsupported data_mode: {data_mode}")
     _string(manifest, "created_at", "release")
     supersedes = manifest.get("supersedes_release_id")
     if supersedes is not None and (not isinstance(supersedes, str) or not supersedes):
@@ -264,6 +268,7 @@ def validate_release_manifest(manifest: Mapping[str, Any], candidate_root: Path)
         if unknown_artifacts:
             raise ValueError(f"{context} references unknown artifacts: {unknown_artifacts}")
         _digest(claim.get("value_digest"), f"{context}.value_digest")
+        _string(claim, "value_summary", context)
         _string(claim, "truth_state", context)
         _string(claim, "interpretation_boundary", context)
         evidence_class = claim.get("evidence_class")
@@ -284,7 +289,7 @@ def validate_release_manifest(manifest: Mapping[str, Any], candidate_root: Path)
 
 
 def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, Any]) -> dict[str, Any]:
-    """Produce source/artifact/diagnostic/claim diffs and contract failures."""
+    """Produce auditable diffs and fail-closed contract violations."""
     new_sources = _by_id(_rows(candidate, "sources", "release"), "source_id")
     new_artifacts = _by_id(_rows(candidate, "artifacts", "release"), "artifact_id")
     new_diagnostics = _by_id(_rows(candidate, "diagnostics", "release"), "diagnostic_id")
@@ -300,15 +305,39 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
         old_claims = _by_id(_rows(previous, "claims", "release"), "claim_id")
 
     failures: list[dict[str, str]] = []
+    if previous is None and candidate.get("release_type") != "baseline":
+        failures.append({"code": "FIRST_RELEASE_NOT_BASELINE", "scope": "release"})
+    if previous is not None and candidate.get("release_type") == "baseline":
+        failures.append({"code": "BASELINE_REUSE", "scope": "release"})
+    if previous is not None and previous.get("data_mode") != candidate.get("data_mode"):
+        failures.append({"code": "DATA_MODE_CHANGE", "scope": "release"})
+
     source_changes: list[dict[str, Any]] = []
+    has_new_wave_change = False
+    has_revision_change = False
     for source_id in sorted(old_sources.keys() | new_sources.keys()):
         old = old_sources.get(source_id)
         new = new_sources.get(source_id)
         if old is None and new is not None:
-            source_changes.append({"source_id": source_id, "change": "added"})
+            has_new_wave_change = True
+            source_changes.append(
+                {
+                    "source_id": source_id,
+                    "change": "added",
+                    "old_source_vintage_id": None,
+                    "new_source_vintage_id": new.get("source_vintage_id"),
+                }
+            )
             continue
         if new is None and old is not None:
-            source_changes.append({"source_id": source_id, "change": "removed"})
+            source_changes.append(
+                {
+                    "source_id": source_id,
+                    "change": "removed",
+                    "old_source_vintage_id": old.get("source_vintage_id"),
+                    "new_source_vintage_id": None,
+                }
+            )
             failures.append({"code": "MISSING_SOURCE", "source_id": source_id})
             continue
         if old is None or new is None:
@@ -323,6 +352,8 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
         new_periods = {str(v) for v in new.get("reference_periods", [])}
         added_periods = sorted(new_periods - old_periods)
         removed_periods = sorted(old_periods - new_periods)
+        if added_periods:
+            has_new_wave_change = True
         if removed_periods:
             failures.append({"code": "MISSING_PERIOD", "source_id": source_id})
         old_objects = _source_objects(old)
@@ -334,6 +365,10 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
             for object_id in old_objects.keys() & new_objects.keys()
             if old_objects[object_id].get("sha256") != new_objects[object_id].get("sha256")
         )
+        if added_objects:
+            has_new_wave_change = True
+        if modified_objects:
+            has_revision_change = True
         if removed_objects:
             failures.append({"code": "MISSING_SOURCE_OBJECT", "source_id": source_id})
         changed = bool(added_periods or removed_periods or added_objects or removed_objects or modified_objects)
@@ -342,6 +377,8 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
                 {
                     "source_id": source_id,
                     "change": "modified",
+                    "old_source_vintage_id": old.get("source_vintage_id"),
+                    "new_source_vintage_id": new.get("source_vintage_id"),
                     "added_periods": added_periods,
                     "removed_periods": removed_periods,
                     "added_objects": added_objects,
@@ -349,8 +386,18 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
                     "modified_objects": modified_objects,
                 }
             )
+            if new.get("source_vintage_id") == old.get("source_vintage_id"):
+                failures.append({"code": "SOURCE_VINTAGE_ID_NOT_ADVANCED", "source_id": source_id})
             if new.get("revision_status") == "unchanged":
                 failures.append({"code": "REVISION_STATUS_MISMATCH", "source_id": source_id})
+
+    release_type = candidate.get("release_type")
+    if previous is not None and release_type == "new_wave" and has_revision_change:
+        failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
+    if previous is not None and release_type == "revision" and has_new_wave_change:
+        failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
+    if previous is not None and release_type == "new_wave" and not has_new_wave_change:
+        failures.append({"code": "RELEASE_TYPE_MISMATCH", "scope": "release"})
 
     artifact_changes: list[dict[str, Any]] = []
     changed_artifacts: set[str] = set()
@@ -376,7 +423,7 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
             }
         )
 
-    diagnostic_changes: list[dict[str, str]] = []
+    diagnostic_changes: list[dict[str, Any]] = []
     changed_diagnostics: set[str] = set()
     diagnostic_fields = ("status", "value_digest", "diagnostic_class")
     for diagnostic_id in sorted(old_diagnostics.keys() | new_diagnostics.keys()):
@@ -391,11 +438,28 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
         else:
             continue
         changed_diagnostics.add(diagnostic_id)
-        diagnostic_changes.append({"diagnostic_id": diagnostic_id, "change": change})
+        diagnostic_changes.append(
+            {
+                "diagnostic_id": diagnostic_id,
+                "change": change,
+                "old_status": old.get("status") if old else None,
+                "new_status": new.get("status") if new else None,
+                "old_value_digest": old.get("value_digest") if old else None,
+                "new_value_digest": new.get("value_digest") if new else None,
+            }
+        )
 
     claim_changes: list[dict[str, Any]] = []
     affected_claims: set[str] = set()
-    claim_fields = ("value_digest", "truth_state", "artifact_ids", "evidence_class", "interpretation_boundary", "surfaces")
+    claim_fields = (
+        "value_digest",
+        "value_summary",
+        "truth_state",
+        "artifact_ids",
+        "evidence_class",
+        "interpretation_boundary",
+        "surfaces",
+    )
     for claim_id in sorted(old_claims.keys() | new_claims.keys()):
         old = old_claims.get(claim_id)
         new = new_claims.get(claim_id)
@@ -408,15 +472,27 @@ def diff_releases(previous: Mapping[str, Any] | None, candidate: Mapping[str, An
         else:
             change = "unchanged"
         refs: set[str] = set()
+        surfaces: set[str] = set()
         if old is not None:
             refs.update(str(v) for v in old.get("artifact_ids", []))
+            surfaces.update(str(v) for v in old.get("surfaces", []))
         if new is not None:
             refs.update(str(v) for v in new.get("artifact_ids", []))
+            surfaces.update(str(v) for v in new.get("surfaces", []))
         dependency_changed = bool(refs & changed_artifacts)
         if change != "unchanged" or dependency_changed:
             affected_claims.add(claim_id)
             claim_changes.append(
-                {"claim_id": claim_id, "change": change, "artifact_dependency_changed": dependency_changed}
+                {
+                    "claim_id": claim_id,
+                    "change": change,
+                    "artifact_dependency_changed": dependency_changed,
+                    "surfaces": sorted(surfaces),
+                    "old_value_summary": old.get("value_summary") if old else None,
+                    "new_value_summary": new.get("value_summary") if new else None,
+                    "old_truth_state": old.get("truth_state") if old else None,
+                    "new_truth_state": new.get("truth_state") if new else None,
+                }
             )
 
     return {
@@ -440,7 +516,11 @@ def candidate_gate_failures(candidate: Mapping[str, Any], release_diff: Mapping[
     for source in _rows(candidate, "sources", "release"):
         source_id = str(source["source_id"])
         rights = _mapping(source, "rights", f"source {source_id}")
-        if rights.get("status") != "approved" or rights.get("publication_scope") == "none":
+        if (
+            rights.get("status") != "approved"
+            or rights.get("publication_scope") == "none"
+            or rights.get("redistribution_scope") == "none"
+        ):
             failures.append({"code": "RIGHTS_UNRESOLVED", "source_id": source_id})
         coverage = _mapping(source, "coverage", f"source {source_id}")
         required = coverage.get("required_units")
@@ -459,13 +539,15 @@ def gate_status(failures: Sequence[Mapping[str, str]], has_changes: bool) -> str
         return "BLOCKED_RIGHTS"
     if "DEFINITION_CHANGE" in codes:
         return "BLOCKED_DEFINITION_CHANGE"
+    if "DATA_MODE_CHANGE" in codes:
+        return "BLOCKED_DATA_MODE_CHANGE"
     if codes & {"MISSING_SOURCE", "MISSING_PERIOD", "MISSING_SOURCE_OBJECT"}:
         return "BLOCKED_MISSING_SERIES"
     if "COVERAGE_FAILED" in codes:
         return "BLOCKED_COVERAGE"
     if "DIAGNOSTIC_FAILED" in codes:
         return "BLOCKED_DIAGNOSTICS"
-    if "REVISION_STATUS_MISMATCH" in codes:
+    if codes & {"REVISION_STATUS_MISMATCH", "SOURCE_VINTAGE_ID_NOT_ADVANCED", "RELEASE_TYPE_MISMATCH"}:
         return "BLOCKED_REVISION_STATUS"
     if failures:
         return "BLOCKED_CONTRACT"
@@ -473,20 +555,28 @@ def gate_status(failures: Sequence[Mapping[str, str]], has_changes: bool) -> str
 
 
 def review_package(candidate: Mapping[str, Any], release_diff: Mapping[str, Any]) -> dict[str, Any]:
-    claims = _by_id(_rows(candidate, "claims", "release"), "claim_id")
+    change_by_claim = {
+        str(row["claim_id"]): row
+        for row in release_diff.get("claim_changes", [])
+        if isinstance(row, Mapping) and "claim_id" in row
+    }
     affected: list[dict[str, Any]] = []
     for raw_id in release_diff.get("affected_claim_ids", []):
         claim_id = str(raw_id)
-        claim = claims.get(claim_id)
+        change = change_by_claim.get(claim_id, {})
         affected.append(
             {
                 "claim_id": claim_id,
-                "surfaces": list(claim.get("surfaces", [])) if claim else [],
+                "surfaces": list(change.get("surfaces", [])),
+                "old_value_summary": change.get("old_value_summary"),
+                "new_value_summary": change.get("new_value_summary"),
+                "old_truth_state": change.get("old_truth_state"),
+                "new_truth_state": change.get("new_truth_state"),
                 "review_status": "PENDING",
-                "removed_from_candidate": claim is None,
             }
         )
     return {
+        "data_mode": candidate.get("data_mode"),
         "changed_source_ids": list(release_diff.get("changed_source_ids", [])),
         "changed_diagnostic_ids": list(release_diff.get("changed_diagnostic_ids", [])),
         "affected_claims": affected,
@@ -518,7 +608,6 @@ def validate_review_attestation(
     ci_run_ids = attestation.get("ci_run_ids")
     if not isinstance(ci_run_ids, list) or not ci_run_ids or not all(isinstance(v, int) and not isinstance(v, bool) and v > 0 for v in ci_run_ids):
         raise ValueError("Review attestation requires one or more positive integer ci_run_ids")
-
     expected_artifacts = {
         str(row["artifact_id"]): str(row["sha256"])
         for row in _rows(candidate, "artifacts", "release")
@@ -538,7 +627,7 @@ def validate_review_attestation(
 
 
 def sanitized_public_manifest(candidate: Mapping[str, Any]) -> dict[str, Any]:
-    """Remove local source paths while retaining source identity/provenance."""
+    """Remove local source paths while retaining identity and provenance."""
     public = json.loads(json.dumps(candidate))
     sources = public.get("sources")
     if isinstance(sources, list):
