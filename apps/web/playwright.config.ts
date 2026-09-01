@@ -3,14 +3,50 @@ import { defineConfig } from "@playwright/test";
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
 
 const projects = [
-  { name: "chromium-375", browserName: "chromium" as const, viewport: { width: 375, height: 812 } },
-  { name: "chromium-768", browserName: "chromium" as const, viewport: { width: 768, height: 1024 } },
-  { name: "chromium-1024", browserName: "chromium" as const, viewport: { width: 1024, height: 900 } },
-  { name: "chromium-1440", browserName: "chromium" as const, viewport: { width: 1440, height: 1000 } },
-  { name: "firefox-375", browserName: "firefox" as const, viewport: { width: 375, height: 812 } },
-  { name: "firefox-1440", browserName: "firefox" as const, viewport: { width: 1440, height: 1000 } },
-  { name: "webkit-375", browserName: "webkit" as const, viewport: { width: 375, height: 812 } },
-  { name: "webkit-1440", browserName: "webkit" as const, viewport: { width: 1440, height: 1000 } },
+  {
+    name: "chrome-375",
+    browserName: "chromium" as const,
+    channel: "chrome",
+    viewport: { width: 375, height: 812 },
+  },
+  {
+    name: "chrome-768",
+    browserName: "chromium" as const,
+    channel: "chrome",
+    viewport: { width: 768, height: 1024 },
+  },
+  {
+    name: "chrome-1024",
+    browserName: "chromium" as const,
+    channel: "chrome",
+    viewport: { width: 1024, height: 900 },
+  },
+  {
+    name: "chrome-1440",
+    browserName: "chromium" as const,
+    channel: "chrome",
+    viewport: { width: 1440, height: 1000 },
+  },
+  {
+    name: "firefox-375",
+    browserName: "firefox" as const,
+    viewport: { width: 375, height: 812 },
+  },
+  {
+    name: "firefox-1440",
+    browserName: "firefox" as const,
+    viewport: { width: 1440, height: 1000 },
+  },
+  {
+    name: "webkit-375",
+    browserName: "webkit" as const,
+    viewport: { width: 375, height: 812 },
+  },
+  {
+    name: "webkit-1440",
+    browserName: "webkit" as const,
+    viewport: { width: 1440, height: 1000 },
+  },
 ];
 
 export default defineConfig({
@@ -37,6 +73,7 @@ export default defineConfig({
     name: project.name,
     use: {
       browserName: project.browserName,
+      channel: "channel" in project ? project.channel : undefined,
       viewport: project.viewport,
     },
   })),
