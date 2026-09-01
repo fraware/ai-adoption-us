@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -24,6 +25,15 @@ from genai_at_work.release_engine import (
 )
 
 ROOT = Path(__file__).parents[1]
+RELEASE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
+
+
+def _safe_release_id(value: object, *, context: str) -> str:
+    if not isinstance(value, str) or RELEASE_ID_RE.fullmatch(value) is None:
+        raise SystemExit(
+            f"{context} must be a lowercase ASCII release slug using only a-z, 0-9, '.', '_' or '-'"
+        )
+    return value
 
 
 def _write_json(path: Path, value: object) -> None:
@@ -37,9 +47,7 @@ def _current_id(registry: dict[str, Any]) -> str | None:
     value = registry.get("current_release_id")
     if value is None:
         return None
-    if not isinstance(value, str) or not value:
-        raise SystemExit("Release registry current_release_id must be null or a non-empty string")
-    return value
+    return _safe_release_id(value, context="Release registry current_release_id")
 
 
 def _load_previous(registry: dict[str, Any], releases_root: Path) -> dict[str, Any] | None:
@@ -61,7 +69,10 @@ def _load_previous(registry: dict[str, Any], releases_root: Path) -> dict[str, A
 
 def _validate_supersession(candidate: dict[str, Any], registry: dict[str, Any]) -> None:
     current = _current_id(registry)
+    release_id = _safe_release_id(candidate.get("release_id"), context="Candidate release_id")
     supersedes = candidate.get("supersedes_release_id")
+    if supersedes is not None:
+        _safe_release_id(supersedes, context="Candidate supersedes_release_id")
     if current is None and supersedes is not None:
         raise SystemExit("First promoted release must use supersedes_release_id=null")
     if current is not None and supersedes != current:
@@ -69,8 +80,11 @@ def _validate_supersession(candidate: dict[str, Any], registry: dict[str, Any]) 
     releases = registry.get("releases")
     if not isinstance(releases, list):
         raise SystemExit("Release registry releases must be a list")
-    known = {str(row.get("release_id")) for row in releases if isinstance(row, dict)}
-    release_id = str(candidate.get("release_id", ""))
+    known = {
+        _safe_release_id(row.get("release_id"), context="Registered release_id")
+        for row in releases
+        if isinstance(row, dict)
+    }
     if release_id == current or release_id in known:
         raise SystemExit(f"Release ID is already frozen and cannot be reused: {release_id}")
 
@@ -204,7 +218,7 @@ def promote(args: argparse.Namespace) -> int:
         release_diff=release_diff,
     )
 
-    release_id = str(candidate["release_id"])
+    release_id = _safe_release_id(candidate["release_id"], context="Candidate release_id")
     target = args.releases_root / release_id
     temporary = args.releases_root / f".{release_id}.tmp"
     if target.exists():
