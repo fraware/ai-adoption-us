@@ -26,14 +26,15 @@ def test_rps_refresh_candidate_stays_private_and_fail_closed():
 
 def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     script = (ROOT / "scripts" / "prepare_rps_observatory_candidate.py").read_text()
-    module = (ROOT / "src" / "genai_at_work" / "rps_release.py").read_text()
+    module = (ROOT / "src" / "genai_at_work" / "rps_release_complete.py").read_text()
 
     assert 'PRIVATE_ROOT = ROOT / "data" / "audit" / "private"' in script
     assert "Repository-local RPS release candidates may only be written under" in script
     assert '"promotion_performed": False' in script
     assert "global_baseline_warning" in script
+    assert "build_rps_release_candidate_complete_history" in script
     assert '"source_input_bytes_publication": False' in module
-    assert "RPS longitudinal component only" in module
+    assert "complete 131-series source history" in module
     assert "artifacts/longitudinal/" in module
     assert "apps/web/public" not in script
     assert "apps/web/public" not in module
@@ -42,12 +43,29 @@ def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     assert "observatory_release.py" not in script
 
 
+def test_snapshot_native_composition_join_emits_derived_evidence_only():
+    script = (ROOT / "scripts" / "build_composition_residuals.py").read_text()
+    module = (ROOT / "src" / "genai_at_work" / "composition_snapshot.py").read_text()
+
+    assert "--source-snapshot" in script
+    assert "prepare_rps_source_history" in script
+    assert "rps-private-fixture" not in script
+    assert '"source_snapshot_published": False' in script
+    assert '"public_raw_rps_observations_included": False' in script
+    assert "private_fixture" not in module
+    assert "occupation-adjusted descriptive industry-context residual" in module
+    assert "not a causal or organizational effect" in module
+    assert "leave_one_occupation_out" in module
+    assert "cross_period_persistence" in module
+
+
 def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     workflow = (ROOT / ".github" / "workflows" / "rps-live-validation.yml").read_text()
 
     assert "name: RPS live validation" in workflow
     assert "push:" in workflow
     assert "branches: [main]" in workflow
+    assert "src/genai_at_work/rps_release_complete.py" in workflow
     assert "workflow_dispatch:" in workflow
     assert "schedule:" not in workflow
     assert "contents: read" in workflow
@@ -56,6 +74,9 @@ def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     assert "--output-dir /tmp/rps-refresh" in workflow
     assert "--archive-root /tmp/rps-private-vintage" in workflow
     assert "--output-dir /tmp/rps-observatory" in workflow
+    assert "scripts/build_composition_residuals.py" in workflow
+    assert "--output-dir /tmp/rps-composition" in workflow
+    assert "composition-residuals" in workflow
     assert "private-vintage-manifest.json" in workflow
     assert "live-validation-summary.json" in workflow
     assert "rps_source_snapshot.json" in workflow
@@ -68,8 +89,11 @@ def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     assert 'release.get("data_mode") != "derived_only"' in workflow
     assert 'archive.get("public_archive") is not False' in workflow
     assert 'archive.get("source_content_sha256") != source.get("content_sha256")' in workflow
+    assert 'composition_inputs.get("source_content_sha256") != source.get("content_sha256")' in workflow
+    assert 'composition_inputs.get("public_raw_rps_observations_included") is not False' in workflow
     assert '"source_content_sha256": source.get("content_sha256")' in workflow
     assert '"archive_persisted_durably": False' in workflow
+    assert '"composition_residual_evidence_built": True' in workflow
     assert '"promotion_performed": False' in workflow
     assert "actions/upload-artifact@" in workflow
     assert "retention-days: 14" in workflow

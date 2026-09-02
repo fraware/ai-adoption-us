@@ -8,12 +8,19 @@ on:
       - 'scripts/prepare_rps_refresh_candidate.py'
       - 'scripts/prepare_rps_observatory_candidate.py'
       - 'scripts/archive_rps_private_vintage.py'
+      - 'scripts/build_composition_residuals.py'
       - 'src/genai_at_work/rps_refresh.py'
       - 'src/genai_at_work/rps_release.py'
+      - 'src/genai_at_work/rps_release_complete.py'
       - 'src/genai_at_work/private_vintage.py'
+      - 'src/genai_at_work/composition.py'
+      - 'src/genai_at_work/composition_snapshot.py'
       - 'src/genai_at_work/sources/fred.py'
       - 'data/registry/rps_source_series_manifest.json'
       - 'data/registry/rps_provider_catalog_scope.json'
+      - 'data/derived/composition/cps-q2-2025/cps_composition.json'
+      - 'data/derived/composition/cps-q2-2026/cps_composition.json'
+      - 'data/derived/composition/composition-evidence-v1/industry_evidence_tiers.json'
   workflow_dispatch:
 
 permissions:
@@ -25,7 +32,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Retrieve, validate, archive-rehearse, and build RPS candidate
+    name: Retrieve, validate, archive-rehearse, and build RPS evidence
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
@@ -70,16 +77,26 @@ jobs:
           --output-dir /tmp/rps-observatory
           --release-id rps-live-validation-${GITHUB_RUN_ID}
 
+      - name: Build snapshot-native CPS composition residual evidence
+        run: >-
+          PYTHONPATH=src python scripts/build_composition_residuals.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+          --composition 2025-Q2=data/derived/composition/cps-q2-2025/cps_composition.json
+          --composition 2026-Q2=data/derived/composition/cps-q2-2026/cps_composition.json
+          --evidence-tiers data/derived/composition/composition-evidence-v1/industry_evidence_tiers.json
+          --output-dir /tmp/rps-composition
+
       - name: Assemble rights-safe live-validation evidence
         shell: bash
         run: |
           set -euo pipefail
           evidence="$RUNNER_TEMP/rps-live-validation-evidence"
-          mkdir -p "$evidence/observatory-artifacts"
+          mkdir -p "$evidence/observatory-artifacts" "$evidence/composition-residuals"
 
           cp /tmp/rps-refresh/rps_refresh_candidate.json "$evidence/source-candidate-summary.json"
           cp /tmp/rps-observatory/release.json "$evidence/rps-component-release.json"
           cp -R /tmp/rps-observatory/artifacts/longitudinal/. "$evidence/observatory-artifacts/"
+          cp -R /tmp/rps-composition/. "$evidence/composition-residuals/"
 
           manifest="$(find /tmp/rps-private-vintage -name private_vintage_manifest.json -type f -print -quit)"
           test -n "$manifest"
@@ -88,6 +105,7 @@ jobs:
           test ! -e "$evidence/rps_source_snapshot.json"
           test ! -e "$evidence/rps_refresh_diff.json"
           test ! -d "$evidence/inputs"
+          test ! -e "$evidence/composition-residuals/rps_source_snapshot.json"
 
           python - <<'PY'
           import json
@@ -98,6 +116,15 @@ jobs:
           source = json.loads((root / "source-candidate-summary.json").read_text())
           release = json.loads((root / "rps-component-release.json").read_text())
           archive = json.loads((root / "private-vintage-manifest.json").read_text())
+          composition_validation = json.loads(
+              (root / "composition-residuals" / "validation_checks.json").read_text()
+          )
+          composition_inputs = json.loads(
+              (root / "composition-residuals" / "input_manifest.json").read_text()
+          )
+          persistence = json.loads(
+              (root / "composition-residuals" / "cross_period_persistence.json").read_text()
+          )
 
           if source.get("public_raw_observations_included") is not False:
               raise SystemExit("Source summary widened raw-observation publication scope")
@@ -109,6 +136,12 @@ jobs:
               raise SystemExit("Archive rehearsal lost private-only contract")
           if archive.get("source_content_sha256") != source.get("content_sha256"):
               raise SystemExit("Archive and source summary scientific identities disagree")
+          if composition_validation.get("status") != "pass":
+              raise SystemExit("Composition residual validation did not pass")
+          if composition_inputs.get("source_content_sha256") != source.get("content_sha256"):
+              raise SystemExit("Composition residual evidence is not bound to the live source identity")
+          if composition_inputs.get("public_raw_rps_observations_included") is not False:
+              raise SystemExit("Composition residual evidence widened raw-source publication scope")
 
           summary = {
               "schema_version": 1,
@@ -125,6 +158,12 @@ jobs:
               "archive_contract_rehearsed": True,
               "archive_persisted_durably": False,
               "observatory_candidate_built": True,
+              "composition_residual_evidence_built": True,
+              "composition_residual_primary_rows": composition_validation.get("primary_row_count"),
+              "composition_residual_supported_primary_rows": composition_validation.get(
+                  "primary_supported_row_count"
+              ),
+              "composition_persistence_diagnostic_rows": len(persistence),
               "promotion_performed": False,
               "public_raw_observations_included": False,
           }
