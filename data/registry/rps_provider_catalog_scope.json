@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_date": "2026-09-01",
+  "verified_date": "2026-09-02",
   "provider_distribution_layer": "FRED, Federal Reserve Bank of St. Louis",
   "provider_release_id": 6,
   "provider_release_title": "Real-Time Population Survey: Generative Artificial Intelligence Adoption Tracker",
@@ -75,8 +75,20 @@
   ],
   "count_reconciliation": "137 provider series = 11 national + 60 industry + 66 occupation; 131 observatory series = 5 included national + 60 industry + 66 occupation; the six-series difference is the intentionally excluded national overall/outside-work block.",
   "fred_copyright_label": "Copyrighted: Citation Required",
-  "source_owner_permission_status": "unresolved",
-  "production_consequence": "Keep direct RPS observations fail-closed until an authorized source-owner/data-provider decision resolves persistent display, storage, redistribution, historical-vintage retention, and transformed-result publication.",
+  "source_owner_permission_status": "granted-by-project-owner-attestation",
+  "source_owner_permission_decision": "docs/source-rights/RPS_SOURCE_DECISION.md",
+  "direct_first_party_machine_readable_feed_status": "not-resolved",
+  "production_consequence": "Published aggregate refresh is authorized through versioned, review-gated source checkpoints. FRED/ALFRED remains a transport layer; no speculative first-party endpoint is inferred, no raw public-tree exporter is revived, and provider changes never become canonical automatically.",
+  "refresh_policy": {
+    "workflow": ".github/workflows/rps-source-watch.yml",
+    "cadence": "weekly review probe plus manual dispatch",
+    "supported_series_checked": 131,
+    "complete_history_persisted_by_probe": false,
+    "canonical_q2_industry_checkpoint_revision_check": true,
+    "automatic_repository_write": false,
+    "automatic_publication": false,
+    "promotion_requirement": "explicit versioned checkpoint plus revision review, pull request review, and CI"
+  },
   "sources": {
     "fred_announcement": "https://news.research.stlouisfed.org/2026/07/fred-adds-data-about-the-adoption-of-generative-artificial-intelligence/",
     "fred_release": "https://fred.stlouisfed.org/release?rid=6",
