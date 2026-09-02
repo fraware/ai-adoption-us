@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "snapshot_id": "rps-industry-adoption-work-q2-2026-v1",
+  "verified_date": "2026-09-02",
+  "period": "Q2 2026",
+  "observation_date": "2026-04-01",
+  "metric_id": "adoption_work",
+  "construct": "share of employed adults aged 18-64 in the industry reporting use of Generative AI for their job",
+  "question": "Do you use Generative AI for your job?",
+  "unit": "percent",
+  "frequency": "quarterly",
+  "seasonal_adjustment": "not seasonally adjusted",
+  "source_family": "Real-Time Population Survey: Generative Artificial Intelligence Adoption Tracker",
+  "authors": [
+    "Alexander Bick",
+    "Adam Blandin",
+    "David Deming"
+  ],
+  "transport": "FRED/ALFRED official series distribution",
+  "retrieval_note": "All 20 current Q2 2026 industry observations were independently checked against official ALFRED series pages on 2026-09-02. Series identifiers are the canonical FRED identifiers already pinned in rps_source_series_manifest.json.",
+  "permission_basis": {
+    "status": "user-attested-source-owner-permission",
+    "attested_date": "2026-09-02",
+    "scope_used_here": "published aggregate Tracker observations may be stored and used for this project and for derived analysis",
+    "documentary_evidence_in_repository": false,
+    "guardrail": "Do not infer permission for respondent-level microdata, historical replication packages, or separate task-index artifacts from this aggregate-series attestation."
+  },
+  "rows": [
+    {"entity_index": 1, "entity_name": "Agriculture, Forestry, Fishing, and Hunting", "series_id": "RPSGENAIUSAGESHAREIND1", "value_pct": 34.77068, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND1", "source_updated": "2026-08-04"},
+    {"entity_index": 2, "entity_name": "Mining, Quarrying, and Oil and Gas Extraction", "series_id": "RPSGENAIUSAGESHAREIND2", "value_pct": 26.09946, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND2", "source_updated": "2026-08-04"},
+    {"entity_index": 3, "entity_name": "Construction", "series_id": "RPSGENAIUSAGESHAREIND3", "value_pct": 43.54248, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND3", "source_updated": "2026-08-04"},
+    {"entity_index": 4, "entity_name": "Manufacturing", "series_id": "RPSGENAIUSAGESHAREIND4", "value_pct": 47.65867, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND4", "source_updated": "2026-08-04"},
+    {"entity_index": 5, "entity_name": "Wholesale Trade", "series_id": "RPSGENAIUSAGESHAREIND5", "value_pct": 62.11655, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND5", "source_updated": "2026-08-04"},
+    {"entity_index": 6, "entity_name": "Retail Trade", "series_id": "RPSGENAIUSAGESHAREIND6", "value_pct": 39.45123, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND6", "source_updated": "2026-08-04"},
+    {"entity_index": 7, "entity_name": "Transportation and Warehousing", "series_id": "RPSGENAIUSAGESHAREIND7", "value_pct": 25.10418, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND7", "source_updated": "2026-08-04"},
+    {"entity_index": 8, "entity_name": "Utilities", "series_id": "RPSGENAIUSAGESHAREIND8", "value_pct": 56.42715, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND8", "source_updated": "2026-08-04"},
+    {"entity_index": 9, "entity_name": "Information", "series_id": "RPSGENAIUSAGESHAREIND9", "value_pct": 82.19260, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND9", "source_updated": "2026-08-04"},
+    {"entity_index": 10, "entity_name": "Finance and Insurance", "series_id": "RPSGENAIUSAGESHAREIND10", "value_pct": 67.33240, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND10", "source_updated": "2026-08-04"},
+    {"entity_index": 11, "entity_name": "Real Estate and Rental and Leasing", "series_id": "RPSGENAIUSAGESHAREIND11", "value_pct": 56.49284, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND11", "source_updated": "2026-08-04"},
+    {"entity_index": 12, "entity_name": "Professional, Scientific, and Technical Services", "series_id": "RPSGENAIUSAGESHAREIND12", "value_pct": 69.54294, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND12", "source_updated": "2026-08-04"},
+    {"entity_index": 13, "entity_name": "Management of Companies and Enterprises", "series_id": "RPSGENAIUSAGESHAREIND13", "value_pct": 64.45943, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND13", "source_updated": "2026-08-04"},
+    {"entity_index": 14, "entity_name": "Administrative and Support and Waste Management Services", "series_id": "RPSGENAIUSAGESHAREIND14", "value_pct": 40.46012, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND14", "source_updated": "2026-08-04"},
+    {"entity_index": 15, "entity_name": "Educational Services", "series_id": "RPSGENAIUSAGESHAREIND15", "value_pct": 52.58519, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND15", "source_updated": "2026-08-04"},
+    {"entity_index": 16, "entity_name": "Health Care and Social Assistance", "series_id": "RPSGENAIUSAGESHAREIND16", "value_pct": 37.16530, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND16", "source_updated": "2026-08-04"},
+    {"entity_index": 17, "entity_name": "Arts, Entertainment, and Recreation", "series_id": "RPSGENAIUSAGESHAREIND17", "value_pct": 31.99921, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND17", "source_updated": "2026-08-04"},
+    {"entity_index": 18, "entity_name": "Accommodation and Food Services", "series_id": "RPSGENAIUSAGESHAREIND18", "value_pct": 30.52520, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND18", "source_updated": "2026-08-04"},
+    {"entity_index": 19, "entity_name": "Other Services, Except Public Administration", "series_id": "RPSGENAIUSAGESHAREIND19", "value_pct": 24.67841, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND19", "source_updated": "2026-08-04"},
+    {"entity_index": 20, "entity_name": "Public Administration", "series_id": "RPSGENAIUSAGESHAREIND20", "value_pct": 23.35467, "source_url": "https://alfred.stlouisfed.org/series?seid=RPSGENAIUSAGESHAREIND20", "source_updated": "2026-08-04"}
+  ],
+  "publication_status": "authorized-source-checkpoint"
+}
