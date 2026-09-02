@@ -9,6 +9,7 @@ on:
       - 'scripts/prepare_rps_observatory_candidate.py'
       - 'scripts/archive_rps_private_vintage.py'
       - 'scripts/build_composition_residuals.py'
+      - 'scripts/report_rps_period_topology.py'
       - 'src/genai_at_work/rps_refresh.py'
       - 'src/genai_at_work/rps_release.py'
       - 'src/genai_at_work/rps_release_complete.py'
@@ -63,6 +64,11 @@ jobs:
         run: >-
           PYTHONPATH=src python scripts/prepare_rps_refresh_candidate.py
           --output-dir /tmp/rps-refresh
+
+      - name: Report rights-safe RPS period topology
+        run: >-
+          PYTHONPATH=src python scripts/report_rps_period_topology.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
 
       - name: Rehearse immutable private-vintage archive contract
         run: >-
