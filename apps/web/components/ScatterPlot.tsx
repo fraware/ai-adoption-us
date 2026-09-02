@@ -75,8 +75,8 @@ export function ScatterPlot({
       <figure className="chart-frame" aria-label={`${yLabel} versus ${xLabel}`}>
         <div className="chart-canvas" ref={container} aria-hidden="true" />
         <figcaption>
-          Each point is one subgroup. Labels identify the highest-adoption and highest-assisted-hours
-          groups; exact values are available in the table below.
+          Each point is one subgroup. Labels identify groups with the highest values on either axis;
+          exact values are available in the table below.
         </figcaption>
       </figure>
       <details className="data-details">
