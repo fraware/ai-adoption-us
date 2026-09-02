@@ -57,6 +57,9 @@ _DEFINITION_FIELDS = (
     "unit",
     "seasonal_adjustment",
     "notes_hash",
+    "source_url",
+    "copyright_status",
+    "citation_text",
 )
 
 
@@ -154,6 +157,30 @@ def _observation_payload(observation: Observation) -> dict[str, Any]:
         ),
         "realtime_end": observation.realtime_end.isoformat() if observation.realtime_end else None,
         "source_last_updated": observation.source_last_updated,
+    }
+
+
+def _stable_series_content(series: Mapping[str, Any]) -> dict[str, Any]:
+    """Select scientific source content while excluding query-time fields.
+
+    FRED defaults the observation endpoint's real-time period to the retrieval
+    date. Those transport-envelope fields remain in the private snapshot for
+    provenance, but they must not make an unchanged source acquire a different
+    scientific content hash solely because it was retrieved on another date.
+    """
+
+    observations = _object_rows(series.get("observations"), label="series.observations")
+    return {
+        **{field: series.get(field) for field in _DEFINITION_FIELDS},
+        "observations": [
+            {
+                "date": row.get("date"),
+                "period": row.get("period"),
+                "value": row.get("value"),
+                "unit": row.get("unit"),
+            }
+            for row in observations
+        ],
     }
 
 
@@ -306,8 +333,8 @@ def build_refresh_snapshot(
     stable_content = {
         "provider_release_id": release_id,
         "provider_series_ids": sorted(observed_provider_ids),
-        "series": series_payloads,
-        "excluded_series": excluded_payloads,
+        "series": [_stable_series_content(series) for series in series_payloads],
+        "excluded_series_ids": sorted(excluded_ids),
     }
     content_sha256 = canonical_digest(stable_content)
 
