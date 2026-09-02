@@ -1,6 +1,6 @@
 # RPS source-check and release cadence policy
 
-Status: **D-G1 cadence pinned; scheduled execution not activated**
+Status: **D-G1 cadence pinned; periodic execution not activated**
 
 Date: 2026-09-02
 
@@ -12,7 +12,7 @@ The RPS production feed separates three clocks that must never be conflated:
 2. **source-check cadence** — weekly, Wednesday at 18:00 UTC;
 3. **publication cadence** — no fixed schedule; publication occurs only after a changed source has produced a reviewed, CI-passed, globally composed observatory release candidate.
 
-The source-check cadence is pinned in `data/registry/rps_refresh_policy.json`. It is intentionally **not activated yet**.
+The source-check cadence is pinned in `data/registry/rps_refresh_policy.json`. Periodic execution is intentionally **not activated yet**.
 
 ## Evidence basis
 
@@ -45,16 +45,16 @@ Wednesday 18:00 UTC is a stable operational slot. It is not inferred from a guar
 
 ## Activation remains deferred
 
-The schedule must remain manual-only until all four activation conditions are evidenced:
+The periodic schedule remains disabled until all four activation conditions are evidenced:
 
-1. the manual live RPS probe succeeds;
-2. `FRED_API_KEY` is verified in the actual execution environment;
+1. an actual `RPS live validation` run succeeds on merged `main`;
+2. `FRED_API_KEY` is thereby verified in the actual execution environment;
 3. an operator-controlled private vintage backend is configured;
 4. a write/read/verify rehearsal against that private backend passes.
 
-The existing `.github/workflows/rps-source-probe.yml` therefore remains `workflow_dispatch` only. This policy does not add a GitHub Actions `schedule` trigger.
+`.github/workflows/rps-live-validation.yml` may run automatically on relevant `main` changes and may also be dispatched manually. That validation trigger is deliberately distinct from the **periodic weekly source-check schedule**, which remains absent until all activation gates pass.
 
-Activating a cron before those gates pass would create repeated network retrievals whose exact private source bytes could not yet be retained durably in the production environment.
+This separation allows the live credential/source path to be proven without creating recurring network retrievals before exact source bytes can be retained durably in the production environment.
 
 ## Source-check state machine
 
@@ -130,7 +130,7 @@ The cadence policy distinguishes check evidence from source-vintage evidence.
 
 ### Unchanged checks
 
-Exact source bytes remain transient. The current manual probe retains review-safe Actions evidence for 14 days.
+Exact source bytes remain transient. Rights-safe live-validation/check evidence may be retained for 14 days in GitHub Actions.
 
 ### Content-changing vintages
 
@@ -138,11 +138,11 @@ Exact source bytes are retained in the private vintage archive until an explicit
 
 ### Release-referenced vintages
 
-A private vintage referenced by a promoted release is retained for the lifetime of the corresponding release history, subject to any later source-rights requirement that legally/contractually changes storage permission.
+A private vintage referenced by a promoted release is retained for the lifetime of the corresponding release history, subject to any later source-rights requirement that legally or contractually changes storage permission.
 
 No automatic deletion policy may remove bytes required to reproduce a still-governed immutable release without an explicit release/rights migration decision.
 
-## Future schedule activation
+## Future periodic schedule activation
 
 Once the four activation gates are evidenced, the implementation may add a scheduled workflow equivalent to:
 
@@ -150,7 +150,7 @@ Once the four activation gates are evidenced, the implementation may add a sched
 weekly / Wednesday / 18:00 UTC
 ```
 
-That future workflow must:
+That future periodic workflow must:
 
 1. retrieve and validate the source;
 2. compare against the exact prior private vintage;
@@ -163,14 +163,14 @@ The schedule change must be its own reviewed repository change. It must not be s
 
 ## Remaining D-G1 dependencies
 
-Cadence is now specified independently of backend selection. D-G1 still requires:
+Cadence is specified independently of backend selection. The remaining runtime dependencies are:
 
-- a successful manual live source probe;
-- confirmation of the actual current 137/131/6 provider state from that probe;
+- a successful automatic live validation on merged `main`;
+- confirmation of the actual current 137/131/6 provider state from that run;
 - a configured operator-controlled private vintage backend;
 - private backend write/read/verify evidence;
-- activation of the pinned weekly schedule;
-- first complete global observatory baseline composition/review/promotion;
-- subsequent-wave or source-revision rehearsal against the frozen predecessor.
+- activation of the pinned weekly schedule only after those gates pass;
+- complete global observatory baseline composition/review/promotion before any global release claim;
+- subsequent-wave or source-revision rehearsal against a frozen predecessor.
 
-Until those execution conditions are met, the policy remains `PINNED_NOT_ACTIVATED`.
+Until the periodic activation conditions are met, the policy remains `PINNED_NOT_ACTIVATED` even though one-off live validation may run automatically on relevant repository changes.
