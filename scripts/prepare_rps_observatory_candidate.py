@@ -16,7 +16,8 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from genai_at_work.rps_release import RpsReleaseError, build_rps_release_candidate
+from genai_at_work.rps_release import RpsReleaseError
+from genai_at_work.rps_release_complete import build_rps_release_candidate_complete_history
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = ROOT / "data" / "audit" / "private"
@@ -126,7 +127,7 @@ def main() -> int:
     commit = _builder_commit()
 
     try:
-        candidate = build_rps_release_candidate(
+        candidate = build_rps_release_candidate_complete_history(
             snapshot,
             manifest,
             scope,
@@ -149,7 +150,9 @@ def main() -> int:
         "source_vintage_id": source["source_vintage_id"],
         "source_revision_status": source["revision_status"],
         "reference_periods": source["reference_periods"],
+        "analysis_reference_periods": source["analysis_reference_periods"],
         "source_objects": len(source["objects"]),
+        "full_source_observed_units": source["coverage"]["full_source_observed_units"],
         "derived_artifacts": len(candidate["artifacts"]),
         "diagnostics": {
             row["diagnostic_id"]: row["status"] for row in candidate["diagnostics"]
