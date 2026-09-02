@@ -1,0 +1,29 @@
+{
+  "artifact_type": "oews_rps_adoption_robustness_input_manifest",
+  "canonical_manifest_sha256": "130b0bdf7be71ca49bd9be957047423ddef76f20a97b3047fa5e0d0e1970c924",
+  "cps_primary_residuals_sha256": "fa49c1d6e84119b22359396befa1ec1dd94d7056ce2089faf8f8b2a8ec088656",
+  "interpretation_boundary": "OEWS is an independent establishment-side occupation-composition robustness source. Missing OEWS occupation cells are partially identified, not zero-imputed. CPS and OEWS residuals are never averaged.",
+  "occupation_crosswalk_sha256": "587bec0fd4cbb32960cdbca00920b9c91c565a5b9d3892a5edde20ea3cfa5cba",
+  "oews_composition_sha256": "1daec0e5f78c0336b8895feb899ef4f81d24baa4bc1965edbc2b00ce5958ce88",
+  "provider_scope_sha256": "41f2b0a8b6499dd2a38c64b4b7fc99bfb00179bb442bb0c1e09c3a992080fa6f",
+  "public_raw_rps_observations_included": false,
+  "requested_periods": [
+    "2025-Q2",
+    "2026-Q2"
+  ],
+  "rps_analysis_periods": [
+    "2024-Q4",
+    "2025-Q1",
+    "2025-Q2",
+    "2025-Q3",
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2"
+  ],
+  "schema_version": 1,
+  "source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+  "source_observation_count": 962,
+  "source_series_count": 131,
+  "source_snapshot_file_sha256": "66b3ffbaebf43c3c8434556eec9329a232d8f17483ba3a613e6b00d214af3f74",
+  "source_snapshot_published": false
+}
