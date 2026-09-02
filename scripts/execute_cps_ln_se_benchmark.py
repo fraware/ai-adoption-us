@@ -43,6 +43,14 @@ BLS_SE_GUIDANCE_URL = (
     "https://www.bls.gov/cps/factsheets/understanding-standard-errors-and-confidence-intervals.htm"
 )
 BLS_API_FEATURES_URL = "https://www.bls.gov/bls/api_features.htm"
+CENSUS_PUBLIC_USE_DISCLOSURE_NOTE_URL = (
+    "https://www.census.gov/programs-surveys/cps/technical-documentation/"
+    "user-notes/cpsbasic_2013_01.html"
+)
+CENSUS_PUBLIC_USE_DOCUMENTATION_URL = (
+    "https://www2.census.gov/programs-surveys/cps/methodology/PublicUseDocumentation_final.pdf"
+)
+MAX_PUBLIC_USE_DISCREPANCY_STANDARD_ERRORS = 1.0
 USER_AGENT = "ai-adoption-us/1.0 public-data-validation"
 
 
@@ -82,8 +90,10 @@ def _write_report(path: Path, benchmark: dict[str, object]) -> None:
     se = float(benchmark["published_standard_error_thousands"])
     reconstructed = float(benchmark["reconstructed_estimate_thousands"])
     difference = float(benchmark["reconstruction_difference_thousands"])
+    discrepancy_se = float(benchmark["absolute_reconstruction_difference_standard_errors"])
     lower = float(benchmark["published_90pct_ci_lower_thousands"])
     upper = float(benchmark["published_90pct_ci_upper_thousands"])
+    threshold = float(benchmark["project_validation_threshold_standard_errors"])
     report = f"""# CPS LN same-period uncertainty benchmark
 
 ## Result
@@ -96,17 +106,34 @@ Professional, and Related occupation definition.
 - BLS published estimate: **{official:,.0f} thousand persons**
 - public-use reconstruction: **{reconstructed:,.6f} thousand persons**
 - reconstruction minus published estimate: **{difference:,.6f} thousand persons**
+- absolute reconstruction discrepancy: **{discrepancy_se:.6f} official standard errors**
 - published BLS standard error: **{se:,.6f} thousand persons**
 - BLS-style 90% same-period confidence interval: **[{lower:,.3f}, {upper:,.3f}] thousand persons**
-- published-rounding reproduction: **{benchmark['published_rounding_matches']}**
+- exact published-rounding reproduction: **{benchmark['published_rounding_matches']}**
+- project public-use validation threshold: **≤ {threshold:.1f} official standard error**
+- threshold satisfied: **{benchmark['public_use_discrepancy_within_project_threshold']}**
+
+## Why exact equality is not the validation rule
+
+Census documents that disclosure-avoidance protections in Basic Monthly CPS public-use
+files can cause estimates below the top-line labor-force totals—including estimates
+using occupation—to differ slightly from BLS estimates based on internal files. Census
+states that these differences should remain well within the sampling variability of the
+CPS estimate. Accordingly, this project does not require an occupation estimate from the
+public-use file to round exactly to the internal-file BLS publication.
+
+The project uses **one published BLS standard error** as a conservative, explicit
+validation threshold for this reconstruction. This is a project quality-control rule,
+not a BLS significance test and not a Census-prescribed threshold. The exact difference
+and its standardized value remain published regardless of pass/fail status.
 
 ## What this validates
 
 This benchmark establishes a reproducible connection among three official outputs:
 the Basic Monthly CPS public-use record, the BLS LN published point estimate, and the
 BLS LN published standard-error aspect. The public-use reconstruction checks the
-universe, occupation coding, and final-weight arithmetic. The standard error itself
-remains an official BLS design-based output; it is not reconstructed from the
+universe, occupation coding, and composited-final-weight arithmetic. The standard error
+itself remains an official BLS design-based output; it is not reconstructed from the
 public-use file.
 
 ## What this does not validate
@@ -165,6 +192,10 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         official_estimate,
     )
     difference = reconstruction.benchmark_thousands - official_estimate
+    absolute_difference_se = abs(difference) / official_se.value
+    discrepancy_within_threshold = (
+        absolute_difference_se <= MAX_PUBLIC_USE_DISCREPANCY_STANDARD_ERRORS
+    )
     confidence_half_width = 1.645 * official_se.value
     source_build_commit = args.source_build_commit or os.environ.get("GITHUB_SHA", "unrecorded")
     generated_at = _utc_now()
@@ -185,24 +216,32 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "published_90pct_ci_upper_thousands": official_estimate + confidence_half_width,
         "reconstructed_estimate_thousands": reconstruction.benchmark_thousands,
         "reconstruction_difference_thousands": difference,
+        "absolute_reconstruction_difference_standard_errors": absolute_difference_se,
         "published_rounding_matches": rounding_match,
+        "project_validation_threshold_standard_errors": MAX_PUBLIC_USE_DISCREPANCY_STANDARD_ERRORS,
+        "public_use_discrepancy_within_project_threshold": discrepancy_within_threshold,
+        "project_threshold_is_bls_or_census_rule": False,
         "cps_rows_read": reconstruction.rows_read,
         "cps_employed_16_plus_rows": reconstruction.employed_16_plus_rows,
         "cps_benchmark_rows": reconstruction.benchmark_rows,
         "universe": "employed people age 16 and over",
         "occupation_definition": "PRDTOCC1 major occupation recodes 1 through 10",
-        "weight_variable": "PWSSWGT with four implied decimals",
+        "weight_variable": "PWCMPWGT composited final weight with four implied decimals",
         "interpretation": "same-reference-period validation only; no temporal covariance inference",
         "source_build_commit": source_build_commit,
         "generated_at_utc": generated_at,
     }
     validation = {
-        "status": "pass" if rounding_match else "fail",
+        "status": "pass" if discrepancy_within_threshold else "fail",
         "series_id": args.series_id,
         "year": args.year,
         "period": period,
         "published_rounding_reproduced": rounding_match,
         "official_standard_error_present": math.isfinite(official_se.value) and official_se.value > 0,
+        "absolute_reconstruction_difference_standard_errors": absolute_difference_se,
+        "project_validation_threshold_standard_errors": MAX_PUBLIC_USE_DISCREPANCY_STANDARD_ERRORS,
+        "public_use_discrepancy_within_project_threshold": discrepancy_within_threshold,
+        "project_threshold_is_bls_or_census_rule": False,
         "raw_cps_file_published": False,
         "raw_bls_api_response_published": False,
         "cross_month_covariance_available": False,
@@ -218,6 +257,8 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "bls_api_features_url": BLS_API_FEATURES_URL,
         "bls_ln_flat_aspect_reference_url": BLS_LN_ASPECT_URL,
         "bls_standard_error_guidance_url": BLS_SE_GUIDANCE_URL,
+        "census_public_use_disclosure_note_url": CENSUS_PUBLIC_USE_DISCLOSURE_NOTE_URL,
+        "census_public_use_documentation_url": CENSUS_PUBLIC_USE_DOCUMENTATION_URL,
         "cps_public_use": cps_provenance,
         "source_build_commit": source_build_commit,
     }
@@ -236,10 +277,12 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
     )
     _write_report(args.output_dir / "BENCHMARK_REPORT.md", benchmark)
 
-    if not rounding_match:
+    if not discrepancy_within_threshold:
         raise ValueError(
-            "official CPS public-use reconstruction does not round to the published BLS level: "
-            f"reconstructed={reconstruction.benchmark_thousands}, published={official_estimate}"
+            "official CPS public-use reconstruction differs from the published BLS level by more "
+            "than the project validation threshold: "
+            f"difference={difference}, standard_errors={absolute_difference_se}, "
+            f"threshold={MAX_PUBLIC_USE_DISCREPANCY_STANDARD_ERRORS}"
         )
     return validation
 
