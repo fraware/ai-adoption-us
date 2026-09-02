@@ -217,7 +217,7 @@ def build_public_rps_source_checkpoint(
         raise RpsCheckpointError("release source subgroup/national inventory is not 126/5")
     expected_analytical_units = 131 * len(analysis_periods)
     if coverage.get("required_units") != expected_analytical_units:
-        raise RpsCheckpointError("release required analytical units do not match 131 × joint periods")
+        raise RpsCheckpointError("release required analytical units do not match 131 x joint periods")
     if coverage.get("observed_units") != expected_analytical_units:
         raise RpsCheckpointError("release observed analytical units do not match required units")
 
