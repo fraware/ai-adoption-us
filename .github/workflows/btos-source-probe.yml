@@ -9,12 +9,14 @@ on:
       - 'scripts/validate_btos_core_checkpoint.py'
       - 'tests/test_btos_sources.py'
       - 'tests/test_btos_core.py'
+      - 'tests/test_btos_core_202611.py'
       - '.github/workflows/btos-source-probe.yml'
       - 'data/registry/btos_construct_scope_v1.json'
       - 'data/registry/btos_rps_industry_crosswalk_v1.json'
-      - 'data/registry/btos_core_ai_202617_source_v1.json'
-      - 'data/derived/btos/btos_core_ai_202617.json'
-      - 'docs/BTOS_CORE_AI_202617_REPRODUCTION.md'
+      - 'data/registry/btos_core_ai_*_source_v1.json'
+      - 'data/derived/btos/btos_core_ai_*.json'
+      - 'data/registry/btos_rps_comparison_execution_state_v1.json'
+      - 'docs/BTOS_CORE_AI_*_REPRODUCTION.md'
   push:
     branches: [main]
     paths:
@@ -24,12 +26,14 @@ on:
       - 'scripts/validate_btos_core_checkpoint.py'
       - 'tests/test_btos_sources.py'
       - 'tests/test_btos_core.py'
+      - 'tests/test_btos_core_202611.py'
       - '.github/workflows/btos-source-probe.yml'
       - 'data/registry/btos_construct_scope_v1.json'
       - 'data/registry/btos_rps_industry_crosswalk_v1.json'
-      - 'data/registry/btos_core_ai_202617_source_v1.json'
-      - 'data/derived/btos/btos_core_ai_202617.json'
-      - 'docs/BTOS_CORE_AI_202617_REPRODUCTION.md'
+      - 'data/registry/btos_core_ai_*_source_v1.json'
+      - 'data/derived/btos/btos_core_ai_*.json'
+      - 'data/registry/btos_rps_comparison_execution_state_v1.json'
+      - 'docs/BTOS_CORE_AI_*_REPRODUCTION.md'
   workflow_dispatch:
 
 permissions:
@@ -58,13 +62,23 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: PYTHONPATH=src python scripts/probe_btos_sources.py --output-dir btos-source-probe
 
-      - name: Validate pinned core AI checkpoint
+      - name: Validate pinned core AI checkpoint 202617
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: >-
           PYTHONPATH=src python scripts/validate_btos_core_checkpoint.py
           --source-dir btos-source-probe
           --report btos-source-probe/core-ai-202617-validation.json
+
+      - name: Validate preregistered core AI checkpoint 202611
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: >-
+          PYTHONPATH=src python scripts/validate_btos_core_checkpoint.py
+          --source-dir btos-source-probe
+          --source-registry data/registry/btos_core_ai_202611_source_v1.json
+          --checkpoint data/derived/btos/btos_core_ai_202611.json
+          --report btos-source-probe/core-ai-202611-validation.json
 
       - name: Upload BTOS source evidence
         if: always()

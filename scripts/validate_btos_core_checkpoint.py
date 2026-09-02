@@ -13,9 +13,9 @@ from genai_at_work.btos_core import (
 )
 
 ROOT = Path(__file__).parents[1]
-SOURCE_REGISTRY = ROOT / "data" / "registry" / "btos_core_ai_202617_source_v1.json"
+DEFAULT_SOURCE_REGISTRY = ROOT / "data" / "registry" / "btos_core_ai_202617_source_v1.json"
+DEFAULT_CHECKPOINT = ROOT / "data" / "derived" / "btos" / "btos_core_ai_202617.json"
 CROSSWALK = ROOT / "data" / "registry" / "btos_rps_industry_crosswalk_v1.json"
-CHECKPOINT = ROOT / "data" / "derived" / "btos" / "btos_core_ai_202617.json"
 
 
 def _load_json(path: Path) -> dict[str, object]:
@@ -32,6 +32,10 @@ def _sha256(data: bytes) -> str:
 def _require_equal(actual: object, expected: object, label: str) -> None:
     if actual != expected:
         raise ValueError(f"{label} mismatch: actual={actual!r}, expected={expected!r}")
+
+
+def _resolve_repo_path(path: Path) -> Path:
+    return path if path.is_absolute() else ROOT / path
 
 
 def _load_pinned_workbook(source_dir: Path, source: dict[str, object], label: str) -> bytes:
@@ -55,10 +59,77 @@ def _response_payload(response: BTOSResponseEstimate) -> dict[str, object]:
     }
 
 
-def validate(source_dir: Path) -> dict[str, object]:
-    registry = _load_json(SOURCE_REGISTRY)
-    checkpoint = _load_json(CHECKPOINT)
+def _validate_national_distribution(
+    national_bytes: bytes,
+    registry: dict[str, object],
+    *,
+    cycle: str,
+    question_id: int,
+) -> float:
+    responses = [
+        extract_national_response(
+            national_bytes,
+            cycle=cycle,
+            question_id=question_id,
+            answer_id=answer_id,
+        )
+        for answer_id in (1, 2, 3)
+    ]
+    if any(response.suppression_code is not None for response in responses):
+        raise ValueError("national Q7 response distribution unexpectedly contains suppression")
+    if any(response.estimate_pct is None for response in responses):
+        raise ValueError("national Q7 response distribution contains a missing estimate")
+
+    distribution_total = sum(float(response.estimate_pct) for response in responses)
+    distribution_contract = registry.get("national_response_distribution")
+    if distribution_contract is None:
+        expected_total = 100.0
+    elif isinstance(distribution_contract, dict):
+        expected_answers = {
+            1: distribution_contract.get("answer_1_yes_pct"),
+            2: distribution_contract.get("answer_2_no_pct"),
+            3: distribution_contract.get("answer_3_do_not_know_pct"),
+        }
+        for answer_id, response in zip((1, 2, 3), responses, strict=True):
+            expected = expected_answers[answer_id]
+            if expected is not None:
+                _require_equal(response.estimate_pct, expected, f"national Q7/A{answer_id} estimate")
+        expected_total = distribution_contract.get("published_total_pct", 100.0)
+        if not isinstance(expected_total, int | float):
+            raise ValueError("national response-distribution total is not numeric")
+    else:
+        raise ValueError("national_response_distribution must be an object when present")
+
+    if abs(float(expected_total) - 100.0) > 0.15:
+        raise ValueError(
+            "registered national response total exceeds the maximum one-decimal rounding residual: "
+            f"{expected_total}"
+        )
+    if abs(distribution_total - float(expected_total)) > 1e-9:
+        raise ValueError(
+            "national Q7 response distribution total differs from the registered published total: "
+            f"actual={distribution_total}, expected={expected_total}"
+        )
+    return distribution_total
+
+
+def validate(
+    source_dir: Path,
+    *,
+    source_registry_path: Path = DEFAULT_SOURCE_REGISTRY,
+    checkpoint_path: Path = DEFAULT_CHECKPOINT,
+) -> dict[str, object]:
+    source_registry_path = _resolve_repo_path(source_registry_path)
+    checkpoint_path = _resolve_repo_path(checkpoint_path)
+
+    registry = _load_json(source_registry_path)
+    checkpoint = _load_json(checkpoint_path)
     crosswalk = _load_json(CROSSWALK)
+
+    _require_equal(checkpoint["checkpoint_id"], registry["checkpoint_id"], "checkpoint identity")
+    _require_equal(checkpoint["cycle"], registry["cycle"], "checkpoint cycle")
+    _require_equal(checkpoint["question_id"], registry["question_id"], "checkpoint question ID")
+    _require_equal(checkpoint["answer_id"], registry["answer_id"], "checkpoint answer ID")
 
     source_files = registry["source_files"]
     if not isinstance(source_files, dict):
@@ -109,23 +180,12 @@ def validate(source_dir: Path) -> dict[str, object]:
     }
     _require_equal(date_payload, registry["dates"], "cycle date metadata")
 
-    response_distribution: list[BTOSResponseEstimate] = []
-    for distribution_answer_id in (1, 2, 3):
-        response_distribution.append(
-            extract_national_response(
-                national_bytes,
-                cycle=cycle,
-                question_id=question_id,
-                answer_id=distribution_answer_id,
-            )
-        )
-    if any(response.suppression_code is not None for response in response_distribution):
-        raise ValueError("national Q7 response distribution unexpectedly contains suppression")
-    distribution_total = sum(
-        response.estimate_pct for response in response_distribution if response.estimate_pct is not None
+    distribution_total = _validate_national_distribution(
+        national_bytes,
+        registry,
+        cycle=cycle,
+        question_id=question_id,
     )
-    if abs(distribution_total - 100.0) > 1e-9:
-        raise ValueError(f"national Q7 response distribution does not sum to 100: {distribution_total}")
 
     actual_sectors = {
         response.sector_code: response
@@ -156,6 +216,7 @@ def validate(source_dir: Path) -> dict[str, object]:
 
     published = 0
     suppressed = 0
+    expected_suppressed_keys: set[str] = set()
     for row in sector_checkpoint:
         if not isinstance(row, dict):
             raise ValueError("checkpoint sector row is not an object")
@@ -175,6 +236,8 @@ def validate(source_dir: Path) -> dict[str, object]:
         _require_equal(actual.question, registry["question"], f"sector {source_key} question text")
         _require_equal(actual.answer, registry["answer"], f"sector {source_key} answer text")
 
+        if row["suppression_code"] == "S":
+            expected_suppressed_keys.add(source_key)
         if actual.suppression_code == "S":
             suppressed += 1
             if actual.estimate_pct is not None or actual.standard_error_pp is not None:
@@ -193,12 +256,16 @@ def validate(source_dir: Path) -> dict[str, object]:
         for field in ("entity_index", "entity_id", "entity_name", "comparability", "naics_sector_span"):
             _require_equal(row[field], mapping[field], f"sector {source_key} {field}")
 
-    _require_equal(published, 18, "published source-sector row count including XX")
-    _require_equal(suppressed, 2, "suppressed source-sector row count")
+    _require_equal(
+        published,
+        len(sector_checkpoint) - len(expected_suppressed_keys),
+        "published source-sector row count including XX",
+    )
+    _require_equal(suppressed, len(expected_suppressed_keys), "suppressed source-sector row count")
     suppressed_keys = {
         key for key, response in actual_sectors.items() if response.suppression_code == "S"
     }
-    _require_equal(suppressed_keys, {"11", "55"}, "suppressed source-key set")
+    _require_equal(suppressed_keys, expected_suppressed_keys, "suppressed source-key set")
 
     unsupported_targets = checkpoint["unsupported_targets"]
     if not isinstance(unsupported_targets, list) or len(unsupported_targets) != 1:
@@ -234,18 +301,26 @@ def validate(source_dir: Path) -> dict[str, object]:
         "dates": date_payload,
         "national_sha256": national_source["sha256"],
         "sector_sha256": sector_source["sha256"],
+        "source_registry": str(source_registry_path.relative_to(ROOT)),
+        "checkpoint": str(checkpoint_path.relative_to(ROOT)),
         "note": "Source reproduction only; no RPS values or cross-source statistics validated.",
     }
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Validate the pinned BTOS core AI 202617 checkpoint.")
+    parser = argparse.ArgumentParser(description="Validate a pinned BTOS core AI checkpoint.")
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--source-registry", type=Path, default=DEFAULT_SOURCE_REGISTRY)
+    parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     args = parser.parse_args()
 
     try:
-        report = validate(args.source_dir)
+        report = validate(
+            args.source_dir,
+            source_registry_path=args.source_registry,
+            checkpoint_path=args.checkpoint,
+        )
     except Exception as exc:
         failure = {
             "status": "failed",
