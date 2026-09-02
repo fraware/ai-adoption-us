@@ -107,7 +107,7 @@ jobs:
               raise SystemExit("Live validation must remain derived_only")
           if archive.get("public_archive") is not False:
               raise SystemExit("Archive rehearsal lost private-only contract")
-          if archive.get("source_content_sha256") != source.get("source_content_sha256"):
+          if archive.get("source_content_sha256") != source.get("content_sha256"):
               raise SystemExit("Archive and source summary scientific identities disagree")
 
           summary = {
@@ -116,7 +116,7 @@ jobs:
               "github_run_id": os.environ["GITHUB_RUN_ID"],
               "github_sha": os.environ["GITHUB_SHA"],
               "source_id": source.get("source_id"),
-              "source_content_sha256": source.get("source_content_sha256"),
+              "source_content_sha256": source.get("content_sha256"),
               "source_snapshot_file_sha256": source.get("private_snapshot_file_sha256"),
               "revision_status": source.get("revision_status"),
               "requires_release_review": source.get("requires_release_review"),
@@ -128,6 +128,10 @@ jobs:
               "promotion_performed": False,
               "public_raw_observations_included": False,
           }
+          if not summary["source_content_sha256"]:
+              raise SystemExit("Live validation summary is missing source scientific identity")
+          if not summary["source_snapshot_file_sha256"]:
+              raise SystemExit("Live validation summary is missing exact snapshot-file identity")
           (root / "live-validation-summary.json").write_text(
               json.dumps(summary, indent=2, sort_keys=True) + "\n"
           )
