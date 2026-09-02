@@ -246,7 +246,7 @@ def main() -> int:
 
     try:
         report = validate(args.source_dir)
-    except Exception as exc:  # noqa: BLE001 - preserve validation failure evidence
+    except Exception as exc:
         failure = {
             "status": "failed",
             "error_type": type(exc).__name__,
