@@ -8,7 +8,7 @@ from typing import Any
 
 _ALLOWED_REFRESH_STATUSES = {"baseline", "unchanged", "new_wave", "revision", "mixed"}
 _REQUIRED_ACTIVATION_GATES = {
-    "successful_manual_live_probe",
+    "successful_live_validation",
     "fred_api_key_verified_in_execution_environment",
     "operator_controlled_private_vintage_backend_configured",
     "private_backend_write_read_verify_rehearsal_passed",
@@ -77,7 +77,7 @@ def validate_rps_refresh_policy(policy: Mapping[str, Any]) -> None:
     gates = set(_strings(check, "activation_requirements", context="policy.source_check"))
     if gates != _REQUIRED_ACTIVATION_GATES:
         raise RpsRefreshPolicyError(
-            "RPS schedule activation requirements must exactly cover live probe, credential, private backend, and backend rehearsal"
+            "RPS schedule activation requirements must exactly cover live validation, credential, private backend, and backend rehearsal"
         )
 
     unchanged = _mapping(policy.get("unchanged_source"), context="policy.unchanged_source")

@@ -70,7 +70,7 @@ def test_pinned_policy_is_valid_and_scheduled_activation_remains_deferred() -> N
         "maximum_nominal_detection_lag_days": 7,
         "schedule_activation": "deferred",
         "activation_requirements": [
-            "successful_manual_live_probe",
+            "successful_live_validation",
             "fred_api_key_verified_in_execution_environment",
             "operator_controlled_private_vintage_backend_configured",
             "private_backend_write_read_verify_rehearsal_passed",
@@ -163,8 +163,11 @@ def test_policy_and_summary_contradictions_fail_closed() -> None:
         action_for_refresh_summary(policy(), changed_without_counts)
 
 
-def test_manual_probe_remains_unscheduled_until_activation_gates_are_exercised() -> None:
-    workflow = (ROOT / ".github" / "workflows" / "rps-source-probe.yml").read_text()
+def test_live_validation_can_run_automatically_without_enabling_periodic_schedule() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "rps-live-validation.yml").read_text()
+    assert "push:" in workflow
+    assert "branches: [main]" in workflow
     assert "workflow_dispatch:" in workflow
     assert "schedule:" not in workflow
     assert "cron:" not in workflow
+    assert policy()["source_check"]["schedule_activation"] == "deferred"
