@@ -8,7 +8,8 @@ import json
 import subprocess
 from pathlib import Path
 
-from genai_at_work.private_vintage import PrivateVintageError, archive_rps_private_vintage
+from genai_at_work.private_vintage import PrivateVintageError
+from genai_at_work.private_vintage_store import store_rps_private_vintage
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = ROOT / "data" / "audit" / "private"
@@ -92,7 +93,7 @@ def main() -> int:
     _assert_private_archive_boundary(args.archive_root)
 
     try:
-        package_dir, manifest = archive_rps_private_vintage(
+        package_dir, manifest = store_rps_private_vintage(
             args.source_snapshot,
             args.archive_root,
             builder_commit=_builder_commit(),
