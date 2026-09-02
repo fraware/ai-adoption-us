@@ -117,13 +117,15 @@ def test_execution_state_advances_without_overwriting_protocol_history() -> None
     assert protocol["status"] == "preregistered-not-executed"
     assert protocol["execution_gate"]["btos_selected_cycle_observation_values_examined"] is False
     assert execution["protocol_canonical_commit"] == "854db8d637e5f7896ef2f779692d9451d8971e55"
-    assert execution["status"] == "cross-source-analysis-executed-review-gated"
+    assert execution["status"] == "cross-source-analysis-executed"
     assert execution["period_resolution"]["selection_was_value_independent"] is True
     assert execution["btos_execution"]["selected_cycle_observation_values_examined"] is True
     assert execution["rps_execution"]["industry_observation_vector_retrieved"] is True
     assert execution["rps_execution"]["rights_gate_blocks_execution"] is False
     assert execution["cross_source_execution"]["statistics_computed"] is True
     assert execution["governance"]["analysis_was_executed_after_protocol_became_canonical"] is True
+    assert execution["governance"]["canonicality_is_commit_scoped"] is True
+    assert "present on main" in execution["governance"]["canonicality_rule"]
     assert execution["governance"]["protocol_v1_modified_after_outcome_inspection"] is False
 
 
