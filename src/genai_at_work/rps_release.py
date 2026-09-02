@@ -1126,14 +1126,14 @@ def build_rps_release_candidate(
     for period in panel.periods:
         object_id = period.lower()
         relative = f"inputs/rps/{period}.json"
-        payload = {
+        source_payload: object = {
             "schema_version": 1,
             "source_id": source_id,
             "provider_release_id": provider_release_id,
             "period": period,
             "records": list(panel.period_rows[period]),
         }
-        sha256, size = _write_json(output_dir / relative, payload)
+        sha256, size = _write_json(output_dir / relative, source_payload)
         source_objects.append(
             {
                 "object_id": object_id,
@@ -1182,14 +1182,14 @@ def build_rps_release_candidate(
     ]
     artifacts: list[dict[str, Any]] = []
     output_hashes: dict[str, str] = {}
-    for artifact_id, relative, kind, payload, fieldnames in artifact_specs:
+    for artifact_id, relative, kind, artifact_payload, fieldnames in artifact_specs:
         path = output_dir / relative
         if kind == "json":
-            sha256, size = _write_json(path, payload)
+            sha256, size = _write_json(path, artifact_payload)
         else:
-            assert isinstance(payload, list)
+            assert isinstance(artifact_payload, list)
             assert fieldnames is not None
-            sha256, size = _write_csv(path, payload, fieldnames=fieldnames)
+            sha256, size = _write_csv(path, artifact_payload, fieldnames=fieldnames)
         artifacts.append(
             {
                 "artifact_id": artifact_id,
