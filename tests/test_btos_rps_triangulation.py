@@ -22,6 +22,8 @@ CROSSWALK = ROOT / "data" / "registry" / "btos_rps_industry_crosswalk_v1.json"
 ARTIFACT = ROOT / "data" / "derived" / "btos_rps" / "industry_triangulation_q2_2026_v1.json"
 EXECUTION = ROOT / "data" / "registry" / "btos_rps_comparison_execution_state_v1.json"
 RIGHTS = ROOT / "docs" / "source-rights" / "RPS_SOURCE_DECISION.md"
+PUBLICATION_COMMIT = "75b94550be97c2e500db6c7b796330d0d8e90c40"
+PUBLICATION_ROUTE = "/explore/industries"
 
 
 def _load(path: Path) -> dict[str, object]:
@@ -94,13 +96,15 @@ def test_suppressed_and_unsupported_entities_are_never_paired() -> None:
     assert len(indices) == 17
 
 
-def test_committed_artifact_matches_deterministic_executor() -> None:
+def test_committed_artifact_matches_deterministic_executor_and_publication_state() -> None:
     artifact = _load(ARTIFACT)
     result = execute_v1(_load(BTOS), _load(RPS), _load(CROSSWALK))
     assert artifact["primary"] == result["primary"]
     assert artifact["expanded_sensitivity"] == result["expanded_sensitivity"]
     assert artifact["pairs"] == result["pairs"]
-    assert artifact["public_product_status"] == "derived-analysis-ready-for-review"
+    assert artifact["public_product_status"] == "published"
+    assert artifact["public_product_route"] == PUBLICATION_ROUTE
+    assert artifact["publication_validated_commit"] == PUBLICATION_COMMIT
 
 
 def test_cli_rebuilds_committed_analysis(tmp_path: Path) -> None:
@@ -117,7 +121,7 @@ def test_cli_rebuilds_committed_analysis(tmp_path: Path) -> None:
     assert json.loads(output.read_text()) == json.loads(ARTIFACT.read_text())
 
 
-def test_execution_state_records_analysis_without_inferential_overclaim() -> None:
+def test_execution_state_records_published_analysis_without_inferential_overclaim() -> None:
     state = _load(EXECUTION)
     assert state["status"] == "cross-source-analysis-executed"
     assert state["rps_execution"]["rights_gate_blocks_execution"] is False
@@ -126,7 +130,15 @@ def test_execution_state_records_analysis_without_inferential_overclaim() -> Non
     assert state["cross_source_execution"]["primary_n"] == 14
     assert state["cross_source_execution"]["p_values_computed"] is False
     assert state["cross_source_execution"]["correlation_confidence_intervals_computed"] is False
+    assert state["cross_source_execution"]["scatter_plot_created"] is True
+    assert state["cross_source_execution"]["scatter_plot_route"] == PUBLICATION_ROUTE
+    assert state["cross_source_execution"]["leaderboard_created"] is False
     assert state["governance"]["canonicality_is_commit_scoped"] is True
     assert "reviewed commit" in state["governance"]["canonicality_rule"]
     assert state["governance"]["public_product_release_is_separate"] is True
+    assert state["governance"]["public_product_release_status"] == "published"
+    assert state["governance"]["public_product_route"] == PUBLICATION_ROUTE
+    assert state["governance"]["publication_validated_commit"] == PUBLICATION_COMMIT
+    assert state["governance"]["publication_post_merge_checks_verified"] is True
+    assert "Maintain the published triangulation" in state["governance"]["next_permitted_step"]
     assert state["governance"]["protocol_v1_modified_after_outcome_inspection"] is False

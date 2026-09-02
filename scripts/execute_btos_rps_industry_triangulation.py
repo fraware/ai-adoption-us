@@ -15,6 +15,8 @@ DEFAULT_BTOS = ROOT / "data" / "derived" / "btos" / "btos_core_ai_202611.json"
 DEFAULT_RPS = ROOT / "data" / "registry" / "rps_industry_adoption_q2_2026_v1.json"
 DEFAULT_CROSSWALK = ROOT / "data" / "registry" / "btos_rps_industry_crosswalk_v1.json"
 DEFAULT_OUTPUT = ROOT / "data" / "derived" / "btos_rps" / "industry_triangulation_q2_2026_v1.json"
+PUBLIC_PRODUCT_ROUTE = "/explore/industries"
+PUBLICATION_VALIDATED_COMMIT = "75b94550be97c2e500db6c7b796330d0d8e90c40"
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -76,7 +78,9 @@ def build_payload(
             "Do not interpret either measure as productivity.",
             "Do not report p-values or correlation confidence intervals without an approved survey-covariance design.",
         ],
-        "public_product_status": "derived-analysis-ready-for-review",
+        "public_product_status": "published",
+        "public_product_route": PUBLIC_PRODUCT_ROUTE,
+        "publication_validated_commit": PUBLICATION_VALIDATED_COMMIT,
     }
 
 

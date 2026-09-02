@@ -54,7 +54,8 @@
     "expanded_sensitivity_pearson_r": 0.850095624804,
     "p_values_computed": false,
     "correlation_confidence_intervals_computed": false,
-    "scatter_plot_created": false,
+    "scatter_plot_created": true,
+    "scatter_plot_route": "/explore/industries",
     "leaderboard_created": false
   },
   "governance": {
@@ -63,7 +64,11 @@
     "canonicality_is_commit_scoped": true,
     "canonicality_rule": "This execution state and its derived artifact are canonical only when present on main at a reviewed commit whose required CI checks passed.",
     "public_product_release_is_separate": true,
-    "next_permitted_step": "Integrate the derived result into the public product only after this execution state is canonical under the rule above, retaining explicit construct-mismatch language.",
+    "public_product_release_status": "published",
+    "public_product_route": "/explore/industries",
+    "publication_validated_commit": "75b94550be97c2e500db6c7b796330d0d8e90c40",
+    "publication_post_merge_checks_verified": true,
+    "next_permitted_step": "Maintain the published triangulation under source and update governance. Any new period, crosswalk version, construct, or statistic requires an explicit new version or preregistration decision.",
     "no_claim": "The reported correlations are descriptive sector-level concordance between non-equivalent business- and worker-level measures. They are not causal effects, calibration, productivity estimates, or evidence that the constructs are interchangeable."
   }
 }

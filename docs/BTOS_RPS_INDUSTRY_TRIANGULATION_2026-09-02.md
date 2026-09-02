@@ -90,4 +90,6 @@ The implementation uses average ranks for ties and ordinary unweighted Pearson c
 
 ## Publication status
 
-This analysis is ready for repository review. It becomes canonical only after the exact reviewed head passes the permanent test/governance and production-build gates and is merged to `main`. Public website presentation is a subsequent release step and must retain the construct-mismatch language above.
+The analysis is canonical and published at `/explore/industries`. The public presentation was merged in commit `75b94550be97c2e500db6c7b796330d0d8e90c40` after exact-head review. On that merge commit, the Python/empirical/governance suite, production TypeScript/build/private-data/route-smoke suite, and rendered Chrome/Firefox/WebKit plus axe and Lighthouse checks all passed.
+
+The rendered publication preserves the construct mismatch beside the comparison and presents the 14-sector preregistered result as primary, with the 17-sector limited-comparability result labeled separately as a sensitivity. WebKit is an engine-level compatibility check and is not evidence of native Safari or iOS Safari validation.
