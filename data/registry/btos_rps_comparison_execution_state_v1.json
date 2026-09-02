@@ -4,7 +4,7 @@
   "protocol_registry": "data/registry/btos_rps_comparison_protocol_v1.json",
   "protocol_canonical_commit": "854db8d637e5f7896ef2f779692d9451d8971e55",
   "updated_date": "2026-09-02",
-  "status": "btos-selected-cycle-reproduced-rps-blocked",
+  "status": "cross-source-analysis-executed-review-gated",
   "period_resolution": {
     "rps_target_period": "Q2 2026",
     "rps_named_wave_month": "2026-05",
@@ -25,30 +25,43 @@
     "national_standard_error_pp": 0.29,
     "primary_crosswalk_sectors": 15,
     "primary_btos_published_non_suppressed": 14,
-    "primary_btos_suppressed_source_keys": [
-      "55"
-    ],
+    "primary_btos_suppressed_source_keys": ["55"],
     "limited_crosswalk_sectors": 4,
     "limited_btos_published_non_suppressed": 3,
-    "limited_btos_suppressed_source_keys": [
-      "11"
-    ]
+    "limited_btos_suppressed_source_keys": ["11"]
   },
   "rps_execution": {
-    "source_owner_permission_status": "unresolved",
-    "industry_observation_vector_retrieved": false,
-    "eligibility_evaluated": false,
-    "rights_gate_blocks_execution": true
+    "source_owner_permission_status": "granted-by-project-owner-attestation",
+    "permission_decision": "docs/source-rights/RPS_SOURCE_DECISION.md",
+    "industry_observation_vector_retrieved": true,
+    "checkpoint": "data/registry/rps_industry_adoption_q2_2026_v1.json",
+    "metric": "adoption_work",
+    "period": "Q2 2026",
+    "industry_rows": 20,
+    "eligibility_evaluated": true,
+    "rights_gate_blocks_execution": false,
+    "separate_microdata_task_rights_remain_unresolved": true
   },
   "cross_source_execution": {
-    "statistics_computed": false,
-    "sector_pairs_assembled": false,
+    "statistics_computed": true,
+    "sector_pairs_assembled": true,
+    "analysis_artifact": "data/derived/btos_rps/industry_triangulation_q2_2026_v1.json",
+    "primary_n": 14,
+    "primary_spearman_rho": 0.704070833089,
+    "primary_pearson_r": 0.797472661352,
+    "expanded_sensitivity_n": 17,
+    "expanded_sensitivity_spearman_rho": 0.815450797048,
+    "expanded_sensitivity_pearson_r": 0.850095624804,
+    "p_values_computed": false,
+    "correlation_confidence_intervals_computed": false,
     "scatter_plot_created": false,
     "leaderboard_created": false
   },
   "governance": {
     "protocol_v1_modified_after_outcome_inspection": false,
-    "next_permitted_step": "Resolve the independent RPS rights gate. Do not retrieve the full RPS industry observation vector or compute cross-source statistics while permission remains unresolved.",
-    "no_claim": "BTOS source reproduction does not constitute BTOS-RPS triangulation, worker adoption measurement, productivity evidence, or causal evidence."
+    "analysis_was_executed_after_protocol_became_canonical": true,
+    "artifact_is_canonical_only_after_reviewed_merge": true,
+    "next_permitted_step": "Validate the deterministic reproduction and source/provenance contracts, then integrate the derived result into the public product with explicit construct-mismatch language.",
+    "no_claim": "The reported correlations are descriptive sector-level concordance between non-equivalent business- and worker-level measures. They are not causal effects, calibration, productivity estimates, or evidence that the constructs are interchangeable."
   }
 }
