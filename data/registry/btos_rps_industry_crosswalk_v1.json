@@ -1,17 +1,49 @@
 {
-  "version": "btos-2022-naics-rps-v1",
+  "version": "btos-2022-naics-rps-v1.1",
   "verified_date": "2026-09-02",
   "source_taxonomy": "2022 NAICS sector",
   "target_taxonomy": "RPS 20-industry observatory registry",
   "source_unit": "employer business",
   "target_context": "RPS worker industry",
-  "mapping_level": "nominal sector-to-industry alignment with explicit universe-comparability tier",
+  "mapping_level": "exact BTOS Sector.xlsx source key to nominal RPS industry alignment, with separate NAICS span labels and explicit universe-comparability tier",
+  "source_key_contract": {
+    "source_file": "Sector.xlsx",
+    "source_sha256": "d4e4ef99e958c66bc8b044489e36a6468f93307a1b8216f96e92dbdba8a44e78",
+    "retrieved_at_utc": "2026-09-02T11:06:18.300020+00:00",
+    "verified_cycle": "202617",
+    "verified_question_id": 7,
+    "verified_answer_id": 1,
+    "observed_sector_keys": [
+      "11",
+      "21",
+      "22",
+      "23",
+      "31",
+      "42",
+      "44",
+      "48",
+      "51",
+      "52",
+      "53",
+      "54",
+      "55",
+      "56",
+      "61",
+      "62",
+      "71",
+      "72",
+      "81",
+      "XX"
+    ],
+    "rule": "btos_sector_code is the exact value stored in the Census Sector.xlsx Sector column. naics_sector_span is descriptive taxonomy metadata and must never be substituted as the join key."
+  },
   "entries": [
     {
       "entity_index": 1,
       "entity_id": "agriculture-forestry-fishing-and-hunting",
       "entity_name": "Agriculture, Forestry, Fishing, and Hunting",
       "btos_sector_code": "11",
+      "naics_sector_span": "11",
       "btos_sector_name": "Agriculture, Forestry, Fishing and Hunting",
       "mapping_status": "mapped",
       "comparability": "limited",
@@ -22,6 +54,7 @@
       "entity_id": "mining-quarrying-and-oil-and-gas-extraction",
       "entity_name": "Mining, Quarrying, and Oil and Gas Extraction",
       "btos_sector_code": "21",
+      "naics_sector_span": "21",
       "btos_sector_name": "Mining, Quarrying, and Oil and Gas Extraction",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -31,6 +64,7 @@
       "entity_id": "construction",
       "entity_name": "Construction",
       "btos_sector_code": "23",
+      "naics_sector_span": "23",
       "btos_sector_name": "Construction",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -39,7 +73,8 @@
       "entity_index": 4,
       "entity_id": "manufacturing",
       "entity_name": "Manufacturing",
-      "btos_sector_code": "31-33",
+      "btos_sector_code": "31",
+      "naics_sector_span": "31-33",
       "btos_sector_name": "Manufacturing",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -49,6 +84,7 @@
       "entity_id": "wholesale-trade",
       "entity_name": "Wholesale Trade",
       "btos_sector_code": "42",
+      "naics_sector_span": "42",
       "btos_sector_name": "Wholesale Trade",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -57,7 +93,8 @@
       "entity_index": 6,
       "entity_id": "retail-trade",
       "entity_name": "Retail Trade",
-      "btos_sector_code": "44-45",
+      "btos_sector_code": "44",
+      "naics_sector_span": "44-45",
       "btos_sector_name": "Retail Trade",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -66,7 +103,8 @@
       "entity_index": 7,
       "entity_id": "transportation-and-warehousing",
       "entity_name": "Transportation and Warehousing",
-      "btos_sector_code": "48-49",
+      "btos_sector_code": "48",
+      "naics_sector_span": "48-49",
       "btos_sector_name": "Transportation and Warehousing",
       "mapping_status": "mapped",
       "comparability": "limited",
@@ -77,6 +115,7 @@
       "entity_id": "utilities",
       "entity_name": "Utilities",
       "btos_sector_code": "22",
+      "naics_sector_span": "22",
       "btos_sector_name": "Utilities",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -86,6 +125,7 @@
       "entity_id": "information",
       "entity_name": "Information",
       "btos_sector_code": "51",
+      "naics_sector_span": "51",
       "btos_sector_name": "Information",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -95,6 +135,7 @@
       "entity_id": "finance-and-insurance",
       "entity_name": "Finance and Insurance",
       "btos_sector_code": "52",
+      "naics_sector_span": "52",
       "btos_sector_name": "Finance and Insurance",
       "mapping_status": "mapped",
       "comparability": "limited",
@@ -105,6 +146,7 @@
       "entity_id": "real-estate-and-rental-and-leasing",
       "entity_name": "Real Estate and Rental and Leasing",
       "btos_sector_code": "53",
+      "naics_sector_span": "53",
       "btos_sector_name": "Real Estate and Rental and Leasing",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -114,6 +156,7 @@
       "entity_id": "professional-scientific-and-technical-services",
       "entity_name": "Professional, Scientific, and Technical Services",
       "btos_sector_code": "54",
+      "naics_sector_span": "54",
       "btos_sector_name": "Professional, Scientific, and Technical Services",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -123,6 +166,7 @@
       "entity_id": "management-of-companies-and-enterprises",
       "entity_name": "Management of Companies and Enterprises",
       "btos_sector_code": "55",
+      "naics_sector_span": "55",
       "btos_sector_name": "Management of Companies and Enterprises",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -132,6 +176,7 @@
       "entity_id": "administrative-and-support-and-waste-management-services",
       "entity_name": "Administrative and Support and Waste Management Services",
       "btos_sector_code": "56",
+      "naics_sector_span": "56",
       "btos_sector_name": "Administrative and Support and Waste Management and Remediation Services",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -141,6 +186,7 @@
       "entity_id": "educational-services",
       "entity_name": "Educational Services",
       "btos_sector_code": "61",
+      "naics_sector_span": "61",
       "btos_sector_name": "Educational Services",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -150,6 +196,7 @@
       "entity_id": "health-care-and-social-assistance",
       "entity_name": "Health Care and Social Assistance",
       "btos_sector_code": "62",
+      "naics_sector_span": "62",
       "btos_sector_name": "Health Care and Social Assistance",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -159,6 +206,7 @@
       "entity_id": "arts-entertainment-and-recreation",
       "entity_name": "Arts, Entertainment, and Recreation",
       "btos_sector_code": "71",
+      "naics_sector_span": "71",
       "btos_sector_name": "Arts, Entertainment, and Recreation",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -168,6 +216,7 @@
       "entity_id": "accommodation-and-food-services",
       "entity_name": "Accommodation and Food Services",
       "btos_sector_code": "72",
+      "naics_sector_span": "72",
       "btos_sector_name": "Accommodation and Food Services",
       "mapping_status": "mapped",
       "comparability": "primary"
@@ -177,6 +226,7 @@
       "entity_id": "other-services-except-public-administration",
       "entity_name": "Other Services, Except Public Administration",
       "btos_sector_code": "81",
+      "naics_sector_span": "81",
       "btos_sector_name": "Other Services (except Public Administration)",
       "mapping_status": "mapped",
       "comparability": "limited",
@@ -187,6 +237,7 @@
       "entity_id": "public-administration",
       "entity_name": "Public Administration",
       "btos_sector_code": null,
+      "naics_sector_span": "92",
       "btos_sector_name": null,
       "mapping_status": "unsupported",
       "comparability": "excluded",
@@ -196,6 +247,7 @@
   "source_special_codes": [
     {
       "btos_sector_code": "XX",
+      "naics_sector_span": null,
       "meaning": "Unclassified multi-location business across multiple sectors",
       "mapping_status": "unsupported",
       "target_entity_id": null,
@@ -211,7 +263,7 @@
   },
   "global_scope_note": "BTOS percentages describe employer businesses while RPS measures describe workers. A taxonomy mapping does not make the measurement units or denominators equivalent. Even primary rows are cross-source triangulation, not synchronized-universe validation.",
   "required_use_rules": [
-    "Join by explicit btos_sector_code and entity_id only; do not use fuzzy label matching in production.",
+    "Join by exact btos_sector_code from the Census Sector.xlsx Sector column and canonical entity_id only; do not join on naics_sector_span or use fuzzy label matching in production.",
     "Expose comparability tier and reason with every mapped sector statistic used in a BTOS-RPS comparison.",
     "Do not produce a BTOS-RPS comparison for Public Administration.",
     "Do not redistribute BTOS XX/unclassified businesses to mapped industries.",
@@ -221,6 +273,7 @@
     "btos_current_program": "https://www.census.gov/programs-surveys/btos.html",
     "btos_methodology": "https://www.census.gov/hfp/btos/downloads/methodology/Business_Trends_and_Outlook_Survey_Methodology_V6.pdf",
     "naics_2022_manual": "https://www.census.gov/naics/reference_files_tools/2022_NAICS_Manual.pdf",
-    "canonical_rps_industry_reference": "data/registry/cps_industry_crosswalk_v2.json"
+    "canonical_rps_industry_reference": "data/registry/cps_industry_crosswalk_v2.json",
+    "source_probe": "src/genai_at_work/btos_sources.py"
   }
 }
