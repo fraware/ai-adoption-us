@@ -58,6 +58,11 @@ def _utc_now() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def _canonical_sha256(value: object) -> str:
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def _sha256_file(path: Path) -> str:
     hasher = hashlib.sha256()
     with path.open("rb") as handle:
@@ -78,8 +83,11 @@ def _fetch_bls_series_with_aspects(*, series_id: str) -> tuple[dict[str, Any], d
         {str(key): value for key, value in raw.items()},
         {
             "request_url": request_url,
-            "response_sha256": hashlib.sha256(raw_bytes).hexdigest(),
-            "response_size_bytes": len(raw_bytes),
+            "transport_response_sha256": hashlib.sha256(raw_bytes).hexdigest(),
+            "transport_response_size_bytes": len(raw_bytes),
+            "transport_hash_semantics": (
+                "exact retrieval bytes; may vary when non-scientific API envelope content changes"
+            ),
             "raw_response_published": False,
         },
     )
@@ -181,6 +189,18 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         year=args.year,
         period=period,
     )
+    api_scientific_content = {
+        "series_id": args.series_id,
+        "year": args.year,
+        "period": period,
+        "published_estimate_thousands": official_estimate,
+        "published_standard_error_thousands": official_se.value,
+        "standard_error_aspect_type": official_se.aspect_type,
+        "standard_error_footnote_code": official_se.footnote_code,
+    }
+    api_provenance["scientific_content_sha256"] = _canonical_sha256(api_scientific_content)
+    api_provenance["scientific_content"] = api_scientific_content
+
     reconstruction = reconstruct_management_professional_employment(
         cps_path,
         year=args.year,
