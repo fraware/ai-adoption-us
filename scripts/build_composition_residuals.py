@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from genai_at_work.composition_snapshot import build_composition_residual_evidence
-from genai_at_work.rps_release import prepare_rps_panel
+from genai_at_work.rps_release_complete import prepare_rps_source_history
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "data" / "registry" / "rps_source_series_manifest.json"
@@ -98,7 +98,8 @@ def main() -> int:
     snapshot = _load_object(args.source_snapshot)
     canonical_manifest = _load_object(MANIFEST_PATH)
     provider_scope = _load_object(SCOPE_PATH)
-    panel = prepare_rps_panel(snapshot, canonical_manifest, provider_scope)
+    prepared = prepare_rps_source_history(snapshot, canonical_manifest, provider_scope)
+    panel = prepared.analysis_panel
     compositions = {period: _load_object(path) for period, path in composition_paths.items()}
     evidence_tiers = _load_array(args.evidence_tiers)
     evidence = build_composition_residual_evidence(
@@ -128,6 +129,8 @@ def main() -> int:
         "source_snapshot_published": False,
         "source_definition_id": panel.definition_id,
         "source_taxonomy_version": panel.taxonomy_version,
+        "source_history_periods": list(prepared.source_periods),
+        "analysis_reference_periods": list(panel.periods),
         "canonical_manifest_sha256": _sha256(MANIFEST_PATH),
         "provider_scope_sha256": _sha256(SCOPE_PATH),
         "composition_inputs": {
@@ -149,6 +152,7 @@ def main() -> int:
         json.dumps(
             {
                 "periods": evidence["periods"],
+                "source_history_periods": list(prepared.source_periods),
                 "primary_rows": len(evidence["primary_residuals"]),
                 "usual_hours_sensitivity_rows": len(evidence["usual_hours_sensitivity"]),
                 "influence_rows": len(evidence["leave_one_occupation_out_influence"]),
