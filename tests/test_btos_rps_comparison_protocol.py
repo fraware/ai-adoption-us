@@ -25,12 +25,15 @@ def test_protocol_is_preregistered_and_empirically_unexecuted() -> None:
     assert gate["cross_source_statistics_included"] is False
 
 
-def test_protocol_remains_fail_closed_on_current_rps_rights_state() -> None:
+def test_protocol_preserves_preregistration_rights_state_after_permission_change() -> None:
     protocol = _load(PROTOCOL)
     rps_scope = _load(RPS_SCOPE)
     gate = protocol["execution_gate"]
 
-    assert rps_scope["source_owner_permission_status"] == "unresolved"
+    assert (
+        rps_scope["source_owner_permission_status"]
+        == "granted_for_published_aggregate_project_use"
+    )
     assert gate["current_rps_source_owner_permission_status"] == "unresolved"
     requirements = " ".join(gate["required_before_execution"])
     assert "unresolved permission state blocks execution" in requirements

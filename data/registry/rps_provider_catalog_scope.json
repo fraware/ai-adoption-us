@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "verified_date": "2026-09-01",
+  "verified_date": "2026-09-02",
   "provider_distribution_layer": "FRED, Federal Reserve Bank of St. Louis",
   "provider_release_id": 6,
   "provider_release_title": "Real-Time Population Survey: Generative Artificial Intelligence Adoption Tracker",
@@ -75,8 +75,9 @@
   ],
   "count_reconciliation": "137 provider series = 11 national + 60 industry + 66 occupation; 131 observatory series = 5 included national + 60 industry + 66 occupation; the six-series difference is the intentionally excluded national overall/outside-work block.",
   "fred_copyright_label": "Copyrighted: Citation Required",
-  "source_owner_permission_status": "unresolved",
-  "production_consequence": "Keep direct RPS observations fail-closed until an authorized source-owner/data-provider decision resolves persistent display, storage, redistribution, historical-vintage retention, and transformed-result publication.",
+  "source_owner_permission_status": "granted_for_published_aggregate_project_use",
+  "rights_decision_ref": "docs/source-rights/RPS_SOURCE_DECISION.md",
+  "production_consequence": "Published aggregate refresh is authorized through versioned source checkpoints and the normal revision/release gates. Unrestricted bulk mirroring/public-API redistribution, respondent microdata, the historical replication package, and the separate task-index artifact remain outside this decision unless separately authorized.",
   "sources": {
     "fred_announcement": "https://news.research.stlouisfed.org/2026/07/fred-adds-data-about-the-adoption-of-generative-artificial-intelligence/",
     "fred_release": "https://fred.stlouisfed.org/release?rid=6",

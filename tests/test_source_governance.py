@@ -10,6 +10,19 @@ def test_static_fred_builder_is_retired():
     assert "FredClient" not in text
 
 
+def test_rps_refresh_candidate_stays_private_and_fail_closed():
+    script = (ROOT / "scripts" / "prepare_rps_refresh_candidate.py").read_text()
+    module = (ROOT / "src" / "genai_at_work" / "rps_refresh.py").read_text()
+
+    assert 'PRIVATE_ROOT = ROOT / "data" / "audit" / "private"' in script
+    assert "Repository-local RPS refresh outputs may only be written under" in script
+    assert "apps/web/public" not in script
+    assert '"promotion_state": "source-candidate-only"' in module
+    assert '"public_raw_observations_included": False' in module
+    assert "Provider release inventory drift" in module
+    assert "observations_retrieved" in module
+
+
 def test_no_public_observation_bundle():
     assert not (ROOT / "apps" / "web" / "public" / "data" / "observations.json").exists()
 
