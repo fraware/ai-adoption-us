@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "artifact_type": "rps_cps_residual_robustness_summary",
+  "periods": ["2025-Q2", "2026-Q2"],
+  "leave_one_occupation_out": {
+    "definition": "remove one positive-weight occupation and renormalize remaining weights to one",
+    "row_count": 120,
+    "supported_row_count": 120,
+    "all_supported": {
+      "adoption_work": {
+        "row_count": 40,
+        "median_max_absolute_residual_shift": 5.013698923799746,
+        "maximum_max_absolute_residual_shift": 13.740054721292388,
+        "sign_flip_count": 9
+      },
+      "assisted_hours_share": {
+        "row_count": 40,
+        "median_max_absolute_residual_shift": 1.2190996534950251,
+        "maximum_max_absolute_residual_shift": 3.192195098831838,
+        "sign_flip_count": 8
+      },
+      "reported_time_savings_share": {
+        "row_count": 40,
+        "median_max_absolute_residual_shift": 0.3074142919547289,
+        "maximum_max_absolute_residual_shift": 0.9044502970365549,
+        "sign_flip_count": 4
+      }
+    },
+    "primary_stable": {
+      "adoption_work": {
+        "row_count": 32,
+        "median_max_absolute_residual_shift": 4.629219814993416,
+        "maximum_max_absolute_residual_shift": 13.740054721292388,
+        "sign_flip_count": 8
+      },
+      "assisted_hours_share": {
+        "row_count": 32,
+        "median_max_absolute_residual_shift": 1.2168324795632555,
+        "maximum_max_absolute_residual_shift": 3.0462138624402373,
+        "sign_flip_count": 7
+      },
+      "reported_time_savings_share": {
+        "row_count": 32,
+        "median_max_absolute_residual_shift": 0.2894789464109041,
+        "maximum_max_absolute_residual_shift": 0.9044502970365549,
+        "sign_flip_count": 4
+      }
+    },
+    "largest_shift_examples": [
+      {
+        "period": "2026-Q2",
+        "metric_id": "adoption_work",
+        "industry_id": "accommodation-and-food-services",
+        "baseline_residual": -7.086576709015517,
+        "perturbed_residual": -20.826631430307906,
+        "max_absolute_residual_shift": 13.740054721292388,
+        "most_influential_occupation_id": "food-preparation-and-serving-related-occupations",
+        "most_influential_occupation_weight": 0.6186137652675728,
+        "sign_flip": false
+      },
+      {
+        "period": "2026-Q2",
+        "metric_id": "adoption_work",
+        "industry_id": "construction",
+        "baseline_residual": 1.071609646769609,
+        "perturbed_residual": -10.550068043622431,
+        "max_absolute_residual_shift": 11.62167769039204,
+        "most_influential_occupation_id": "construction-and-extraction-occupations",
+        "most_influential_occupation_weight": 0.5765390506192365,
+        "sign_flip": true
+      },
+      {
+        "period": "2026-Q2",
+        "metric_id": "adoption_work",
+        "industry_id": "agriculture-forestry-fishing-and-hunting",
+        "baseline_residual": -13.301161531288813,
+        "perturbed_residual": -3.3489844437465166,
+        "max_absolute_residual_shift": 9.952177087542296,
+        "most_influential_occupation_id": "management-occupations",
+        "most_influential_occupation_weight": 0.2946999790951172,
+        "sign_flip": false
+      },
+      {
+        "period": "2026-Q2",
+        "metric_id": "adoption_work",
+        "industry_id": "administrative-and-support-and-waste-management-services",
+        "baseline_residual": 7.7878896229401064,
+        "perturbed_residual": -1.6888756309134791,
+        "max_absolute_residual_shift": 9.476765253853586,
+        "most_influential_occupation_id": "building-and-grounds-cleaning-and-maintenance-occupations",
+        "most_influential_occupation_weight": 0.4619302133273775,
+        "sign_flip": true
+      },
+      {
+        "period": "2025-Q2",
+        "metric_id": "adoption_work",
+        "industry_id": "administrative-and-support-and-waste-management-services",
+        "baseline_residual": 4.3289347501537385,
+        "perturbed_residual": -4.603700092026383,
+        "max_absolute_residual_shift": 8.932634842180121,
+        "most_influential_occupation_id": "building-and-grounds-cleaning-and-maintenance-occupations",
+        "most_influential_occupation_weight": 0.4571387020305382,
+        "sign_flip": true
+      }
+    ]
+  },
+  "usual_hours_sensitivity": {
+    "row_count": 80,
+    "coverage_gate": 0.98,
+    "supported_row_count": 2,
+    "by_period_metric": {
+      "2025-Q2:assisted_hours_share": {
+        "row_count": 20,
+        "supported_row_count": 0,
+        "coverage_min": 0.9073983715328263,
+        "coverage_median": 0.9497324589550629,
+        "coverage_max": 0.9765695823413343
+      },
+      "2025-Q2:reported_time_savings_share": {
+        "row_count": 20,
+        "supported_row_count": 0,
+        "coverage_min": 0.9073983715328263,
+        "coverage_median": 0.9497324589550629,
+        "coverage_max": 0.9765695823413343
+      },
+      "2026-Q2:assisted_hours_share": {
+        "row_count": 20,
+        "supported_row_count": 1,
+        "coverage_min": 0.8820285138296556,
+        "coverage_median": 0.9505443821307147,
+        "coverage_max": 0.9808948268413022
+      },
+      "2026-Q2:reported_time_savings_share": {
+        "row_count": 20,
+        "supported_row_count": 1,
+        "coverage_min": 0.8820285138296556,
+        "coverage_median": 0.9505443821307147,
+        "coverage_max": 0.9808948268413022
+      }
+    }
+  },
+  "interpretation": "descriptive sensitivity, not sampling inference"
+}
