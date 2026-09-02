@@ -1,0 +1,121 @@
+industry_index,industry_id,composition_basis_evidence_tier,period,metric_id,weight_basis,coverage,suppressed,observed,predicted_from_occupation_mix,occupation_adjusted_industry_context_residual
+1,agriculture-forestry-fishing-and-hunting,excluded,2025-Q2,adoption_work,CPS worker share,1.0,False,37.0313108501,46.9017160657989,-9.870405215698902
+2,mining-quarrying-and-oil-and-gas-extraction,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,54.9223558799,35.623716023821636,19.298639856078367
+3,construction,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,37.3614483696,35.91733072749236,1.444117642107635
+4,manufacturing,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,35.0128845868,38.263060180563585,-3.2501755937635863
+5,wholesale-trade,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,41.633456879,33.05929711518853,8.574159763811473
+6,retail-trade,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,31.0596763863,29.75418278455479,1.3054936017452121
+7,transportation-and-warehousing,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,20.8097327979,27.156180529025434,-6.3464477311254335
+8,utilities,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,51.1037199779,39.22565814680669,11.878061831093312
+9,information,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,59.3019751766,45.437013855293934,13.864961321306069
+10,finance-and-insurance,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,45.4443301367,41.4277142881624,4.0166158485376044
+11,real-estate-and-rental-and-leasing,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,42.1723849562,35.721971455723875,6.450413500476124
+12,professional-scientific-and-technical-services,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,52.4063018677,48.43371994053426,3.9725819271657414
+13,management-of-companies-and-enterprises,sensitivity_unstable,2025-Q2,adoption_work,CPS worker share,1.0,False,49.3573230881,46.59613480626524,2.7611882818347624
+14,administrative-and-support-and-waste-management-services,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,27.5099585876,23.18102383744626,4.3289347501537385
+15,educational-services,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,37.0550913567,40.045592408630505,-2.990501051930508
+16,health-care-and-social-assistance,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,26.9159098341,31.060219058134223,-4.144309224034224
+17,arts-entertainment-and-recreation,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,34.3794733773,34.611381090731136,-0.23190771343113425
+18,accommodation-and-food-services,primary_stable,2025-Q2,adoption_work,CPS worker share,1.0,False,22.8353679461,29.286195422929875,-6.4508274768298755
+19,other-services-except-public-administration,limited,2025-Q2,adoption_work,CPS worker share,1.0,False,25.6566212512,30.288663947614413,-4.632042696414413
+20,public-administration,excluded,2025-Q2,adoption_work,CPS worker share,1.0,False,10.9601933249,33.76808240968778,-22.807889084787778
+1,agriculture-forestry-fishing-and-hunting,excluded,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,2.7304308952,9.13329705661308,-6.40286616141308
+2,mining-quarrying-and-oil-and-gas-extraction,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,3.1507048801,4.311726972403119,-1.161022092303119
+3,construction,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.2442004077,4.454230244439795,0.7899701632602047
+4,manufacturing,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,4.4514181931,4.678930323417085,-0.22751213031708506
+5,wholesale-trade,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,6.2152046031,5.015573452350028,1.1996311507499717
+6,retail-trade,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,1.9409145187,4.598923884374426,-2.658009365674426
+7,transportation-and-warehousing,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,4.8005210135,3.6521471932023446,1.1483738202976554
+8,utilities,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,1.7533552569,5.212338738607082,-3.458983481707082
+9,information,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,10.4928282589,7.4948313536941455,2.997996905205854
+10,finance-and-insurance,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,7.0342204541,6.705173171363248,0.32904728273675143
+11,real-estate-and-rental-and-leasing,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,3.3341268998,5.721373560294215,-2.387246660494215
+12,professional-scientific-and-technical-services,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,10.9699295898,7.735527572097931,3.2344020177020685
+13,management-of-companies-and-enterprises,sensitivity_unstable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,6.4699659985,7.701914398701128,-1.2319484002011274
+14,administrative-and-support-and-waste-management-services,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,2.6626646754,2.891153817962487,-0.2284891425624873
+15,educational-services,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,2.571823672,4.17763084665928,-1.6058071746592804
+16,health-care-and-social-assistance,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,2.9934271983,4.2583501563375075,-1.2649229580375074
+17,arts-entertainment-and-recreation,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,7.3294283676,5.079620927464794,2.249807440135206
+18,accommodation-and-food-services,primary_stable,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,2.0108063195,3.4158546127665086,-1.4050482932665087
+19,other-services-except-public-administration,limited,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.5978468443,4.162214266161758,1.4356325781382422
+20,public-administration,excluded,2025-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,0.60938934,4.732905979351659,-4.123516639351659
+1,agriculture-forestry-fishing-and-hunting,excluded,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.9916965915,2.487703392719181,-0.49600680121918095
+2,mining-quarrying-and-oil-and-gas-extraction,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.1783648668,1.756299426377552,-0.577934559577552
+3,construction,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.785186884,1.6206694349710158,1.164517449028984
+4,manufacturing,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.1171586945,2.107256429739414,0.009902264760586199
+5,wholesale-trade,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.9099434097,1.9445755855278914,-0.034632175827891354
+6,retail-trade,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.4954809451,1.8993650993204374,-0.40388415422043744
+7,transportation-and-warehousing,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.0083057973,1.347403423828668,0.6609023734713317
+8,utilities,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.1982936327,2.053378624616815,-0.8550849919168151
+9,information,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.8670233548,2.5405111120394324,0.3265122427605678
+10,finance-and-insurance,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.2784296871,2.1623861423910906,0.11604354470890943
+11,real-estate-and-rental-and-leasing,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.4394790854,2.1171409625765563,0.32233812282344365
+12,professional-scientific-and-technical-services,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,3.3625485759,2.635369127872568,0.7271794480274321
+13,management-of-companies-and-enterprises,sensitivity_unstable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.997144115,2.4236546867234035,-0.42651057172340345
+14,administrative-and-support-and-waste-management-services,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.2764736633,0.9891377460041614,0.2873359172958386
+15,educational-services,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.5813798724,1.9563303784775843,-0.3749505060775842
+16,health-care-and-social-assistance,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.3531334195,1.6346024147047917,-0.28146899520479174
+17,arts-entertainment-and-recreation,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.0868567047,1.711087020766196,0.3757696839338043
+18,accommodation-and-food-services,primary_stable,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,0.81426626,1.3370786505218684,-0.5228123905218683
+19,other-services-except-public-administration,limited,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.0076394235,1.5178357301751897,-0.5101963066751898
+20,public-administration,excluded,2025-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,0.320739093,1.503930757225935,-1.183191664225935
+1,agriculture-forestry-fishing-and-hunting,excluded,2026-Q2,adoption_work,CPS worker share,1.0,False,34.7706769906,48.071838521888814,-13.301161531288813
+2,mining-quarrying-and-oil-and-gas-extraction,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,26.0994565394,45.10206949483012,-19.00261295543012
+3,construction,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,43.5424833398,42.47087369303039,1.071609646769609
+4,manufacturing,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,47.6586710999,46.201246983733725,1.4574241161662727
+5,wholesale-trade,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,62.1165459402,44.22460447362572,17.89194146657428
+6,retail-trade,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,39.4512265617,42.266510578449925,-2.815284016749928
+7,transportation-and-warehousing,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,25.1041845591,36.33939479623745,-11.235210237137451
+8,utilities,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,56.4271540336,48.14640996677337,8.280744066826628
+9,information,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,82.1926036484,54.83846599017874,27.354137658221255
+10,finance-and-insurance,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,67.33240401,56.48277782483197,10.849626185168034
+11,real-estate-and-rental-and-leasing,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,56.4928358382,51.112372597632096,5.380463240567906
+12,professional-scientific-and-technical-services,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,69.5429443332,59.39066751680626,10.152276816393737
+13,management-of-companies-and-enterprises,sensitivity_unstable,2026-Q2,adoption_work,CPS worker share,1.0,False,64.4594343994,57.62830617712332,6.831128222276675
+14,administrative-and-support-and-waste-management-services,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,40.4601157323,32.67222610935989,7.7878896229401064
+15,educational-services,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,52.5851862896,53.4270076459201,-0.8418213563200965
+16,health-care-and-social-assistance,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,37.1653034619,42.13127498052902,-4.9659715186290185
+17,arts-entertainment-and-recreation,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,31.9992080832,42.28774254361696,-10.288534460416958
+18,accommodation-and-food-services,primary_stable,2026-Q2,adoption_work,CPS worker share,1.0,False,30.52520052,37.611777229015516,-7.086576709015517
+19,other-services-except-public-administration,limited,2026-Q2,adoption_work,CPS worker share,1.0,False,24.6784134748,38.03438996726626,-13.355976492466258
+20,public-administration,excluded,2026-Q2,adoption_work,CPS worker share,1.0,False,23.3546710364,42.43079136228233,-19.07612032588233
+1,agriculture-forestry-fishing-and-hunting,excluded,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.863539399,7.389485856043925,-1.5259464570439247
+2,mining-quarrying-and-oil-and-gas-extraction,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,3.8073849106,6.162254756363232,-2.354869845763232
+3,construction,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,1.7602016509,5.725748658359377,-3.965547007459377
+4,manufacturing,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.4632646397,6.554788506699527,-1.0915238669995269
+5,wholesale-trade,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,6.7084275959,6.540501155283943,0.167926440616057
+6,retail-trade,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.5901659209,6.197493766264064,-0.6073278453640647
+7,transportation-and-warehousing,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.8435236716,4.767821172915858,1.0757024986841417
+8,utilities,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,3.1412439418,6.946505118086357,-3.805261176286357
+9,information,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,16.0321649686,8.584096214183287,7.448068754416713
+10,finance-and-insurance,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,9.6694506578,8.959200269217016,0.7102503885829847
+11,real-estate-and-rental-and-leasing,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,11.6319079256,8.10890282591663,3.5230050996833704
+12,professional-scientific-and-technical-services,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,11.3597281842,9.350220010922046,2.009508173277954
+13,management-of-companies-and-enterprises,sensitivity_unstable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,15.7318445509,9.058598574620799,6.673245976279201
+14,administrative-and-support-and-waste-management-services,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,8.1794513408,3.7870913211305943,4.392360019669406
+15,educational-services,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,4.4429037997,6.180773642887827,-1.737869843187827
+16,health-care-and-social-assistance,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,3.6104212977,5.157979026846827,-1.5475577291468272
+17,arts-entertainment-and-recreation,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,5.4191928543,6.2311219689044215,-0.8119291146044212
+18,accommodation-and-food-services,primary_stable,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,2.6135350368,5.45703127163982,-2.8434962348398196
+19,other-services-except-public-administration,limited,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,3.8503209899,5.11091296518652,-1.2605919752865198
+20,public-administration,excluded,2026-Q2,assisted_hours_share,CPS actual main-job hour share,1.0,False,1.458685612,5.656707732089117,-4.198022120089117
+1,agriculture-forestry-fishing-and-hunting,excluded,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.4838052521,2.1876255206563973,-0.7038202685563972
+2,mining-quarrying-and-oil-and-gas-extraction,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,0.6776629266,2.137081483806057,-1.4594185572060567
+3,construction,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.4841153471,1.914678236289218,0.5694371108107819
+4,manufacturing,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.6966314885,2.2695339568994464,-0.5729024683994464
+5,wholesale-trade,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.8261876653,2.0469745339536005,0.7792131313463995
+6,retail-trade,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.9142074567,1.877927188480832,0.03628026821916808
+7,transportation-and-warehousing,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.5872747319,1.7441092384480228,-0.15683450654802278
+8,utilities,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.2473540551,2.4156859813140317,-1.1683319262140317
+9,information,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,4.8530973208,2.902086439867754,1.951010880932246
+10,finance-and-insurance,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,3.2897462883,2.8689077030823356,0.4208385852176644
+11,real-estate-and-rental-and-leasing,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,2.599201416,2.4601431703946135,0.1390582456053866
+12,professional-scientific-and-technical-services,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,3.9382219577,3.2851908156764527,0.6530311420235475
+13,management-of-companies-and-enterprises,sensitivity_unstable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,3.9151456855,3.1910484996049853,0.7240971858950149
+14,administrative-and-support-and-waste-management-services,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,3.4899386984,2.0564929131248135,1.4334457852751865
+15,educational-services,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.7267464564,2.3850626702658717,-0.6583162138658718
+16,health-care-and-social-assistance,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.485303308,1.9056014491924627,-0.42029814119246267
+17,arts-entertainment-and-recreation,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.2766191055,2.211194259137532,-0.9345751536375322
+18,accommodation-and-food-services,primary_stable,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.5603812248,1.8572009015604702,-0.2968196767604703
+19,other-services-except-public-administration,limited,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.2556840279,1.8728094866631275,-0.6171254587631274
+20,public-administration,excluded,2026-Q2,reported_time_savings_share,CPS actual main-job hour share,1.0,False,1.2541821922,2.0869749852409214,-0.8327927930409214
