@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "verified_date": "2026-09-02",
+  "issue": 9,
+  "program": "U.S. Census Bureau Business Trends and Outlook Survey",
+  "source_population": {
+    "unit": "employer business",
+    "coverage": "All U.S. employer businesses, single-location and multi-location, excluding farms, for data from September 11, 2023 onward.",
+    "sample": "Approximately 1.2 million businesses split into six biweekly panels of approximately 200,000 businesses; each panel is asked to report once every 12 weeks for about one year.",
+    "taxonomy": "2022 NAICS",
+    "detailed_sector_caveat": "Multi-location businesses operating in more than one sector are assigned to an unclassified sector and excluded from detailed sector totals to avoid double counting."
+  },
+  "core_ai": {
+    "current_post_change": {
+      "series_status": "canonical for post-change current business AI use",
+      "collection_start": "2025-11-17",
+      "release_start": "2025-12-04",
+      "reference_period": "last two weeks",
+      "question_object": "whether this business used AI in any of its business functions",
+      "measurement_unit": "business",
+      "estimator_denominator": "nonresponse-adjusted weighted businesses responding to the question",
+      "worker_weighted": false,
+      "employment_weighted": false
+    },
+    "expected_post_change": {
+      "series_status": "canonical for post-change expected business AI use",
+      "collection_start": "2025-11-17",
+      "release_start": "2025-12-04",
+      "reference_period": "next six months",
+      "question_object": "whether the business expects to use AI in any of its business functions",
+      "measurement_unit": "business"
+    },
+    "legacy_pre_change": {
+      "question_object": "business AI use in producing goods or services",
+      "series_end_reason": "The Census Bureau broadened the wording to any business function and observed a level shift associated with the change.",
+      "comparable_as_single_continuous_series_with_post_change": false,
+      "splice_permitted": false,
+      "historical_location": "AI Core Questions (Original) historical table"
+    },
+    "wording_break": {
+      "collection_change_date": "2025-11-17",
+      "first_new_series_release_date": "2025-12-04",
+      "governance_rule": "Never stitch the legacy producing-goods-or-services series to the post-change any-business-functions series as one continuous AI-use measure."
+    }
+  },
+  "ai_supplement_2025_2026": {
+    "collection_window": {
+      "start": "2025-11-17",
+      "end": "2026-02-08"
+    },
+    "publication_date": "2026-04-23",
+    "panel_design": "Responses from all six biweekly panels are pooled; nonresponse adjustment is performed for each panel and weights are adjusted for pooled estimation.",
+    "measurement_unit": "business",
+    "estimator_denominator": "adjusted-weight sum of all businesses responding to the question",
+    "reference_window_for_selected_ai_questions": "last six months",
+    "api_available": false,
+    "canonical_acquisition_path": "official Census downloadable files; supplemental content is not currently available through the BTOS API",
+    "questions": {
+      "Q24_business_functions": {
+        "construct": "business-reported AI use by business function during the last six months",
+        "response_structure": "yes/no/do not know by 15 listed business functions"
+      },
+      "Q25_task_change_modes": {
+        "construct": "business-reported modes of AI-related task change during the last six months",
+        "response_categories": [
+          "perform a task previously done by an employee",
+          "supplement or enhance a task performed by an employee",
+          "introduce a new task not previously done by an employee",
+          "none of the above"
+        ],
+        "multi_select": true
+      },
+      "Q26_replacement_intensity": {
+        "construct": "ordinal business report of the number of employee tasks instead performed by AI among businesses selecting replacement in Q25",
+        "response_categories": [
+          "small number",
+          "moderate number",
+          "large number"
+        ],
+        "continuous_task_count": false
+      }
+    }
+  },
+  "construct_contract": {
+    "B_core_current": "business-reported current AI use under the post-November-2025 any-business-function wording",
+    "B_core_expected": "business-reported expectation of AI use over the next six months",
+    "B_function": "business-reported AI use within a named business function over the supplement reference window",
+    "B_task_change": "business report of AI replacing, supplementing/enhancing, or introducing employee tasks",
+    "A_worker": "worker-reported GenAI adoption for work in RPS",
+    "H_worker": "worker-reported share of work hours actively using GenAI",
+    "S_worker": "worker-reported counterfactual hours-saved share",
+    "prohibited_collapses": [
+      "business AI use is not worker adoption",
+      "business-function use is not worker task adoption",
+      "business-reported task replacement or enhancement is not measured productivity",
+      "legacy and post-change BTOS core AI series are not one continuous series",
+      "sector-level BTOS/RPS association is not an organizational effect",
+      "BTOS and RPS measures must not be combined into a composite adoption score"
+    ]
+  },
+  "cross_source_alignment": {
+    "rps_comparison_role": "triangulation across different units and denominators",
+    "rps_direct_equivalence": false,
+    "required_sector_crosswalk": "Versioned 2022-NAICS-to-RPS-20-industry mapping with explicit ambiguity, coverage, and unclassified-sector treatment.",
+    "required_reporting": [
+      "BTOS question wording and reference period",
+      "business-versus-worker measurement unit",
+      "BTOS weighting/denominator",
+      "sector taxonomy and mapping coverage",
+      "suppression and uncertainty information",
+      "period and wording-series identity"
+    ]
+  },
+  "source_use": {
+    "core_api_terms_reviewed": true,
+    "api_permitted_uses_summary": "Census API terms permit services to search, display, analyze, retrieve, and view released Census data subject to confidentiality, attribution, representation, and access-limit conditions.",
+    "api_required_notice": "This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.",
+    "reidentification_prohibited": true,
+    "supplement_public_download_path_identified": true,
+    "supplement_asset_terms_status": "Use remains subject to applicable Census website policies/notices and source citation; no respondent-level data are involved in this aggregate source gate."
+  },
+  "empirical_status": {
+    "observation_values_included": false,
+    "source_ingestion_status": "not-executed",
+    "construct_alignment_status": "ready-for-versioned-source-ingestion",
+    "public_analysis_status": "blocked-pending-versioned-ingestion-crosswalk-and-reproduction"
+  },
+  "required_before_empirical_analysis": [
+    "Pin the exact official post-change core period files/API datasets and/or AI supplement workbook used, including retrieval date, byte size, and SHA-256 where a file is downloaded.",
+    "Record the exact Census variable/question/answer identifiers and published estimate/uncertainty fields used.",
+    "Build and test a versioned 2022-NAICS-to-RPS-20-industry crosswalk, preserving ambiguous and unclassified cells rather than silently reallocating them.",
+    "Reproduce official national and sector totals from the pinned source before introducing new cross-source statistics.",
+    "Preserve suppression, standard-error or margin-of-error fields where published and fail closed where support is inadequate.",
+    "Compare BTOS business measures with RPS worker measures only as explicitly labeled triangulation; do not treat agreement or disagreement as causal evidence."
+  ],
+  "sources": {
+    "about": "https://www.census.gov/hfp/btos/about",
+    "data": "https://www.census.gov/hfp/btos/data",
+    "downloads": "https://www.census.gov/hfp/btos/data_downloads",
+    "methodology": "https://www.census.gov/hfp/btos/downloads/methodology/Business_Trends_and_Outlook_Survey_Methodology_V6.pdf",
+    "ai_question_wording_update": "https://www.census.gov/hfp/btos/downloads/AI%20Question%20Wording%20Updates.pdf",
+    "ai_supplement_questionnaire": "https://www2.census.gov/data/experimental-data-products/business-trends-and-outlook-survey/questionnaire-ai-supplement.pdf",
+    "api_reference": "https://www.census.gov/hfp/btos/downloads/BTOS%20API%20Reference%20Documentation.pdf",
+    "api_terms": "https://www.census.gov/data/developers/about/terms-of-service.html"
+  }
+}
