@@ -2,9 +2,8 @@
 """Execute one official BLS LN/CPS same-period uncertainty benchmark.
 
 The script reconstructs BLS series LNU02032201 from one official Basic Monthly
-CPS public-use file, retrieves the corresponding BLS point estimate through the
-Public Data API, and extracts the official standard error from the public LN
-bulk aspect file.
+CPS public-use file and retrieves the corresponding published point estimate and
+standard-error aspect through the BLS Public Data API.
 
 This is a same-reference-period validation. It does not estimate covariance
 between months and does not authorize significance tests over time.
@@ -33,7 +32,7 @@ from genai_at_work.cps_ln_benchmark import (
     BLS_LN_ASPECT_URL,
     BLS_PUBLIC_API_V2_URL,
     MANAGEMENT_PROFESSIONAL_SERIES_ID,
-    extract_ln_standard_error,
+    extract_bls_api_standard_error,
     month_period,
     parse_bls_api_month_value,
     published_rounding_matches,
@@ -43,7 +42,8 @@ from genai_at_work.cps_ln_benchmark import (
 BLS_SE_GUIDANCE_URL = (
     "https://www.bls.gov/cps/factsheets/understanding-standard-errors-and-confidence-intervals.htm"
 )
-USER_AGENT = "ai-adoption-us/1.0 public-data validation"
+BLS_API_FEATURES_URL = "https://www.bls.gov/bls/api_features.htm"
+USER_AGENT = "ai-adoption-us/1.0 public-data-validation"
 
 
 def _utc_now() -> str:
@@ -58,44 +58,23 @@ def _sha256_file(path: Path) -> str:
     return hasher.hexdigest()
 
 
-def _download_public_file(url: str, destination: Path) -> dict[str, object]:
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    hasher = hashlib.sha256()
-    try:
-        with urllib.request.urlopen(request, timeout=120) as response, destination.open("wb") as out:
-            while chunk := response.read(1024 * 1024):
-                out.write(chunk)
-                hasher.update(chunk)
-    except Exception:
-        destination.unlink(missing_ok=True)
-        raise
-    return {
-        "source_url": url,
-        "sha256": hasher.hexdigest(),
-        "file_size_bytes": destination.stat().st_size,
-    }
-
-
-def _fetch_bls_point_estimate(*, series_id: str, year: int) -> dict[str, Any]:
-    payload = json.dumps(
-        {
-            "seriesid": [series_id],
-            "startyear": str(year),
-            "endyear": str(year),
-        }
-    ).encode("utf-8")
-    request = urllib.request.Request(
-        BLS_PUBLIC_API_V2_URL,
-        data=payload,
-        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
-        method="POST",
-    )
+def _fetch_bls_series_with_aspects(*, series_id: str) -> tuple[dict[str, Any], dict[str, object]]:
+    request_url = f"{BLS_PUBLIC_API_V2_URL}{series_id}?aspects=true"
+    request = urllib.request.Request(request_url, headers={"User-Agent": USER_AGENT})
     with urllib.request.urlopen(request, timeout=60) as response:
-        raw: object = json.loads(response.read().decode("utf-8"))
+        raw_bytes = response.read()
+    raw: object = json.loads(raw_bytes.decode("utf-8"))
     if not isinstance(raw, dict):
         raise ValueError("BLS Public Data API returned a non-object payload")
-    return {str(key): value for key, value in raw.items()}
+    return (
+        {str(key): value for key, value in raw.items()},
+        {
+            "request_url": request_url,
+            "response_sha256": hashlib.sha256(raw_bytes).hexdigest(),
+            "response_size_bytes": len(raw_bytes),
+            "raw_response_published": False,
+        },
+    )
 
 
 def _write_report(path: Path, benchmark: dict[str, object]) -> None:
@@ -123,20 +102,21 @@ Professional, and Related occupation definition.
 
 ## What this validates
 
-This benchmark establishes a reproducible connection among three official artifacts:
+This benchmark establishes a reproducible connection among three official outputs:
 the Basic Monthly CPS public-use record, the BLS LN published point estimate, and the
-BLS LN published standard-error aspect. The public-use reconstruction is a check on
-universe/weight/occupation coding. The standard error itself remains an official BLS
-design-based output; it is not reconstructed from the public-use file.
+BLS LN published standard-error aspect. The public-use reconstruction checks the
+universe, occupation coding, and final-weight arithmetic. The standard error itself
+remains an official BLS design-based output; it is not reconstructed from the
+public-use file.
 
 ## What this does not validate
 
-The LN standard error is intended for comparisons within the same reference period.
-It does not provide the cross-month covariance needed for month-, quarter-, or
-shorter year-over-year inference under the CPS rotating-panel design. This benchmark
-therefore does not supply a covariance matrix for the observatory's 22-dimensional
-industry occupation shares and does not support a confidence interval for a pooled
-quarter residual.
+BLS states that LN standard errors are intended for comparisons within the same
+reference period. They do not provide the cross-month covariance needed for month-,
+quarter-, or shorter year-over-year inference under the CPS rotating-panel design.
+This benchmark therefore does not supply a covariance matrix for the observatory's
+22-dimensional industry occupation shares and does not support a confidence interval
+for a pooled-quarter residual.
 """
     path.write_text(report)
 
@@ -158,19 +138,17 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "filename": cps_filename,
         "sha256": _sha256_file(cps_path),
         "file_size_bytes": cps_path.stat().st_size,
+        "raw_file_published": False,
     }
 
-    aspect_path = args.input_dir / "ln.aspect"
-    aspect_provenance = _download_public_file(BLS_LN_ASPECT_URL, aspect_path)
-    official_se = extract_ln_standard_error(
-        aspect_path,
+    api_payload, api_provenance = _fetch_bls_series_with_aspects(series_id=args.series_id)
+    official_estimate = parse_bls_api_month_value(
+        api_payload,
         series_id=args.series_id,
         year=args.year,
         period=period,
     )
-
-    api_payload = _fetch_bls_point_estimate(series_id=args.series_id, year=args.year)
-    official_estimate = parse_bls_api_month_value(
+    official_se = extract_bls_api_standard_error(
         api_payload,
         series_id=args.series_id,
         year=args.year,
@@ -226,7 +204,7 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "published_rounding_reproduced": rounding_match,
         "official_standard_error_present": math.isfinite(official_se.value) and official_se.value > 0,
         "raw_cps_file_published": False,
-        "raw_ln_aspect_file_published": False,
+        "raw_bls_api_response_published": False,
         "cross_month_covariance_available": False,
         "pooled_quarter_design_based_interval_supported": False,
         "source_build_commit": source_build_commit,
@@ -236,12 +214,11 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "benchmark_type": benchmark["benchmark_type"],
         "retrieved_at_utc": generated_at,
         "series_id": args.series_id,
-        "bls_public_api_url": BLS_PUBLIC_API_V2_URL,
-        "bls_ln_aspect": aspect_provenance,
+        "bls_public_api": api_provenance,
+        "bls_api_features_url": BLS_API_FEATURES_URL,
+        "bls_ln_flat_aspect_reference_url": BLS_LN_ASPECT_URL,
         "bls_standard_error_guidance_url": BLS_SE_GUIDANCE_URL,
         "cps_public_use": cps_provenance,
-        "raw_cps_file_published": False,
-        "raw_ln_aspect_file_published": False,
         "source_build_commit": source_build_commit,
     }
 
@@ -279,7 +256,30 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    validation = execute(parse_args())
+    args = parse_args()
+    try:
+        validation = execute(args)
+    except Exception as exc:
+        args.output_dir.mkdir(parents=True, exist_ok=True)
+        failure = {
+            "schema_version": 1,
+            "benchmark_type": "bls_ln_same_period_cps_public_use_reconstruction",
+            "status": "failed",
+            "error_type": type(exc).__name__,
+            "error_message": str(exc),
+            "year": args.year,
+            "month": args.month,
+            "series_id": args.series_id,
+            "source_build_commit": args.source_build_commit
+            or os.environ.get("GITHUB_SHA", "unrecorded"),
+            "generated_at_utc": _utc_now(),
+            "raw_cps_file_published": False,
+            "raw_bls_api_response_published": False,
+        }
+        (args.output_dir / "failure.json").write_text(
+            json.dumps(failure, indent=2, sort_keys=True) + "\n"
+        )
+        raise
     print(json.dumps(validation, indent=2, sort_keys=True))
     return 0
 
