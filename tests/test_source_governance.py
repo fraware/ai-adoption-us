@@ -19,6 +19,7 @@ def test_rps_refresh_candidate_stays_private_and_fail_closed():
     assert "apps/web/public" not in script
     assert '"promotion_state": "source-candidate-only"' in module
     assert '"public_raw_observations_included": False' in module
+    assert '"content_sha256": _required_string(snapshot, "content_sha256"' in module
     assert "Provider release inventory drift" in module
     assert "observations_retrieved" in module
 
@@ -66,6 +67,8 @@ def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     assert "source_input_bytes_publication" in workflow
     assert 'release.get("data_mode") != "derived_only"' in workflow
     assert 'archive.get("public_archive") is not False' in workflow
+    assert 'archive.get("source_content_sha256") != source.get("content_sha256")' in workflow
+    assert '"source_content_sha256": source.get("content_sha256")' in workflow
     assert '"archive_persisted_durably": False' in workflow
     assert '"promotion_performed": False' in workflow
     assert "actions/upload-artifact@" in workflow
