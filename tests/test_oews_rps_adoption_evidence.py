@@ -5,7 +5,6 @@ from hashlib import sha256
 from json import loads
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 EVIDENCE = ROOT / "data" / "derived" / "composition" / "oews-rps-adoption-2026-09-02"
 
