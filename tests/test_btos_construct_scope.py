@@ -75,10 +75,18 @@ def test_btos_and_rps_are_registered_as_distinct_measurement_units() -> None:
     assert "BTOS and RPS measures must not be combined into a composite adoption score" in prohibited
 
 
-def test_btos_empirical_analysis_remains_unexecuted() -> None:
+def test_btos_source_reproduction_is_executed_but_cross_source_analysis_is_not() -> None:
     status = _load_registry()["empirical_status"]
 
-    assert status["observation_values_included"] is False
-    assert status["source_ingestion_status"] == "not-executed"
-    assert status["construct_alignment_status"] == "ready-for-versioned-source-ingestion"
-    assert status["public_analysis_status"] == "blocked-pending-versioned-ingestion-crosswalk-and-reproduction"
+    assert status["observation_values_included"] is True
+    assert status["source_ingestion_status"] == "cycle-202617-core-source-reproduction-executed"
+    assert (
+        status["construct_alignment_status"]
+        == "cycle-202617-source-reproduction-verified; cross-source-analysis-not-executed"
+    )
+    assert status["public_analysis_status"] == "source-reproduction-only; no BTOS-RPS statistic published"
+    assert status["verified_checkpoint"] == "data/derived/btos/btos_core_ai_202617.json"
+    assert (
+        status["verified_source_registry"]
+        == "data/registry/btos_core_ai_202617_source_v1.json"
+    )

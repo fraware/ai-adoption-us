@@ -120,18 +120,26 @@
     "supplement_asset_terms_status": "Use remains subject to applicable Census website policies/notices and source citation; no respondent-level data are involved in this aggregate source gate."
   },
   "empirical_status": {
-    "observation_values_included": false,
-    "source_ingestion_status": "not-executed",
-    "construct_alignment_status": "ready-for-versioned-source-ingestion",
-    "public_analysis_status": "blocked-pending-versioned-ingestion-crosswalk-and-reproduction"
+    "observation_values_included": true,
+    "source_ingestion_status": "cycle-202617-core-source-reproduction-executed",
+    "construct_alignment_status": "cycle-202617-source-reproduction-verified; cross-source-analysis-not-executed",
+    "public_analysis_status": "source-reproduction-only; no BTOS-RPS statistic published",
+    "verified_checkpoint": "data/derived/btos/btos_core_ai_202617.json",
+    "verified_source_registry": "data/registry/btos_core_ai_202617_source_v1.json"
   },
-  "required_before_empirical_analysis": [
-    "Pin the exact official post-change core period files/API datasets and/or AI supplement workbook used, including retrieval date, byte size, and SHA-256 where a file is downloaded.",
-    "Record the exact Census variable/question/answer identifiers and published estimate/uncertainty fields used.",
-    "Build and test a versioned 2022-NAICS-to-RPS-20-industry crosswalk, preserving ambiguous and unclassified cells rather than silently reallocating them.",
-    "Reproduce official national and sector totals from the pinned source before introducing new cross-source statistics.",
-    "Preserve suppression, standard-error or margin-of-error fields where published and fail closed where support is inadequate.",
-    "Compare BTOS business measures with RPS worker measures only as explicitly labeled triangulation; do not treat agreement or disagreement as causal evidence."
+  "completed_source_reproduction_requirements": [
+    "Pinned exact official National.xlsx and Sector.xlsx source bytes for cycle 202617 with retrieval timestamp, byte size, and SHA-256.",
+    "Recorded exact Question 7 / Answer 1 identity, cycle dates, estimate fields, and published standard errors.",
+    "Built and tested a versioned 2022-NAICS-to-RPS-20-industry crosswalk with exact Census source keys and explicit unclassified/unsupported treatment.",
+    "Reproduced the cycle-202617 national and sector Question 7 / Answer 1 source observations directly from the pinned workbooks.",
+    "Preserved Census suppression code S and published standard errors without reconstructing suppressed cells."
+  ],
+  "remaining_before_cross_source_analysis": [
+    "Pre-specify the BTOS-versus-RPS comparison period and eligible comparability tiers before examining cross-source patterns.",
+    "Pre-specify treatment of BTOS-suppressed sectors, XX unclassified businesses, and RPS Public Administration with no BTOS counterpart.",
+    "Use only RPS observations authorized by the independent RPS source-rights gate.",
+    "Report BTOS business measures and RPS worker measures only as explicitly labeled triangulation; do not treat agreement or disagreement as causal evidence.",
+    "Do not combine BTOS and RPS measures into a composite adoption score."
   ],
   "sources": {
     "about": "https://www.census.gov/hfp/btos/about",

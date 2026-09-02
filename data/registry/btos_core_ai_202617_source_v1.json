@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "checkpoint_id": "btos-core-ai-202617-q7-a1-v1",
+  "verified_date": "2026-09-02",
+  "source_owner": "U.S. Census Bureau",
+  "program": "Business Trends and Outlook Survey",
+  "cycle": "202617",
+  "question_id": 7,
+  "answer_id": 1,
+  "answer": "Yes",
+  "question": "In the last two weeks, did this business use Artificial Intelligence (AI) in any of its business functions? (Examples of AI: machine learning, natural language processing, virtual agents, voice recognition, etc.)",
+  "construct": "business-reported current AI use in any business function during the last two weeks",
+  "measurement_unit": "employer business",
+  "estimator_denominator": "nonresponse-adjusted weighted businesses responding to the question",
+  "worker_weighted": false,
+  "employment_weighted": false,
+  "dates": {
+    "collection_start": "2026-08-10",
+    "collection_end": "2026-08-23",
+    "reference_start": "2026-07-27",
+    "reference_end": "2026-08-09",
+    "publication_date": "2026-08-27"
+  },
+  "source_files": {
+    "national": {
+      "url": "https://www.census.gov/hfp/btos/downloads/National.xlsx",
+      "filename": "National.xlsx",
+      "retrieved_at_utc": "2026-09-02T11:06:18.300020+00:00",
+      "byte_size": 95940,
+      "sha256": "0db08921d1feaf2f1ee6516a4118424183941d5460d2330a9659cacbe1046dc7",
+      "required_sheets": [
+        "Response Estimates",
+        "Response Standard Errors",
+        "Collection and Reference Dates"
+      ]
+    },
+    "sector": {
+      "url": "https://www.census.gov/hfp/btos/downloads/Sector.xlsx",
+      "filename": "Sector.xlsx",
+      "retrieved_at_utc": "2026-09-02T11:06:18.300020+00:00",
+      "byte_size": 1480216,
+      "sha256": "d4e4ef99e958c66bc8b044489e36a6468f93307a1b8216f96e92dbdba8a44e78",
+      "required_sheets": [
+        "Response Estimates",
+        "Response Standard Errors"
+      ]
+    }
+  },
+  "crosswalk": {
+    "registry": "data/registry/btos_rps_industry_crosswalk_v1.json",
+    "version": "btos-2022-naics-rps-v1.1",
+    "role": "taxonomy annotation only; no RPS observation or cross-source statistic is part of this checkpoint"
+  },
+  "suppression": {
+    "source_code": "S",
+    "committed_value_rule": "Represent a source-suppressed estimate and standard error as null with suppression_code S.",
+    "inference_rule": "Never infer, back-solve, complement, interpolate, or otherwise reconstruct a source-suppressed BTOS value."
+  },
+  "source_mutability": {
+    "download_urls_are_mutable": true,
+    "validation_rule": "The online validator must require these exact SHA-256 hashes before comparing workbook values. Hash drift means a new source vintage or revision must be reviewed; it must not silently rewrite this checkpoint."
+  },
+  "structural_gap_note": "Cycles 202521 through 202523 were not collected during the 2025 federal funding lapse. This checkpoint does not interpolate or backfill those periods.",
+  "analysis_status": "source-reproduction-only",
+  "public_product_status": "not-published",
+  "rps_values_included": false,
+  "cross_source_statistics_included": false,
+  "raw_workbook_bytes_committed": false,
+  "attribution": "U.S. Census Bureau, Business Trends and Outlook Survey. This independent product is not endorsed or certified by the Census Bureau."
+}
