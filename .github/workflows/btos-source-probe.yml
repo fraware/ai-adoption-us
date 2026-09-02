@@ -1,0 +1,56 @@
+name: BTOS official source probe
+
+on:
+  pull_request:
+    paths:
+      - 'src/genai_at_work/btos_sources.py'
+      - 'scripts/probe_btos_sources.py'
+      - 'tests/test_btos_sources.py'
+      - '.github/workflows/btos-source-probe.yml'
+      - 'data/registry/btos_construct_scope_v1.json'
+      - 'data/registry/btos_rps_industry_crosswalk_v1.json'
+  push:
+    branches: [main]
+    paths:
+      - 'src/genai_at_work/btos_sources.py'
+      - 'scripts/probe_btos_sources.py'
+      - 'tests/test_btos_sources.py'
+      - '.github/workflows/btos-source-probe.yml'
+      - 'data/registry/btos_construct_scope_v1.json'
+      - 'data/registry/btos_rps_industry_crosswalk_v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: btos-source-probe-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    name: Download, hash, and inspect official BTOS workbooks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Probe official Census BTOS workbooks
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: PYTHONPATH=src python scripts/probe_btos_sources.py --output-dir btos-source-probe
+
+      - name: Upload BTOS source evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: btos-source-probe-${{ github.sha }}
+          path: btos-source-probe
+          if-no-files-found: warn
+          retention-days: 14
