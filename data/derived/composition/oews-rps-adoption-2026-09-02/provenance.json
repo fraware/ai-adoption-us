@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "artifact_type": "oews_rps_adoption_robustness_provenance",
+  "evidence_date": "2026-09-02",
+  "live_validation": {
+    "github_run_id": "33687737639",
+    "github_sha": "3fb2cff4a9b1cbc2f340c8db00328efaa2c30130",
+    "workflow_artifact_id": 9868969207,
+    "workflow_artifact_name": "rps-live-validation-33687737639-3fb2cff4a9b1cbc2f340c8db00328efaa2c30130",
+    "workflow_artifact_digest": "sha256:fd8b4ed3f828755efaaa00c80b7d444480f7d0e058b88dddf2ffae8f17539de7",
+    "workflow_status": "success"
+  },
+  "rps_source": {
+    "source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+    "source_snapshot_file_sha256": "66b3ffbaebf43c3c8434556eec9329a232d8f17483ba3a613e6b00d214af3f74",
+    "source_series_count": 131,
+    "source_observation_count": 962,
+    "source_snapshot_published": false,
+    "rights_decision": "docs/source-rights/RPS_SOURCE_DECISION.md"
+  },
+  "inputs": {
+    "canonical_rps_manifest_sha256": "130b0bdf7be71ca49bd9be957047423ddef76f20a97b3047fa5e0d0e1970c924",
+    "provider_scope_sha256": "41f2b0a8b6499dd2a38c64b4b7fc99bfb00179bb442bb0c1e09c3a992080fa6f",
+    "oews_composition_sha256": "1daec0e5f78c0336b8895feb899ef4f81d24baa4bc1965edbc2b00ce5958ce88",
+    "oews_occupation_crosswalk_sha256": "587bec0fd4cbb32960cdbca00920b9c91c565a5b9d3892a5edde20ea3cfa5cba",
+    "cps_primary_residuals_sha256": "fa49c1d6e84119b22359396befa1ec1dd94d7056ce2089faf8f8b2a8ec088656"
+  },
+  "transient_live_output_sha256": {
+    "full_counterfactuals_json": "080f5dbf99e613c115ea7ad18b87694a1a2a9d340ad40c86c3bbbb87994aa0b6",
+    "full_comparison_json": "cc3e7d587289e77f39fb5d32ec86a8be88c6408017418fcbf745ec3ea1b2f0a7",
+    "summary_json": "623b52f69dbf8b1dd0204009c65465ec0fd51f15146b507a4d1235f9a53d73de",
+    "validation_json": "594571b2c4b21ba31afcadda18b8e23809486023b71a7948a18901eb94f27ab9",
+    "input_manifest_json": "e9cf784b350e6d4694dcc73716b98184dfaebfefb511fd6688a30cc398a5457d"
+  },
+  "canonical_public_subset": {
+    "scope": "17 primary-comparability industries for each of Q2 2025 and Q2 2026",
+    "primary_counterfactual_rows": 34,
+    "primary_comparison_rows": 34,
+    "primary_counterfactuals_sha256": "d684e8dbd1490b3ca201147629b9638b48939fe0d196ebaf1a455430acab9bc6",
+    "primary_comparison_sha256": "3e239eecf2f3b3c7a1e474628c55dfeb12bd5158d2cb0b84d6989f430d083f38",
+    "full_live_counterfactual_row_count": 40,
+    "full_live_comparison_row_count": 40,
+    "full_live_partially_identified_row_count": 8,
+    "primary_partially_identified_row_count": 6
+  },
+  "rights_boundary": {
+    "raw_rps_snapshot_committed": false,
+    "raw_rps_source_rows_committed": false,
+    "derived_aggregate_evidence_committed": true,
+    "bulk_source_mirror_created": false
+  },
+  "interpretation_boundary": "OEWS and CPS are independent composition bases with different source universes. Agreement or disagreement is robustness evidence only. Residuals remain descriptive occupation-adjusted industry-context gaps, not causal, organizational, efficiency, or productivity effects."
+}
