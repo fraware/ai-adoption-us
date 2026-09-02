@@ -23,12 +23,12 @@ from typing import Any
 from genai_at_work.longitudinal import REQUIRED_ENTITY_COUNTS, AuditRecord
 from genai_at_work.release_engine import canonical_digest
 from genai_at_work.rps_release import (
+    _DEFINITION_FIELDS,
     RPS_SOURCE_URL,
     SUBGROUP_ENTITY_TYPES,
     SUBGROUP_METRICS,
     PreparedRpsPanel,
     RpsReleaseError,
-    _DEFINITION_FIELDS,
     _claim_rows,
     _diagnostic_manifest,
     _period_key,
