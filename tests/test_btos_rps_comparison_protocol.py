@@ -114,7 +114,7 @@ def test_suppression_and_unsupported_categories_fail_closed() -> None:
     assert "no BTOS counterpart" in exclusions["public-administration"]
     assert "Never infer, complement, interpolate, or model" in eligibility["suppression_rule"]
     assert "never switch cycles" in eligibility["suppression_rule"]
-    assert "No adjacent RPS quarter or alternative metric" in eligibility["missingness_rule"]
+    assert "do not substitute another RPS quarter or metric" in eligibility["missingness_rule"]
 
 
 def test_statistics_are_fixed_descriptive_and_noncausal() -> None:
