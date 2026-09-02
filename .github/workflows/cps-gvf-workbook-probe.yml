@@ -1,0 +1,106 @@
+name: CPS GVF workbook source probe
+
+on:
+  push:
+    branches:
+      - research/cps-gvf-lender-calibration
+    paths:
+      - '.github/workflows/cps-gvf-workbook-probe.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Inspect official BLS PF workbook
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install workbook reader
+        run: python -m pip install 'openpyxl>=3.1,<4'
+
+      - name: Probe official BLS PF workbook
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import urllib.request
+          from pathlib import Path
+          from openpyxl import load_workbook
+
+          source_url = 'https://www.bls.gov/cps/methods/parameters-and-factors-for-calculating-standard-errors.xlsx'
+          destination = Path('${RUNNER_TEMP}') / 'parameters-and-factors.xlsx'
+          request = urllib.request.Request(
+              source_url,
+              headers={'User-Agent': 'ai-adoption-us/1.0 public-data-validation'},
+          )
+          with urllib.request.urlopen(request, timeout=120) as response:
+              raw = response.read()
+          destination.write_bytes(raw)
+
+          workbook = load_workbook(destination, data_only=True, read_only=True)
+          keywords = (
+              'employ',
+              'labor force',
+              'not in labor force',
+              'civilian noninstitutional',
+              'population',
+              'men',
+              'women',
+          )
+          result = {
+              'schema_version': 1,
+              'source_url': source_url,
+              'source_sha256': hashlib.sha256(raw).hexdigest(),
+              'source_size_bytes': len(raw),
+              'raw_workbook_published': False,
+              'sheet_names': workbook.sheetnames,
+              'sheets': [],
+          }
+          for sheet in workbook.worksheets:
+              rows = []
+              keyword_rows = []
+              for row_number, cells in enumerate(sheet.iter_rows(values_only=True), start=1):
+                  values = [value for value in cells]
+                  normalized = [
+                      None if value is None else str(value).strip()
+                      for value in values
+                  ]
+                  while normalized and normalized[-1] is None:
+                      normalized.pop()
+                  if row_number <= 12 and any(value is not None for value in normalized):
+                      rows.append({'row': row_number, 'values': normalized})
+                  text = ' | '.join(value or '' for value in normalized).casefold()
+                  if text and any(keyword in text for keyword in keywords):
+                      keyword_rows.append({'row': row_number, 'values': normalized})
+              result['sheets'].append({
+                  'title': sheet.title,
+                  'max_row': sheet.max_row,
+                  'max_column': sheet.max_column,
+                  'header_excerpt': rows,
+                  'keyword_rows': keyword_rows,
+              })
+
+          output = Path('${RUNNER_TEMP}') / 'cps-gvf-workbook-probe.json'
+          output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(result, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload rights-safe workbook probe
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cps-gvf-workbook-probe-${{ github.run_id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/cps-gvf-workbook-probe.json
+          retention-days: 14
+          if-no-files-found: error
