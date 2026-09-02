@@ -9,6 +9,7 @@ import pytest
 from genai_at_work.cps import FIXED_WIDTH_FIELDS_2026
 from genai_at_work.cps_ln_benchmark import (
     MANAGEMENT_PROFESSIONAL_SERIES_ID,
+    PWCMPWGT_FIXED_WIDTH_2026,
     extract_bls_api_standard_error,
     extract_ln_standard_error,
     month_period,
@@ -19,10 +20,16 @@ from genai_at_work.cps_ln_benchmark import (
 
 
 def _fixed_width_record(**values: str) -> str:
-    width = max(end for _, end in FIXED_WIDTH_FIELDS_2026.values())
+    width = max(
+        max(end for _, end in FIXED_WIDTH_FIELDS_2026.values()),
+        PWCMPWGT_FIXED_WIDTH_2026[1],
+    )
     chars = [" "] * width
     for field, value in values.items():
-        start, end = FIXED_WIDTH_FIELDS_2026[field]
+        if field == "PWCMPWGT":
+            start, end = PWCMPWGT_FIXED_WIDTH_2026
+        else:
+            start, end = FIXED_WIDTH_FIELDS_2026[field]
         if len(value) > end - start:
             raise ValueError(f"fixture value too wide for {field}")
         chars[start:end] = list(value.rjust(end - start))
@@ -140,7 +147,7 @@ def test_extract_bls_api_standard_error_fails_when_keyless_path_omits_aspects() 
         )
 
 
-def test_reconstruct_management_professional_employment_uses_official_16_plus_universe(
+def test_reconstruct_management_professional_employment_uses_composited_weight(
     tmp_path: Path,
 ) -> None:
     path = tmp_path / "jul26pub.dat.gz"
@@ -149,31 +156,36 @@ def test_reconstruct_management_professional_employment_uses_official_16_plus_un
             PRTAGE="16",
             PREMPNOT="1",
             PRDTOCC1="1",
-            PWSSWGT=_raw_weight(1000.4),
+            PWSSWGT=_raw_weight(9000.0),
+            PWCMPWGT=_raw_weight(1000.4),
         ),
         _fixed_width_record(
             PRTAGE="70",
             PREMPNOT="1",
             PRDTOCC1="10",
-            PWSSWGT=_raw_weight(2000.2),
+            PWSSWGT=_raw_weight(8000.0),
+            PWCMPWGT=_raw_weight(2000.2),
         ),
         _fixed_width_record(
             PRTAGE="45",
             PREMPNOT="1",
             PRDTOCC1="11",
             PWSSWGT=_raw_weight(5000.0),
+            PWCMPWGT=_raw_weight(5000.0),
         ),
         _fixed_width_record(
             PRTAGE="15",
             PREMPNOT="1",
             PRDTOCC1="2",
             PWSSWGT=_raw_weight(7000.0),
+            PWCMPWGT=_raw_weight(7000.0),
         ),
         _fixed_width_record(
             PRTAGE="50",
             PREMPNOT="2",
             PRDTOCC1="3",
             PWSSWGT=_raw_weight(9000.0),
+            PWCMPWGT=_raw_weight(9000.0),
         ),
     ]
     with gzip.open(path, mode="wt", encoding="ascii") as handle:
