@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "evidence_id": "cps-ln-se-benchmark-2026-07",
+  "scientific_scope": "same-reference-period validation of one official CPS published estimate and BLS standard error; no pooled-quarter covariance inference",
+  "live_execution": {
+    "github_run_id": "33691440205",
+    "github_head_sha": "f9bcc48350a5acf923b8de1982092caf34542172",
+    "workflow_name": "CPS LN same-period uncertainty benchmark",
+    "workflow_conclusion": "success",
+    "artifact_id": "9870172427",
+    "artifact_digest": "sha256:6d299bc5d7a403bbf4503728705051c3cbde7b1c7b1d2dfaf8dc1e020e24ecd1"
+  },
+  "upstream_source_identity": {
+    "cps_public_use_sha256": "a97d4908014689f29c2f833c01289c6564c8a27c0b5358562dd111eb33e05247",
+    "bls_api_response_sha256": "64a597f049d1793f788d0deaea1e089bfce9cd92de116ffd4634d186a231756a"
+  },
+  "canonical_evidence_sha256": {
+    "BENCHMARK_REPORT.md": "9bc7bdc7c8096caacc61f6ed44bfbc5d611d4365044536c98681fb97dc1587b5",
+    "benchmark.json": "e1b705aab94b4f063122423753ba77abc70b15ebe45cb5c3a3a587991c1b4199",
+    "input_manifest.json": "2c4a0719151df12844402ef726148840002d6b30bb8b711c10e8095a22f6f618",
+    "standard_error_observation.json": "716e1a3b6a5e2735ac12637e3b8cb4ab5bda6a608f4bd71a0a48c56bbd89ffb9",
+    "validation_checks.json": "48a4a89f09511767feb4094adc374a1d39b647a7a75cea0e11e581fe3209bc30"
+  },
+  "rights_and_publication_boundary": {
+    "raw_cps_public_use_file_committed": false,
+    "raw_bls_api_response_committed": false,
+    "raw_ln_aspect_file_committed": false,
+    "published_content_is_derived_or_single_observation_evidence": true
+  },
+  "interpretation_guardrails": {
+    "project_one_se_threshold_is_bls_or_census_rule": false,
+    "standard_error_reconstructed_from_public_use_microdata": false,
+    "cross_month_covariance_available": false,
+    "pooled_quarter_design_based_interval_supported": false,
+    "occupation_adjusted_rps_residual_interval_supported": false
+  }
+}

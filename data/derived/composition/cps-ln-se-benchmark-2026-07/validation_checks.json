@@ -1,0 +1,17 @@
+{
+  "absolute_reconstruction_difference_standard_errors": 0.06358422392887796,
+  "cross_month_covariance_available": false,
+  "official_standard_error_present": true,
+  "period": "M07",
+  "pooled_quarter_design_based_interval_supported": false,
+  "project_threshold_is_bls_or_census_rule": false,
+  "project_validation_threshold_standard_errors": 1.0,
+  "public_use_discrepancy_within_project_threshold": true,
+  "published_rounding_reproduced": false,
+  "raw_bls_api_response_published": false,
+  "raw_cps_file_published": false,
+  "series_id": "LNU02032201",
+  "source_build_commit": "f9bcc48350a5acf923b8de1982092caf34542172",
+  "status": "pass",
+  "year": 2026
+}

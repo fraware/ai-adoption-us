@@ -1,0 +1,68 @@
+name: CPS LN same-period uncertainty benchmark
+
+on:
+  push:
+    branches:
+      - main
+      - research/cps-ln-se-benchmark
+    paths:
+      - '.github/workflows/cps-ln-se-benchmark.yml'
+      - 'scripts/execute_cps_ln_se_benchmark.py'
+      - 'src/genai_at_work/cps_ln_benchmark.py'
+      - 'src/genai_at_work/cps.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cps-ln-se-benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    name: Reconstruct official CPS level and attach BLS LN standard error
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install package
+        run: python -m pip install -e .
+
+      - name: Execute July 2026 same-period benchmark
+        run: >-
+          PYTHONPATH=src python scripts/execute_cps_ln_se_benchmark.py
+          --year 2026
+          --month jul
+          --input-dir "${RUNNER_TEMP}/cps-ln-se-inputs"
+          --output-dir "${RUNNER_TEMP}/cps-ln-se-evidence"
+          --source-build-commit "${GITHUB_SHA}"
+
+      - name: Verify rights-safe evidence boundary
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="${RUNNER_TEMP}/cps-ln-se-evidence"
+          if [ -d "$evidence" ]; then
+            test ! -e "$evidence/jul26pub.dat.gz"
+            test ! -e "$evidence/ln.aspect"
+          fi
+
+      - name: Upload benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cps-ln-se-benchmark-${{ github.run_id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/cps-ln-se-evidence
+          if-no-files-found: warn
+          retention-days: 14
