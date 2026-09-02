@@ -1,16 +1,22 @@
 """Official FRED API client for the RPS GenAI tracker.
 
 The client intentionally uses only documented FRED API endpoints. It does not scrape
-FRED HTML, consistent with FRED's published Terms of Use.
+FRED HTML, consistent with FRED's published Terms of Use. Transient transport,
+rate-limit, and server failures are retried with bounded exponential backoff; semantic
+client errors and exhausted retries fail closed. Error text never includes the full
+credential-bearing request URL.
 """
 
 from __future__ import annotations
 
+import time
 from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
 
 import httpx
+
+TRANSIENT_HTTP_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 
 
 class FredError(RuntimeError):
@@ -43,31 +49,79 @@ class FredClient:
     api_key:
         Registered FRED API key.
     timeout_seconds:
-        Network timeout applied to each request.
+        Network timeout applied to each individual request attempt.
+    max_attempts:
+        Maximum attempts for transient transport, HTTP 429, and selected HTTP 5xx
+        failures. Non-transient HTTP failures are never retried.
+    backoff_seconds:
+        Initial deterministic backoff before the second attempt. Subsequent retry
+        delays double. Set to zero only in deterministic tests.
     """
 
     api_key: str
     timeout_seconds: float = 30.0
+    max_attempts: int = 4
+    backoff_seconds: float = 1.0
     base_url: str = "https://api.stlouisfed.org/fred"
+
+    def __post_init__(self) -> None:
+        if self.timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive")
+        if self.max_attempts <= 0:
+            raise ValueError("max_attempts must be positive")
+        if self.backoff_seconds < 0:
+            raise ValueError("backoff_seconds must be nonnegative")
+
+    def _sleep_before_retry(self, attempt: int) -> None:
+        delay = self.backoff_seconds * (2 ** (attempt - 1))
+        if delay > 0:
+            time.sleep(delay)
 
     def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
         if not self.api_key:
             raise FredError("FRED_API_KEY is required; HTML scraping is intentionally unsupported.")
 
         query = {**params, "api_key": self.api_key, "file_type": "json"}
-        try:
-            response = httpx.get(
-                f"{self.base_url}/{path}", params=query, timeout=self.timeout_seconds
-            )
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
-            raise FredError(f"FRED request failed for {path}: {exc}") from exc
+        url = f"{self.base_url}/{path}"
 
-        raw_payload: object = response.json()
-        payload = _string_keyed_dict(raw_payload, label="response")
-        if "error_code" in payload:
-            raise FredError(f"FRED API error {payload['error_code']}: {payload.get('error_message')}")
-        return payload
+        for attempt in range(1, self.max_attempts + 1):
+            try:
+                response = httpx.get(url, params=query, timeout=self.timeout_seconds)
+            except httpx.RequestError as exc:
+                if attempt >= self.max_attempts:
+                    raise FredError(
+                        f"FRED transport request failed for {path} after {attempt} attempts "
+                        f"({exc.__class__.__name__})"
+                    ) from exc
+                self._sleep_before_retry(attempt)
+                continue
+
+            if response.status_code in TRANSIENT_HTTP_STATUS_CODES:
+                if attempt >= self.max_attempts:
+                    raise FredError(
+                        f"FRED transient request failed for {path} after {attempt} attempts "
+                        f"with HTTP {response.status_code}"
+                    )
+                self._sleep_before_retry(attempt)
+                continue
+
+            if response.is_error:
+                raise FredError(
+                    f"FRED request failed for {path} with HTTP {response.status_code}"
+                )
+
+            try:
+                raw_payload: object = response.json()
+            except ValueError as exc:
+                raise FredError(f"FRED response for {path} was not valid JSON") from exc
+            payload = _string_keyed_dict(raw_payload, label="response")
+            if "error_code" in payload:
+                raise FredError(
+                    f"FRED API error {payload['error_code']}: {payload.get('error_message')}"
+                )
+            return payload
+
+        raise AssertionError("unreachable FRED retry loop")
 
     def iter_release_series(self, release_id: int, page_size: int = 1000) -> Iterator[dict[str, Any]]:
         """Yield every series listed on a FRED release with pagination."""
