@@ -42,6 +42,22 @@ def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     assert "observatory_release.py" not in script
 
 
+def test_snapshot_native_composition_join_emits_derived_evidence_only():
+    script = (ROOT / "scripts" / "build_composition_residuals.py").read_text()
+    module = (ROOT / "src" / "genai_at_work" / "composition_snapshot.py").read_text()
+
+    assert "--source-snapshot" in script
+    assert "prepare_rps_panel" in script
+    assert "rps-private-fixture" not in script
+    assert '"source_snapshot_published": False' in script
+    assert '"public_raw_rps_observations_included": False' in script
+    assert "private_fixture" not in module
+    assert "occupation-adjusted descriptive industry-context residual" in module
+    assert "not a causal or organizational effect" in module
+    assert "leave_one_occupation_out" in module
+    assert "cross_period_persistence" in module
+
+
 def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     workflow = (ROOT / ".github" / "workflows" / "rps-live-validation.yml").read_text()
 
@@ -56,6 +72,9 @@ def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     assert "--output-dir /tmp/rps-refresh" in workflow
     assert "--archive-root /tmp/rps-private-vintage" in workflow
     assert "--output-dir /tmp/rps-observatory" in workflow
+    assert "scripts/build_composition_residuals.py" in workflow
+    assert "--output-dir /tmp/rps-composition" in workflow
+    assert "composition-residuals" in workflow
     assert "private-vintage-manifest.json" in workflow
     assert "live-validation-summary.json" in workflow
     assert "rps_source_snapshot.json" in workflow
@@ -68,8 +87,11 @@ def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     assert 'release.get("data_mode") != "derived_only"' in workflow
     assert 'archive.get("public_archive") is not False' in workflow
     assert 'archive.get("source_content_sha256") != source.get("content_sha256")' in workflow
+    assert 'composition_inputs.get("source_content_sha256") != source.get("content_sha256")' in workflow
+    assert 'composition_inputs.get("public_raw_rps_observations_included") is not False' in workflow
     assert '"source_content_sha256": source.get("content_sha256")' in workflow
     assert '"archive_persisted_durably": False' in workflow
+    assert '"composition_residual_evidence_built": True' in workflow
     assert '"promotion_performed": False' in workflow
     assert "actions/upload-artifact@" in workflow
     assert "retention-days: 14" in workflow
