@@ -34,6 +34,10 @@ def _require_equal(actual: object, expected: object, label: str) -> None:
         raise ValueError(f"{label} mismatch: actual={actual!r}, expected={expected!r}")
 
 
+def _resolve_repo_path(path: Path) -> Path:
+    return path if path.is_absolute() else ROOT / path
+
+
 def _load_pinned_workbook(source_dir: Path, source: dict[str, object], label: str) -> bytes:
     filename = source["filename"]
     if not isinstance(filename, str):
@@ -115,6 +119,9 @@ def validate(
     source_registry_path: Path = DEFAULT_SOURCE_REGISTRY,
     checkpoint_path: Path = DEFAULT_CHECKPOINT,
 ) -> dict[str, object]:
+    source_registry_path = _resolve_repo_path(source_registry_path)
+    checkpoint_path = _resolve_repo_path(checkpoint_path)
+
     registry = _load_json(source_registry_path)
     checkpoint = _load_json(checkpoint_path)
     crosswalk = _load_json(CROSSWALK)
