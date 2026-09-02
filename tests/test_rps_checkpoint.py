@@ -157,16 +157,8 @@ def test_checkpoint_rejects_different_builder_commit() -> None:
         _build(release=release)
 
 
-def test_checkpoint_rejects_observation_bearing_output_field(monkeypatch: pytest.MonkeyPatch) -> None:
-    from genai_at_work import rps_checkpoint
+def test_checkpoint_rights_scan_rejects_observation_bearing_mapping() -> None:
+    from genai_at_work.rps_checkpoint import _assert_no_forbidden_keys
 
-    original = rps_checkpoint._assert_no_forbidden_keys
-
-    def inject_and_validate(value: object, *, context: str = "checkpoint") -> None:
-        assert isinstance(value, dict)
-        value["observations"] = []
-        original(value, context=context)
-
-    monkeypatch.setattr(rps_checkpoint, "_assert_no_forbidden_keys", inject_and_validate)
     with pytest.raises(RpsCheckpointError, match="forbidden source-data key"):
-        _build()
+        _assert_no_forbidden_keys({"schema_version": 1, "observations": []})
