@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "protocol_id": "btos-rps-industry-triangulation-v1",
+  "registered_date": "2026-09-02",
+  "status": "preregistered-not-executed",
+  "scientific_role": "descriptive cross-source triangulation across non-equivalent business-level and worker-level constructs",
+  "execution_gate": {
+    "rps_observation_values_included": false,
+    "btos_selected_cycle_observation_values_examined": false,
+    "cross_source_statistics_included": false,
+    "current_rps_source_owner_permission_status": "unresolved",
+    "required_before_execution": [
+      "The independent RPS source-rights decision must explicitly authorize retrieval/storage needed for analysis and publication of the transformed cross-source result; an unresolved permission state blocks execution.",
+      "The RPS Q2 2026 fieldwork dates must be resolved from an authoritative source if available without retrieving industry observation values; otherwise the registered May-midpoint fallback rule applies.",
+      "The BTOS comparison cycle must be selected mechanically under this protocol before its Question 7 / Answer 1 sector observations are inspected.",
+      "The selected BTOS cycle must be reproduced from the pinned official workbook with published standard errors and suppression codes preserved before any RPS values are joined."
+    ]
+  },
+  "constructs": {
+    "btos": {
+      "construct_id": "B_core_current",
+      "question_id": 7,
+      "answer_id": 1,
+      "answer": "Yes",
+      "object": "business-reported current Artificial Intelligence use in any business function during the last two weeks",
+      "measurement_unit": "employer business",
+      "technology_scope": "Artificial Intelligence as defined by BTOS",
+      "worker_weighted": false,
+      "employment_weighted": false
+    },
+    "rps": {
+      "metric_id": "adoption_work",
+      "object": "worker-reported use of Generative AI for the respondent's job",
+      "measurement_unit": "employed adult age 18-64",
+      "technology_scope": "Generative AI",
+      "series_selection_rule": "Use exactly the 20 industry rows with entity_type=industry and metric_id=adoption_work in data/registry/rps_source_series_manifest.json; do not substitute assisted-hours or reported-time-savings metrics."
+    },
+    "non_equivalence": [
+      "BTOS measures employer businesses while RPS measures workers.",
+      "BTOS current core Question 7 covers Artificial Intelligence in any business function while RPS adoption_work covers Generative AI used for a worker's job.",
+      "A common industry label does not synchronize survey universes, denominators, technology scope, or reference periods.",
+      "The comparison is not a validation of a common adoption rate and must not be converted into a composite adoption score."
+    ]
+  },
+  "period_selection": {
+    "rps_target_period": "Q2 2026",
+    "rps_series_frequency": "Quarterly",
+    "rps_named_wave_month": "2026-05",
+    "rps_exact_fieldwork_dates_status": "unresolved-in-current-metadata-review",
+    "primary_rule": "If authoritative Q2 2026 RPS fieldwork start and end dates are resolved before any industry observation values are retrieved, compute their calendar midpoint and select the post-2025-11-17 BTOS core cycle whose reference-period midpoint has the smallest absolute distance from that RPS midpoint. Ties select the earlier BTOS cycle. Do not choose a cycle based on estimates, suppression, sample size, correlation, or sector coverage.",
+    "fallback_rule": "If authoritative exact RPS Q2 2026 fieldwork dates remain unavailable, use 2026-05-16 as the midpoint of the named May 2026 wave and apply the same nearest-reference-midpoint rule.",
+    "fallback_selected_btos_cycle": {
+      "cycle": "202611",
+      "reference_start": "2026-05-04",
+      "reference_end": "2026-05-17",
+      "collection_start": "2026-05-18",
+      "collection_end": "2026-05-31",
+      "publication_date": "2026-06-04",
+      "selection_basis": "date metadata only from the pinned National.xlsx workbook; Question 7 / Answer 1 sector values for this cycle were not inspected when v1 was registered"
+    },
+    "explicit_non_selection": "Do not use the already reproduced cycle 202617 for the first BTOS-RPS comparison because its late-July/early-August reference period is materially later than RPS Q2 2026."
+  },
+  "sector_eligibility": {
+    "crosswalk": "data/registry/btos_rps_industry_crosswalk_v1.json",
+    "primary": {
+      "mapping_status": "mapped",
+      "comparability": "primary",
+      "btos_requirement": "published non-suppressed Question 7 / Answer 1 estimate in the mechanically selected cycle",
+      "rps_requirement": "authorized, nonmissing Q2 2026 adoption_work observation",
+      "expected_crosswalk_pool_before_missingness_or_suppression": 15,
+      "minimum_analysis_n": 10,
+      "weighting": "unweighted across eligible industry categories"
+    },
+    "limited_comparability_sensitivity": {
+      "enabled": true,
+      "comparability": "limited",
+      "rule": "Include every limited-comparability mapped sector that otherwise satisfies the same published/authorized/nonmissing rules; report this expanded result separately from the primary analysis.",
+      "source_keys": [
+        "11",
+        "48",
+        "52",
+        "81"
+      ]
+    },
+    "always_excluded": [
+      {
+        "source_or_target": "XX",
+        "reason": "BTOS unclassified multi-sector businesses have no RPS target and may not be redistributed."
+      },
+      {
+        "source_or_target": "public-administration",
+        "reason": "RPS Public Administration has no BTOS counterpart because NAICS 92 is outside the BTOS target population."
+      }
+    ],
+    "suppression_rule": "If BTOS suppresses a selected-cycle sector, retain the suppression state and exclude that sector from the correlation. Never infer, complement, interpolate, or model the suppressed value and never switch cycles to recover it.",
+    "missingness_rule": "If an authorized RPS sector observation is missing, exclude it pairwise under the fixed eligibility rule; do not substitute another RPS quarter or metric."
+  },
+  "analysis": {
+    "primary_statistic": {
+      "name": "Spearman rank correlation",
+      "symbol": "rho",
+      "reason": "The two sources use different units, denominators, and technology scope, so cross-sector ordering is more defensible as the primary descriptive object than level equality or a fitted slope.",
+      "tie_method": "average ranks",
+      "weights": "none"
+    },
+    "secondary_statistic": {
+      "name": "Pearson correlation",
+      "symbol": "r",
+      "role": "descriptive sensitivity to linear association only",
+      "weights": "none"
+    },
+    "forbidden_statistics_or_transformations_v1": [
+      "percentage-point BTOS-minus-RPS adoption gaps",
+      "identity-line error or calibration loss",
+      "employment-weighted correlation",
+      "regression interpreted as an organizational effect",
+      "causal coefficients",
+      "composite BTOS-RPS adoption scores",
+      "post-hoc sector deletion based on influence, sign, magnitude, or rank"
+    ],
+    "insufficient_n_rule": "If the primary eligible sector count is below 10, do not report either correlation as a summary association; report the preregistered analysis as insufficiently supported."
+  },
+  "uncertainty": {
+    "btos": "Preserve and display published BTOS standard errors for individual sector estimates where available.",
+    "rps": "Use only uncertainty information authorized and documented by the RPS source decision; current provider metadata does not establish a covariance matrix for the 20-industry vector.",
+    "cross_source_inference_v1": "Do not report p-values or confidence intervals for rho or r in v1. The fixed industry taxonomy is not treated as an iid random sample of sectors, and the required cross-sector/cross-source covariance structure has not been established.",
+    "future_change_rule": "Any inferential uncertainty model requires a new protocol version committed before computing that inference."
+  },
+  "reporting": {
+    "required_outputs": [
+      "eligible-sector count and exact included sector list",
+      "excluded/suppressed/missing sector list with prespecified reason",
+      "primary Spearman rho",
+      "secondary Pearson r",
+      "separately labeled limited-comparability sensitivity if support is sufficient",
+      "scatter plot with axes labeled as different constructs and no identity line",
+      "BTOS question wording/reference period and RPS metric/quarter",
+      "explicit business-versus-worker and AI-versus-GenAI mismatch statement"
+    ],
+    "interpretation_rule": "Describe the result only as descriptive cross-industry concordance or discordance between distinct measures. Do not interpret agreement as validation or causality, and do not interpret disagreement as measurement error without separate evidence.",
+    "ranking_rule": "Do not publish a one-cycle industry leaderboard from this triangulation."
+  },
+  "pre_analysis_exposure": {
+    "fully_blinded": false,
+    "disclosure": "During metadata verification on 2026-09-02, web search results inadvertently surfaced observation tables for two RPS industry series: Information and Management of Companies and Enterprises. No complete RPS industry vector was assembled, no candidate-cycle BTOS sector observations were inspected, and no cross-source statistic or ranking was computed before this protocol was registered.",
+    "exposed_rps_industries": [
+      "information",
+      "management-of-companies-and-enterprises"
+    ],
+    "governance_rule": "Do not exclude or specially treat the exposed industries because of this exposure; they remain subject to the same prespecified eligibility rules as every other sector. Describe v1 as registered with disclosed limited pre-analysis exposure, not as fully blinded."
+  },
+  "versioning": {
+    "immutable_after_values_rule": "After authorized RPS industry observations or selected-cycle BTOS sector observations are inspected, changes to period selection, metrics, sector eligibility, minimum n, statistics, weighting, suppression treatment, or interpretation rules require a new protocol version with an explicit reason. Do not overwrite v1.",
+    "execution_status_after_registration": "blocked-pending-rps-rights-and-selected-cycle-btos-reproduction"
+  },
+  "sources": {
+    "btos_construct_scope": "data/registry/btos_construct_scope_v1.json",
+    "btos_rps_crosswalk": "data/registry/btos_rps_industry_crosswalk_v1.json",
+    "btos_date_metadata_source_sha256": "0db08921d1feaf2f1ee6516a4118424183941d5460d2330a9659cacbe1046dc7",
+    "rps_provider_scope": "data/registry/rps_provider_catalog_scope.json",
+    "rps_series_manifest": "data/registry/rps_source_series_manifest.json",
+    "rps_project": "https://sites.google.com/view/covid-rps/generative-ai",
+    "rps_quarterly_cadence_source": "https://www.stlouisfed.org/on-the-economy/2025/nov/state-generative-ai-adoption-2025",
+    "rps_release_metadata": "https://fred.stlouisfed.org/release?rid=6"
+  }
+}
