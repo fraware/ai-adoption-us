@@ -4,7 +4,7 @@
   "protocol_registry": "data/registry/btos_rps_comparison_protocol_v1.json",
   "protocol_canonical_commit": "854db8d637e5f7896ef2f779692d9451d8971e55",
   "updated_date": "2026-09-02",
-  "status": "cross-source-analysis-executed-review-gated",
+  "status": "cross-source-analysis-executed",
   "period_resolution": {
     "rps_target_period": "Q2 2026",
     "rps_named_wave_month": "2026-05",
@@ -60,8 +60,10 @@
   "governance": {
     "protocol_v1_modified_after_outcome_inspection": false,
     "analysis_was_executed_after_protocol_became_canonical": true,
-    "artifact_is_canonical_only_after_reviewed_merge": true,
-    "next_permitted_step": "Validate the deterministic reproduction and source/provenance contracts, then integrate the derived result into the public product with explicit construct-mismatch language.",
+    "canonicality_is_commit_scoped": true,
+    "canonicality_rule": "This execution state and its derived artifact are canonical only when present on main at a reviewed commit whose required CI checks passed.",
+    "public_product_release_is_separate": true,
+    "next_permitted_step": "Integrate the derived result into the public product only after this execution state is canonical under the rule above, retaining explicit construct-mismatch language.",
     "no_claim": "The reported correlations are descriptive sector-level concordance between non-equivalent business- and worker-level measures. They are not causal effects, calibration, productivity estimates, or evidence that the constructs are interchangeable."
   }
 }
