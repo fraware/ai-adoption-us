@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "decision_id": "cps-design-variance-path-2026-09-03",
+  "decision_status": "PUBLIC_FULL_DESIGN_COVARIANCE_UNSUPPORTED",
+  "reviewed_at": "2026-09-03",
+  "issue": 14,
+  "target": {
+    "estimand": "industry-specific occupation composition vector",
+    "occupation_dimension": 22,
+    "quarter_month_count": 3,
+    "pooling": "equal-month pooling of Basic Monthly CPS weighted occupation levels before share normalization",
+    "required_output": "design-valid covariance for pooled occupation shares"
+  },
+  "official_method_evidence": {
+    "direct_variance_method": {
+      "method": "successive-difference replication",
+      "replicate_count": 160,
+      "rotation_group_in_replication_sort": true,
+      "rotation_group_variance_and_covariance_supported_in_internal_method": true,
+      "source": "https://www2.census.gov/programs-surveys/cps/methodology/CPS-Tech-Paper-77.pdf",
+      "evidence_scope": "CPS design and internal variance-estimation methodology"
+    },
+    "rotation_overlap": {
+      "pattern": "4-8-4",
+      "consecutive_month_sample_unit_overlap_fraction": 0.75,
+      "same_month_consecutive_year_sample_unit_overlap_fraction": 0.5,
+      "source": "https://www2.census.gov/programs-surveys/cps/methodology/CPS-Tech-Paper-77.pdf"
+    },
+    "gvf": {
+      "monthly_parameters_available": true,
+      "period_and_change_factors_available": true,
+      "period_factor_basis": "historical correlations with an equal-monthly-variance approximation",
+      "borrowing_requires_approximately_similar_design_effects": true,
+      "source": "https://www.bls.gov/cps/methods/calculating-standard-errors-and-confidence-intervals.pdf"
+    }
+  },
+  "public_variance_path": {
+    "basic_monthly_public_replicate_system_identified": false,
+    "evidence_statement": "No general-purpose Basic Monthly public replicate-weight product was identified in the official Census/BLS public materials reviewed on 2026-09-03. Census separately advertises replicate weights, when available, for CPS supplement data collections. This is a reviewed-public-materials statement, not a claim that no restricted or agency-provided path can exist.",
+    "census_dataset_index": "https://www.census.gov/programs-surveys/cps/data/datasets.html",
+    "bls_public_use_page": "https://www.bls.gov/cps/data/public-use-file.htm",
+    "gvf_scalar_or_marginal_approximation_available": true,
+    "gvf_full_composition_covariance_identified": false,
+    "research_access_candidate_status": "NOT_VERIFIED_FOR_REQUIRED_REPLICATE_OR_COVARIANCE_INPUTS",
+    "research_access_reference": "https://www.census.gov/topics/research/guidance/restricted-use-microdata.html"
+  },
+  "identifiability": {
+    "symmetric_parameter_count": 253,
+    "simplex_constraint_count": 22,
+    "parameters_after_simplex_constraint": 231,
+    "marginal_variance_count": 22,
+    "unidentified_parameters_after_marginals": 209,
+    "reason": "Twenty-two marginal variances plus the composition sum-to-one constraint do not determine the off-diagonal covariance structure. Scalar GVF period factors do not supply the missing cross-occupation covariances."
+  },
+  "quarter_pooling": {
+    "required_month_level_dimension": 66,
+    "requires_cross_month_covariance_blocks": true,
+    "independent_month_assumption_allowed": false,
+    "gvf_quarter_factor_interpretation": "approximate standard error for a specified scalar series or percentage under the applicable PF row; not a 66-by-66 month-occupation covariance block"
+  },
+  "publication": {
+    "design_based_composition_interval_allowed": false,
+    "pooled_quarter_design_based_interval_allowed": false,
+    "occupation_adjusted_rps_residual_interval_allowed": false,
+    "gvf_marginal_benchmark_allowed": true,
+    "descriptive_reliability_diagnostics_retained": true
+  },
+  "resolution_requirements": [
+    "Authoritative Basic Monthly replicate weights or replicate estimates sufficient to reproduce the relevant SDR covariance",
+    "or an agency-supported direct covariance method for arbitrary Basic Monthly industry-by-occupation domains",
+    "or official domain-specific covariance/design-effect guidance that identifies both cross-occupation and cross-month dependence",
+    "then same-vintage validation against official CPS estimates before publication use"
+  ]
+}
