@@ -1,65 +1,75 @@
-# Manual RPS authorized source probe
+# RPS live-source validation
 
-Status: **D-G1 operational tranche — manual live-source evidence path; D-G1 remains open**
+Status: **D-G1 live validation path — automatically exercised on relevant `main` changes; non-promoting**
 
 Date: 2026-09-02
 
 ## Purpose
 
-`.github/workflows/rps-source-probe.yml` provides a deliberately manual execution path for the authorized published-aggregate RPS/FRED source pipeline.
+`.github/workflows/rps-live-validation.yml` is the repository's canonical live-source validation path for the authorized published-aggregate RPS/FRED feed.
 
-Its purpose is to answer a narrow operational question before any schedule or publication workflow is introduced: **does the current live provider state satisfy the registered 137-series provider contract, the 131-series observatory scope, the current definition/rights checks, and the deterministic RPS candidate build?**
+It replaces the earlier manual-only `rps-source-probe.yml`. The prior file was present in the repository but was not reliably surfaced as a runnable workflow in the GitHub Actions UI, so the project no longer depends on an operator finding or manually dispatching it.
 
-The probe is not a release job. It cannot promote an observatory release and does not publish source observation bytes.
+The live-validation workflow answers a narrower, auditable question: **can the current live provider state be retrieved with the authorized credential, satisfy the exact 137-series provider inventory / 131-series observatory contract, pass rights and construct checks, rehearse immutable private-vintage storage, and produce the deterministic derived RPS observatory component?**
 
-## Trigger and permissions
+It is not a publication or promotion job.
 
-The workflow has only `workflow_dispatch` as a trigger. It has no `push`, `pull_request`, or scheduled trigger.
+## Trigger
 
-Repository permissions are restricted to:
+The workflow runs automatically on pushes to `main` when the live-source contract itself changes, including the workflow file, the RPS retrieval/release/archive modules, operator commands, and registered source manifests. The workflow also retains a `workflow_dispatch` trigger as an optional operator convenience, but D-G1 no longer depends on manual dispatch for validation.
+
+The first merge that adds this workflow therefore constitutes an automatic live execution attempt on the exact merged code, assuming the configured repository secret is available.
+
+No periodic schedule is enabled here. Periodic source-check activation remains governed separately by `data/registry/rps_refresh_policy.json`.
+
+## Permissions and credential contract
+
+Repository permissions remain restricted to:
 
 ```yaml
 permissions:
   contents: read
 ```
 
-This is intentional. D-G1 has not yet pinned a production source-check cadence, so the repository must not begin periodic source retrieval merely because the probe exists.
+The workflow requires the repository Actions secret:
 
-## Credential contract
+`FRED_API_KEY`
 
-The workflow requires the repository secret `FRED_API_KEY`.
+The credential is supplied only to the validation job environment. Absence of the secret fails explicitly before source retrieval. There is no HTML-scraping or manual-copy fallback.
 
-The secret is supplied only to the probe job environment and is consumed by the existing `prepare_rps_refresh_candidate.py` API path. If the secret is absent, the workflow fails before source retrieval with an explicit credential error.
+A successful workflow run is evidence that the credential path was operational for that run. Merely having the workflow file or secret configuration is not treated as successful live retrieval.
 
-The workflow does not contain an HTML-scraping or manual-copy fallback.
+## Live transaction
 
-The existence of this workflow does not establish that the secret is currently configured. A successful dispatched run is required evidence that the credential path is operational.
+The workflow performs four ordered stages on one runner:
 
-## Transient source-byte boundary
+1. retrieve and validate the live RPS aggregate source into `/tmp/rps-refresh`;
+2. rehearse the immutable private-vintage archive contract under `/tmp/rps-private-vintage`;
+3. build the non-promoting RPS observatory component under `/tmp/rps-observatory`;
+4. assemble and upload only rights-safe review evidence.
 
-The live refresh writes its private snapshot under the runner's temporary filesystem:
+The archive rehearsal verifies the exact-byte package, scientific content identity, private rights boundary, immutable namespace, and archive implementation. The rehearsal root is intentionally transient and therefore does **not** claim durable production archival.
 
-```text
-/tmp/rps-refresh/
-```
+## Source-byte boundary
 
-The release-component build writes its private candidate package under:
+Raw/source observation material remains on the runner temporary filesystem. The retained GitHub Actions artifact deliberately excludes:
 
-```text
-/tmp/rps-observatory/
-```
+- `rps_source_snapshot.json`;
+- `rps_refresh_diff.json`;
+- all release `inputs/` objects;
+- any copied raw/source observation bundle.
 
-Those locations are outside the checked-out public repository.
-
-The temporary source materials include source observations and release `inputs/`. They exist only for the duration of the job and are not copied into the retained Actions artifact.
+No source observation file is written into the checked-out public repository.
 
 ## Retained evidence
 
-The workflow retains a 14-day GitHub Actions artifact containing only review-safe evidence:
+The 14-day rights-safe Actions artifact contains:
 
 ```text
-rps-probe-evidence/
+rps-live-validation-evidence/
+  live-validation-summary.json
   source-candidate-summary.json
+  private-vintage-manifest.json
   rps-component-release.json
   observatory-artifacts/
     longitudinal_diagnostics.json
@@ -68,78 +78,47 @@ rps-probe-evidence/
     validation_checks.json
 ```
 
-The artifact deliberately excludes:
+`live-validation-summary.json` records run identity, source scientific hash, exact private snapshot-file hash, inventory and observation counts, source revision status, archive-rehearsal result, candidate-build result, and explicit non-promotion / no-raw-publication flags.
 
-- `rps_source_snapshot.json`;
-- `rps_refresh_diff.json`;
-- every release `inputs/` object;
-- any copied raw/source observation bundle.
+`private-vintage-manifest.json` contains hashes and provenance only; the exact archived source bytes remain transient in this workflow.
 
-The source-candidate summary retains the scientific source-content hash, private snapshot-file hash, inventory counts, observation count, retrieval timestamp, and change-count summary without carrying the source observation rows.
+## Rights and release safeguards
 
-The component release manifest retains source-object sizes and SHA-256 identities, source vintage identity, definition/taxonomy identity, derived artifact hashes, diagnostics, and claim traceability while declaring `data_mode = derived_only` and `source_input_bytes_publication = false`.
+Before artifact upload, the workflow verifies that:
 
-The derived longitudinal artifacts are within the already approved derived-aggregate publication scope.
+- `public_raw_observations_included = false`;
+- `source_input_bytes_publication = false`;
+- the component remains `data_mode = derived_only`;
+- the archive manifest remains `public_archive = false`;
+- archive and source-summary scientific content hashes agree;
+- no source snapshot, detailed diff, or `inputs/` tree entered the retained evidence directory.
 
-## Why the detailed refresh diff is excluded
+The workflow never invokes `scripts/observatory_release.py`, never stages a global release automatically, and never promotes a release.
 
-A revision diff may contain old and new source values for changed cells. The manual probe does not need to redistribute those values through a public-repository Actions artifact to establish whether a source change occurred.
+## Result categories
 
-The retained summary carries change counts and cryptographic identities. Detailed cell-level inspection remains part of a private source-review execution path.
+A run can end in:
 
-## Candidate construction inside the probe
+1. **credential failure** — the configured secret is unavailable or invalid;
+2. **transport/source-contract failure** — the official API request, provider inventory, identity, rights, definition, period, value, or coverage contract fails;
+3. **archive-contract failure** — the current source cannot pass exact-byte private-vintage packaging/verification;
+4. **candidate-build failure** — retrieval succeeds but deterministic derived component construction or diagnostics fail;
+5. **successful live validation** — the current source satisfies all implemented source/archive/component contracts and rights-safe evidence is retained.
 
-After live retrieval, the workflow immediately executes `prepare_rps_observatory_candidate.py` against the exact transient source snapshot. This verifies that the current source state can pass the source-to-derived transformation contract on the same runner.
+Only the fifth outcome establishes that the live feed worked on that exact Git commit. Even then, it does not establish durable private storage, a complete global observatory baseline, or publication approval.
 
-Candidate construction remains non-promoting. The generated release ID is a run-scoped probe slug:
+## Periodic source checking
 
-`rps-probe-<GitHub run ID>`
+The operational cadence is defined separately in `data/registry/rps_refresh_policy.json` as weekly Wednesday 18:00 UTC checking, with activation fail-closed until the required production gates are satisfied. Source checking and publication remain separate decisions: unchanged checks do not generate releases, while changed source states require archive/build/review and remain non-promoting until the normal reviewed release controls pass.
 
-The workflow does not invoke `scripts/observatory_release.py`.
+## Durable archive boundary
 
-## Evidence checks before artifact upload
+`src/genai_at_work/private_vintage.py` and `scripts/archive_rps_private_vintage.py` define the durable private-vintage package contract, but the repository does not silently choose a storage vendor. This workflow rehearses that contract only on runner-local temporary storage.
 
-Before uploading evidence, the workflow checks that:
+Production durable archival still requires an operator-controlled private filesystem/object-store mount or a future adapter implementing the same create-only and verification semantics. Public GitHub Actions artifacts are not used as the durable raw-source vault.
 
-- no source snapshot was copied into the evidence directory;
-- no `inputs/` directory exists in the evidence directory;
-- no detailed refresh diff was copied into the evidence directory;
-- the source-candidate summary says `public_raw_observations_included = false`;
-- the component manifest says `source_input_bytes_publication = false`;
-- the component manifest remains `data_mode = derived_only`.
+## D-G1 completion interpretation
 
-Failure of any check prevents a successful probe artifact.
+Repository engineering is considered complete when the live workflow, source contracts, archive contract, cadence policy, candidate generation, regression tests, and reviewed release handoff are all implemented and green. A successful automatic live run supplies the missing runtime evidence for the configured FRED path.
 
-## Execution result categories
-
-A dispatched run has four materially different outcomes:
-
-1. **credential failure** — `FRED_API_KEY` is unavailable; no source claim follows;
-2. **source-contract failure** — provider inventory, identity, rights, definition, period, value, or coverage checks fail; the source must not advance;
-3. **candidate-build failure** — retrieval succeeds but deterministic RPS release-component validation or diagnostics fail; the source must not advance;
-4. **successful probe** — the current source state satisfies the implemented source and component contracts and a rights-safe evidence artifact is retained.
-
-A successful probe still does not authorize publication or establish a global observatory baseline.
-
-## What this probe does not solve
-
-The public repository does not currently provide a durable private source-byte archive suitable for later release staging. The Actions artifact intentionally omits those bytes.
-
-Consequently, this manual probe is evidence of live source compatibility, not the durable private-vintage store required for a future production release system. A production refresh that must later be staged without re-fetching needs an explicitly approved private storage mechanism or another reproducible source-vintage strategy.
-
-The probe also does not yet compare against a durable previous private source snapshot, so it cannot by itself provide the full cell-level historical revision audit required for recurring production updates.
-
-## Remaining D-G1 sequence
-
-After this workflow is merged:
-
-1. confirm whether the `FRED_API_KEY` repository secret is configured;
-2. dispatch the probe and inspect the actual live source evidence;
-3. record the observed provider inventory, current source vintage hash, periods, definition/taxonomy hashes, diagnostic state, and derived artifact hashes;
-4. resolve any provider or definition drift before proceeding;
-5. choose the durable private-vintage storage/retrieval mechanism needed for recurring historical revision comparisons;
-6. pin source-check cadence and release-date handling only after the live source behavior is observed;
-7. compose and review the first complete global observatory baseline before any promotion;
-8. rehearse a subsequent wave/revision against a frozen baseline.
-
-D-G1 remains open until the production feed is reproducibly executable with retained provenance and the reviewed release controls are exercised end to end.
+No claim of successful live retrieval is made until an actual `RPS live validation` run completes successfully and its rights-safe evidence has been inspected.
