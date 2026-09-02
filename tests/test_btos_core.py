@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from io import BytesIO
 from pathlib import Path
-from zipfile import ZipFile
 from xml.sax.saxutils import escape
+from zipfile import ZipFile
 
 from genai_at_work.btos_core import (
     extract_cycle_dates,
