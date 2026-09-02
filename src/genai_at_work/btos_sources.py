@@ -101,7 +101,7 @@ def download_btos_workbook(source_key: str, *, timeout_seconds: float = 60.0) ->
         source_url,
         headers={"User-Agent": "ai-adoption-us-source-probe/1.0 (+public statistical reproducibility)"},
     )
-    with urlopen(request, timeout=timeout_seconds) as response:  # noqa: S310 - fixed HTTPS allowlist
+    with urlopen(request, timeout=timeout_seconds) as response:
         final_url = response.geturl()
         _validate_census_url(final_url)
         content_type = response.headers.get_content_type()
