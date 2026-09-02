@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - research/cps-ln-se-benchmark
+      - research/cps-ln-se-content-identity
     paths:
       - '.github/workflows/cps-ln-se-benchmark.yml'
       - 'scripts/execute_cps_ln_se_benchmark.py'
