@@ -9,6 +9,7 @@ on:
       - 'scripts/prepare_rps_observatory_candidate.py'
       - 'scripts/archive_rps_private_vintage.py'
       - 'scripts/build_composition_residuals.py'
+      - 'scripts/build_oews_rps_adoption_robustness.py'
       - 'scripts/report_rps_period_topology.py'
       - 'src/genai_at_work/rps_refresh.py'
       - 'src/genai_at_work/rps_release.py'
@@ -16,12 +17,17 @@ on:
       - 'src/genai_at_work/private_vintage.py'
       - 'src/genai_at_work/composition.py'
       - 'src/genai_at_work/composition_snapshot.py'
+      - 'src/genai_at_work/oews.py'
+      - 'src/genai_at_work/oews_partial.py'
+      - 'src/genai_at_work/oews_rps.py'
       - 'src/genai_at_work/sources/fred.py'
       - 'data/registry/rps_source_series_manifest.json'
       - 'data/registry/rps_provider_catalog_scope.json'
+      - 'data/registry/oews_occupation_crosswalk_v1.json'
       - 'data/derived/composition/cps-q2-2025/cps_composition.json'
       - 'data/derived/composition/cps-q2-2026/cps_composition.json'
       - 'data/derived/composition/composition-evidence-v1/industry_evidence_tiers.json'
+      - 'data/derived/composition/oews-may-2025/oews_composition.json'
   workflow_dispatch:
 
 permissions:
@@ -92,17 +98,34 @@ jobs:
           --evidence-tiers data/derived/composition/composition-evidence-v1/industry_evidence_tiers.json
           --output-dir /tmp/rps-composition
 
+      - name: Build independent OEWS-weighted RPS adoption robustness
+        run: >-
+          PYTHONPATH=src python scripts/build_oews_rps_adoption_robustness.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+          --canonical-manifest data/registry/rps_source_series_manifest.json
+          --provider-scope data/registry/rps_provider_catalog_scope.json
+          --oews-composition data/derived/composition/oews-may-2025/oews_composition.json
+          --occupation-crosswalk data/registry/oews_occupation_crosswalk_v1.json
+          --cps-primary-residuals /tmp/rps-composition/primary_residuals.json
+          --period 2025-Q2
+          --period 2026-Q2
+          --output-dir /tmp/oews-rps-adoption
+
       - name: Assemble rights-safe live-validation evidence
         shell: bash
         run: |
           set -euo pipefail
           evidence="$RUNNER_TEMP/rps-live-validation-evidence"
-          mkdir -p "$evidence/observatory-artifacts" "$evidence/composition-residuals"
+          mkdir -p \
+            "$evidence/observatory-artifacts" \
+            "$evidence/composition-residuals" \
+            "$evidence/oews-rps-adoption"
 
           cp /tmp/rps-refresh/rps_refresh_candidate.json "$evidence/source-candidate-summary.json"
           cp /tmp/rps-observatory/release.json "$evidence/rps-component-release.json"
           cp -R /tmp/rps-observatory/artifacts/longitudinal/. "$evidence/observatory-artifacts/"
           cp -R /tmp/rps-composition/. "$evidence/composition-residuals/"
+          cp -R /tmp/oews-rps-adoption/. "$evidence/oews-rps-adoption/"
 
           manifest="$(find /tmp/rps-private-vintage -name private_vintage_manifest.json -type f -print -quit)"
           test -n "$manifest"
@@ -112,6 +135,7 @@ jobs:
           test ! -e "$evidence/rps_refresh_diff.json"
           test ! -d "$evidence/inputs"
           test ! -e "$evidence/composition-residuals/rps_source_snapshot.json"
+          test ! -e "$evidence/oews-rps-adoption/rps_source_snapshot.json"
 
           python - <<'PY'
           import json
@@ -131,6 +155,15 @@ jobs:
           persistence = json.loads(
               (root / "composition-residuals" / "cross_period_persistence.json").read_text()
           )
+          oews_validation = json.loads(
+              (root / "oews-rps-adoption" / "validation_checks.json").read_text()
+          )
+          oews_inputs = json.loads(
+              (root / "oews-rps-adoption" / "input_manifest.json").read_text()
+          )
+          oews_summary = json.loads(
+              (root / "oews-rps-adoption" / "summary.json").read_text()
+          )
 
           if source.get("public_raw_observations_included") is not False:
               raise SystemExit("Source summary widened raw-observation publication scope")
@@ -148,6 +181,14 @@ jobs:
               raise SystemExit("Composition residual evidence is not bound to the live source identity")
           if composition_inputs.get("public_raw_rps_observations_included") is not False:
               raise SystemExit("Composition residual evidence widened raw-source publication scope")
+          if oews_validation.get("status") not in {"pass", "pass_with_unsupported_rows"}:
+              raise SystemExit("OEWS/RPS adoption robustness validation failed")
+          if oews_inputs.get("source_content_sha256") != source.get("content_sha256"):
+              raise SystemExit("OEWS/RPS evidence is not bound to the live RPS source identity")
+          if oews_inputs.get("public_raw_rps_observations_included") is not False:
+              raise SystemExit("OEWS/RPS evidence widened raw-source publication scope")
+          if len(oews_summary) != 2:
+              raise SystemExit("OEWS/RPS evidence must summarize Q2 2025 and Q2 2026")
 
           summary = {
               "schema_version": 1,
@@ -170,6 +211,13 @@ jobs:
                   "primary_supported_row_count"
               ),
               "composition_persistence_diagnostic_rows": len(persistence),
+              "oews_rps_adoption_evidence_built": True,
+              "oews_rps_counterfactual_rows": oews_validation.get("counterfactual_row_count"),
+              "oews_rps_comparison_rows": oews_validation.get("comparison_row_count"),
+              "oews_rps_point_identified_rows": oews_validation.get("point_identified_row_count"),
+              "oews_rps_partially_identified_rows": oews_validation.get(
+                  "partially_identified_row_count"
+              ),
               "promotion_performed": False,
               "public_raw_observations_included": False,
           }
