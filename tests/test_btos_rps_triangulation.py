@@ -119,11 +119,14 @@ def test_cli_rebuilds_committed_analysis(tmp_path: Path) -> None:
 
 def test_execution_state_records_analysis_without_inferential_overclaim() -> None:
     state = _load(EXECUTION)
-    assert state["status"] == "cross-source-analysis-executed-review-gated"
+    assert state["status"] == "cross-source-analysis-executed"
     assert state["rps_execution"]["rights_gate_blocks_execution"] is False
     assert state["rps_execution"]["industry_observation_vector_retrieved"] is True
     assert state["cross_source_execution"]["statistics_computed"] is True
     assert state["cross_source_execution"]["primary_n"] == 14
     assert state["cross_source_execution"]["p_values_computed"] is False
     assert state["cross_source_execution"]["correlation_confidence_intervals_computed"] is False
+    assert state["governance"]["canonicality_is_commit_scoped"] is True
+    assert "reviewed commit" in state["governance"]["canonicality_rule"]
+    assert state["governance"]["public_product_release_is_separate"] is True
     assert state["governance"]["protocol_v1_modified_after_outcome_inspection"] is False
