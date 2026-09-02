@@ -65,5 +65,7 @@
     "Do not interpret either measure as productivity.",
     "Do not report p-values or correlation confidence intervals without an approved survey-covariance design."
   ],
-  "public_product_status": "derived-analysis-ready-for-review"
+  "public_product_status": "published",
+  "public_product_route": "/explore/industries",
+  "publication_validated_commit": "75b94550be97c2e500db6c7b796330d0d8e90c40"
 }
