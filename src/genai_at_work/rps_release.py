@@ -24,9 +24,9 @@ from pathlib import Path
 from typing import Any
 
 from genai_at_work.longitudinal import (
-    AuditRecord,
     METRIC_MAP,
     REQUIRED_ENTITY_COUNTS,
+    AuditRecord,
     quarter_diagnostic,
     ranks,
     spearman,
@@ -175,10 +175,10 @@ def snapshot_content_sha256(snapshot: Mapping[str, Any]) -> str:
 
     series = _rows(snapshot.get("series"), context="snapshot.series")
     excluded = _rows(snapshot.get("excluded_series"), context="snapshot.excluded_series")
-    stable_series = sorted(
-        (_stable_snapshot_series(row) for row in series),
-        key=lambda row: str(row.get("series_id")),
-    )
+    stable_series = [
+        _stable_snapshot_series(row)
+        for row in sorted(series, key=lambda item: str(item.get("series_id")))
+    ]
     included_ids = {str(row.get("series_id")) for row in series}
     excluded_ids = {str(row.get("series_id")) for row in excluded}
     provider_series_ids = sorted(included_ids | excluded_ids)
@@ -415,7 +415,9 @@ def prepare_rps_panel(
                 )
         period_sets[series_id] = seen_periods
 
-    distinct_period_sets = {tuple(sorted(values, key=_period_key)) for values in period_sets.values()}
+    distinct_period_sets = {
+        tuple(sorted(values, key=_period_key)) for values in period_sets.values()
+    }
     if len(distinct_period_sets) != 1:
         raise RpsReleaseError(
             "RPS canonical series do not share one complete quarterly period set"
@@ -470,10 +472,7 @@ def prepare_rps_panel(
 
     return PreparedRpsPanel(
         periods=periods,
-        period_rows={
-            period: tuple(period_rows[period])
-            for period in periods
-        },
+        period_rows={period: tuple(period_rows[period]) for period in periods},
         subgroup_records=tuple(subgroup_records),
         definition_id=f"sha256:{definition_digest}",
         taxonomy_version=f"sha256:{manifest_digest}",
@@ -495,7 +494,8 @@ def _rank_vector(
     if metric_id is None:
         raise RpsReleaseError(f"Unsupported rank-stability metric: {metric}")
     rows = [
-        row for row in records
+        row
+        for row in records
         if row.entity_type == entity_type
         and row.period == period
         and row.metric_id == metric_id
@@ -515,8 +515,7 @@ def _rank_stability_detail(
     periods: Sequence[str],
 ) -> dict[str, object]:
     rank_by_period = {
-        period: _rank_vector(records, entity_type, period, metric)
-        for period in periods
+        period: _rank_vector(records, entity_type, period, metric) for period in periods
     }
     pairs = [
         (periods[left], periods[right])
@@ -524,8 +523,7 @@ def _rank_stability_detail(
         for right in range(left + 1, len(periods))
     ]
     pairwise = [
-        spearman(rank_by_period[first], rank_by_period[second])
-        for first, second in pairs
+        spearman(rank_by_period[first], rank_by_period[second]) for first, second in pairs
     ]
     consecutive = [
         [
@@ -607,8 +605,7 @@ def _rank_stability_dominance(
 
 
 def _quarter_rows(
-    records: Sequence[AuditRecord],
-    periods: Sequence[str],
+    records: Sequence[AuditRecord], periods: Sequence[str]
 ) -> list[dict[str, Any]]:
     return [
         dict(quarter_diagnostic(records, entity_type, period))
@@ -735,9 +732,7 @@ def build_longitudinal_artifacts(
         for record in records
     }
     expected_subgroup = (
-        sum(REQUIRED_ENTITY_COUNTS.values())
-        * len(SUBGROUP_METRICS)
-        * len(periods)
+        sum(REQUIRED_ENTITY_COUNTS.values()) * len(SUBGROUP_METRICS) * len(periods)
     )
     validation_checks = {
         "canonical_series_count": panel.series_count == 131,
@@ -771,8 +766,7 @@ def build_longitudinal_artifacts(
         "subgroup_observation_count": len(records) == expected_subgroup,
         "unique_subgroup_keys": len(unique_keys) == len(records),
         "values_finite_0_100": all(
-            isfinite(record.value) and 0.0 <= record.value <= 100.0
-            for record in records
+            isfinite(record.value) and 0.0 <= record.value <= 100.0 for record in records
         ),
     }
     validation = {
@@ -913,10 +907,7 @@ def _diagnostic_manifest(
             {
                 "entity_type": row.get("entity_type"),
                 "period": row.get("period"),
-                **{
-                    field: row.get(field)
-                    for field in (*correlation_fields, *r2_fields)
-                },
+                **{field: row.get(field) for field in (*correlation_fields, *r2_fields)},
                 "increment_H_given_A": row.get("increment_H_given_A"),
                 "increment_A_given_H": row.get("increment_A_given_H"),
             }
@@ -1042,7 +1033,9 @@ def _release_type(
         != row.get("sha256")
         for row in artifacts
     )
-    if changed or set(previous_artifacts) != {str(row["artifact_id"]) for row in artifacts}:
+    if changed or set(previous_artifacts) != {
+        str(row["artifact_id"]) for row in artifacts
+    }:
         return "revision"
     return "revision"
 
@@ -1055,10 +1048,7 @@ def _claim_rows(
 ) -> list[dict[str, Any]]:
     claims = _rows(claim_inventory.get("claims"), context="claim_inventory.claims")
     artifact_ids = [str(row["artifact_id"]) for row in artifacts]
-    artifact_hashes = {
-        str(row["artifact_id"]): str(row["sha256"])
-        for row in artifacts
-    }
+    artifact_hashes = {str(row["artifact_id"]): str(row["sha256"]) for row in artifacts}
     period_summary = f"{len(periods)} complete quarterly waves through {periods[-1]}"
     output: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -1117,7 +1107,9 @@ def build_rps_release_candidate(
     """Build a private RPS release candidate package without staging or promotion."""
 
     if not re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", builder_commit):
-        raise RpsReleaseError("builder_commit must be a 40- or 64-character hexadecimal commit")
+        raise RpsReleaseError(
+            "builder_commit must be a 40- or 64-character hexadecimal commit"
+        )
     if not release_id or re.fullmatch(r"[a-z0-9][a-z0-9._-]{0,127}", release_id) is None:
         raise RpsReleaseError("release_id must be a lowercase release slug")
     if output_dir.exists() and any(output_dir.iterdir()):
@@ -1127,9 +1119,7 @@ def build_rps_release_candidate(
     panel = prepare_rps_panel(snapshot, canonical_manifest, provider_scope)
     source_id = _required_string(snapshot, "source_id", context="snapshot")
     source_content_sha = _required_string(snapshot, "content_sha256", context="snapshot")
-    provider_release_id = _required_int(
-        snapshot, "provider_release_id", context="snapshot"
-    )
+    provider_release_id = _required_int(snapshot, "provider_release_id", context="snapshot")
 
     source_objects: list[dict[str, Any]] = []
     input_hashes: dict[str, str] = {}
@@ -1199,11 +1189,7 @@ def build_rps_release_candidate(
         else:
             assert isinstance(payload, list)
             assert fieldnames is not None
-            sha256, size = _write_csv(
-                path,
-                payload,
-                fieldnames=fieldnames,
-            )
+            sha256, size = _write_csv(path, payload, fieldnames=fieldnames)
         artifacts.append(
             {
                 "artifact_id": artifact_id,
