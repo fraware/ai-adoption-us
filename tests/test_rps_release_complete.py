@@ -39,15 +39,21 @@ def _value(row: dict[str, Any], period_index: int) -> float:
     entity_index = int(row["entity_index"])
     metric = str(row["metric_id"])
     if row["entity_type"] == "national":
-        return 20.0 + list(
-            ("adoption_work", "work_use_last_week", "work_use_daily", "assisted_hours_share", "reported_time_savings_share")
-        ).index(metric) * 3.0 + period_index * 0.2
-    metric_offset = {
-        "adoption_work": 0.0,
-        "assisted_hours_share": 4.0,
-        "reported_time_savings_share": 8.0,
-    }[metric]
-    return 8.0 + metric_offset + entity_index * 0.7 + (entity_index % 4) * 0.25 + period_index * 0.3
+        metric_index = (
+            "adoption_work",
+            "work_use_last_week",
+            "work_use_daily",
+            "assisted_hours_share",
+            "reported_time_savings_share",
+        ).index(metric)
+        return 20.0 + metric_index * 3.0 + period_index * 0.2
+    if metric == "adoption_work":
+        return 10.0 + 0.82 * entity_index + 0.65 * (entity_index % 2) + period_index * 0.4
+    if metric == "assisted_hours_share":
+        return 7.0 + 0.49 * entity_index + 1.15 * (entity_index % 3) + period_index * 0.25
+    if metric == "reported_time_savings_share":
+        return 5.0 + 0.36 * entity_index + 0.85 * (entity_index % 5) + period_index * 0.45
+    raise AssertionError(f"Unexpected subgroup metric: {metric}")
 
 
 def _snapshot(
@@ -190,7 +196,9 @@ def test_complete_history_candidate_hash_binds_national_only_periods(tmp_path: P
     ]
     assert source["coverage"]["required_units"] == 131 * len(SUBGROUP_PERIODS)
     assert source["coverage"]["observed_units"] == 131 * len(SUBGROUP_PERIODS)
-    assert source["coverage"]["full_source_observed_units"] == 5 * len(NATIONAL_PERIODS) + 126 * len(SUBGROUP_PERIODS)
+    assert source["coverage"]["full_source_observed_units"] == (
+        5 * len(NATIONAL_PERIODS) + 126 * len(SUBGROUP_PERIODS)
+    )
     assert candidate["source_input_bytes_publication"] is False
 
 
@@ -206,8 +214,12 @@ def test_subgroup_new_wave_adds_one_object_and_preserves_old_history(tmp_path: P
         previous_release=baseline,
     )
     validate_release_manifest(current, tmp_path / "new")
-    old_objects = {row["object_id"]: row["sha256"] for row in baseline["sources"][0]["objects"]}
-    new_objects = {row["object_id"]: row["sha256"] for row in current["sources"][0]["objects"]}
+    old_objects = {
+        row["object_id"]: row["sha256"] for row in baseline["sources"][0]["objects"]
+    }
+    new_objects = {
+        row["object_id"]: row["sha256"] for row in current["sources"][0]["objects"]
+    }
     for period in NATIONAL_PERIODS:
         assert new_objects[period.lower()] == old_objects[period.lower()]
     assert "2026-q3" in new_objects
@@ -215,7 +227,9 @@ def test_subgroup_new_wave_adds_one_object_and_preserves_old_history(tmp_path: P
     assert current["sources"][0]["analysis_reference_periods"][-1] == "2026-Q3"
 
 
-def test_national_only_history_revision_is_detected_even_when_analytics_are_unchanged(tmp_path: Path) -> None:
+def test_national_only_history_revision_is_detected_even_when_analytics_are_unchanged(
+    tmp_path: Path,
+) -> None:
     baseline = _build(tmp_path / "baseline", _snapshot())
     revised = _snapshot()
     national = next(row for row in revised["series"] if row["entity_type"] == "national")
