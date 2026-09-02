@@ -60,9 +60,10 @@ test.describe("Release 1 rendered browser QA", () => {
         `Page-level horizontal overflow on ${route.path}: ${JSON.stringify(pageOverflow)}`,
       ).toBeLessThanOrEqual(pageOverflow.clientWidth + 1);
 
-      const tableCount = await page.locator("table").count();
+      const visibleTables = page.locator("table:visible");
+      const tableCount = await visibleTables.count();
       for (let index = 0; index < tableCount; index += 1) {
-        const table = page.locator("table").nth(index);
+        const table = visibleTables.nth(index);
         await expect(table).toBeVisible();
         await expect(table.locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' table-wrap ')][1]")).toHaveCount(1);
       }
@@ -113,4 +114,39 @@ test.describe("Release 1 rendered browser QA", () => {
       expect(consoleErrors, `Console errors on ${route.path}`).toEqual([]);
     });
   }
+
+  test("industries: canonical BTOS-RPS triangulation is explicit and inspectable", async ({ page }) => {
+    const response = await page.goto("/explore/industries", { waitUntil: "networkidle" });
+    expect(response?.ok()).toBeTruthy();
+
+    const section = page.locator('section[aria-labelledby="cross-source-triangulation"]');
+    await expect(section).toBeVisible();
+    await expect(section.getByRole("heading", { name: "Two different measures, one sector pattern" })).toBeVisible();
+    await expect(section.locator(".metric").filter({ hasText: "Primary sectors" }).locator("strong")).toHaveText("14");
+    await expect(section.locator(".metric").filter({ hasText: "Spearman rank correlation" }).locator("strong")).toHaveText("0.704");
+    await expect(section.locator(".metric").filter({ hasText: "Pearson correlation" }).locator("strong")).toHaveText("0.797");
+
+    const boundary = section.locator("#btos-rps-measurement-boundary");
+    await expect(boundary).toContainText("responding employer businesses");
+    await expect(boundary).toContainText("employed adults");
+    await expect(boundary).toContainText("not percentage-point gaps");
+    await expect(boundary).toContainText("not");
+    await expect(boundary).toContainText("causal effects");
+
+    await expect(
+      section.locator('figure[aria-label="RPS worker GenAI adoption (%) versus BTOS business AI use (%)"]'),
+    ).toBeVisible();
+
+    const dataDetails = section.locator("details.data-details");
+    await expect(dataDetails).toHaveCount(1);
+    await dataDetails.locator("summary").click();
+    await expect(dataDetails.locator("table")).toBeVisible();
+    await expect(dataDetails.locator("tbody tr")).toHaveCount(14);
+
+    const sensitivity = section.locator(".comparison-card").filter({ hasText: "Expanded sensitivity" });
+    await expect(sensitivity).toContainText("17");
+    await expect(sensitivity).toContainText("0.815");
+    await expect(sensitivity).toContainText("0.850");
+    await expect(sensitivity).toContainText("limited-comparability sectors");
+  });
 });
