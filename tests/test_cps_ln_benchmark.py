@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import gzip
-import json
 from pathlib import Path
 
 import pytest
@@ -37,7 +36,7 @@ def _fixed_width_record(**values: str) -> str:
 
 
 def _raw_weight(persons: float) -> str:
-    return str(int(round(persons * 10_000))).rjust(10, "0")
+    return str(round(persons * 10_000)).rjust(10, "0")
 
 
 def _api_payload(*, with_aspects: bool = True) -> dict[str, object]:
