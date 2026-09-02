@@ -27,22 +27,21 @@ def test_crosswalk_uses_exact_canonical_rps20_entities() -> None:
     ]
 
 
-def test_btos_sector_codes_are_unique_and_complete_for_in_scope_sector_set() -> None:
-    entries = _load(BTOS)["entries"]
+def test_btos_sector_codes_are_exact_source_file_keys() -> None:
+    registry = _load(BTOS)
+    entries = registry["entries"]
     mapped = [row for row in entries if row["mapping_status"] == "mapped"]
     codes = [row["btos_sector_code"] for row in mapped]
 
-    assert len(mapped) == 19
-    assert len(codes) == len(set(codes))
-    assert set(codes) == {
+    expected = {
         "11",
         "21",
         "22",
         "23",
-        "31-33",
+        "31",
         "42",
-        "44-45",
-        "48-49",
+        "44",
+        "48",
         "51",
         "52",
         "53",
@@ -55,6 +54,32 @@ def test_btos_sector_codes_are_unique_and_complete_for_in_scope_sector_set() -> 
         "72",
         "81",
     }
+    assert len(mapped) == 19
+    assert len(codes) == len(set(codes))
+    assert set(codes) == expected
+
+    contract = registry["source_key_contract"]
+    assert contract["source_file"] == "Sector.xlsx"
+    assert contract["source_sha256"] == (
+        "d4e4ef99e958c66bc8b044489e36a6468f93307a1b8216f96e92dbdba8a44e78"
+    )
+    assert set(contract["observed_sector_keys"]) == expected | {"XX"}
+    assert "exact value stored" in contract["rule"]
+
+
+def test_naics_span_labels_are_not_source_join_keys() -> None:
+    entries = _load(BTOS)["entries"]
+    by_entity = {row["entity_id"]: row for row in entries}
+
+    assert by_entity["manufacturing"]["btos_sector_code"] == "31"
+    assert by_entity["manufacturing"]["naics_sector_span"] == "31-33"
+    assert by_entity["retail-trade"]["btos_sector_code"] == "44"
+    assert by_entity["retail-trade"]["naics_sector_span"] == "44-45"
+    assert by_entity["transportation-and-warehousing"]["btos_sector_code"] == "48"
+    assert by_entity["transportation-and-warehousing"]["naics_sector_span"] == "48-49"
+
+    rules = " ".join(_load(BTOS)["required_use_rules"])
+    assert "do not join on naics_sector_span" in rules
 
 
 def test_public_administration_has_no_btos_counterpart() -> None:
@@ -63,6 +88,7 @@ def test_public_administration_has_no_btos_counterpart() -> None:
 
     assert public_admin["entity_index"] == 20
     assert public_admin["btos_sector_code"] is None
+    assert public_admin["naics_sector_span"] == "92"
     assert public_admin["mapping_status"] == "unsupported"
     assert public_admin["comparability"] == "excluded"
     assert "NAICS 92" in public_admin["reason"]
@@ -71,7 +97,11 @@ def test_public_administration_has_no_btos_counterpart() -> None:
 
 def test_limited_comparability_universes_are_explicit() -> None:
     entries = _load(BTOS)["entries"]
-    limited = {row["entity_id"]: row["reason"] for row in entries if row["comparability"] == "limited"}
+    limited = {
+        row["entity_id"]: row["reason"]
+        for row in entries
+        if row["comparability"] == "limited"
+    }
 
     assert set(limited) == {
         "agriculture-forestry-fishing-and-hunting",
@@ -94,6 +124,7 @@ def test_unclassified_btos_businesses_are_fail_closed() -> None:
     assert len(special) == 1
     xx = special[0]
     assert xx["btos_sector_code"] == "XX"
+    assert xx["naics_sector_span"] is None
     assert xx["mapping_status"] == "unsupported"
     assert xx["target_entity_id"] is None
     assert "Never redistribute" in xx["rule"]
@@ -111,7 +142,8 @@ def test_summary_and_use_rules_preserve_cross_source_boundary() -> None:
         "limited_comparability": 4,
         "excluded_no_btos_counterpart": 1,
     }
-    assert "do not use fuzzy label matching" in rules
+    assert "do not join on naics_sector_span" in rules
+    assert "fuzzy label matching" in rules
     assert "Do not redistribute BTOS XX" in rules
     assert "Do not produce a BTOS-RPS comparison for Public Administration" in rules
     assert "productivity" in rules
