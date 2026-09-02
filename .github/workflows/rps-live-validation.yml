@@ -1,0 +1,142 @@
+name: RPS live validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/rps-live-validation.yml'
+      - 'scripts/prepare_rps_refresh_candidate.py'
+      - 'scripts/prepare_rps_observatory_candidate.py'
+      - 'scripts/archive_rps_private_vintage.py'
+      - 'src/genai_at_work/rps_refresh.py'
+      - 'src/genai_at_work/rps_release.py'
+      - 'src/genai_at_work/private_vintage.py'
+      - 'src/genai_at_work/sources/fred.py'
+      - 'data/registry/rps_source_series_manifest.json'
+      - 'data/registry/rps_provider_catalog_scope.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rps-live-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Retrieve, validate, archive-rehearse, and build RPS candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install source-pipeline dependencies
+        run: python -m pip install -e .
+
+      - name: Require authorized FRED credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FRED_API_KEY:-}" ]; then
+            echo "FRED_API_KEY repository secret is required for the authorized FRED API path." >&2
+            exit 1
+          fi
+
+      - name: Retrieve and validate live RPS aggregate source
+        run: >-
+          PYTHONPATH=src python scripts/prepare_rps_refresh_candidate.py
+          --output-dir /tmp/rps-refresh
+
+      - name: Rehearse immutable private-vintage archive contract
+        run: >-
+          PYTHONPATH=src python scripts/archive_rps_private_vintage.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+          --archive-root /tmp/rps-private-vintage
+
+      - name: Build non-promoting RPS observatory component
+        run: >-
+          PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+          --output-dir /tmp/rps-observatory
+          --release-id rps-live-validation-${GITHUB_RUN_ID}
+
+      - name: Assemble rights-safe live-validation evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/rps-live-validation-evidence"
+          mkdir -p "$evidence/observatory-artifacts"
+
+          cp /tmp/rps-refresh/rps_refresh_candidate.json "$evidence/source-candidate-summary.json"
+          cp /tmp/rps-observatory/release.json "$evidence/rps-component-release.json"
+          cp -R /tmp/rps-observatory/artifacts/longitudinal/. "$evidence/observatory-artifacts/"
+
+          manifest="$(find /tmp/rps-private-vintage -name private_vintage_manifest.json -type f -print -quit)"
+          test -n "$manifest"
+          cp "$manifest" "$evidence/private-vintage-manifest.json"
+
+          test ! -e "$evidence/rps_source_snapshot.json"
+          test ! -e "$evidence/rps_refresh_diff.json"
+          test ! -d "$evidence/inputs"
+
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "rps-live-validation-evidence"
+          source = json.loads((root / "source-candidate-summary.json").read_text())
+          release = json.loads((root / "rps-component-release.json").read_text())
+          archive = json.loads((root / "private-vintage-manifest.json").read_text())
+
+          if source.get("public_raw_observations_included") is not False:
+              raise SystemExit("Source summary widened raw-observation publication scope")
+          if release.get("source_input_bytes_publication") is not False:
+              raise SystemExit("Release component widened source-input publication scope")
+          if release.get("data_mode") != "derived_only":
+              raise SystemExit("Live validation must remain derived_only")
+          if archive.get("public_archive") is not False:
+              raise SystemExit("Archive rehearsal lost private-only contract")
+          if archive.get("source_content_sha256") != source.get("source_content_sha256"):
+              raise SystemExit("Archive and source summary scientific identities disagree")
+
+          summary = {
+              "schema_version": 1,
+              "validation_type": "rps_live_source_validation",
+              "github_run_id": os.environ["GITHUB_RUN_ID"],
+              "github_sha": os.environ["GITHUB_SHA"],
+              "source_id": source.get("source_id"),
+              "source_content_sha256": source.get("source_content_sha256"),
+              "source_snapshot_file_sha256": source.get("private_snapshot_file_sha256"),
+              "revision_status": source.get("revision_status"),
+              "requires_release_review": source.get("requires_release_review"),
+              "inventory": source.get("inventory"),
+              "observation_count": source.get("observation_count"),
+              "archive_contract_rehearsed": True,
+              "archive_persisted_durably": False,
+              "observatory_candidate_built": True,
+              "promotion_performed": False,
+              "public_raw_observations_included": False,
+          }
+          (root / "live-validation-summary.json").write_text(
+              json.dumps(summary, indent=2, sort_keys=True) + "\n"
+          )
+          PY
+
+      - name: Upload rights-safe live-validation evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rps-live-validation-${{ github.run_id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/rps-live-validation-evidence
+          if-no-files-found: error
+          retention-days: 14
