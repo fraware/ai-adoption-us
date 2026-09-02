@@ -20,7 +20,7 @@
     "maximum_nominal_detection_lag_days": 7,
     "schedule_activation": "deferred",
     "activation_requirements": [
-      "successful_manual_live_probe",
+      "successful_live_validation",
       "fred_api_key_verified_in_execution_environment",
       "operator_controlled_private_vintage_backend_configured",
       "private_backend_write_read_verify_rehearsal_passed"
