@@ -1,0 +1,247 @@
+{
+  "schema_version": 1,
+  "checkpoint_id": "btos-core-ai-202617-q7-a1-v1",
+  "cycle": "202617",
+  "question_id": 7,
+  "answer_id": 1,
+  "metric": "business_current_ai_use_any_function",
+  "unit": "percent_of_businesses_responding_to_question",
+  "national": {
+    "estimate_pct": 22.4,
+    "standard_error_pp": 0.36,
+    "suppression_code": null
+  },
+  "sectors": [
+    {
+      "btos_sector_code": "11",
+      "naics_sector_span": "11",
+      "entity_index": 1,
+      "entity_id": "agriculture-forestry-fishing-and-hunting",
+      "entity_name": "Agriculture, Forestry, Fishing, and Hunting",
+      "comparability": "limited",
+      "estimate_pct": null,
+      "standard_error_pp": null,
+      "suppression_code": "S"
+    },
+    {
+      "btos_sector_code": "21",
+      "naics_sector_span": "21",
+      "entity_index": 2,
+      "entity_id": "mining-quarrying-and-oil-and-gas-extraction",
+      "entity_name": "Mining, Quarrying, and Oil and Gas Extraction",
+      "comparability": "primary",
+      "estimate_pct": 8.2,
+      "standard_error_pp": 2.46,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "22",
+      "naics_sector_span": "22",
+      "entity_index": 8,
+      "entity_id": "utilities",
+      "entity_name": "Utilities",
+      "comparability": "primary",
+      "estimate_pct": 21.2,
+      "standard_error_pp": 5.33,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "23",
+      "naics_sector_span": "23",
+      "entity_index": 3,
+      "entity_id": "construction",
+      "entity_name": "Construction",
+      "comparability": "primary",
+      "estimate_pct": 14.3,
+      "standard_error_pp": 0.84,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "31",
+      "naics_sector_span": "31-33",
+      "entity_index": 4,
+      "entity_id": "manufacturing",
+      "entity_name": "Manufacturing",
+      "comparability": "primary",
+      "estimate_pct": 20.3,
+      "standard_error_pp": 0.88,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "42",
+      "naics_sector_span": "42",
+      "entity_index": 5,
+      "entity_id": "wholesale-trade",
+      "entity_name": "Wholesale Trade",
+      "comparability": "primary",
+      "estimate_pct": 18.8,
+      "standard_error_pp": 1.07,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "44",
+      "naics_sector_span": "44-45",
+      "entity_index": 6,
+      "entity_id": "retail-trade",
+      "entity_name": "Retail Trade",
+      "comparability": "primary",
+      "estimate_pct": 15.2,
+      "standard_error_pp": 0.71,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "48",
+      "naics_sector_span": "48-49",
+      "entity_index": 7,
+      "entity_id": "transportation-and-warehousing",
+      "entity_name": "Transportation and Warehousing",
+      "comparability": "limited",
+      "estimate_pct": 10.2,
+      "standard_error_pp": 0.76,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "51",
+      "naics_sector_span": "51",
+      "entity_index": 9,
+      "entity_id": "information",
+      "entity_name": "Information",
+      "comparability": "primary",
+      "estimate_pct": 46.0,
+      "standard_error_pp": 2.44,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "52",
+      "naics_sector_span": "52",
+      "entity_index": 10,
+      "entity_id": "finance-and-insurance",
+      "entity_name": "Finance and Insurance",
+      "comparability": "limited",
+      "estimate_pct": 40.0,
+      "standard_error_pp": 1.23,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "53",
+      "naics_sector_span": "53",
+      "entity_index": 11,
+      "entity_id": "real-estate-and-rental-and-leasing",
+      "entity_name": "Real Estate and Rental and Leasing",
+      "comparability": "primary",
+      "estimate_pct": 28.9,
+      "standard_error_pp": 1.75,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "54",
+      "naics_sector_span": "54",
+      "entity_index": 12,
+      "entity_id": "professional-scientific-and-technical-services",
+      "entity_name": "Professional, Scientific, and Technical Services",
+      "comparability": "primary",
+      "estimate_pct": 41.9,
+      "standard_error_pp": 0.86,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "55",
+      "naics_sector_span": "55",
+      "entity_index": 13,
+      "entity_id": "management-of-companies-and-enterprises",
+      "entity_name": "Management of Companies and Enterprises",
+      "comparability": "primary",
+      "estimate_pct": null,
+      "standard_error_pp": null,
+      "suppression_code": "S"
+    },
+    {
+      "btos_sector_code": "56",
+      "naics_sector_span": "56",
+      "entity_index": 14,
+      "entity_id": "administrative-and-support-and-waste-management-services",
+      "entity_name": "Administrative and Support and Waste Management Services",
+      "comparability": "primary",
+      "estimate_pct": 20.8,
+      "standard_error_pp": 1.58,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "61",
+      "naics_sector_span": "61",
+      "entity_index": 15,
+      "entity_id": "educational-services",
+      "entity_name": "Educational Services",
+      "comparability": "primary",
+      "estimate_pct": 33.8,
+      "standard_error_pp": 2.05,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "62",
+      "naics_sector_span": "62",
+      "entity_index": 16,
+      "entity_id": "health-care-and-social-assistance",
+      "entity_name": "Health Care and Social Assistance",
+      "comparability": "primary",
+      "estimate_pct": 24.0,
+      "standard_error_pp": 0.52,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "71",
+      "naics_sector_span": "71",
+      "entity_index": 17,
+      "entity_id": "arts-entertainment-and-recreation",
+      "entity_name": "Arts, Entertainment, and Recreation",
+      "comparability": "primary",
+      "estimate_pct": 16.6,
+      "standard_error_pp": 1.36,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "72",
+      "naics_sector_span": "72",
+      "entity_index": 18,
+      "entity_id": "accommodation-and-food-services",
+      "entity_name": "Accommodation and Food Services",
+      "comparability": "primary",
+      "estimate_pct": 8.6,
+      "standard_error_pp": 0.66,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "81",
+      "naics_sector_span": "81",
+      "entity_index": 19,
+      "entity_id": "other-services-except-public-administration",
+      "entity_name": "Other Services, Except Public Administration",
+      "comparability": "limited",
+      "estimate_pct": 12.6,
+      "standard_error_pp": 1.23,
+      "suppression_code": null
+    },
+    {
+      "btos_sector_code": "XX",
+      "naics_sector_span": null,
+      "entity_index": null,
+      "entity_id": null,
+      "entity_name": null,
+      "comparability": "unclassified",
+      "estimate_pct": 34.6,
+      "standard_error_pp": 2.07,
+      "suppression_code": null
+    }
+  ],
+  "unsupported_targets": [
+    {
+      "entity_index": 20,
+      "entity_id": "public-administration",
+      "entity_name": "Public Administration",
+      "reason": "NAICS 92 Public Administration is outside the BTOS target population; no BTOS estimate is imputed."
+    }
+  ],
+  "interpretation": "Released Census BTOS aggregate source reproduction only. Sector mapping supplies taxonomy/comparability metadata; it does not convert business-level estimates into worker-level RPS measures.",
+  "rps_values_included": false,
+  "cross_source_statistics_included": false
+}
