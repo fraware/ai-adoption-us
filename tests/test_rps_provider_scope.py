@@ -76,6 +76,20 @@ def test_provider_catalog_scope_reconciles_137_to_canonical_131() -> None:
         assert {str(row["metric_id"]) for row in occupations if row["entity_id"] == entity_id} == SUBGROUP_METRICS
 
 
+def test_provider_scope_records_granted_aggregate_use_without_broadening_rights() -> None:
+    scope = _load("data/registry/rps_provider_catalog_scope.json")
+
+    assert scope["verified_date"] == "2026-09-02"
+    assert scope["observation_values_included"] is False
+    assert scope["source_owner_permission_status"] == "granted_for_published_aggregate_project_use"
+    assert scope["rights_decision_ref"] == "docs/source-rights/RPS_SOURCE_DECISION.md"
+    consequence = str(scope["production_consequence"])
+    assert "versioned source checkpoints" in consequence
+    assert "Unrestricted bulk mirroring/public-API redistribution" in consequence
+    assert "respondent microdata" in consequence
+    assert "task-index artifact" in consequence
+
+
 def test_all_six_out_of_scope_national_constructs_are_explicitly_excluded() -> None:
     titles = (
         "Generative Artificial Intelligence, Adoption Rate Overall: Working-Age Adults",
