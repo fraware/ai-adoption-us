@@ -8,8 +8,8 @@ from io import BytesIO
 from posixpath import join as posix_join
 from posixpath import normpath
 from typing import cast
-from zipfile import ZipFile
 from xml.etree import ElementTree
+from zipfile import ZipFile
 
 _MAIN_NS = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
 _OFFICE_REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
