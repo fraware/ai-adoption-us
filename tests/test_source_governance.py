@@ -65,6 +65,7 @@ def test_rps_live_validation_is_auto_triggered_secret_gated_and_rights_safe():
     assert "name: RPS live validation" in workflow
     assert "push:" in workflow
     assert "branches: [main]" in workflow
+    assert "src/genai_at_work/rps_release_complete.py" in workflow
     assert "workflow_dispatch:" in workflow
     assert "schedule:" not in workflow
     assert "contents: read" in workflow
