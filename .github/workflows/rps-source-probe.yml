@@ -1,0 +1,90 @@
+name: RPS authorized source probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rps-source-probe-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    name: Retrieve and validate authorized RPS aggregate source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install source-pipeline dependencies
+        run: python -m pip install -e .
+
+      - name: Require authorized FRED credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FRED_API_KEY:-}" ]; then
+            echo "FRED_API_KEY repository secret is required for the authorized API distribution path." >&2
+            exit 1
+          fi
+
+      - name: Retrieve private RPS source candidate
+        run: >-
+          PYTHONPATH=src python scripts/prepare_rps_refresh_candidate.py
+          --output-dir /tmp/rps-refresh
+
+      - name: Build non-promoting RPS observatory component
+        run: >-
+          PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+          --output-dir /tmp/rps-observatory
+          --release-id rps-probe-${GITHUB_RUN_ID}
+
+      - name: Assemble rights-safe probe evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$RUNNER_TEMP/rps-probe-evidence"
+          mkdir -p "$evidence/observatory-artifacts"
+          cp /tmp/rps-refresh/rps_refresh_candidate.json "$evidence/source-candidate-summary.json"
+          cp /tmp/rps-observatory/release.json "$evidence/rps-component-release.json"
+          cp -R /tmp/rps-observatory/artifacts/longitudinal/. "$evidence/observatory-artifacts/"
+
+          test ! -e "$evidence/rps_source_snapshot.json"
+          test ! -d "$evidence/inputs"
+          test ! -e "$evidence/rps_refresh_diff.json"
+
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "rps-probe-evidence"
+          source = json.loads((root / "source-candidate-summary.json").read_text())
+          release = json.loads((root / "rps-component-release.json").read_text())
+          if source.get("public_raw_observations_included") is not False:
+              raise SystemExit("Source candidate summary does not preserve the no-raw-publication boundary")
+          if release.get("source_input_bytes_publication") is not False:
+              raise SystemExit("RPS component release does not preserve the source-input publication boundary")
+          if release.get("data_mode") != "derived_only":
+              raise SystemExit("RPS component probe must remain derived_only")
+          PY
+
+      - name: Upload rights-safe RPS probe evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rps-source-probe-${{ github.run_id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/rps-probe-evidence
+          if-no-files-found: error
+          retention-days: 14

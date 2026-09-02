@@ -41,6 +41,32 @@ def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     assert "observatory_release.py" not in script
 
 
+def test_manual_rps_source_probe_is_secret_gated_and_exports_only_rights_safe_evidence():
+    workflow = (ROOT / ".github" / "workflows" / "rps-source-probe.yml").read_text()
+
+    assert "workflow_dispatch:" in workflow
+    assert "pull_request:" not in workflow
+    assert "push:" not in workflow
+    assert "schedule:" not in workflow
+    assert "contents: read" in workflow
+    assert "secrets.FRED_API_KEY" in workflow
+    assert "FRED_API_KEY repository secret is required" in workflow
+    assert "--output-dir /tmp/rps-refresh" in workflow
+    assert "--output-dir /tmp/rps-observatory" in workflow
+    assert "rps_refresh_candidate.json" in workflow
+    assert "rps_source_snapshot.json" in workflow
+    assert "test ! -e \"$evidence/rps_source_snapshot.json\"" in workflow
+    assert "test ! -d \"$evidence/inputs\"" in workflow
+    assert "test ! -e \"$evidence/rps_refresh_diff.json\"" in workflow
+    assert "cp /tmp/rps-refresh/rps_source_snapshot.json" not in workflow
+    assert "cp /tmp/rps-refresh/rps_refresh_diff.json" not in workflow
+    assert "source_input_bytes_publication" in workflow
+    assert 'release.get("data_mode") != "derived_only"' in workflow
+    assert "actions/upload-artifact@" in workflow
+    assert "retention-days: 14" in workflow
+    assert "observatory_release.py" not in workflow
+
+
 def test_no_public_observation_bundle():
     assert not (ROOT / "apps" / "web" / "public" / "data" / "observations.json").exists()
 
