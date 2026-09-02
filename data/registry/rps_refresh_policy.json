@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "source_id": "rps-genai-tracker-fred-release-6",
+  "policy_status": "PINNED_NOT_ACTIVATED",
+  "evidence_basis": {
+    "source_frequency": "quarterly",
+    "latest_observed_period": "2026-Q2",
+    "latest_observed_provider_update_date": "2026-08-04",
+    "provider_next_release_date_status": "not_available",
+    "checked_at": "2026-09-02",
+    "source_refs": [
+      "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREIND9",
+      "https://fred.stlouisfed.org/series/RPSGENAIUSAGESHAREALL"
+    ]
+  },
+  "source_check": {
+    "cadence": "weekly",
+    "weekday": "Wednesday",
+    "time_utc": "18:00",
+    "maximum_nominal_detection_lag_days": 7,
+    "schedule_activation": "deferred",
+    "activation_requirements": [
+      "successful_manual_live_probe",
+      "fred_api_key_verified_in_execution_environment",
+      "operator_controlled_private_vintage_backend_configured",
+      "private_backend_write_read_verify_rehearsal_passed"
+    ],
+    "rationale": "The registered source is quarterly and currently exposes no next release date. Weekly checking bounds normal detection lag without claiming a publisher calendar or coupling checking to publication."
+  },
+  "unchanged_source": {
+    "archive_exact_source_bytes": false,
+    "build_observatory_candidate": false,
+    "stage_release": false,
+    "publish_release": false,
+    "retain_review_safe_check_evidence": true
+  },
+  "changed_source": {
+    "statuses": [
+      "baseline",
+      "new_wave",
+      "revision",
+      "mixed"
+    ],
+    "archive_exact_source_bytes_privately": true,
+    "retain_private_detailed_diff_when_predecessor_exists": true,
+    "build_observatory_candidate": true,
+    "stage_release_automatically": false,
+    "publish_release_automatically": false,
+    "requires_human_scientific_editorial_rights_review": true
+  },
+  "contract_change": {
+    "definition_or_taxonomy_change": "archive_privately_then_block_ordinary_release_path",
+    "rights_change": "block_and_require_explicit_rights_decision",
+    "inventory_or_coverage_failure": "block_and_require_source_contract_review",
+    "data_mode_change": "block_and_require_explicit_contract_migration"
+  },
+  "publication": {
+    "automatic": false,
+    "trigger": "reviewed_release_candidate_only",
+    "requires_ci": true,
+    "requires_exact_staged_hash_review": true,
+    "requires_global_observatory_release_composition": true
+  },
+  "retention": {
+    "unchanged_check_source_bytes": "transient_only",
+    "content_changing_private_vintages": "retain_until_explicit_rights_or_retention_decision_changes",
+    "release_referenced_private_vintages": "retain_for_lifetime_of_corresponding_release_history_subject_to_rights",
+    "public_probe_evidence_days": 14
+  }
+}
