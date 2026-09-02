@@ -27,6 +27,11 @@ DATES = {
 }
 NATIONAL_PERIODS = ("2024-Q3", "2024-Q4", "2025-Q1", "2025-Q2", "2026-Q2")
 SUBGROUP_PERIODS = ("2025-Q2", "2026-Q2")
+STAGGERED_SUBGROUP_PERIODS = {
+    "adoption_work": ("2024-Q3", "2024-Q4", "2025-Q1", "2025-Q2", "2026-Q2"),
+    "assisted_hours_share": ("2024-Q4", "2025-Q1", "2025-Q2", "2026-Q2"),
+    "reported_time_savings_share": ("2024-Q4", "2025-Q1", "2025-Q2", "2026-Q2"),
+}
 
 
 def _load(name: str) -> dict[str, Any]:
@@ -60,6 +65,7 @@ def _snapshot(
     *,
     national_periods: tuple[str, ...] = NATIONAL_PERIODS,
     subgroup_periods: tuple[str, ...] = SUBGROUP_PERIODS,
+    subgroup_periods_by_metric: dict[str, tuple[str, ...]] | None = None,
 ) -> dict[str, Any]:
     manifest = _load("rps_source_series_manifest.json")
     scope = _load("rps_provider_catalog_scope.json")
@@ -69,7 +75,12 @@ def _snapshot(
     observation_count = 0
     for raw in raw_series:
         assert isinstance(raw, dict)
-        periods = national_periods if raw["entity_type"] == "national" else subgroup_periods
+        if raw["entity_type"] == "national":
+            periods = national_periods
+        elif subgroup_periods_by_metric is not None:
+            periods = subgroup_periods_by_metric[str(raw["metric_id"])]
+        else:
+            periods = subgroup_periods
         observations = [
             {
                 "date": DATES[period],
@@ -175,6 +186,7 @@ def test_longer_national_history_is_preserved_while_subgroup_window_is_complete(
     panel = prepared.analysis_panel
     assert prepared.source_periods == NATIONAL_PERIODS
     assert panel.periods == SUBGROUP_PERIODS
+    assert all(periods == SUBGROUP_PERIODS for periods in prepared.metric_periods.values())
     assert prepared.subgroup_series_count == 126
     assert prepared.national_series_count == 5
     assert len(panel.period_rows["2024-Q3"]) == 5
@@ -184,6 +196,25 @@ def test_longer_national_history_is_preserved_while_subgroup_window_is_complete(
     assert len(panel.subgroup_records) == 126 * len(SUBGROUP_PERIODS)
 
 
+def test_construct_specific_start_is_preserved_and_joint_window_is_intersection() -> None:
+    snapshot = _snapshot(subgroup_periods_by_metric=STAGGERED_SUBGROUP_PERIODS)
+    prepared = prepare_rps_source_history(
+        snapshot,
+        _load("rps_source_series_manifest.json"),
+        _load("rps_provider_catalog_scope.json"),
+    )
+    panel = prepared.analysis_panel
+
+    assert prepared.metric_periods == STAGGERED_SUBGROUP_PERIODS
+    assert panel.periods == ("2024-Q4", "2025-Q1", "2025-Q2", "2026-Q2")
+    assert prepared.source_periods == NATIONAL_PERIODS
+    assert len(panel.period_rows["2024-Q3"]) == 47  # five national + 42 adoption subgroup series
+    assert all(len(panel.period_rows[period]) == 131 for period in panel.periods)
+    assert len(panel.subgroup_records) == 126 * len(panel.periods)
+    expected_full_subgroup = 42 * sum(len(periods) for periods in STAGGERED_SUBGROUP_PERIODS.values())
+    assert panel.observation_count == 5 * len(NATIONAL_PERIODS) + expected_full_subgroup
+
+
 def test_complete_history_candidate_hash_binds_national_only_periods(tmp_path: Path) -> None:
     candidate = _build(tmp_path, _snapshot())
     validate_release_manifest(candidate, tmp_path)
@@ -191,6 +222,14 @@ def test_complete_history_candidate_hash_binds_national_only_periods(tmp_path: P
     assert candidate["release_type"] == "baseline"
     assert source["reference_periods"] == list(NATIONAL_PERIODS)
     assert source["analysis_reference_periods"] == list(SUBGROUP_PERIODS)
+    assert source["analysis_metric_reference_periods"] == {
+        metric_id: list(SUBGROUP_PERIODS)
+        for metric_id in (
+            "adoption_work",
+            "assisted_hours_share",
+            "reported_time_savings_share",
+        )
+    }
     assert [row["object_id"] for row in source["objects"]] == [
         period.lower() for period in NATIONAL_PERIODS
     ]
@@ -249,13 +288,17 @@ def test_national_only_history_revision_is_detected_even_when_analytics_are_unch
     assert diff["source_changes"][0]["modified_objects"] == ["2024-q3"]
 
 
-def test_inconsistent_subgroup_period_sets_fail_closed() -> None:
-    snapshot = _snapshot()
-    subgroup = next(row for row in snapshot["series"] if row["entity_type"] == "occupation")
+def test_inconsistent_period_set_within_one_metric_family_fails_closed() -> None:
+    snapshot = _snapshot(subgroup_periods_by_metric=STAGGERED_SUBGROUP_PERIODS)
+    subgroup = next(
+        row
+        for row in snapshot["series"]
+        if row["entity_type"] == "occupation" and row["metric_id"] == "assisted_hours_share"
+    )
     subgroup["observations"] = subgroup["observations"][:-1]
     snapshot["observation_count"] -= 1
     snapshot["content_sha256"] = snapshot_content_sha256(snapshot)
-    with pytest.raises(RpsReleaseError, match="subgroup series do not share"):
+    with pytest.raises(RpsReleaseError, match="subgroup metric family assisted_hours_share"):
         prepare_rps_source_history(
             snapshot,
             _load("rps_source_series_manifest.json"),
