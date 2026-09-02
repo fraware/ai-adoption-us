@@ -9,6 +9,7 @@ import pytest
 from genai_at_work.cps import FIXED_WIDTH_FIELDS_2026
 from genai_at_work.cps_ln_benchmark import (
     MANAGEMENT_PROFESSIONAL_SERIES_ID,
+    extract_bls_api_standard_error,
     extract_ln_standard_error,
     month_period,
     parse_bls_api_month_value,
@@ -30,6 +31,37 @@ def _fixed_width_record(**values: str) -> str:
 
 def _raw_weight(persons: float) -> str:
     return str(int(round(persons * 10_000))).rjust(10, "0")
+
+
+def _api_payload(*, with_aspects: bool = True) -> dict[str, object]:
+    observation: dict[str, object] = {
+        "year": "2026",
+        "period": "M07",
+        "value": "69,913",
+    }
+    if with_aspects:
+        observation["aspects"] = [
+            {
+                "name": "Standard Error",
+                "value": "447.5",
+                "footnotes": [{"code": "P", "text": "Preliminary."}],
+            }
+        ]
+    return {
+        "status": "REQUEST_SUCCEEDED",
+        "message": [],
+        "Results": {
+            "series": [
+                {
+                    "seriesID": "LNU02032201",
+                    "data": [
+                        observation,
+                        {"year": "2026", "period": "M06", "value": "70366"},
+                    ],
+                }
+            ]
+        },
+    }
 
 
 def test_month_period_maps_month_abbreviations() -> None:
@@ -75,29 +107,37 @@ def test_extract_ln_standard_error_fails_closed_on_duplicate_rows(tmp_path: Path
 
 
 def test_parse_bls_api_month_value_requires_exact_observation() -> None:
-    payload = json.loads(
-        """{
-          "status": "REQUEST_SUCCEEDED",
-          "Results": {
-            "series": [{
-              "seriesID": "LNU02032201",
-              "data": [
-                {"year": "2026", "period": "M07", "value": "69,913"},
-                {"year": "2026", "period": "M06", "value": "70366"}
-              ]
-            }]
-          }
-        }"""
-    )
     assert (
         parse_bls_api_month_value(
-            payload,
+            _api_payload(),
             series_id=MANAGEMENT_PROFESSIONAL_SERIES_ID,
             year=2026,
             period="M07",
         )
         == 69_913.0
     )
+
+
+def test_extract_bls_api_standard_error_requires_named_aspect() -> None:
+    result = extract_bls_api_standard_error(
+        _api_payload(),
+        series_id=MANAGEMENT_PROFESSIONAL_SERIES_ID,
+        year=2026,
+        period="M07",
+    )
+    assert result.value == 447.5
+    assert result.aspect_type == "Standard Error"
+    assert result.footnote_code == "P"
+
+
+def test_extract_bls_api_standard_error_fails_when_keyless_path_omits_aspects() -> None:
+    with pytest.raises(ValueError, match="did not include an aspects array"):
+        extract_bls_api_standard_error(
+            _api_payload(with_aspects=False),
+            series_id=MANAGEMENT_PROFESSIONAL_SERIES_ID,
+            year=2026,
+            period="M07",
+        )
 
 
 def test_reconstruct_management_professional_employment_uses_official_16_plus_universe(
