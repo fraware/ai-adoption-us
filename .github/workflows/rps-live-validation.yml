@@ -11,6 +11,7 @@ on:
       - 'scripts/build_composition_residuals.py'
       - 'src/genai_at_work/rps_refresh.py'
       - 'src/genai_at_work/rps_release.py'
+      - 'src/genai_at_work/rps_release_complete.py'
       - 'src/genai_at_work/private_vintage.py'
       - 'src/genai_at_work/composition.py'
       - 'src/genai_at_work/composition_snapshot.py'
