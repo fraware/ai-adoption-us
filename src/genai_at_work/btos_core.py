@@ -7,6 +7,7 @@ from datetime import date, timedelta
 from io import BytesIO
 from posixpath import join as posix_join
 from posixpath import normpath
+from typing import cast
 from zipfile import ZipFile
 from xml.etree import ElementTree
 
@@ -132,7 +133,7 @@ def read_xlsx_sheet_rows(data: bytes, sheet_name: str) -> tuple[tuple[str | None
 def _require_cell(row: tuple[str | None, ...], index: int, label: str) -> str:
     if index >= len(row) or row[index] is None:
         raise ValueError(f"BTOS workbook row is missing {label}")
-    return row[index]  # type: ignore[return-value]
+    return cast(str, row[index])
 
 
 def _cycle_column(header: tuple[str | None, ...], cycle: str) -> int:
@@ -313,23 +314,22 @@ def _excel_serial_date(raw: str, *, label: str) -> date:
 def extract_cycle_dates(data: bytes, *, cycle: str) -> BTOSCycleDates:
     rows = read_xlsx_sheet_rows(data, "Collection and Reference Dates")
     header = rows[0]
-    required_headers = {
-        "Smpdt": None,
-        "Collection Start": None,
-        "Col End": None,
-        "Reference Period Start": None,
-        "Ref End": None,
-        "Publication Date": None,
-    }
+    required_headers = (
+        "Smpdt",
+        "Collection Start",
+        "Col End",
+        "Reference Period Start",
+        "Ref End",
+        "Publication Date",
+    )
     header_map = {value: index for index, value in enumerate(header) if value is not None}
     missing = [name for name in required_headers if name not in header_map]
     if missing:
         raise ValueError(f"BTOS collection/reference sheet is missing columns: {missing}")
 
+    sample_date_index = header_map["Smpdt"]
     matches = [
-        row
-        for row in rows[1:]
-        if len(row) > header_map["Smpdt"] and row[header_map["Smpdt"]] == cycle
+        row for row in rows[1:] if len(row) > sample_date_index and row[sample_date_index] == cycle
     ]
     if len(matches) != 1:
         raise ValueError(f"BTOS expected one collection/reference row for cycle {cycle}, found {len(matches)}")
