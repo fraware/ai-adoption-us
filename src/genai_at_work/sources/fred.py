@@ -3,7 +3,8 @@
 The client intentionally uses only documented FRED API endpoints. It does not scrape
 FRED HTML, consistent with FRED's published Terms of Use. Transient transport,
 rate-limit, and server failures are retried with bounded exponential backoff; semantic
-client errors and exhausted retries fail closed.
+client errors and exhausted retries fail closed. Error text never includes the full
+credential-bearing request URL.
 """
 
 from __future__ import annotations
@@ -89,26 +90,25 @@ class FredClient:
             except httpx.RequestError as exc:
                 if attempt >= self.max_attempts:
                     raise FredError(
-                        f"FRED request failed for {path} after {attempt} attempts: {exc}"
+                        f"FRED transport request failed for {path} after {attempt} attempts "
+                        f"({exc.__class__.__name__})"
                     ) from exc
                 self._sleep_before_retry(attempt)
                 continue
 
             if response.status_code in TRANSIENT_HTTP_STATUS_CODES:
                 if attempt >= self.max_attempts:
-                    try:
-                        response.raise_for_status()
-                    except httpx.HTTPStatusError as exc:
-                        raise FredError(
-                            f"FRED transient request failed for {path} after {attempt} attempts: {exc}"
-                        ) from exc
+                    raise FredError(
+                        f"FRED transient request failed for {path} after {attempt} attempts "
+                        f"with HTTP {response.status_code}"
+                    )
                 self._sleep_before_retry(attempt)
                 continue
 
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError as exc:
-                raise FredError(f"FRED request failed for {path}: {exc}") from exc
+            if response.is_error:
+                raise FredError(
+                    f"FRED request failed for {path} with HTTP {response.status_code}"
+                )
 
             try:
                 raw_payload: object = response.json()
