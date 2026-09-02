@@ -1,10 +1,10 @@
-"""Release adapter for RPS sources whose national history predates subgroup series.
+"""Release adapter for RPS sources with construct-specific history lengths.
 
-The live FRED distribution contains five national work-focused series with a
-longer quarterly history than the 126 industry/occupation A/H/S subgroup
-series. This adapter preserves and hash-binds the complete 131-series source
-history while defining longitudinal analytical completeness on the common
-subgroup period set.
+The live FRED distribution can expose different valid start dates by construct.
+This adapter preserves and hash-binds the complete 131-series source history,
+requires every industry/occupation series within each A/H/S construct family to
+share one internally complete period set, then defines the joint longitudinal
+analytical window as the intersection of those complete construct windows.
 
 It deliberately reuses the established longitudinal artifact/diagnostic logic
 from :mod:`genai_at_work.rps_release`; it changes source-history topology, not
@@ -44,13 +44,16 @@ from genai_at_work.rps_release import (
     build_longitudinal_artifacts,
 )
 
+SUBGROUP_SERIES_PER_METRIC = sum(REQUIRED_ENTITY_COUNTS.values())
+
 
 @dataclass(frozen=True)
 class PreparedRpsSourceHistory:
-    """Full source history plus the complete subgroup analytical panel."""
+    """Full source history plus the complete joint A/H/S analytical panel."""
 
     analysis_panel: PreparedRpsPanel
     source_periods: tuple[str, ...]
+    metric_periods: Mapping[str, tuple[str, ...]]
     subgroup_series_count: int
     national_series_count: int
 
@@ -60,7 +63,13 @@ def prepare_rps_source_history(
     canonical_manifest: Mapping[str, Any],
     provider_scope: Mapping[str, Any],
 ) -> PreparedRpsSourceHistory:
-    """Validate full source history without requiring equal national/subgroup starts."""
+    """Validate full history and derive a complete common construct window.
+
+    Different constructs may have different legitimate source starts. What is not
+    accepted is heterogeneity *within* one construct family across the 20 industry
+    and 22 occupation entities. Each metric family must therefore be internally
+    complete before its intersection with the other A/H/S families is considered.
+    """
 
     manifest, series, _ = _validate_registered_scope(snapshot, canonical_manifest, provider_scope)
     manifest_digest = canonical_digest(
@@ -100,9 +109,25 @@ def prepare_rps_source_history(
             f"Canonical national work inventory must contain 5 series, observed {len(expected_national_series)}"
         )
 
+    expected_metric_series: dict[str, set[str]] = {
+        metric_id: {
+            series_id
+            for series_id, row in manifest.items()
+            if row.get("entity_type") in SUBGROUP_ENTITY_TYPES
+            and row.get("metric_id") == metric_id
+        }
+        for metric_id in SUBGROUP_METRICS
+    }
+    for metric_id, series_ids in expected_metric_series.items():
+        if len(series_ids) != SUBGROUP_SERIES_PER_METRIC:
+            raise RpsReleaseError(
+                f"Canonical {metric_id} subgroup inventory must contain "
+                f"{SUBGROUP_SERIES_PER_METRIC} series, observed {len(series_ids)}"
+            )
+
     period_rows: dict[str, list[dict[str, Any]]] = {}
     period_sets: dict[str, set[str]] = {}
-    subgroup_records: list[AuditRecord] = []
+    subgroup_records_all: list[AuditRecord] = []
     observed_count = 0
 
     for series_index, raw_series in enumerate(series):
@@ -175,7 +200,7 @@ def prepare_rps_source_history(
             observed_count += 1
 
             if series_id in expected_subgroup_series:
-                subgroup_records.append(
+                subgroup_records_all.append(
                     AuditRecord(
                         entity_type=str(raw_series["entity_type"]),
                         entity_id=str(raw_series["entity_id"]),
@@ -190,17 +215,26 @@ def prepare_rps_source_history(
                 )
         period_sets[series_id] = seen_periods
 
-    subgroup_period_shapes = {
-        tuple(sorted(period_sets[series_id], key=_period_key))
-        for series_id in expected_subgroup_series
-    }
-    if len(subgroup_period_shapes) != 1:
-        raise RpsReleaseError(
-            "RPS subgroup series do not share one complete quarterly analytical period set"
-        )
-    analysis_periods = next(iter(subgroup_period_shapes))
+    metric_periods: dict[str, tuple[str, ...]] = {}
+    for metric_id, series_ids in sorted(expected_metric_series.items()):
+        family_shapes = {
+            tuple(sorted(period_sets[series_id], key=_period_key)) for series_id in series_ids
+        }
+        if len(family_shapes) != 1:
+            raise RpsReleaseError(
+                f"RPS subgroup metric family {metric_id} does not share one complete "
+                "quarterly period set across all 42 industry/occupation series"
+            )
+        metric_periods[metric_id] = next(iter(family_shapes))
+
+    common_periods = set(metric_periods[next(iter(sorted(metric_periods)))])
+    for periods in metric_periods.values():
+        common_periods.intersection_update(periods)
+    analysis_periods = tuple(sorted(common_periods, key=_period_key))
     if len(analysis_periods) < 2:
-        raise RpsReleaseError("Longitudinal release candidates require at least two subgroup quarters")
+        raise RpsReleaseError(
+            "Joint A/H/S longitudinal release candidates require at least two common quarters"
+        )
 
     source_periods = tuple(
         sorted({period for values in period_sets.values() for period in values}, key=_period_key)
@@ -218,8 +252,8 @@ def prepare_rps_source_history(
         if series_ids != expected_ids:
             raise RpsReleaseError(f"RPS source-period identity mismatch for {period}")
 
-    # Every analytical subgroup quarter must also contain the five national work series,
-    # so each analytical-period object is a complete 131-series cross-section.
+    # Every joint analytical quarter must contain all five national work series plus
+    # every A/H/S subgroup series, producing a complete 131-series cross-section.
     for period in analysis_periods:
         rows = period_rows.get(period, [])
         if len(rows) != expected_series_count:
@@ -236,21 +270,33 @@ def prepare_rps_source_history(
     if sum(len(rows) for rows in period_rows.values()) != observed_count:
         raise RpsReleaseError("Period-partitioned RPS source rows do not cover every source observation")
 
-    subgroup_series_ids = {record.series_id for record in subgroup_records}
+    subgroup_series_ids = {record.series_id for record in subgroup_records_all}
     if subgroup_series_ids != expected_subgroup_series:
         raise RpsReleaseError("Subgroup RPS series coverage does not match the canonical manifest")
-    expected_subgroup_observations = len(expected_subgroup_series) * len(analysis_periods)
-    if len(subgroup_records) != expected_subgroup_observations:
+    expected_full_subgroup_observations = sum(
+        SUBGROUP_SERIES_PER_METRIC * len(periods) for periods in metric_periods.values()
+    )
+    if len(subgroup_records_all) != expected_full_subgroup_observations:
         raise RpsReleaseError(
-            f"Incomplete subgroup panel: expected {expected_subgroup_observations} rows, "
-            f"observed {len(subgroup_records)}"
+            f"Incomplete full subgroup history: expected {expected_full_subgroup_observations} rows, "
+            f"observed {len(subgroup_records_all)}"
+        )
+
+    analysis_records = tuple(
+        record for record in subgroup_records_all if record.period in common_periods
+    )
+    expected_analysis_observations = len(expected_subgroup_series) * len(analysis_periods)
+    if len(analysis_records) != expected_analysis_observations:
+        raise RpsReleaseError(
+            f"Incomplete joint A/H/S analytical panel: expected {expected_analysis_observations} rows, "
+            f"observed {len(analysis_records)}"
         )
 
     for period in analysis_periods:
         for entity_type, expected_entities in REQUIRED_ENTITY_COUNTS.items():
             entities = {
                 record.entity_id
-                for record in subgroup_records
+                for record in analysis_records
                 if record.period == period and record.entity_type == entity_type
             }
             if len(entities) != expected_entities:
@@ -262,7 +308,7 @@ def prepare_rps_source_history(
     analysis_panel = PreparedRpsPanel(
         periods=analysis_periods,
         period_rows={period: tuple(rows) for period, rows in period_rows.items()},
-        subgroup_records=tuple(subgroup_records),
+        subgroup_records=analysis_records,
         definition_id=f"sha256:{definition_digest}",
         taxonomy_version=f"sha256:{manifest_digest}",
         series_count=expected_series_count,
@@ -271,6 +317,7 @@ def prepare_rps_source_history(
     return PreparedRpsSourceHistory(
         analysis_panel=analysis_panel,
         source_periods=source_periods,
+        metric_periods=metric_periods,
         subgroup_series_count=len(expected_subgroup_series),
         national_series_count=len(expected_national_series),
     )
@@ -287,7 +334,7 @@ def build_rps_release_candidate_complete_history(
     builder_commit: str,
     previous_release: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Build a release candidate that binds full source history and subgroup analytics."""
+    """Build a release candidate that binds full source history and joint A/H/S analytics."""
 
     if not re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", builder_commit):
         raise RpsReleaseError("builder_commit must be a 40- or 64-character hexadecimal commit")
@@ -332,6 +379,9 @@ def build_rps_release_candidate_complete_history(
         panel, source_content_sha256=source_content_sha
     )
     validation["source_history_periods"] = list(prepared.source_periods)
+    validation["analysis_metric_periods"] = {
+        metric_id: list(periods) for metric_id, periods in sorted(prepared.metric_periods.items())
+    }
     validation["source_history_observation_count"] = panel.observation_count
     validation["subgroup_series_count"] = prepared.subgroup_series_count
     validation["national_series_count"] = prepared.national_series_count
@@ -420,6 +470,10 @@ def build_rps_release_candidate_complete_history(
         "revision_status": source_status,
         "reference_periods": list(prepared.source_periods),
         "analysis_reference_periods": list(panel.periods),
+        "analysis_metric_reference_periods": {
+            metric_id: list(periods)
+            for metric_id, periods in sorted(prepared.metric_periods.items())
+        },
         "instrument_version": "not-versioned-in-fred-distribution",
         "definition_id": panel.definition_id,
         "taxonomy_versions": {"rps_source_series_manifest": panel.taxonomy_version},
@@ -455,7 +509,7 @@ def build_rps_release_candidate_complete_history(
         "diagnostics": diagnostics,
         "claims": claims,
         "build": {
-            "builder_id": "rps-published-aggregate-complete-history-release-v2",
+            "builder_id": "rps-published-aggregate-construct-window-release-v3",
             "builder_commit": builder_commit.lower(),
             "deterministic": True,
             "input_sha256": input_hashes,
@@ -463,8 +517,9 @@ def build_rps_release_candidate_complete_history(
         },
         "candidate_scope": (
             "RPS longitudinal component only; complete 131-series source history is bound in "
-            "private inputs while analytical claims use the common 126-series subgroup window. "
-            "Do not promote as the first global observatory baseline unless the complete public "
+            "private inputs. Each A/H/S subgroup construct family must be internally complete; "
+            "joint longitudinal claims use only their common complete period window. Do not "
+            "promote as the first global observatory baseline unless the complete public "
             "observatory release composition has been reviewed."
         ),
         "source_input_bytes_publication": False,
