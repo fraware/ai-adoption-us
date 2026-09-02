@@ -99,19 +99,33 @@ def test_source_identity_separates_transport_bytes_from_scientific_content() -> 
     assert identity["bls_scientific_content_sha256"] == _canonical_sha256(scientific)
     assert identity["scientific_content_equal"] is True
     assert identity["transport_response_bytes_equal"] is False
+    assert identity["independent_live_retrieval_count"] == 3
+    assert identity["distinct_transport_response_hash_count"] == 3
+
     review = identity["canonical_review_transport"]
     repeat = identity["canonical_main_repeat_transport"]
+    verification = identity["content_identity_verification_transport"]
     assert isinstance(review, dict)
     assert isinstance(repeat, dict)
-    assert review["bls_api_transport_response_sha256"] == (
-        "64a597f049d1793f788d0deaea1e089bfce9cd92de116ffd4634d186a231756a"
+    assert isinstance(verification, dict)
+
+    hashes = {
+        review["bls_api_transport_response_sha256"],
+        repeat["bls_api_transport_response_sha256"],
+        verification["bls_api_transport_response_sha256"],
+    }
+    assert hashes == {
+        "64a597f049d1793f788d0deaea1e089bfce9cd92de116ffd4634d186a231756a",
+        "c4f2fa5e6322f3ef6d3f6fe8a246d0997aa72738fae2690b44b74c1309094f6b",
+        "367b2d6140611596e1f952bab07fc1bdbe574b1fa29f08bd218741b63789527b",
+    }
+    assert verification["bls_api_scientific_content_sha256"] == _canonical_sha256(scientific)
+    assert verification["github_run_id"] == "33692874104"
+    assert verification["github_head_sha"] == "c7c5c57809b26d09f5d033ca50495cedc0e00ddc"
+    assert verification["artifact_id"] == "9870694833"
+    assert verification["artifact_digest"] == (
+        "sha256:828af14745253e5dbe4a7341c22ed2e21a47a4c2d42e419509bccdff3f0afbc2"
     )
-    assert repeat["bls_api_transport_response_sha256"] == (
-        "c4f2fa5e6322f3ef6d3f6fe8a246d0997aa72738fae2690b44b74c1309094f6b"
-    )
-    assert review["bls_api_transport_response_sha256"] != repeat[
-        "bls_api_transport_response_sha256"
-    ]
 
 
 def test_provenance_binds_live_run_artifact_and_canonical_file_hashes() -> None:
