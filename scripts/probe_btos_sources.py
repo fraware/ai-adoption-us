@@ -46,7 +46,7 @@ def main() -> int:
                     "sheet_names": list(downloaded.inspection.sheet_names),
                 }
             )
-        except Exception as exc:  # noqa: BLE001 - evidence manifest must capture source failures
+        except (OSError, ValueError) as exc:
             errors.append(
                 {
                     "source_key": source_key,
