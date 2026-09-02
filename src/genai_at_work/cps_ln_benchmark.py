@@ -1,11 +1,10 @@
 """Official BLS LN benchmark primitives for CPS uncertainty validation.
 
-This module supports a deliberately narrow validation exercise for R1.1-G2b. It can:
-
-* extract the published standard-error aspect for one BLS LN series/period;
-* parse the corresponding point estimate returned by the BLS Public Data API; and
-* reconstruct the published employment level from one official Basic Monthly CPS
-  fixed-width public-use file under the BLS 16+ universe.
+This module supports a deliberately narrow validation exercise for R1.1-G2b. It can
+extract one published BLS standard-error aspect from either the LN flat-file format or
+the Public Data API, parse the corresponding point estimate, and reconstruct the
+published employment level from one official Basic Monthly CPS public-use file under
+the BLS 16+ universe.
 
 The benchmark does not estimate a CPS standard error from public-use microdata and it
 must not be used to infer month-to-month, quarter-to-quarter, or year-over-year
@@ -28,6 +27,7 @@ BLS_LN_ASPECT_URL = "https://download.bls.gov/pub/time.series/ln/ln.aspect"
 BLS_PUBLIC_API_V2_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 MANAGEMENT_PROFESSIONAL_SERIES_ID = "LNU02032201"
 STANDARD_ERROR_ASPECT_TYPE = "E"
+STANDARD_ERROR_API_NAME = "Standard Error"
 MANAGEMENT_PROFESSIONAL_OCCUPATION_CODES = frozenset(range(1, 11))
 
 _MONTH_TO_PERIOD = {
@@ -94,6 +94,16 @@ def _clean_row(row: Mapping[str | None, str | None]) -> dict[str, str]:
     return cleaned
 
 
+def _validated_positive_value(raw_value: object, *, label: str) -> float:
+    try:
+        value = float(str(raw_value).replace(",", ""))
+    except ValueError as exc:
+        raise ValueError(f"{label} is not numeric: {raw_value!r}") from exc
+    if not math.isfinite(value) or value <= 0:
+        raise ValueError(f"{label} must be finite and positive: {value!r}")
+    return value
+
+
 def extract_ln_standard_error(
     aspect_path: Path,
     *,
@@ -101,12 +111,7 @@ def extract_ln_standard_error(
     year: int,
     period: str,
 ) -> LNStandardError:
-    """Extract exactly one ``E`` aspect row for a BLS LN series/period.
-
-    The function scans the official tab-delimited bulk aspect file. It fails closed
-    when the expected schema is absent, no standard-error observation exists, or more
-    than one standard-error row exists for the requested series/period.
-    """
+    """Extract exactly one ``E`` aspect row from the tab-delimited LN flat file."""
 
     if year < 1900:
         raise ValueError("year is implausible")
@@ -147,49 +152,41 @@ def extract_ln_standard_error(
         )
 
     row = standard_error_rows[0]
-    try:
-        value = float(row["value"])
-    except ValueError as exc:
-        raise ValueError(f"standard-error aspect value is not numeric: {row['value']!r}") from exc
-    if not math.isfinite(value) or value <= 0:
-        raise ValueError(f"standard-error aspect value must be finite and positive: {value!r}")
-
     footnote = row.get("footnote_codes", row.get("footnote_code", ""))
     return LNStandardError(
         series_id=series_id,
         year=year,
         period=period,
         aspect_type=STANDARD_ERROR_ASPECT_TYPE,
-        value=value,
+        value=_validated_positive_value(row["value"], label="standard-error aspect value"),
         footnote_code=footnote,
     )
 
 
-def parse_bls_api_month_value(
+def _bls_api_observation(
     payload: Mapping[str, object],
     *,
     series_id: str,
     year: int,
     period: str,
-) -> float:
-    """Parse one point estimate from a BLS Public Data API response."""
-
+) -> dict[str, object]:
     if payload.get("status") != "REQUEST_SUCCEEDED":
-        raise ValueError(f"BLS API request did not succeed: {payload.get('status')!r}")
+        raise ValueError(
+            f"BLS API request did not succeed: {payload.get('status')!r}; "
+            f"message={payload.get('message')!r}"
+        )
     results = payload.get("Results")
     if not isinstance(results, dict):
         raise ValueError("BLS API response lacks Results object")
     raw_series = results.get("series")
     if not isinstance(raw_series, list):
         raise ValueError("BLS API response lacks series array")
-
     candidates = [row for row in raw_series if isinstance(row, dict) and row.get("seriesID") == series_id]
     if len(candidates) != 1:
         raise ValueError(f"expected exactly one BLS API series {series_id}; found {len(candidates)}")
     data = candidates[0].get("data")
     if not isinstance(data, list):
         raise ValueError("BLS API series lacks data array")
-
     matches = [
         row
         for row in data
@@ -202,7 +199,25 @@ def parse_bls_api_month_value(
             f"expected exactly one BLS API observation for {series_id} {year} {period}; "
             f"found {len(matches)}"
         )
-    raw_value = matches[0].get("value")
+    return {str(key): value for key, value in matches[0].items()}
+
+
+def parse_bls_api_month_value(
+    payload: Mapping[str, object],
+    *,
+    series_id: str,
+    year: int,
+    period: str,
+) -> float:
+    """Parse one point estimate from a BLS Public Data API response."""
+
+    observation = _bls_api_observation(
+        payload,
+        series_id=series_id,
+        year=year,
+        period=period,
+    )
+    raw_value = observation.get("value")
     try:
         value = float(str(raw_value).replace(",", ""))
     except ValueError as exc:
@@ -210,6 +225,59 @@ def parse_bls_api_month_value(
     if not math.isfinite(value) or value < 0:
         raise ValueError(f"BLS API observation must be finite and nonnegative: {value!r}")
     return value
+
+
+def extract_bls_api_standard_error(
+    payload: Mapping[str, object],
+    *,
+    series_id: str,
+    year: int,
+    period: str,
+) -> LNStandardError:
+    """Extract exactly one ``Standard Error`` aspect from one BLS API observation."""
+
+    observation = _bls_api_observation(
+        payload,
+        series_id=series_id,
+        year=year,
+        period=period,
+    )
+    aspects = observation.get("aspects")
+    if not isinstance(aspects, list):
+        raise ValueError(
+            "BLS API observation did not include an aspects array; the keyless "
+            "single-series aspects path is unavailable for this request"
+        )
+    matches = [
+        aspect
+        for aspect in aspects
+        if isinstance(aspect, dict)
+        and str(aspect.get("name", "")).strip().casefold() == STANDARD_ERROR_API_NAME.casefold()
+    ]
+    if len(matches) != 1:
+        observed_names = sorted(
+            str(aspect.get("name", "")) for aspect in aspects if isinstance(aspect, dict)
+        )
+        raise ValueError(
+            "expected exactly one BLS API Standard Error aspect for "
+            f"{series_id} {year} {period}; found {len(matches)}; "
+            f"observed aspect names={observed_names}"
+        )
+    aspect = matches[0]
+    footnotes = aspect.get("footnotes")
+    codes: list[str] = []
+    if isinstance(footnotes, list):
+        for item in footnotes:
+            if isinstance(item, dict) and item.get("code"):
+                codes.append(str(item["code"]))
+    return LNStandardError(
+        series_id=series_id,
+        year=year,
+        period=period,
+        aspect_type=STANDARD_ERROR_API_NAME,
+        value=_validated_positive_value(aspect.get("value"), label="BLS API Standard Error"),
+        footnote_code=",".join(codes),
+    )
 
 
 def reconstruct_management_professional_employment(
