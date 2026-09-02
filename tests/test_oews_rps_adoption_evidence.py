@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import csv
 import hashlib
 import json
+from csv import DictReader
 from pathlib import Path
 
 
@@ -12,7 +12,7 @@ EVIDENCE = ROOT / "data" / "derived" / "composition" / "oews-rps-adoption-2026-0
 
 def _rows(name: str) -> list[dict[str, str]]:
     with (EVIDENCE / name).open(newline="") as handle:
-        return list(csv.DictReader(handle))
+        return list(DictReader(handle))
 
 
 def _json(name: str) -> object:
