@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import hashlib
-import json
 from csv import DictReader
+from hashlib import sha256
+from json import loads
 from pathlib import Path
 
 
@@ -16,11 +16,11 @@ def _rows(name: str) -> list[dict[str, str]]:
 
 
 def _json(name: str) -> object:
-    return json.loads((EVIDENCE / name).read_text())
+    return loads((EVIDENCE / name).read_text())
 
 
 def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    return sha256(path.read_bytes()).hexdigest()
 
 
 def test_live_oews_rps_evidence_is_bound_to_canonical_source_identity() -> None:
