@@ -110,7 +110,7 @@ def test_suppression_and_unsupported_categories_fail_closed() -> None:
     exclusions = {row["source_or_target"]: row["reason"] for row in eligibility["always_excluded"]}
 
     assert set(exclusions) == {"XX", "public-administration"}
-    assert "never redistributed" in exclusions["XX"]
+    assert "may not be redistributed" in exclusions["XX"]
     assert "no BTOS counterpart" in exclusions["public-administration"]
     assert "Never infer, complement, interpolate, or model" in eligibility["suppression_rule"]
     assert "never switch cycles" in eligibility["suppression_rule"]
@@ -132,7 +132,9 @@ def test_statistics_are_fixed_descriptive_and_noncausal() -> None:
     assert "employment-weighted correlation" in forbidden
     assert "causal coefficients" in forbidden
     assert "composite BTOS-RPS adoption scores" in forbidden
-    assert "no p-values and no confidence intervals" in uncertainty["cross_source_inference_v1"]
+    assert "Do not report p-values or confidence intervals" in uncertainty[
+        "cross_source_inference_v1"
+    ]
 
 
 def test_limited_preanalysis_exposure_is_disclosed_without_posthoc_exclusion() -> None:
@@ -156,7 +158,9 @@ def test_protocol_cannot_publish_a_leaderboard_or_overclaim() -> None:
     assert "business-versus-worker" in required
     assert "AI-versus-GenAI" in required
     assert "not publish a one-cycle industry leaderboard" in reporting["ranking_rule"]
-    assert "not evidence of causality" in reporting["interpretation_rule"]
+    assert "Do not interpret agreement as validation or causality" in reporting[
+        "interpretation_rule"
+    ]
 
 
 def test_v1_becomes_immutable_after_outcome_inspection() -> None:
