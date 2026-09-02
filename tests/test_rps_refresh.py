@@ -16,7 +16,7 @@ from genai_at_work.rps_refresh import (
 
 
 class FakeRpsClient:
-    def __init__(self) -> None:
+    def __init__(self, *, realtime_date: str = "2026-09-02") -> None:
         self.release_rows = [
             {
                 "id": "RPSGENAIUSAGESHAREWORK",
@@ -61,6 +61,7 @@ class FakeRpsClient:
         ]
         self.observation_calls: list[str] = []
         self.notes = "Published aggregate RPS test series."
+        self.realtime_date = realtime_date
 
     def iter_release_series(
         self, release_id: int, page_size: int = 1000
@@ -88,8 +89,8 @@ class FakeRpsClient:
             {
                 "date": "2026-05-01",
                 "value": values[series_id],
-                "realtime_start": "2026-08-04",
-                "realtime_end": "9999-12-31",
+                "realtime_start": self.realtime_date,
+                "realtime_end": self.realtime_date,
             }
         ]
 
@@ -170,6 +171,26 @@ def test_refresh_requires_exact_provider_inventory_and_skips_excluded_observatio
     assert len(snapshot["content_sha256"]) == 64
 
 
+def test_content_identity_ignores_fred_default_realtime_query_date() -> None:
+    first = build_refresh_snapshot(
+        FakeRpsClient(realtime_date="2026-09-02"),
+        _manifest(),
+        _scope(),
+        retrieved_at=datetime(2026, 9, 2, 12, 0, tzinfo=UTC),
+    )
+    second = build_refresh_snapshot(
+        FakeRpsClient(realtime_date="2026-09-03"),
+        _manifest(),
+        _scope(),
+        retrieved_at=datetime(2026, 9, 3, 12, 0, tzinfo=UTC),
+    )
+
+    assert first["retrieved_at"] != second["retrieved_at"]
+    assert first["series"][0]["observations"][0]["realtime_start"] != second["series"][0]["observations"][0]["realtime_start"]
+    assert first["content_sha256"] == second["content_sha256"]
+    assert compare_refresh_snapshots(first, second)["revision_status"] == "unchanged"
+
+
 def test_refresh_fails_closed_on_provider_inventory_drift() -> None:
     client = FakeRpsClient()
     client.release_rows.pop()
@@ -195,7 +216,7 @@ def test_snapshot_comparison_distinguishes_new_wave_revision_and_mixed() -> None
             "value": 55.0,
             "unit": "Percent",
             "realtime_start": "2026-11-01",
-            "realtime_end": "9999-12-31",
+            "realtime_end": "2026-11-01",
             "source_last_updated": "2026-11-01 10:00:00-06",
         }
     )
