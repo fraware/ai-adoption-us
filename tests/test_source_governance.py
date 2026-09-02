@@ -26,14 +26,15 @@ def test_rps_refresh_candidate_stays_private_and_fail_closed():
 
 def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     script = (ROOT / "scripts" / "prepare_rps_observatory_candidate.py").read_text()
-    module = (ROOT / "src" / "genai_at_work" / "rps_release.py").read_text()
+    module = (ROOT / "src" / "genai_at_work" / "rps_release_complete.py").read_text()
 
     assert 'PRIVATE_ROOT = ROOT / "data" / "audit" / "private"' in script
     assert "Repository-local RPS release candidates may only be written under" in script
     assert '"promotion_performed": False' in script
     assert "global_baseline_warning" in script
+    assert "build_rps_release_candidate_complete_history" in script
     assert '"source_input_bytes_publication": False' in module
-    assert "RPS longitudinal component only" in module
+    assert "complete 131-series source history" in module
     assert "artifacts/longitudinal/" in module
     assert "apps/web/public" not in script
     assert "apps/web/public" not in module
@@ -47,7 +48,7 @@ def test_snapshot_native_composition_join_emits_derived_evidence_only():
     module = (ROOT / "src" / "genai_at_work" / "composition_snapshot.py").read_text()
 
     assert "--source-snapshot" in script
-    assert "prepare_rps_panel" in script
+    assert "prepare_rps_source_history" in script
     assert "rps-private-fixture" not in script
     assert '"source_snapshot_published": False' in script
     assert '"public_raw_rps_observations_included": False' in script
