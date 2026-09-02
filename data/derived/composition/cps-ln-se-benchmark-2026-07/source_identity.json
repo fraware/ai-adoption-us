@@ -28,8 +28,19 @@
     "bls_api_transport_response_sha256": "c4f2fa5e6322f3ef6d3f6fe8a246d0997aa72738fae2690b44b74c1309094f6b",
     "bls_api_transport_response_size_bytes": 3837
   },
+  "content_identity_verification_transport": {
+    "github_run_id": "33692874104",
+    "github_head_sha": "c7c5c57809b26d09f5d033ca50495cedc0e00ddc",
+    "artifact_id": "9870694833",
+    "artifact_digest": "sha256:828af14745253e5dbe4a7341c22ed2e21a47a4c2d42e419509bccdff3f0afbc2",
+    "bls_api_transport_response_sha256": "367b2d6140611596e1f952bab07fc1bdbe574b1fa29f08bd218741b63789527b",
+    "bls_api_transport_response_size_bytes": 3836,
+    "bls_api_scientific_content_sha256": "8f1e05bf9a3dd4692fc2c91fcaf386e85f83f219cca4b0641f3c9b6699949ab5"
+  },
   "transport_response_bytes_equal": false,
   "scientific_content_equal": true,
+  "independent_live_retrieval_count": 3,
+  "distinct_transport_response_hash_count": 3,
   "cps_public_use_sha256": "a97d4908014689f29c2f833c01289c6564c8a27c0b5358562dd111eb33e05247",
   "interpretation": "Raw BLS API response bytes are exact retrieval evidence and may vary without a scientific change. The canonical scientific identity is the digest of the selected estimate and standard-error fields."
 }
