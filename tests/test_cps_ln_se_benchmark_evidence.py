@@ -16,6 +16,11 @@ def _sha256(name: str) -> str:
     return hashlib.sha256((EVIDENCE / name).read_bytes()).hexdigest()
 
 
+def _canonical_sha256(value: object) -> str:
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
 def test_canonical_benchmark_pins_official_estimate_se_and_public_use_gap() -> None:
     benchmark = _json("benchmark.json")
     assert isinstance(benchmark, dict)
@@ -63,7 +68,7 @@ def test_validation_keeps_same_period_and_no_pooled_quarter_boundary() -> None:
     assert validation["raw_bls_api_response_published"] is False
 
 
-def test_input_manifest_pins_live_public_sources_without_raw_source_publication() -> None:
+def test_input_manifest_preserves_exact_canonical_run_transport_snapshot() -> None:
     manifest = _json("input_manifest.json")
     assert isinstance(manifest, dict)
     assert manifest["source_build_commit"] == "f9bcc48350a5acf923b8de1982092caf34542172"
@@ -83,6 +88,32 @@ def test_input_manifest_pins_live_public_sources_without_raw_source_publication(
     assert cps["raw_file_published"] is False
 
 
+def test_source_identity_separates_transport_bytes_from_scientific_content() -> None:
+    identity = _json("source_identity.json")
+    assert isinstance(identity, dict)
+    scientific = identity["bls_scientific_content"]
+    assert isinstance(scientific, dict)
+    assert _canonical_sha256(scientific) == (
+        "8f1e05bf9a3dd4692fc2c91fcaf386e85f83f219cca4b0641f3c9b6699949ab5"
+    )
+    assert identity["bls_scientific_content_sha256"] == _canonical_sha256(scientific)
+    assert identity["scientific_content_equal"] is True
+    assert identity["transport_response_bytes_equal"] is False
+    review = identity["canonical_review_transport"]
+    repeat = identity["canonical_main_repeat_transport"]
+    assert isinstance(review, dict)
+    assert isinstance(repeat, dict)
+    assert review["bls_api_transport_response_sha256"] == (
+        "64a597f049d1793f788d0deaea1e089bfce9cd92de116ffd4634d186a231756a"
+    )
+    assert repeat["bls_api_transport_response_sha256"] == (
+        "c4f2fa5e6322f3ef6d3f6fe8a246d0997aa72738fae2690b44b74c1309094f6b"
+    )
+    assert review["bls_api_transport_response_sha256"] != repeat[
+        "bls_api_transport_response_sha256"
+    ]
+
+
 def test_provenance_binds_live_run_artifact_and_canonical_file_hashes() -> None:
     provenance = _json("provenance.json")
     assert isinstance(provenance, dict)
@@ -93,6 +124,11 @@ def test_provenance_binds_live_run_artifact_and_canonical_file_hashes() -> None:
     assert execution["artifact_id"] == "9870172427"
     assert execution["artifact_digest"] == (
         "sha256:6d299bc5d7a403bbf4503728705051c3cbde7b1c7b1d2dfaf8dc1e020e24ecd1"
+    )
+    scientific_identity = provenance["upstream_scientific_identity"]
+    assert isinstance(scientific_identity, dict)
+    assert scientific_identity["bls_api_scientific_content_sha256"] == (
+        "8f1e05bf9a3dd4692fc2c91fcaf386e85f83f219cca4b0641f3c9b6699949ab5"
     )
     hashes = provenance["canonical_evidence_sha256"]
     assert isinstance(hashes, dict)
