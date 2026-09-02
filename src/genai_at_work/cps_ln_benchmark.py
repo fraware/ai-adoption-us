@@ -29,6 +29,8 @@ MANAGEMENT_PROFESSIONAL_SERIES_ID = "LNU02032201"
 STANDARD_ERROR_ASPECT_TYPE = "E"
 STANDARD_ERROR_API_NAME = "Standard Error"
 MANAGEMENT_PROFESSIONAL_OCCUPATION_CODES = frozenset(range(1, 11))
+# Official 2026 record layout location 846-855, expressed as Python's zero-based slice.
+PWCMPWGT_FIXED_WIDTH_2026 = (845, 855)
 
 _MONTH_TO_PERIOD = {
     "jan": "M01",
@@ -286,12 +288,13 @@ def reconstruct_management_professional_employment(
     year: int,
     month: str,
 ) -> CPSMonthlyBenchmark:
-    """Reconstruct ``LNU02032201`` from one official 2026 Basic Monthly file.
+    """Reconstruct published ``LNU02032201`` from one official 2026 CPS file.
 
-    The published table universe is employed people age 16 and over. The broad
-    Management, Professional, and Related group corresponds to project-audited
-    ``PRDTOCC1`` major occupation recodes 1 through 10. Final person weights are
-    decoded from ``PWSSWGT`` using its four implied decimals.
+    The BLS published-labor-force universe uses the composited final weight
+    ``PWCMPWGT`` for civilian people age 16 and over. The broad Management,
+    Professional, and Related group corresponds to ``PRDTOCC1`` recodes 1 through 10.
+    ``PWCMPWGT`` has four implied decimal places and occupies record positions 846-855
+    in the official 2026 fixed-width layout.
     """
 
     if year != 2026:
@@ -301,6 +304,7 @@ def reconstruct_management_professional_employment(
     employed_16_plus_rows = 0
     benchmark_rows = 0
     weighted_persons = 0.0
+    weight_start, weight_end = PWCMPWGT_FIXED_WIDTH_2026
 
     with gzip.open(cps_path, mode="rt", encoding="ascii", newline="") as handle:
         for line in handle:
@@ -317,10 +321,10 @@ def reconstruct_management_professional_employment(
             employed_16_plus_rows += 1
             if occupation_code not in MANAGEMENT_PROFESSIONAL_OCCUPATION_CODES:
                 continue
-            weight = parse_final_weight(row["PWSSWGT"])
+            weight = parse_final_weight(line[weight_start:weight_end])
             if weight is None:
                 raise ValueError(
-                    f"benchmark row {rows_read} has invalid PWSSWGT despite employed benchmark scope"
+                    f"benchmark row {rows_read} has invalid PWCMPWGT despite published-series scope"
                 )
             benchmark_rows += 1
             weighted_persons += weight
