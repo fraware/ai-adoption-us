@@ -381,6 +381,7 @@ def compare_cps_oews_adoption_residuals(
         cps_residual: float | None = None
         cps_sign: str | None = None
         if cps_supported:
+            assert cps is not None
             raw_residual = cps.get("occupation_adjusted_industry_context_residual")
             if isinstance(raw_residual, bool) or not isinstance(raw_residual, (int, float)):
                 raise OewsRpsError(
