@@ -1,0 +1,26 @@
+{
+  "benchmark_type": "bls_ln_same_period_cps_public_use_reconstruction",
+  "bls_api_features_url": "https://www.bls.gov/bls/api_features.htm",
+  "bls_ln_flat_aspect_reference_url": "https://download.bls.gov/pub/time.series/ln/ln.aspect",
+  "bls_public_api": {
+    "raw_response_published": false,
+    "request_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/LNU02032201?aspects=true",
+    "response_sha256": "64a597f049d1793f788d0deaea1e089bfce9cd92de116ffd4634d186a231756a",
+    "response_size_bytes": 3837
+  },
+  "bls_standard_error_guidance_url": "https://www.bls.gov/cps/factsheets/understanding-standard-errors-and-confidence-intervals.htm",
+  "census_public_use_disclosure_note_url": "https://www.census.gov/programs-surveys/cps/technical-documentation/user-notes/cpsbasic_2013_01.html",
+  "census_public_use_documentation_url": "https://www2.census.gov/programs-surveys/cps/methodology/PublicUseDocumentation_final.pdf",
+  "cps_public_use": {
+    "file_size_bytes": 9502622,
+    "filename": "jul26pub.dat.gz",
+    "raw_file_published": false,
+    "record_layout_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/2026_Basic_CPS_Public_Use_Record_Layout_plus_IO_Code_list.txt",
+    "sha256": "a97d4908014689f29c2f833c01289c6564c8a27c0b5358562dd111eb33e05247",
+    "source_url": "https://www2.census.gov/programs-surveys/cps/datasets/2026/basic/jul26pub.dat.gz"
+  },
+  "retrieved_at_utc": "2026-09-02T22:39:47.790072+00:00",
+  "schema_version": 1,
+  "series_id": "LNU02032201",
+  "source_build_commit": "f9bcc48350a5acf923b8de1982092caf34542172"
+}
