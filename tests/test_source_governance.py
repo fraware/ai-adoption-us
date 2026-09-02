@@ -23,6 +23,24 @@ def test_rps_refresh_candidate_stays_private_and_fail_closed():
     assert "observations_retrieved" in module
 
 
+def test_rps_observatory_candidate_stays_private_and_cannot_promote():
+    script = (ROOT / "scripts" / "prepare_rps_observatory_candidate.py").read_text()
+    module = (ROOT / "src" / "genai_at_work" / "rps_release.py").read_text()
+
+    assert 'PRIVATE_ROOT = ROOT / "data" / "audit" / "private"' in script
+    assert "Repository-local RPS release candidates may only be written under" in script
+    assert '"promotion_performed": False' in script
+    assert "global_baseline_warning" in script
+    assert '"source_input_bytes_publication": False' in module
+    assert "RPS longitudinal component only" in module
+    assert "artifacts/longitudinal/" in module
+    assert "apps/web/public" not in script
+    assert "apps/web/public" not in module
+    assert "FredClient" not in script
+    assert "FredClient" not in module
+    assert "observatory_release.py" not in script
+
+
 def test_no_public_observation_bundle():
     assert not (ROOT / "apps" / "web" / "public" / "data" / "observations.json").exists()
 
