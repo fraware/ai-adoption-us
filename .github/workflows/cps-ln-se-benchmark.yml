@@ -5,11 +5,14 @@ on:
     branches:
       - main
       - research/cps-ln-se-benchmark
+      - research/cps-ln-se-content-identity
     paths:
       - '.github/workflows/cps-ln-se-benchmark.yml'
       - 'scripts/execute_cps_ln_se_benchmark.py'
       - 'src/genai_at_work/cps_ln_benchmark.py'
       - 'src/genai_at_work/cps.py'
+      - 'data/derived/composition/cps-ln-se-benchmark-2026-07/**'
+      - 'tests/test_cps_ln_se_benchmark_evidence.py'
   workflow_dispatch:
 
 permissions:
