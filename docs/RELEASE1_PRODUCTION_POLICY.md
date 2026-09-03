@@ -127,7 +127,9 @@ The repository uses a custom GitHub Actions workflow that:
 5. uploads `apps/web/out` as the GitHub Pages artifact;
 6. deploys only on pushes to `main`.
 
-GitHub Pages must be enabled with **Source: GitHub Actions** in repository settings. The normal workflow token cannot enable Pages if it is disabled; that repository setting is therefore an external platform prerequisite, not something the application silently bypasses.
+GitHub Pages must be enabled with **Source: GitHub Actions** in repository settings. The normal `GITHUB_TOKEN` cannot enable Pages when it is disabled. The official `configure-pages` action documents that automatic enablement requires a stronger token carrying administration/pages-write permissions. The current repository connector is therefore not treated as authority to self-enable Pages.
+
+If the repository setting is already enabled, deployment can proceed automatically after merge. If it is disabled, the workflow's deployment step is expected to fail closed until the repository owner enables **Settings → Pages → Source: GitHub Actions**. No alternate hosting service is selected or invoked by this Release 1 workflow.
 
 ## 11. Release 1 publication gate
 
