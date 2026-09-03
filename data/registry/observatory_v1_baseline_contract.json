@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "contract_id": "observatory-v1-global-baseline-2026-09-03",
+  "data_mode": "derived_only",
+  "required_components": [
+    "rps_longitudinal",
+    "cps_composition",
+    "oews_robustness",
+    "btos_triangulation"
+  ],
+  "rps_component": {
+    "component_id": "rps_longitudinal",
+    "source_id": "rps-genai-tracker-fred-release-6",
+    "required_artifact_ids": [
+      "rps-longitudinal-diagnostics",
+      "rps-quarter-diagnostics",
+      "rps-rank-stability",
+      "rps-longitudinal-validation"
+    ],
+    "require_claims": true,
+    "require_source_input_bytes_publication_false": true
+  },
+  "repository_sources": [
+    {
+      "component_id": "cps_composition",
+      "source_id": "cps-basic-monthly-composition-v1",
+      "provider": "U.S. Census Bureau",
+      "dataset": "Current Population Survey Basic Monthly public-use composition inputs",
+      "retrieved_at": "2026-09-01T08:29:25.692816+00:00",
+      "reference_periods": [
+        "2025-Q2",
+        "2026-Q2"
+      ],
+      "instrument_version": "cps-basic-monthly-public-use-2025-2026",
+      "definition_id": "employed-age-18-64-prempnot-1-worker-and-work-hour-composition-v1",
+      "taxonomy_versions": {
+        "industry": "cps-2022-industry-rps-v2",
+        "occupation": "cps-2022-occupation-rps-v1"
+      },
+      "rights": {
+        "status": "approved",
+        "storage_scope": "public",
+        "publication_scope": "derived_only",
+        "redistribution_scope": "derived_only"
+      },
+      "coverage": {
+        "status": "pass",
+        "required_units": 2,
+        "observed_units": 2
+      },
+      "objects": [
+        {
+          "object_id": "cps-q2-2025-input-manifest",
+          "repository_path": "data/derived/composition/cps-q2-2025/input_manifest.json"
+        },
+        {
+          "object_id": "cps-q2-2026-input-manifest",
+          "repository_path": "data/derived/composition/cps-q2-2026/input_manifest.json"
+        },
+        {
+          "object_id": "cps-quarter-availability",
+          "repository_path": "data/registry/cps_quarter_availability.json"
+        },
+        {
+          "object_id": "cps-design-variance-decision",
+          "repository_path": "data/registry/cps_design_variance_decision.json"
+        }
+      ]
+    },
+    {
+      "component_id": "oews_robustness",
+      "source_id": "oews-may-2025-composition-v1",
+      "provider": "U.S. Bureau of Labor Statistics",
+      "dataset": "May 2025 Occupational Employment and Wage Statistics employment composition",
+      "retrieved_at": "2026-09-01T08:29:30.956807+00:00",
+      "reference_periods": [
+        "2025-05"
+      ],
+      "instrument_version": "oews-may-2025-employment-datatype-01",
+      "definition_id": "oews-covered-employment-composition-robustness-v1",
+      "taxonomy_versions": {
+        "industry": "oews-2022-naics-rps-v1",
+        "occupation": "oews-2018-soc-rps-v1"
+      },
+      "rights": {
+        "status": "approved",
+        "storage_scope": "public",
+        "publication_scope": "derived_only",
+        "redistribution_scope": "derived_only"
+      },
+      "coverage": {
+        "status": "pass",
+        "required_units": 460,
+        "observed_units": 460
+      },
+      "objects": [
+        {
+          "object_id": "oews-may-2025-input-manifest",
+          "repository_path": "data/derived/composition/oews-may-2025/input_manifest.json"
+        },
+        {
+          "object_id": "oews-industry-crosswalk",
+          "repository_path": "data/registry/oews_industry_crosswalk_v1.json"
+        },
+        {
+          "object_id": "oews-occupation-crosswalk",
+          "repository_path": "data/registry/oews_occupation_crosswalk_v1.json"
+        }
+      ]
+    },
+    {
+      "component_id": "btos_triangulation",
+      "source_id": "btos-core-ai-202611-q7-a1-v1",
+      "provider": "U.S. Census Bureau",
+      "dataset": "Business Trends and Outlook Survey cycle 202611 Question 7 Answer 1",
+      "retrieved_at": "2026-09-02T11:06:18.300020+00:00",
+      "reference_periods": [
+        "2026-05-04_to_2026-05-17"
+      ],
+      "instrument_version": "btos-202611-q7-a1",
+      "definition_id": "business-reported-current-ai-use-last-two-weeks-v1",
+      "taxonomy_versions": {
+        "industry": "btos-2022-naics-rps-v1.1"
+      },
+      "rights": {
+        "status": "approved",
+        "storage_scope": "public",
+        "publication_scope": "derived_only",
+        "redistribution_scope": "derived_only"
+      },
+      "coverage": {
+        "status": "pass",
+        "required_units": 1,
+        "observed_units": 1
+      },
+      "objects": [
+        {
+          "object_id": "btos-source-checkpoint",
+          "repository_path": "data/registry/btos_core_ai_202611_source_v1.json"
+        },
+        {
+          "object_id": "btos-construct-scope",
+          "repository_path": "data/registry/btos_construct_scope_v1.json"
+        }
+      ]
+    }
+  ],
+  "repository_artifacts": [
+    {
+      "artifact_id": "cps-composition-q2-2025",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-q2-2025/cps_composition.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-composition-q2-2025-validation",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-q2-2025/validation_checks.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-composition-q2-2026",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-q2-2026/cps_composition.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-composition-q2-2026-validation",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-q2-2026/validation_checks.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-cross-vintage-reliability",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-q2-reliability/cross_vintage_reliability.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-reliability-validation",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-q2-reliability/validation_checks.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-quarter-availability",
+      "component_id": "cps_composition",
+      "repository_path": "data/registry/cps_quarter_availability.json",
+      "evidence_class": 1,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-design-variance-decision",
+      "component_id": "cps_composition",
+      "repository_path": "data/registry/cps_design_variance_decision.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "cps-direct-se-validation-family",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/cps-ln-se-benchmark-2026-07/direct_se_family.json",
+      "evidence_class": 2,
+      "source_ids": ["cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "rps-cps-primary-residuals",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/primary_residuals.csv",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "rps-cps-residual-persistence",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/cross_period_persistence.csv",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "rps-cps-residual-robustness",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/robustness_summary.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "rps-cps-residual-validation",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/validation_checks.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "rps-cps-residual-provenance",
+      "component_id": "cps_composition",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/provenance.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1"]
+    },
+    {
+      "artifact_id": "oews-rps-primary-counterfactuals",
+      "component_id": "oews_robustness",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/primary_counterfactuals.csv",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1", "oews-may-2025-composition-v1"]
+    },
+    {
+      "artifact_id": "oews-rps-cps-comparison",
+      "component_id": "oews_robustness",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/primary_cps_oews_comparison.csv",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1", "oews-may-2025-composition-v1"]
+    },
+    {
+      "artifact_id": "oews-rps-summary",
+      "component_id": "oews_robustness",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/summary.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1", "oews-may-2025-composition-v1"]
+    },
+    {
+      "artifact_id": "oews-rps-validation",
+      "component_id": "oews_robustness",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/validation_checks.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1", "oews-may-2025-composition-v1"]
+    },
+    {
+      "artifact_id": "oews-rps-provenance",
+      "component_id": "oews_robustness",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/provenance.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "cps-basic-monthly-composition-v1", "oews-may-2025-composition-v1"]
+    },
+    {
+      "artifact_id": "btos-core-ai-202611",
+      "component_id": "btos_triangulation",
+      "repository_path": "data/derived/btos/btos_core_ai_202611.json",
+      "evidence_class": 1,
+      "source_ids": ["btos-core-ai-202611-q7-a1-v1"]
+    },
+    {
+      "artifact_id": "btos-rps-industry-triangulation",
+      "component_id": "btos_triangulation",
+      "repository_path": "data/derived/btos_rps/industry_triangulation_q2_2026_v1.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "btos-core-ai-202611-q7-a1-v1"]
+    },
+    {
+      "artifact_id": "btos-rps-execution-state",
+      "component_id": "btos_triangulation",
+      "repository_path": "data/registry/btos_rps_comparison_execution_state_v1.json",
+      "evidence_class": 2,
+      "source_ids": ["rps-genai-tracker-fred-release-6", "btos-core-ai-202611-q7-a1-v1"]
+    }
+  ],
+  "validation_gates": [
+    {
+      "gate_id": "cps-q2-2025-composition",
+      "diagnostic_class": "suppression_coverage",
+      "repository_path": "data/derived/composition/cps-q2-2025/validation_checks.json",
+      "expected": {
+        "sanity_checks.all_worker_vectors_supported": true,
+        "sanity_checks.industry_count_is_20": true,
+        "sanity_checks.supported_worker_vectors_sum_to_one": true,
+        "sanity_checks.supported_worker_weights_nonnegative": true
+      }
+    },
+    {
+      "gate_id": "cps-q2-2026-composition",
+      "diagnostic_class": "suppression_coverage",
+      "repository_path": "data/derived/composition/cps-q2-2026/validation_checks.json",
+      "expected": {
+        "sanity_checks.all_supported_weight_vectors_sum_to_one": true,
+        "sanity_checks.all_weights_nonnegative": true,
+        "sanity_checks.industry_count_is_20": true,
+        "sanity_checks.weighted_worker_population_within_configured_sanity_range": true
+      }
+    },
+    {
+      "gate_id": "cps-residual-contract",
+      "diagnostic_class": "regression_contract",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/validation_checks.json",
+      "expected": {
+        "status": "pass",
+        "residual_identity_failure_count": 0,
+        "unsupported_nonnull_failure_count": 0,
+        "composition_evidence_tiers_bound": true
+      }
+    },
+    {
+      "gate_id": "oews-robustness-contract",
+      "diagnostic_class": "influence",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/validation_checks.json",
+      "expected": {
+        "status": "pass",
+        "raw_rps_snapshot_published": false,
+        "unsupported_comparison_row_count": 0,
+        "unsupported_counterfactual_row_count": 0
+      }
+    },
+    {
+      "gate_id": "btos-cross-construct-governance",
+      "diagnostic_class": "suppression_coverage",
+      "repository_path": "data/registry/btos_rps_comparison_execution_state_v1.json",
+      "expected": {
+        "period_resolution.selection_was_value_independent": true,
+        "cross_source_execution.statistics_computed": true,
+        "cross_source_execution.p_values_computed": false,
+        "cross_source_execution.correlation_confidence_intervals_computed": false,
+        "cross_source_execution.leaderboard_created": false,
+        "governance.protocol_v1_modified_after_outcome_inspection": false,
+        "governance.analysis_was_executed_after_protocol_became_canonical": true
+      }
+    },
+    {
+      "gate_id": "cps-q4-2025-explicit-unavailability",
+      "diagnostic_class": "stability",
+      "repository_path": "data/registry/cps_quarter_availability.json",
+      "expected": {
+        "unavailable.2025-Q4.reason": "October 2025 CPS interviewing was not conducted during the federal government shutdown. No two-month substitution is permitted."
+      }
+    }
+  ],
+  "global_claims": [
+    {
+      "claim_id": "global-cps-q4-2025-unavailable",
+      "surfaces": ["/", "/methodology", "/explore/industries"],
+      "artifact_ids": ["cps-quarter-availability"],
+      "value_summary": "Q4 2025 CPS composition is unavailable because October 2025 CPS interviewing was not conducted; no two-month substitution is permitted.",
+      "truth_state": "supported",
+      "evidence_class": 1,
+      "interpretation_boundary": "This is an explicit source-availability gap. November and December are not substituted or interpolated into a synthetic quarter."
+    },
+    {
+      "claim_id": "global-industry-context-residual-descriptive-only",
+      "surfaces": ["/explore/industries", "/methodology"],
+      "artifact_ids": ["rps-cps-primary-residuals", "rps-cps-residual-robustness", "rps-cps-residual-validation"],
+      "value_summary": "Occupation-adjusted industry-context residuals are descriptive standardization gaps after accounting for occupation composition.",
+      "truth_state": "supported",
+      "evidence_class": 2,
+      "interpretation_boundary": "Residuals are not identified organizational, management-quality, efficiency, productivity, or causal effects."
+    },
+    {
+      "claim_id": "global-oews-composition-robustness",
+      "surfaces": ["/explore/industries", "/methodology"],
+      "artifact_ids": ["oews-rps-cps-comparison", "oews-rps-summary", "oews-rps-validation"],
+      "value_summary": "OEWS provides an independent occupation-composition robustness lens for the industry adoption counterfactual.",
+      "truth_state": "supported",
+      "evidence_class": 2,
+      "interpretation_boundary": "OEWS and CPS have different worker universes; agreement or disagreement is robustness evidence, not synchronized-universe validation or causal inference."
+    },
+    {
+      "claim_id": "global-btos-rps-cross-construct-concordance",
+      "surfaces": ["/explore/industries", "/methodology"],
+      "artifact_ids": ["btos-rps-industry-triangulation", "btos-rps-execution-state"],
+      "value_summary": "BTOS business AI use and RPS worker GenAI adoption show descriptive sector-level concordance under a preregistered crosswalk and period-selection rule.",
+      "truth_state": "supported",
+      "evidence_class": 2,
+      "interpretation_boundary": "The measures have different units, denominators, technology scope, and reference periods. They are not interchangeable, calibrated to identity, causal, or productivity measures."
+    },
+    {
+      "claim_id": "global-cps-composition-design-interval-unsupported",
+      "surfaces": ["/methodology", "/explore/industries"],
+      "artifact_ids": ["cps-design-variance-decision", "cps-direct-se-validation-family"],
+      "value_summary": "Design-based confidence intervals for the custom pooled CPS industry-by-occupation composition vectors remain unsupported in Observatory v1.",
+      "truth_state": "unsupported",
+      "evidence_class": 2,
+      "interpretation_boundary": "Published direct standard errors validate selected same-period aggregates but do not identify the custom 22-dimensional composition covariance or pooled-quarter cross-month covariance."
+    }
+  ]
+}
