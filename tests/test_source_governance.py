@@ -26,20 +26,27 @@ def test_rps_refresh_candidate_stays_private_and_fail_closed():
 
 def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     script = (ROOT / "scripts" / "prepare_rps_observatory_candidate.py").read_text()
-    module = (ROOT / "src" / "genai_at_work" / "rps_release_complete.py").read_text()
+    complete_module = (
+        ROOT / "src" / "genai_at_work" / "rps_release_complete.py"
+    ).read_text()
+    public_module = (
+        ROOT / "src" / "genai_at_work" / "rps_release_public.py"
+    ).read_text()
 
     assert 'PRIVATE_ROOT = ROOT / "data" / "audit" / "private"' in script
     assert "Repository-local RPS release candidates may only be written under" in script
     assert '"promotion_performed": False' in script
     assert "global_baseline_warning" in script
-    assert "build_rps_release_candidate_complete_history" in script
-    assert '"source_input_bytes_publication": False' in module
-    assert "complete 131-series source history" in module
-    assert "artifacts/longitudinal/" in module
-    assert "apps/web/public" not in script
-    assert "apps/web/public" not in module
-    assert "FredClient" not in script
-    assert "FredClient" not in module
+    assert "build_rps_observatory_release_candidate" in script
+    assert "build_rps_release_candidate_complete_history" in public_module
+    assert '"source_input_bytes_publication": False' in complete_module
+    assert "complete 131-series source history" in complete_module
+    assert "artifacts/longitudinal/" in complete_module
+    assert "rps-public-observation-view" in public_module
+    assert "artifacts/public/rps_public_observation_view.json" in public_module
+    for text in (script, complete_module, public_module):
+        assert "apps/web/public" not in text
+        assert "FredClient" not in text
     assert "observatory_release.py" not in script
 
 
