@@ -20,8 +20,6 @@ def test_pages_static_export_and_non_pages_security_baseline_are_explicit():
     assert "trailingSlash: true" in config
     assert "poweredByHeader: false" in config
 
-    # The stronger response-header policy remains available for non-Pages/self-hosted validation,
-    # while Pages deployment is explicitly documented as static-host limited.
     for required in (
         "Content-Security-Policy",
         "Referrer-Policy",
@@ -44,6 +42,8 @@ def test_public_indexing_surfaces_are_explicit_and_limited():
     sitemap = read("apps/web/app/sitemap.ts")
     assert 'allow: "/"' in robots
     assert "sitemap.xml" in robots
+    assert 'dynamic = "force-static"' in robots
+    assert 'dynamic = "force-static"' in sitemap
     for route in (
         '"/"',
         '"/explore/industries"',
@@ -59,7 +59,7 @@ def test_public_indexing_surfaces_are_explicit_and_limited():
 
 def test_release_manifest_is_rights_safe_and_identity_bound():
     text = read("apps/web/app/release-manifest.json/route.ts")
-    assert '"derived_only"' not in text  # must report the actual deployment env, not hard-code success
+    assert '"derived_only"' not in text
     assert "RELEASE_COMMIT_SHA" in text
     assert "GITHUB_PAGES" in text
     assert "VERCEL" not in text
@@ -81,6 +81,7 @@ def test_github_pages_workflow_is_pinned_and_fail_closed():
     assert "data/audit/private" in workflow
     assert "sourceBytesPublished" in workflow
     assert "github.event_name != 'pull_request'" in workflow
+    assert "vercel" not in workflow.lower()
 
 
 def test_production_environment_and_policy_are_explicit():
@@ -93,4 +94,5 @@ def test_production_environment_and_policy_are_explicit():
     assert "no third-party analytics" in policy.lower()
     assert "no client-side monitoring" in policy.lower()
     assert "human/manual and physical-device spot checks remain outside Release 1 scope" in policy
-    assert "Settings" not in policy or "Source: GitHub Actions" in policy
+    assert "Source: GitHub Actions" in policy
+    assert "No alternate hosting service is selected or invoked" in policy
