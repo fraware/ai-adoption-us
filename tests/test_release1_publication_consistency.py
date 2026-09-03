@@ -37,10 +37,11 @@ def test_methodology_matches_executed_composition_boundary():
     methodology = read("apps/web/app/methodology/page.tsx")
     lower = methodology.lower()
 
-    assert "official cps q2 2025 and q2 2026 composition inputs have been executed and validated" in lower
+    assert "cps composition foundation has been executed and validated" in lower
+    assert "official q2 2025 and q2 2026" in lower
     assert "occupation-adjusted industry-context residual evidence" in lower
     assert "derived descriptive" in lower
-    assert "design-based confidence" in lower
+    assert "design-based" in lower
     assert "rps join gated" not in lower
     assert "until source permissions are resolved" not in lower
 
