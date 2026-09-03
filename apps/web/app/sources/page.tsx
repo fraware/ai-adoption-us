@@ -32,8 +32,9 @@ export default function SourcesPage() {
             <p>
               Official Q2 2025 and Q2 2026 Basic Monthly public-use files have been executed through the
               composition pipeline, producing versioned worker-share and actual-main-job-hour occupation
-              weights plus reliability diagnostics. Descriptive composition evidence is distinct from
-              design-based uncertainty for custom pooled vectors.
+              weights plus reliability diagnostics. These CPS weights are composition inputs, not RPS residuals;
+              occupation-adjusted residual evidence is produced separately as a derived descriptive artifact.
+              Design-based uncertainty for custom pooled composition vectors remains unsupported.
             </p>
           </div>
           <div className="status-card">
