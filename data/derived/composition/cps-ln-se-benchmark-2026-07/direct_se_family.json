@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "evidence_class": "official_same_period_direct_standard_error_validation",
+  "source": {
+    "publisher": "U.S. Bureau of Labor Statistics",
+    "service": "Public Data API v2",
+    "request_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+    "request_method": "POST",
+    "reference_period": "2026-M07",
+    "aspects_requested": true,
+    "registration_key_used": false
+  },
+  "live_execution": {
+    "workflow": "CPS occupation direct-SE probe",
+    "workflow_run_id": 33724372289,
+    "head_sha": "6ffa252424d1c653aec7cbd09e6943fd732559f6",
+    "conclusion": "success",
+    "transport_response_sha256": "363d77f69cabcd8d65c228734161332db3d44c47c2775319610f95e63d9b4a88",
+    "transport_response_size_bytes": 18207,
+    "raw_api_response_retained_in_repository": false
+  },
+  "series_family": {
+    "expected_series_count": 14,
+    "returned_series_count": 14,
+    "complete_direct_se_grid": true,
+    "series_ids": [
+      "LNU02032201",
+      "LNU02032202",
+      "LNU02032203",
+      "LNU02032204",
+      "LNU02032205",
+      "LNU02032206",
+      "LNU02032207",
+      "LNU02032208",
+      "LNU02032209",
+      "LNU02032210",
+      "LNU02032211",
+      "LNU02032212",
+      "LNU02032213",
+      "LNU02032214"
+    ],
+    "boundary_correction": {
+      "prior_probe_run_id": 33724132574,
+      "prior_probe_head_sha": "6b345e316826ec4797bdfb61ad7307771c603eb4",
+      "nonexistent_series_ids_reported_by_bls": [
+        "LNU02032215",
+        "LNU02032216",
+        "LNU02032217",
+        "LNU02032218",
+        "LNU02032219",
+        "LNU02032220"
+      ],
+      "interpretation": "The earlier quota-limited probe did not establish whether suffixes 15 through 20 existed. A subsequent single batched BLS request explicitly reported those six IDs as nonexistent. The validation family is therefore 01 through 14; the six IDs are not treated as missing observations."
+    }
+  },
+  "observations": [
+    {"series_id":"LNU02032201","value_thousands":69913.0,"standard_error_thousands":560.0},
+    {"series_id":"LNU02032202","value_thousands":30567.0,"standard_error_thousands":387.0},
+    {"series_id":"LNU02032203","value_thousands":39346.0,"standard_error_thousands":442.0},
+    {"series_id":"LNU02032204","value_thousands":27367.0,"standard_error_thousands":379.0},
+    {"series_id":"LNU02032205","value_thousands":30863.0,"standard_error_thousands":379.0},
+    {"series_id":"LNU02032206","value_thousands":14406.0,"standard_error_thousands":274.0},
+    {"series_id":"LNU02032207","value_thousands":16457.0,"standard_error_thousands":279.0},
+    {"series_id":"LNU02032208","value_thousands":14314.0,"standard_error_thousands":276.0},
+    {"series_id":"LNU02032209","value_thousands":1105.0,"standard_error_thousands":98.0},
+    {"series_id":"LNU02032210","value_thousands":8229.0,"standard_error_thousands":215.0},
+    {"series_id":"LNU02032211","value_thousands":4979.0,"standard_error_thousands":159.0},
+    {"series_id":"LNU02032212","value_thousands":20343.0,"standard_error_thousands":334.0},
+    {"series_id":"LNU02032213","value_thousands":8121.0,"standard_error_thousands":220.0},
+    {"series_id":"LNU02032214","value_thousands":12223.0,"standard_error_thousands":254.0}
+  ],
+  "scope_and_limitations": {
+    "validates": "A rights-safe official same-period family of BLS published occupation-level estimates and direct standard-error aspects can be retrieved reproducibly for calibration and validation work.",
+    "does_not_validate": [
+      "a canonical generalized-variance-function lending-series rule for the observatory's custom industry-by-occupation domains",
+      "the 22-dimensional covariance matrix of an industry occupation-composition vector",
+      "cross-month covariance for pooled-quarter CPS composition",
+      "a design-based confidence interval for an occupation-adjusted RPS residual"
+    ]
+  }
+}

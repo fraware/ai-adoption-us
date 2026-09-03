@@ -1,0 +1,191 @@
+name: CPS occupation direct-SE probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: Retrieve July 2026 BLS occupation estimates and SE aspects
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Retrieve occupation-family direct SEs
+        shell: bash
+        env:
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          base = 'https://api.bls.gov/publicAPI/v2/timeseries/data/'
+          series_ids = [f'LNU020322{suffix:02d}' for suffix in range(1, 15)]
+          api_key = os.environ.get('BLS_API_KEY', '').strip()
+
+          # BLS documents multi-series POST requests and the `aspects` option. A configured
+          # registration key is used when available, but its value is never written to logs or
+          # artifacts. A prior live probe established that LNU02032201--14 are the valid
+          # published series in this direct-SE validation family; 15--20 were explicitly
+          # reported by the BLS API as nonexistent and are not silently treated as missing data.
+          payload = {
+              'seriesid': series_ids,
+              'startyear': '2026',
+              'endyear': '2026',
+              'aspects': True,
+          }
+          if api_key:
+              payload['registrationkey'] = api_key
+
+          public_payload = {key: value for key, value in payload.items() if key != 'registrationkey'}
+          result = {
+              'schema_version': 3,
+              'reference_period': '2026-M07',
+              'series_family_probe': 'LNU02032201 through LNU02032214',
+              'series_family_boundary_evidence': {
+                  'prior_probe_run_id': 33724132574,
+                  'prior_probe_head_sha': '6b345e316826ec4797bdfb61ad7307771c603eb4',
+                  'nonexistent_series_ids_reported_by_bls': [
+                      'LNU02032215',
+                      'LNU02032216',
+                      'LNU02032217',
+                      'LNU02032218',
+                      'LNU02032219',
+                      'LNU02032220',
+                  ],
+              },
+              'request_method': 'POST',
+              'request_url': base,
+              'request_payload': public_payload,
+              'registration_key_used': bool(api_key),
+              'raw_api_response_published': False,
+              'rows': [],
+          }
+          output = Path(os.environ['RUNNER_TEMP']) / 'cps-occupation-se-probe.json'
+
+          request = urllib.request.Request(
+              base,
+              data=json.dumps(payload, separators=(',', ':')).encode('utf-8'),
+              headers={
+                  'Content-Type': 'application/json',
+                  'User-Agent': 'ai-adoption-us/1.0 public-data-validation',
+              },
+              method='POST',
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=120) as response:
+                  raw = response.read()
+          except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+              result['retrieval_error_type'] = type(exc).__name__
+              result['retrieval_error'] = getattr(exc, 'code', None) or str(getattr(exc, 'reason', exc))
+              output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+              print(json.dumps(result, indent=2, sort_keys=True))
+              raise SystemExit(1) from exc
+
+          result['transport_response_sha256'] = hashlib.sha256(raw).hexdigest()
+          result['transport_response_size_bytes'] = len(raw)
+          try:
+              response_payload = json.loads(raw.decode('utf-8'))
+          except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+              result['parse_error_type'] = type(exc).__name__
+              result['parse_error'] = str(exc)
+              output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+              print(json.dumps(result, indent=2, sort_keys=True))
+              raise SystemExit(1) from exc
+
+          result['status'] = response_payload.get('status')
+          result['message'] = response_payload.get('message')
+          results = response_payload.get('Results')
+          returned_series = results.get('series', []) if isinstance(results, dict) else []
+          by_id = {
+              item.get('seriesID'): item
+              for item in returned_series
+              if isinstance(item, dict) and isinstance(item.get('seriesID'), str)
+          }
+
+          complete = response_payload.get('status') == 'REQUEST_SUCCEEDED'
+          for series_id in series_ids:
+              row = {'series_id': series_id}
+              series = by_id.get(series_id)
+              if series is None:
+                  row['series_match_count'] = 0
+                  complete = False
+                  result['rows'].append(row)
+                  continue
+
+              observations = series.get('data', [])
+              matches = [
+                  item for item in observations
+                  if isinstance(item, dict)
+                  and item.get('year') == '2026'
+                  and item.get('period') == 'M07'
+              ]
+              if len(matches) != 1:
+                  row['reference_period_match_count'] = len(matches)
+                  complete = False
+                  result['rows'].append(row)
+                  continue
+
+              observation = matches[0]
+              raw_value = observation.get('value')
+              try:
+                  row['value_thousands'] = float(str(raw_value).replace(',', ''))
+              except (TypeError, ValueError):
+                  row['value_parse_error'] = repr(raw_value)
+                  complete = False
+
+              aspects = observation.get('aspects', [])
+              se = [
+                  item for item in aspects
+                  if isinstance(item, dict)
+                  and str(item.get('name', '')).strip().casefold() == 'standard error'
+              ]
+              if len(se) == 1:
+                  raw_se = se[0].get('value')
+                  try:
+                      row['standard_error_thousands'] = float(str(raw_se).replace(',', ''))
+                  except (TypeError, ValueError):
+                      row['standard_error_parse_error'] = repr(raw_se)
+                      complete = False
+                  row['standard_error_footnotes'] = se[0].get('footnotes', [])
+              else:
+                  row['standard_error_match_count'] = len(se)
+                  complete = False
+
+              result['rows'].append(row)
+
+          result['returned_series_count'] = len(by_id)
+          result['expected_series_count'] = len(series_ids)
+          result['complete_direct_se_grid'] = complete and len(by_id) == len(series_ids)
+          output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+          print(json.dumps(result, indent=2, sort_keys=True))
+
+          if not result['complete_direct_se_grid']:
+              print('Direct-SE validation grid is incomplete; failing closed.', file=sys.stderr)
+              raise SystemExit(1)
+          PY
+
+      - name: Upload rights-safe direct-SE probe
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cps-occupation-se-probe-${{ github.run_id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/cps-occupation-se-probe.json
+          retention-days: 14
+          if-no-files-found: warn
