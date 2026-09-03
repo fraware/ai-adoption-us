@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { absoluteSiteUrl } from "../lib/site";
 
+export const dynamic = "force-static";
+
 const publicRoutes = [
   "/",
   "/explore/industries",
