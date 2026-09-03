@@ -228,7 +228,7 @@ def test_binding_inventory_cannot_omit_rps_dependent_artifact(tmp_path: Path) ->
 
     with pytest.raises(
         ObservatoryRpsBindingError,
-        match="exact repository-pinned registry",
+        match="coverage must exactly match",
     ):
         _validate(candidate, tmp_path, bindings=bindings)
 
@@ -239,6 +239,15 @@ def test_binding_registry_rejects_unsafe_repository_path(tmp_path: Path) -> None
     source_bindings = bindings["source_vintage_bindings"]
     assert isinstance(source_bindings, list) and isinstance(source_bindings[0], dict)
     source_bindings[0]["repository_path"] = "../outside.json"
+
+    with pytest.raises(ObservatoryRpsBindingError, match="Unsafe repository binding path"):
+        _validate(candidate, tmp_path, bindings=bindings)
+
+
+def test_binding_registry_must_match_repository_pinned_bytes(tmp_path: Path) -> None:
+    candidate = _candidate(tmp_path)
+    bindings = deepcopy(load_json_object(BINDINGS))
+    bindings["binding_id"] = "edited-out-of-band"
 
     with pytest.raises(
         ObservatoryRpsBindingError,
