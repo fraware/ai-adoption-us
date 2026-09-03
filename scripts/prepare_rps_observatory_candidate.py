@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a private RPS release-engine candidate component from a source snapshot.
+"""Build a private RPS observatory candidate component from a source snapshot.
 
 This command performs no network access and no release promotion. The supplied
 snapshot must already have been acquired through the authorized RPS refresh
@@ -17,13 +17,16 @@ from pathlib import Path
 from typing import Any
 
 from genai_at_work.rps_release import RpsReleaseError
-from genai_at_work.rps_release_complete import build_rps_release_candidate_complete_history
+from genai_at_work.rps_release_public import build_rps_observatory_release_candidate
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = ROOT / "data" / "audit" / "private"
 MANIFEST_PATH = ROOT / "data" / "registry" / "rps_source_series_manifest.json"
 SCOPE_PATH = ROOT / "data" / "registry" / "rps_provider_catalog_scope.json"
 CLAIMS_PATH = ROOT / "data" / "registry" / "longitudinal_claim_inventory.json"
+PUBLIC_VIEW_CONTRACT_PATH = (
+    ROOT / "data" / "registry" / "rps_public_observation_delivery_v1.json"
+)
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -119,6 +122,7 @@ def main() -> int:
     manifest = _load_json(MANIFEST_PATH)
     scope = _load_json(SCOPE_PATH)
     claims = _load_json(CLAIMS_PATH)
+    public_view_contract = _load_json(PUBLIC_VIEW_CONTRACT_PATH)
     previous = (
         _load_json(args.previous_release_manifest)
         if args.previous_release_manifest is not None
@@ -127,24 +131,27 @@ def main() -> int:
     commit = _builder_commit()
 
     try:
-        candidate = build_rps_release_candidate_complete_history(
+        candidate = build_rps_observatory_release_candidate(
             snapshot,
             manifest,
             scope,
             claims,
+            public_view_contract,
             output_dir=args.output_dir,
             release_id=args.release_id,
             builder_commit=commit,
             previous_release=previous,
         )
-    except RpsReleaseError as exc:
+    except (RpsReleaseError, ValueError) as exc:
         raise SystemExit(str(exc)) from exc
 
     source = candidate["sources"][0]
+    artifact_ids = [row["artifact_id"] for row in candidate["artifacts"]]
     summary = {
         "release_id": candidate["release_id"],
         "release_type": candidate["release_type"],
         "data_mode": candidate["data_mode"],
+        "builder_id": candidate["build"]["builder_id"],
         "builder_commit": candidate["build"]["builder_commit"],
         "source_id": source["source_id"],
         "source_vintage_id": source["source_vintage_id"],
@@ -154,6 +161,7 @@ def main() -> int:
         "source_objects": len(source["objects"]),
         "full_source_observed_units": source["coverage"]["full_source_observed_units"],
         "derived_artifacts": len(candidate["artifacts"]),
+        "public_observation_view_included": "rps-public-observation-view" in artifact_ids,
         "diagnostics": {
             row["diagnostic_id"]: row["status"] for row in candidate["diagnostics"]
         },
@@ -162,7 +170,7 @@ def main() -> int:
         "source_input_bytes_publication": False,
         "promotion_performed": False,
         "global_baseline_warning": (
-            "This is the RPS longitudinal component. Do not promote it as the first global "
+            "This is the RPS observatory component. Do not promote it as the first global "
             "observatory baseline unless the complete observatory release composition is reviewed."
         ),
     }
