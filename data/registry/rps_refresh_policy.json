@@ -27,6 +27,41 @@
     ],
     "rationale": "The registered source is quarterly and currently exposes no next release date. Weekly checking bounds normal detection lag without claiming a publisher calendar or coupling checking to publication."
   },
+  "activation_evidence": {
+    "successful_live_validation": {
+      "status": "passed",
+      "github_run_id": 33687737639,
+      "github_sha": "3fb2cff4a9b1cbc2f340c8db00328efaa2c30130",
+      "workflow": "RPS live validation",
+      "artifact_id": 9868969207,
+      "artifact_digest": "sha256:fd8b4ed3f828755efaaa00c80b7d444480f7d0e058b88dddf2ffae8f17539de7",
+      "source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+      "source_snapshot_file_sha256": "66b3ffbaebf43c3c8434556eec9329a232d8f17483ba3a613e6b00d214af3f74",
+      "retrieved_at": "2026-09-02T21:56:17.680314Z",
+      "revision_status": "baseline",
+      "provider_series_count": 137,
+      "observatory_series_count": 131,
+      "excluded_series_count": 6,
+      "observation_count": 962,
+      "archive_contract_rehearsed": true,
+      "archive_persisted_durably": false,
+      "verified_on": "2026-09-03"
+    },
+    "fred_api_key_verified_in_execution_environment": {
+      "status": "passed",
+      "github_run_id": 33687737639,
+      "evidence_basis": "The successful RPS live validation workflow contains a fail-fast non-empty FRED_API_KEY gate before source retrieval.",
+      "verified_on": "2026-09-03"
+    },
+    "operator_controlled_private_vintage_backend_configured": {
+      "status": "pending",
+      "reason": "No durable operator-controlled private backend is configured in the production execution environment. Runner-local rehearsal paths and GitHub Actions artifacts do not satisfy this gate."
+    },
+    "private_backend_write_read_verify_rehearsal_passed": {
+      "status": "pending",
+      "reason": "A durable backend write/read/verify rehearsal cannot pass until the operator-controlled private backend is configured."
+    }
+  },
   "unchanged_source": {
     "archive_exact_source_bytes": false,
     "build_observatory_candidate": false,
