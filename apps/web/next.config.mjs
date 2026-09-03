@@ -1,3 +1,6 @@
+const pagesBuild = process.env.GITHUB_PAGES === 'true';
+const pagesBasePath = '/ai-adoption-us';
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -24,14 +27,23 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: securityHeaders,
-      },
-    ];
-  },
+  ...(pagesBuild
+    ? {
+        output: 'export',
+        basePath: pagesBasePath,
+        assetPrefix: pagesBasePath,
+        trailingSlash: true,
+      }
+    : {
+        async headers() {
+          return [
+            {
+              source: '/:path*',
+              headers: securityHeaders,
+            },
+          ];
+        },
+      }),
 };
 
 export default nextConfig;
