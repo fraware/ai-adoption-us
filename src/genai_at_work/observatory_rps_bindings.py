@@ -16,7 +16,7 @@ import os
 import shutil
 from collections.abc import Mapping
 from copy import deepcopy
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path, PurePosixPath
 from typing import Any
 
