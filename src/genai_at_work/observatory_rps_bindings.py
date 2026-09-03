@@ -16,6 +16,7 @@ import os
 import shutil
 from collections.abc import Mapping
 from copy import deepcopy
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -200,13 +201,21 @@ def _finite_number(value: object, context: str) -> float:
     return numeric
 
 
+def _decimal_number(value: object, context: str) -> Decimal:
+    numeric = _finite_number(value, context)
+    try:
+        return Decimal(str(numeric))
+    except InvalidOperation as exc:
+        raise ObservatoryRpsBindingError(f"{context} is not a valid decimal") from exc
+
+
 def _validate_value_binding(
     binding: Mapping[str, Any],
     *,
     repo_root: Path,
     candidate_root: Path,
     source: Mapping[str, Any],
-) -> None:
+) -> int:
     binding_id = _string(binding, "binding_id", "source_value_binding")
     repository_path = _string(
         binding, "repository_path", f"source_value_binding.{binding_id}"
@@ -230,6 +239,16 @@ def _validate_value_binding(
         raise ObservatoryRpsBindingError(
             f"source_value_binding.{binding_id}.expected_rows must be positive"
         )
+    decimal_places = binding.get("checkpoint_decimal_places")
+    if (
+        not isinstance(decimal_places, int)
+        or isinstance(decimal_places, bool)
+        or not 0 <= decimal_places <= 12
+    ):
+        raise ObservatoryRpsBindingError(
+            f"source_value_binding.{binding_id}.checkpoint_decimal_places must be an integer from 0 to 12"
+        )
+    quantum = Decimal(1).scaleb(-decimal_places)
 
     candidate_rows = [
         row
@@ -245,14 +264,14 @@ def _validate_value_binding(
             f"RPS value binding {binding_id} expected {expected_rows} candidate rows, "
             f"observed {len(candidate_rows)}"
         )
-    candidate_values: dict[str, float] = {}
+    candidate_values: dict[str, Decimal] = {}
     for index, row in enumerate(candidate_rows):
         series_id = _string(row, "series_id", f"{binding_id}.candidate_rows[{index}]")
         if series_id in candidate_values:
             raise ObservatoryRpsBindingError(
                 f"RPS value binding {binding_id} has duplicate candidate series {series_id}"
             )
-        candidate_values[series_id] = _finite_number(
+        candidate_values[series_id] = _decimal_number(
             row.get("value"), f"{binding_id}.candidate_rows[{index}].value"
         )
 
@@ -271,16 +290,22 @@ def _validate_value_binding(
             f"RPS value binding {binding_id} expected {expected_rows} checkpoint rows, "
             f"observed {len(checkpoint_rows)}"
         )
-    checkpoint_values: dict[str, float] = {}
+    checkpoint_values: dict[str, Decimal] = {}
     for index, row in enumerate(checkpoint_rows):
         series_id = _string(row, "series_id", f"{binding_id}.checkpoint.rows[{index}]")
         if series_id in checkpoint_values:
             raise ObservatoryRpsBindingError(
                 f"RPS value binding {binding_id} has duplicate checkpoint series {series_id}"
             )
-        checkpoint_values[series_id] = _finite_number(
+        value = _decimal_number(
             row.get("value_pct"), f"{binding_id}.checkpoint.rows[{index}].value_pct"
         )
+        quantized = value.quantize(quantum, rounding=ROUND_HALF_UP)
+        if quantized != value:
+            raise ObservatoryRpsBindingError(
+                f"RPS value binding {binding_id} checkpoint series {series_id} exceeds declared precision"
+            )
+        checkpoint_values[series_id] = quantized
 
     if set(candidate_values) != set(checkpoint_values):
         raise ObservatoryRpsBindingError(
@@ -289,17 +314,14 @@ def _validate_value_binding(
     mismatches = [
         series_id
         for series_id in sorted(candidate_values)
-        if not math.isclose(
-            candidate_values[series_id],
-            checkpoint_values[series_id],
-            rel_tol=0.0,
-            abs_tol=1e-9,
-        )
+        if candidate_values[series_id].quantize(quantum, rounding=ROUND_HALF_UP)
+        != checkpoint_values[series_id]
     ]
     if mismatches:
         raise ObservatoryRpsBindingError(
-            f"RPS value binding {binding_id} changed for {len(mismatches)} series"
+            f"RPS value binding {binding_id} changed for {len(mismatches)} series at {decimal_places} decimal places"
         )
+    return decimal_places
 
 
 def validate_rps_repository_bindings(
@@ -349,8 +371,10 @@ def validate_rps_repository_bindings(
                 f"RPS source vintage mismatch for repository binding {registered_id}"
             )
 
+    value_binding_decimal_places: dict[str, int] = {}
     for binding in _rows(bindings.get("source_value_bindings"), "source_value_bindings"):
-        _validate_value_binding(
+        registered_id = _string(binding, "binding_id", "source_value_binding")
+        value_binding_decimal_places[registered_id] = _validate_value_binding(
             binding,
             repo_root=repo_root,
             candidate_root=rps_candidate_root,
@@ -373,6 +397,7 @@ def validate_rps_repository_bindings(
         "status": "pass",
         "binding_ids": sorted(binding_ids),
         "covered_artifact_ids": sorted(covered_artifacts),
+        "value_binding_decimal_places": value_binding_decimal_places,
     }
 
 

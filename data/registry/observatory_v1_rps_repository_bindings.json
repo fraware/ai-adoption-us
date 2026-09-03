@@ -37,6 +37,7 @@
       "entity_type": "industry",
       "metric_id": "adoption_work",
       "expected_rows": 20,
+      "checkpoint_decimal_places": 5,
       "artifact_ids": [
         "btos-rps-industry-triangulation",
         "btos-rps-execution-state"
