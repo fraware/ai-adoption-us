@@ -25,12 +25,15 @@ from genai_at_work.release_engine import (
     sha256_file,
     validate_release_manifest,
 )
+from genai_at_work.rps_public_view import NATIONAL_METRICS, PUBLIC_SUBGROUP_METRICS
 
 ROOT = Path(__file__).parents[1]
 CONTRACT_PATH = ROOT / "data" / "registry" / "observatory_v1_baseline_contract.json"
 RPS_SOURCE_ID = "rps-genai-tracker-fred-release-6"
-RPS_BUILDER_ID = "rps-published-aggregate-construct-window-release-v3"
+RPS_BUILDER_ID = "rps-published-aggregate-observatory-release-v4"
 RPS_BUILDER_COMMIT = "0123456789abcdef0123456789abcdef01234567"
+PUBLIC_VIEW_ID = "rps-public-observation-view"
+PUBLIC_VIEW_PATH = "artifacts/public/rps_public_observation_view.json"
 
 
 def _digest_text(value: str) -> str:
@@ -53,6 +56,84 @@ def _head() -> str:
     ).stdout.strip()
 
 
+def _observation(
+    *,
+    period: str,
+    entity_type: str,
+    entity_id: str,
+    metric_id: str,
+    index: int,
+) -> dict[str, Any]:
+    return {
+        "date": "2025-05-01" if period == "2025-Q2" else "2026-05-01",
+        "period": period,
+        "entity_type": entity_type,
+        "entity_id": entity_id,
+        "metric_id": metric_id,
+        "value": float(10 + index % 80),
+        "unit": "Percent",
+        "series_id": f"series-{entity_type}-{entity_id}-{metric_id}",
+        "source_url": "https://fred.stlouisfed.org/",
+    }
+
+
+def _public_view() -> dict[str, Any]:
+    national_history = [
+        _observation(
+            period=period,
+            entity_type="national",
+            entity_id="us",
+            metric_id=metric_id,
+            index=period_index * 10 + metric_index,
+        )
+        for period_index, period in enumerate(("2025-Q2", "2026-Q2"))
+        for metric_index, metric_id in enumerate(NATIONAL_METRICS)
+    ]
+    industry_latest = [
+        _observation(
+            period="2026-Q2",
+            entity_type="industry",
+            entity_id=f"industry-{entity_index:02d}",
+            metric_id=metric_id,
+            index=entity_index * 3 + metric_index,
+        )
+        for entity_index in range(1, 21)
+        for metric_index, metric_id in enumerate(PUBLIC_SUBGROUP_METRICS)
+    ]
+    occupation_latest = [
+        _observation(
+            period="2026-Q2",
+            entity_type="occupation",
+            entity_id=f"occupation-{entity_index:02d}",
+            metric_id=metric_id,
+            index=entity_index * 3 + metric_index,
+        )
+        for entity_index in range(1, 23)
+        for metric_index, metric_id in enumerate(PUBLIC_SUBGROUP_METRICS)
+    ]
+    return {
+        "schema_version": 1,
+        "view_contract_id": "rps-public-observation-delivery-v1",
+        "source_id": RPS_SOURCE_ID,
+        "source_vintage_id": "sha256:" + _digest_text("rps-vintage"),
+        "publication_scope": "selected_attributed_aggregate_views",
+        "source_input_bytes_included": False,
+        "generic_query_api_included": False,
+        "historical_subgroup_panel_included": False,
+        "latest_subgroup_period": "2026-Q2",
+        "national_history": national_history,
+        "industry_latest": industry_latest,
+        "occupation_latest": occupation_latest,
+        "attribution": {
+            "dataset": "Real-Time Population Survey: Generative Artificial Intelligence Adoption Tracker",
+            "authors": "Alexander Bick, Adam Blandin, and David Deming",
+            "transport": "FRED/ALFRED",
+            "citation_required": True,
+        },
+        "interpretation_boundary": "Synthetic bounded-view test fixture.",
+    }
+
+
 def _rps_candidate(root: Path) -> dict[str, Any]:
     source_sha, source_size = _write(
         root / "inputs/rps/2025-Q2.json",
@@ -67,23 +148,32 @@ def _rps_candidate(root: Path) -> dict[str, Any]:
         "rps-longitudinal-diagnostics": (
             "artifacts/longitudinal/longitudinal_diagnostics.json",
             '{"status":"synthetic-test"}\n',
+            2,
         ),
         "rps-quarter-diagnostics": (
             "artifacts/longitudinal/quarter_diagnostics.csv",
             "period,value\n2025-Q2,1\n2026-Q2,2\n",
+            2,
         ),
         "rps-rank-stability": (
             "artifacts/longitudinal/rank_stability.csv",
             "period,value\n2025-Q2,1\n2026-Q2,1\n",
+            2,
         ),
         "rps-longitudinal-validation": (
             "artifacts/longitudinal/validation_checks.json",
             '{"status":"pass"}\n',
+            2,
+        ),
+        PUBLIC_VIEW_ID: (
+            PUBLIC_VIEW_PATH,
+            json.dumps(_public_view(), indent=2, sort_keys=True) + "\n",
+            1,
         ),
     }
     artifacts: list[dict[str, Any]] = []
     output_hashes: dict[str, str] = {}
-    for artifact_id, (relative, content) in artifact_specs.items():
+    for artifact_id, (relative, content, evidence_class) in artifact_specs.items():
         sha256, size = _write(root / relative, content)
         artifacts.append(
             {
@@ -91,7 +181,7 @@ def _rps_candidate(root: Path) -> dict[str, Any]:
                 "path": relative,
                 "sha256": sha256,
                 "size_bytes": size,
-                "evidence_class": 2,
+                "evidence_class": evidence_class,
                 "source_ids": [RPS_SOURCE_ID],
             }
         )
@@ -195,7 +285,7 @@ def _rps_candidate(root: Path) -> dict[str, Any]:
             },
             "output_sha256": output_hashes,
         },
-        "candidate_scope": "Synthetic test representation of the RPS v3 component.",
+        "candidate_scope": "Synthetic test representation of the RPS v4 component.",
         "source_input_bytes_publication": False,
     }
     (root / "release.json").write_text(
@@ -211,10 +301,27 @@ def _rewrite_release(root: Path, candidate: dict[str, Any]) -> None:
     )
 
 
+def _rewrite_public_view(
+    root: Path,
+    candidate: dict[str, Any],
+    payload: dict[str, Any],
+) -> None:
+    path = root / PUBLIC_VIEW_PATH
+    sha256, size = _write(path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    artifact = next(
+        row for row in candidate["artifacts"] if row["artifact_id"] == PUBLIC_VIEW_ID
+    )
+    artifact["sha256"] = sha256
+    artifact["size_bytes"] = size
+    candidate["build"]["output_sha256"][PUBLIC_VIEW_ID] = sha256
+    _rewrite_release(root, candidate)
+
+
 def test_v1_contract_is_complete_and_current_repository_evidence_passes() -> None:
     contract = load_json_object(CONTRACT_PATH)
     validate_v1_baseline_contract(contract, ROOT)
     assert set(contract["required_components"]) == REQUIRED_COMPONENTS
+    assert set(contract["rps_component"]["required_artifact_ids"]) == REQUIRED_RPS_ARTIFACT_IDS
     assert {
         row["gate_id"] for row in contract["validation_gates"]
     } == REQUIRED_GLOBAL_GATE_IDS
@@ -229,6 +336,16 @@ def test_contract_cannot_silently_drop_a_scientific_gate() -> None:
     with pytest.raises(
         ObservatoryBaselineError,
         match="validation gate inventory",
+    ):
+        validate_v1_baseline_contract(contract, ROOT)
+
+
+def test_contract_cannot_silently_drop_public_observation_view() -> None:
+    contract = deepcopy(load_json_object(CONTRACT_PATH))
+    contract["rps_component"]["required_artifact_ids"].remove(PUBLIC_VIEW_ID)
+    with pytest.raises(
+        ObservatoryBaselineError,
+        match="complete v4 observatory artifact set",
     ):
         validate_v1_baseline_contract(contract, ROOT)
 
@@ -291,6 +408,11 @@ def test_global_composer_builds_one_valid_complete_baseline(tmp_path: Path) -> N
         row["claim_id"] for row in candidate["claims"]
     }
     assert candidate["component_builds"]["rps"]["builder_id"] == RPS_BUILDER_ID
+    public_view = load_json_object(output / PUBLIC_VIEW_PATH)
+    assert public_view["historical_subgroup_panel_included"] is False
+    assert len(public_view["national_history"]) == 10
+    assert len(public_view["industry_latest"]) == 60
+    assert len(public_view["occupation_latest"]) == 66
     assert (output / "release.json").is_file()
     assert not output.with_name(f".{output.name}.tmp").exists()
 
@@ -343,11 +465,10 @@ def test_global_composer_rejects_missing_reviewed_rps_artifact(
 ) -> None:
     rps_root = tmp_path / "rps"
     candidate = _rps_candidate(rps_root)
-    removed = "rps-rank-stability"
     candidate["artifacts"] = [
-        row for row in candidate["artifacts"] if row["artifact_id"] != removed
+        row for row in candidate["artifacts"] if row["artifact_id"] != PUBLIC_VIEW_ID
     ]
-    del candidate["build"]["output_sha256"][removed]
+    del candidate["build"]["output_sha256"][PUBLIC_VIEW_ID]
     _rewrite_release(rps_root, candidate)
     output = tmp_path / "global"
 
@@ -361,6 +482,56 @@ def test_global_composer_rejects_missing_reviewed_rps_artifact(
             contract=load_json_object(CONTRACT_PATH),
             repo_root=ROOT,
             release_id="observatory-v1-missing-rps-artifact-test",
+            builder_commit=_head(),
+        )
+    assert not output.exists()
+
+
+def test_global_composer_rejects_widened_public_observation_scope(
+    tmp_path: Path,
+) -> None:
+    rps_root = tmp_path / "rps"
+    candidate = _rps_candidate(rps_root)
+    payload = load_json_object(rps_root / PUBLIC_VIEW_PATH)
+    payload["historical_subgroup_panel_included"] = True
+    _rewrite_public_view(rps_root, candidate, payload)
+    output = tmp_path / "global"
+
+    with pytest.raises(
+        ObservatoryBaselineError,
+        match="historical_subgroup_panel_included=false",
+    ):
+        compose_v1_global_baseline(
+            rps_candidate_root=rps_root,
+            output_dir=output,
+            contract=load_json_object(CONTRACT_PATH),
+            repo_root=ROOT,
+            release_id="observatory-v1-expanded-rps-public-view-test",
+            builder_commit=_head(),
+        )
+    assert not output.exists()
+
+
+def test_global_composer_rejects_incomplete_public_cross_section(
+    tmp_path: Path,
+) -> None:
+    rps_root = tmp_path / "rps"
+    candidate = _rps_candidate(rps_root)
+    payload = load_json_object(rps_root / PUBLIC_VIEW_PATH)
+    payload["industry_latest"] = payload["industry_latest"][:-1]
+    _rewrite_public_view(rps_root, candidate, payload)
+    output = tmp_path / "global"
+
+    with pytest.raises(
+        ObservatoryBaselineError,
+        match="industry_latest must contain exactly 60 rows",
+    ):
+        compose_v1_global_baseline(
+            rps_candidate_root=rps_root,
+            output_dir=output,
+            contract=load_json_object(CONTRACT_PATH),
+            repo_root=ROOT,
+            release_id="observatory-v1-incomplete-rps-public-view-test",
             builder_commit=_head(),
         )
     assert not output.exists()
