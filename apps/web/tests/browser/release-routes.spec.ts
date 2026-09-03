@@ -77,8 +77,6 @@ test.describe("Release 1 rendered browser QA", () => {
       expect(response, `No document response for ${route.path}`).not.toBeNull();
       expect(response?.ok(), `HTTP ${response?.status()} for ${route.path}`).toBeTruthy();
 
-      await assertMobileEmulationContract(page);
-
       const icon = page.locator('link[rel~="icon"]').first();
       await expect(icon, `No application icon metadata on ${route.path}`).toHaveCount(1);
       const iconHref = await icon.getAttribute("href");
@@ -157,6 +155,8 @@ test.describe("Release 1 rendered browser QA", () => {
         severeViolations,
         `Serious/critical axe violations on ${route.path}: ${JSON.stringify(severeViolations, null, 2)}`,
       ).toEqual([]);
+
+      await assertMobileEmulationContract(page);
 
       expect(pageErrors, `Uncaught runtime errors on ${route.path}`).toEqual([]);
       expect(consoleErrors, `Console errors on ${route.path}`).toEqual([]);
