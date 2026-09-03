@@ -5,7 +5,7 @@ Networked production-build update: 2026-08-31
 Automated rendered-browser update: 2026-09-01  
 Explicit mobile-emulation update: 2026-09-03
 
-This document records the code-level, networked production-build, and automated rendered-browser QA completed for the rights-safe Release 1 candidate. The automated pass is real browser-engine execution and now includes explicit Pixel 7/Chrome and iPhone 15 Pro/WebKit device contexts. It **does not substitute for** native Safari/iOS, physical-device validation, or human assistive-technology testing where those remain required.
+This document records the code-level, networked production-build, and automated rendered-browser QA completed for the rights-safe Release 1 candidate. The automated pass is real browser-engine execution and now includes explicit Pixel 7/Chrome and iPhone 15 Pro/WebKit device contexts. It **does not substitute for a real browser** review on native Safari/iOS, physical-device validation, or human assistive-technology testing where those remain required.
 
 ## Implemented in the code-level pass
 
