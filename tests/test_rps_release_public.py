@@ -24,6 +24,35 @@ def _contract() -> dict[str, Any]:
     return value
 
 
+def _canonical_manifest() -> dict[str, Any]:
+    series: list[dict[str, Any]] = []
+    for metric_id in NATIONAL_METRICS:
+        series.append(
+            {
+                "entity_type": "national",
+                "entity_id": "us",
+                "entity_name": "Employed Adults",
+                "metric_id": metric_id,
+                "series_id": f"national-{metric_id}",
+            }
+        )
+    for entity_type, count in (("industry", 20), ("occupation", 22)):
+        for entity_index in range(1, count + 1):
+            entity_id = f"{entity_type}-{entity_index:02d}"
+            entity_name = f"{entity_type.title()} {entity_index:02d}"
+            for metric_id in PUBLIC_SUBGROUP_METRICS:
+                series.append(
+                    {
+                        "entity_type": entity_type,
+                        "entity_id": entity_id,
+                        "entity_name": entity_name,
+                        "metric_id": metric_id,
+                        "series_id": f"{entity_type}-{entity_index:02d}-{metric_id}",
+                    }
+                )
+    return {"series": series}
+
+
 def _panel() -> PreparedRpsPanel:
     period = "2026-Q2"
     rows: list[dict[str, Any]] = []
@@ -123,7 +152,7 @@ def test_observatory_wrapper_hash_binds_bounded_public_view(
 
     candidate = build_rps_observatory_release_candidate(
         {},
-        {},
+        _canonical_manifest(),
         {},
         {},
         _contract(),
@@ -141,9 +170,13 @@ def test_observatory_wrapper_hash_binds_bounded_public_view(
 
     view_path = output_dir / PUBLIC_VIEW_ARTIFACT_PATH
     view = json.loads(view_path.read_text())
+    assert view["national_complete_periods"] == ["2026-Q2"]
     assert view["latest_subgroup_period"] == "2026-Q2"
     assert len(view["industry_latest"]) == 60
     assert len(view["occupation_latest"]) == 66
+    assert {row["entity_name"] for row in view["national_history"]} == {"Employed Adults"}
+    assert all(row["entity_name"].startswith("Industry ") for row in view["industry_latest"])
+    assert all(row["entity_name"].startswith("Occupation ") for row in view["occupation_latest"])
     assert view["historical_subgroup_panel_included"] is False
 
     manifest = json.loads((output_dir / "release.json").read_text())
