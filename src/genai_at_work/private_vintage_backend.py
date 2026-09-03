@@ -28,9 +28,29 @@ from genai_at_work.private_vintage_store import store_rps_private_vintage
 from genai_at_work.release_engine import canonical_digest
 
 _BACKEND_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_SOURCE_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,255}$")
 _HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
+_COMMIT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 _CHALLENGE_TYPE = "rps_private_backend_write_challenge"
 _VERIFICATION_TYPE = "rps_private_backend_write_read_verify"
+_CHALLENGE_KEYS = {
+    "schema_version",
+    "challenge_type",
+    "backend_id",
+    "configuration_evidence_ref",
+    "backend_namespace",
+    "source_id",
+    "archive_event_id",
+    "source_content_sha256",
+    "source_snapshot_sha256",
+    "previous_snapshot_sha256",
+    "package_digest",
+    "builder_commit",
+    "storage_scope",
+    "public_archive",
+    "activation_gates_updated",
+    "durability_established_by_software_alone",
+}
 
 
 class PrivateVintageBackendError(PrivateVintageError):
@@ -59,10 +79,27 @@ def _hex64(mapping: Mapping[str, Any], key: str, *, context: str) -> str:
     return value
 
 
+def _commit(value: str, *, context: str) -> str:
+    normalized = value.lower()
+    if _COMMIT_RE.fullmatch(normalized) is None:
+        raise PrivateVintageBackendError(
+            f"{context} must be a 40- or 64-character Git commit digest"
+        )
+    return normalized
+
+
 def _backend_id(value: str) -> str:
     if _BACKEND_ID_RE.fullmatch(value) is None:
         raise PrivateVintageBackendError(
             "backend_id must be a filesystem-safe identifier using letters, numbers, '.', '_' or '-'"
+        )
+    return value
+
+
+def _source_id(value: str) -> str:
+    if _SOURCE_ID_RE.fullmatch(value) is None:
+        raise PrivateVintageBackendError(
+            "source_id must be a filesystem-safe identifier using letters, numbers, '.', '_' or '-'"
         )
     return value
 
@@ -95,6 +132,10 @@ def write_backend_challenge(
     """
 
     normalized_backend_id = _backend_id(backend_id)
+    normalized_builder_commit = _commit(
+        builder_commit,
+        context="builder_commit",
+    )
     if not configuration_evidence_ref.strip():
         raise PrivateVintageBackendError(
             "configuration_evidence_ref must identify separately reviewable backend configuration evidence"
@@ -103,10 +144,14 @@ def write_backend_challenge(
     package_dir, manifest = store_rps_private_vintage(
         snapshot_path,
         backend_root,
-        builder_commit=builder_commit,
+        builder_commit=normalized_builder_commit,
         previous_snapshot_path=previous_snapshot_path,
     )
     manifest = verify_rps_private_vintage(package_dir)
+    if manifest["builder_commit"] != normalized_builder_commit:
+        raise PrivateVintageBackendError(
+            "archived builder commit does not match the requested write builder commit"
+        )
     comparison = _mapping(manifest.get("comparison"), context="archive.comparison")
     namespace = f"{manifest['source_id']}/{manifest['archive_event_id']}"
 
@@ -122,7 +167,7 @@ def write_backend_challenge(
         "source_snapshot_sha256": manifest["source_snapshot_sha256"],
         "previous_snapshot_sha256": comparison.get("previous_snapshot_sha256"),
         "package_digest": _package_digest(package_dir, manifest),
-        "builder_commit": manifest["builder_commit"],
+        "builder_commit": normalized_builder_commit,
         "storage_scope": manifest["rights"]["storage_scope"],
         "public_archive": manifest["public_archive"],
         "activation_gates_updated": False,
@@ -135,24 +180,29 @@ def write_backend_challenge(
 def validate_backend_challenge(challenge: Mapping[str, Any]) -> None:
     """Validate a rights-safe backend read-back challenge."""
 
+    if set(challenge) != _CHALLENGE_KEYS:
+        raise PrivateVintageBackendError(
+            "private-backend challenge fields must exactly match the v1 contract"
+        )
     if challenge.get("schema_version") != 1:
         raise PrivateVintageBackendError("challenge.schema_version must equal 1")
     if challenge.get("challenge_type") != _CHALLENGE_TYPE:
         raise PrivateVintageBackendError("Unsupported private-backend challenge type")
-    backend_id = _backend_id(_string(challenge, "backend_id", context="challenge"))
-    del backend_id
+    _backend_id(_string(challenge, "backend_id", context="challenge"))
     _string(challenge, "configuration_evidence_ref", context="challenge")
-    source_id = _string(challenge, "source_id", context="challenge")
+    source_id = _source_id(_string(challenge, "source_id", context="challenge"))
     event_id = _hex64(challenge, "archive_event_id", context="challenge")
     _hex64(challenge, "source_content_sha256", context="challenge")
     snapshot_sha = _hex64(challenge, "source_snapshot_sha256", context="challenge")
-    package_digest = _hex64(challenge, "package_digest", context="challenge")
-    del package_digest
+    _hex64(challenge, "package_digest", context="challenge")
     if event_id != snapshot_sha:
         raise PrivateVintageBackendError(
             "challenge archive_event_id must equal source_snapshot_sha256"
         )
-    if _string(challenge, "backend_namespace", context="challenge") != f"{source_id}/{event_id}":
+    if (
+        _string(challenge, "backend_namespace", context="challenge")
+        != f"{source_id}/{event_id}"
+    ):
         raise PrivateVintageBackendError(
             "challenge backend_namespace does not match source/event identity"
         )
@@ -163,7 +213,10 @@ def validate_backend_challenge(challenge: Mapping[str, Any]) -> None:
         raise PrivateVintageBackendError(
             "challenge.previous_snapshot_sha256 must be null or a SHA-256 digest"
         )
-    _string(challenge, "builder_commit", context="challenge")
+    _commit(
+        _string(challenge, "builder_commit", context="challenge"),
+        context="challenge.builder_commit",
+    )
     if challenge.get("storage_scope") != "private":
         raise PrivateVintageBackendError("challenge.storage_scope must remain private")
     if challenge.get("public_archive") is not False:
@@ -181,15 +234,25 @@ def validate_backend_challenge(challenge: Mapping[str, Any]) -> None:
 def verify_backend_challenge(
     challenge: Mapping[str, Any],
     backend_root: Path,
+    *,
+    verification_builder_commit: str,
 ) -> dict[str, Any]:
     """Independently read back and verify the exact package named by a challenge."""
 
     validate_backend_challenge(challenge)
+    normalized_verification_commit = _commit(
+        verification_builder_commit,
+        context="verification_builder_commit",
+    )
     source_id = str(challenge["source_id"])
     event_id = str(challenge["archive_event_id"])
     backend_package = backend_root / source_id / event_id
     manifest = verify_rps_private_vintage(backend_package)
 
+    if manifest["builder_commit"] != challenge["builder_commit"]:
+        raise PrivateVintageBackendError(
+            "read-back archived builder commit does not match the write challenge"
+        )
     if manifest["source_content_sha256"] != challenge["source_content_sha256"]:
         raise PrivateVintageBackendError(
             "read-back source scientific identity does not match the write challenge"
@@ -210,7 +273,9 @@ def verify_backend_challenge(
             "read-back package digest does not match the write challenge"
         )
 
-    with tempfile.TemporaryDirectory(prefix="rps-private-backend-recovery-") as temporary:
+    with tempfile.TemporaryDirectory(
+        prefix="rps-private-backend-recovery-"
+    ) as temporary:
         recovery_root = Path(temporary)
         recovered_package = recovery_root / source_id / event_id
         recovered_package.parent.mkdir(parents=True)
@@ -241,6 +306,7 @@ def verify_backend_challenge(
         "previous_snapshot_sha256": challenge.get("previous_snapshot_sha256"),
         "package_digest": challenge["package_digest"],
         "write_builder_commit": challenge["builder_commit"],
+        "verification_builder_commit": normalized_verification_commit,
         "verified_at": datetime.now(UTC).isoformat(),
         "write_read_verify_passed": True,
         "recovery_copy_verified": True,
@@ -263,7 +329,9 @@ def load_backend_challenge(path: Path) -> dict[str, Any]:
             f"Could not read private-backend challenge: {path}"
         ) from exc
     if not isinstance(value, dict):
-        raise PrivateVintageBackendError("private-backend challenge must be a JSON object")
+        raise PrivateVintageBackendError(
+            "private-backend challenge must be a JSON object"
+        )
     challenge = {str(key): item for key, item in value.items()}
     validate_backend_challenge(challenge)
     return challenge
