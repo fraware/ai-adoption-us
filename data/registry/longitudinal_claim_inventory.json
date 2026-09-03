@@ -5,7 +5,7 @@
     {
       "claim_id": "home-five-wave-summary",
       "surface": "apps/web/app/page.tsx",
-      "description": "Homepage five-wave longitudinal evidence summary and interpretive framing."
+      "description": "Homepage longitudinal evidence summary and interpretive framing, with wave counts read from the release artifact."
     },
     {
       "claim_id": "industry-explorer-longitudinal",
@@ -20,7 +20,7 @@
     {
       "claim_id": "after-adoption-essay",
       "surface": "apps/web/app/blog/after-adoption/page.tsx",
-      "description": "Technical essay claims derived from the five-wave RPS subgroup audit."
+      "description": "Technical essay claims derived from the complete common-window RPS subgroup diagnostics."
     },
     {
       "claim_id": "readme-longitudinal-status",
