@@ -77,131 +77,173 @@ def _canonical_manifest() -> dict[str, Any]:
 
 
 def _panel() -> PreparedRpsPanel:
-    period = "2026-Q2"
-    rows: list[dict[str, Any]] = []
-    for metric_index, metric_id in enumerate(NATIONAL_METRICS):
-        rows.append(
-            {
-                "date": "2026-05-01",
-                "entity_id": "us",
-                "entity_type": "national",
-                "metric_id": metric_id,
-                "period": period,
-                "series_id": f"national-{metric_id}",
-                "source_url": "https://fred.stlouisfed.org/",
-                "unit": "Percent",
-                "value": 20.0 + metric_index,
-            }
-        )
-    for entity_type, count in (("industry", 20), ("occupation", 22)):
-        for entity_index in range(1, count + 1):
-            for metric_index, metric_id in enumerate(PUBLIC_SUBGROUP_METRICS):
-                rows.append(
-                    {
-                        "date": "2026-05-01",
-                        "entity_id": f"{entity_type}-{entity_index:02d}",
-                        "entity_type": entity_type,
-                        "metric_id": metric_id,
-                        "period": period,
-                        "series_id": (
-                            f"{entity_type}-{entity_index:02d}-{metric_id}"
-                        ),
-                        "source_url": "https://fred.stlouisfed.org/",
-                        "unit": "Percent",
-                        "value": float(entity_index + metric_index),
-                    }
+    period_rows: dict[str, tuple[dict[str, Any], ...]] = {}
+    observation_count = 0
+    for period in PERIODS:
+        rows: list[dict[str, Any]] = []
+        for metric_index, metric_id in enumerate(NATIONAL_METRICS):
+            rows.append(
+                _row(
+                    period=period,
+                    entity_type="national",
+                    entity_id="us",
+                    metric_id=metric_id,
+                    index=metric_index,
                 )
+            )
+        for entity_type, count in (("industry", 20), ("occupation", 22)):
+            for entity_index in range(1, count + 1):
+                for metric_index, metric_id in enumerate(PUBLIC_SUBGROUP_METRICS):
+                    rows.append(
+                        _row(
+                            period=period,
+                            entity_type=entity_type,
+                            entity_id=f"{entity_type}-{entity_index:02d}",
+                            metric_id=metric_id,
+                            index=entity_index * 3 + metric_index,
+                        )
+                    )
+        period_rows[period] = tuple(rows)
+        observation_count += len(rows)
+
     return PreparedRpsPanel(
-        periods=(period,),
-        period_rows={period: tuple(rows)},
+        periods=PERIODS,
+        period_rows=period_rows,
         subgroup_records=(),
         definition_id="sha256:" + "1" * 64,
         taxonomy_version="sha256:" + "2" * 64,
         series_count=131,
-        observation_count=131,
+        observation_count=observation_count,
     )
 
 
-def test_observatory_wrapper_hash_binds_bounded_public_view(
-    tmp_path: Path,
-    monkeypatch: Any,
-) -> None:
-    output_dir = tmp_path / "candidate"
-    output_dir.mkdir()
-    source_id = "rps-genai-tracker-fred-release-6"
-    base_candidate: dict[str, Any] = {
-        "schema_version": 1,
-        "release_id": "synthetic-rps",
-        "release_type": "baseline",
-        "data_mode": "derived_only",
-        "created_at": "2026-09-03T00:00:00Z",
-        "supersedes_release_id": None,
-        "sources": [
-            {
-                "source_id": source_id,
-                "source_vintage_id": "sha256:" + "a" * 64,
-            }
-        ],
-        "artifacts": [],
-        "diagnostics": [],
-        "claims": [],
-        "build": {
-            "builder_id": "rps-published-aggregate-construct-window-release-v3",
-            "builder_commit": "0" * 40,
-            "deterministic": True,
-            "input_sha256": {},
-            "output_sha256": {},
-        },
-        "candidate_scope": "synthetic base",
-        "source_input_bytes_publication": False,
-    }
-
-    def fake_base_builder(*args: Any, **kwargs: Any) -> dict[str, Any]:
-        return base_candidate
-
-    prepared = SimpleNamespace(
-        analysis_panel=_panel(),
-        source_periods=("2026-Q2",),
+def _build(panel: PreparedRpsPanel) -> dict[str, Any]:
+    return build_rps_public_observation_view(
+        panel,
+        source_id="rps-genai-tracker-fred-release-6",
+        source_vintage_id="sha256:" + "a" * 64,
+        source_reference_periods=PERIODS,
+        canonical_manifest=_canonical_manifest(),
+        contract=_contract(),
     )
 
-    monkeypatch.setattr(
-        "genai_at_work.rps_release_public.build_rps_release_candidate_complete_history",
-        fake_base_builder,
-    )
-    monkeypatch.setattr(
-        "genai_at_work.rps_release_public.prepare_rps_source_history",
-        lambda *args, **kwargs: prepared,
-    )
 
-    candidate = build_rps_observatory_release_candidate(
-        {},
-        _canonical_manifest(),
-        {},
-        {},
-        _contract(),
-        output_dir=output_dir,
-        release_id="synthetic-rps",
-        builder_commit="0" * 40,
-    )
+def test_repository_public_observation_contract_is_valid() -> None:
+    validate_rps_public_observation_contract(_contract())
 
-    assert candidate["build"]["builder_id"] == BUILDER_ID
-    assert candidate["build"]["output_sha256"][PUBLIC_VIEW_ARTIFACT_ID]
-    artifact = candidate["artifacts"][0]
-    assert artifact["artifact_id"] == PUBLIC_VIEW_ARTIFACT_ID
-    assert artifact["path"] == PUBLIC_VIEW_ARTIFACT_PATH
-    assert artifact["evidence_class"] == 1
 
-    view_path = output_dir / PUBLIC_VIEW_ARTIFACT_PATH
-    view = json.loads(view_path.read_text())
-    assert view["national_complete_periods"] == ["2026-Q2"]
+def test_public_view_contains_national_history_and_only_latest_subgroup_rows() -> None:
+    view = _build(_panel())
+
+    assert view["national_complete_periods"] == list(PERIODS)
+    assert len(view["national_history"]) == len(PERIODS) * 5
+    assert len(view["industry_latest"]) == 20 * 3
+    assert len(view["occupation_latest"]) == 22 * 3
     assert view["latest_subgroup_period"] == "2026-Q2"
-    assert len(view["industry_latest"]) == 60
-    assert len(view["occupation_latest"]) == 66
+    assert {row["period"] for row in view["industry_latest"]} == {"2026-Q2"}
+    assert {row["period"] for row in view["occupation_latest"]} == {"2026-Q2"}
     assert {row["entity_name"] for row in view["national_history"]} == {"Employed Adults"}
     assert all(row["entity_name"].startswith("Industry ") for row in view["industry_latest"])
     assert all(row["entity_name"].startswith("Occupation ") for row in view["occupation_latest"])
+    assert view["source_input_bytes_included"] is False
+    assert view["generic_query_api_included"] is False
     assert view["historical_subgroup_panel_included"] is False
 
-    manifest = json.loads((output_dir / "release.json").read_text())
-    assert manifest["build"]["builder_id"] == BUILDER_ID
-    assert manifest["artifacts"][0]["artifact_id"] == PUBLIC_VIEW_ARTIFACT_ID
+
+def test_national_history_uses_only_periods_with_complete_five_metric_family() -> None:
+    panel = _panel()
+    q1_rows = list(panel.period_rows["2026-Q1"])
+    q1_rows = [
+        row
+        for row in q1_rows
+        if not (
+            row["entity_type"] == "national"
+            and row["metric_id"] == "reported_time_savings_share"
+        )
+    ]
+    partial_early_history = PreparedRpsPanel(
+        periods=panel.periods,
+        period_rows={**panel.period_rows, "2026-Q1": tuple(q1_rows)},
+        subgroup_records=panel.subgroup_records,
+        definition_id=panel.definition_id,
+        taxonomy_version=panel.taxonomy_version,
+        series_count=panel.series_count,
+        observation_count=panel.observation_count - 1,
+    )
+
+    view = _build(partial_early_history)
+    assert view["national_complete_periods"] == ["2026-Q2"]
+    assert {row["period"] for row in view["national_history"]} == {"2026-Q2"}
+    assert len(view["national_history"]) == 5
+
+
+def test_latest_subgroup_period_requires_complete_national_family() -> None:
+    panel = _panel()
+    q2_rows = list(panel.period_rows["2026-Q2"])
+    q2_rows = [
+        row
+        for row in q2_rows
+        if not (
+            row["entity_type"] == "national"
+            and row["metric_id"] == "reported_time_savings_share"
+        )
+    ]
+    incomplete_latest_national = PreparedRpsPanel(
+        periods=panel.periods,
+        period_rows={**panel.period_rows, "2026-Q2": tuple(q2_rows)},
+        subgroup_records=panel.subgroup_records,
+        definition_id=panel.definition_id,
+        taxonomy_version=panel.taxonomy_version,
+        series_count=panel.series_count,
+        observation_count=panel.observation_count - 1,
+    )
+
+    with pytest.raises(RpsReleaseError, match="Latest complete subgroup period lacks"):
+        _build(incomplete_latest_national)
+
+
+def test_contract_cannot_expand_into_bulk_or_historical_subgroup_publication() -> None:
+    contract = _contract()
+    contract["public_bulk_redistribution_approved"] = True
+    with pytest.raises(RpsReleaseError, match="public_bulk_redistribution_approved"):
+        validate_rps_public_observation_contract(contract)
+
+    contract = _contract()
+    contract["historical_subgroup_panel_approved"] = True
+    with pytest.raises(RpsReleaseError, match="historical_subgroup_panel_approved"):
+        validate_rps_public_observation_contract(contract)
+
+
+def test_public_view_fails_closed_on_incomplete_latest_cross_section() -> None:
+    panel = _panel()
+    rows = list(panel.period_rows["2026-Q2"])
+    rows.pop()
+    incomplete = PreparedRpsPanel(
+        periods=panel.periods,
+        period_rows={**panel.period_rows, "2026-Q2": tuple(rows)},
+        subgroup_records=panel.subgroup_records,
+        definition_id=panel.definition_id,
+        taxonomy_version=panel.taxonomy_version,
+        series_count=panel.series_count,
+        observation_count=panel.observation_count - 1,
+    )
+
+    with pytest.raises(RpsReleaseError, match="Incomplete latest occupation public view"):
+        _build(incomplete)
+
+
+def test_conflicting_canonical_entity_names_are_rejected() -> None:
+    manifest = _canonical_manifest()
+    series = manifest["series"]
+    assert isinstance(series, list) and isinstance(series[1], dict)
+    series[1]["entity_name"] = "Conflicting National Label"
+
+    with pytest.raises(RpsReleaseError, match="Canonical entity name conflicts"):
+        build_rps_public_observation_view(
+            _panel(),
+            source_id="rps-genai-tracker-fred-release-6",
+            source_vintage_id="sha256:" + "b" * 64,
+            source_reference_periods=PERIODS,
+            canonical_manifest=manifest,
+            contract=_contract(),
+        )
