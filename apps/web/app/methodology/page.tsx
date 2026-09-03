@@ -46,9 +46,10 @@ export default function MethodologyPage() {
       <section className="section" aria-labelledby="diagnostics-heading">
         <h2 id="diagnostics-heading">Longitudinal diagnostics</h2>
         <p>
-          Subgroup results are evaluated wave by wave across Q2 2025–Q2 2026. Cross-sectional Pearson
-          and Spearman correlations describe alignment between constructs. The reported R² values are
-          descriptive fits across aggregate groups, not worker-level probabilities or causal estimates.
+          Subgroup results are evaluated wave by wave over the complete common A/H/S window, currently
+          Q4 2024 through Q2 2026. Cross-sectional Pearson and Spearman correlations describe alignment
+          between constructs. The reported R² values are descriptive fits across aggregate groups, not
+          worker-level probabilities or causal estimates.
         </p>
         <p>
           Rank stability uses Spearman correlations between subgroup rankings for every pair of audited
@@ -94,8 +95,9 @@ export default function MethodologyPage() {
             <h3>Survey measurements</h3>
             <p>
               RPS/FRED defines adoption, recent/routine use, assisted hours, and reported savings. Release
-              1 renders rights-safe derived publication evidence and does not redistribute the reviewed raw
-              subgroup fixture.
+              1 may render the bounded, attributed aggregate observation views authorized by the release
+              contract alongside derived publication evidence. It does not publish an unrestricted RPS
+              database or historical subgroup panel.
             </p>
           </div>
           <div className="status-card">
@@ -125,9 +127,10 @@ export default function MethodologyPage() {
       <section className="section" aria-labelledby="release-heading">
         <h2 id="release-heading">Reproducibility and release boundary</h2>
         <p>
-          The private research environment retains the reviewed subgroup fixture and can regenerate the
-          committed longitudinal publication artifacts. Release 1 uses <code>DATA_MODE=derived_only</code>
-          and excludes the raw RPS audit fixture by construction.
+          The authorized release pipeline re-fetches the published aggregate RPS source into a private
+          candidate workspace, validates the registered 131-series inventory, and builds deterministic
+          publication artifacts. Release 1 uses <code>DATA_MODE=derived_only</code> and excludes private
+          source-input bytes from the public bundle.
         </p>
         <p>
           Source-series identities, crosswalk versions, deterministic validators, and interpretive
