@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from genai_at_work.private_vintage import sha256_file
+from genai_at_work.private_vintage import PrivateVintageError, sha256_file
 from genai_at_work.private_vintage_backend import (
     PrivateVintageBackendError,
     validate_backend_challenge,
@@ -198,7 +198,10 @@ def test_backend_source_byte_tampering_fails_readback(tmp_path: Path) -> None:
     payload = source.read_bytes()
     source.write_bytes(payload[:-1] + (b" " if payload[-1:] != b" " else b"\n"))
 
-    with pytest.raises(Exception, match="byte identity mismatch|content hash mismatch"):
+    with pytest.raises(
+        PrivateVintageError,
+        match="byte identity mismatch|content hash mismatch",
+    ):
         verify_backend_challenge(
             challenge,
             backend,
@@ -211,7 +214,7 @@ def test_missing_backend_package_fails_closed(tmp_path: Path) -> None:
     shutil.rmtree(
         backend / str(challenge["source_id"]) / str(challenge["archive_event_id"])
     )
-    with pytest.raises(Exception, match="not a regular directory"):
+    with pytest.raises(PrivateVintageError, match="not a regular directory"):
         verify_backend_challenge(
             challenge,
             backend,
