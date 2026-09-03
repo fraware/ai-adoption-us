@@ -97,7 +97,7 @@ It is deliberately two-phase so a later process or execution can prove read-back
 
 ### Phase 1: write challenge
 
-The `write` command stores the exact source package and emits a rights-safe challenge. The challenge contains only identities and control metadata:
+The `write` command stores the exact source package and emits source-byte-free review evidence. The challenge contains only identities and control metadata:
 
 - backend ID and separately reviewable configuration-evidence reference;
 - exact backend namespace;
@@ -106,11 +106,15 @@ The `write` command stores the exact source package and emits a rights-safe chal
 - predecessor snapshot identity when present;
 - canonical package digest over the manifest and archived files;
 - exact writer Git commit;
-- private/nonpublic flags;
+- private/nonpublic package flags;
+- explicit `source_bytes_in_evidence=false`;
+- explicit `public_evidence_approved=false`;
 - explicit `activation_gates_updated=false`;
 - explicit `durability_established_by_software_alone=false`.
 
-The challenge has an exact v1 field inventory. Unknown fields, malformed identities, unsafe IDs, widened publication scope, false activation claims, or false durability claims fail closed.
+The challenge has an exact v1 field inventory. Unknown fields, malformed identities, unsafe IDs, widened publication scope, source-byte claims, false activation claims, or false durability claims fail closed.
+
+`public_evidence_approved=false` is deliberate. The challenge excludes source observations, but a backend ID, namespace, or configuration-evidence reference can still be operationally sensitive. Source-byte safety is therefore not treated as public-publication approval.
 
 Example:
 
@@ -122,6 +126,8 @@ PYTHONPATH=src python scripts/rehearse_rps_private_backend.py write \
   --configuration-evidence-ref ops/private-rps-vault/configuration-v1 \
   --challenge-out /private/review/backend-write-challenge.json
 ```
+
+The configuration reference must be a non-secret review identifier. Credentials, signed URLs, access tokens, secret-bearing connection strings, or other credential material must never be encoded in it.
 
 For a later source state, `--previous-snapshot` may bind the event to an exact predecessor.
 
@@ -148,14 +154,19 @@ PYTHONPATH=src python scripts/rehearse_rps_private_backend.py verify \
 
 The strongest operational rehearsal runs `verify` in a separate process/execution after the write, with the backend remounted or reacquired through the normal production credential path. That separation is operational evidence, not something a local library can manufacture.
 
-## Rights-safe conformance evidence
+## Source-byte-free review evidence
 
-Neither challenge nor verification evidence contains source observations or detailed private diffs. Verification output records cryptographic identities, backend/configuration references, writer/verifier commits, recovery result, private/nonpublic flags, and two explicit limitations:
+Neither challenge nor verification evidence contains source observations or detailed private diffs. Verification output records cryptographic identities, backend/configuration references, writer/verifier commits, recovery result, private/nonpublic package flags, and explicit control boundaries:
 
+- `source_bytes_in_evidence=false`;
+- `public_evidence_approved=false`;
+- `activation_gates_updated=false`;
 - `durability_established_by_software_alone=false`;
 - `requires_independent_backend_configuration_review=true`.
 
-A successful conformance rehearsal therefore proves that the exact challenged package was later recoverable and internally valid at that backend path. It does not prove that the path is durable across infrastructure loss, that its ACLs are correct, that retention is adequate, or that the operator actually controls the underlying service.
+These JSON files are suitable for controlled review because they omit source observation bytes. They are not automatically approved for public distribution: infrastructure identifiers and configuration references must be reviewed separately before any publication decision.
+
+A successful conformance rehearsal proves that the exact challenged package was later recoverable and internally valid at that backend path. It does not prove that the path is durable across infrastructure loss, that its ACLs are correct, that retention is adequate, or that the operator actually controls the underlying service.
 
 ## Relationship to the activation gates
 
