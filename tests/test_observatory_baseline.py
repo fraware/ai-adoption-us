@@ -248,6 +248,16 @@ def test_contract_fails_when_q4_2025_missingness_rule_is_changed() -> None:
         validate_v1_baseline_contract(contract, ROOT)
 
 
+def test_contract_must_match_exact_repository_pinned_bytes() -> None:
+    contract = deepcopy(load_json_object(CONTRACT_PATH))
+    contract["contract_id"] = "observatory-v1-global-baseline-edited-out-of-band"
+    with pytest.raises(
+        ObservatoryBaselineError,
+        match="exact repository-pinned baseline contract",
+    ):
+        validate_v1_baseline_contract(contract, ROOT)
+
+
 def test_global_composer_builds_one_valid_complete_baseline(tmp_path: Path) -> None:
     rps_root = tmp_path / "rps"
     _rps_candidate(rps_root)
