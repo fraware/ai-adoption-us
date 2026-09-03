@@ -24,9 +24,10 @@ def test_app_icon_and_cross_engine_wrap_contract_exist():
     assert "occupation_<wbr />adjusted_<wbr />industry_<wbr />context_<wbr />residual" in methodology
 
 
-def test_labelled_generic_home_groups_have_explicit_roles():
+def test_labelled_generic_home_groups_have_explicit_roles_and_dynamic_evidence_label():
     home = read("apps/web/app/page.tsx")
-    assert 'className="metric-row" role="group" aria-label="Five-wave evidence summary"' in home
+    assert 'className="metric-row" role="group"' in home
+    assert 'aria-label={`${periods.length}-wave evidence summary`}' in home
     assert (
         'className="measurement-ladder" role="group" '
         'aria-label="Measurement ladder from adoption to realization"'
@@ -72,11 +73,16 @@ def test_browser_version_report_uses_pinned_playwright_version():
     assert "Unable to resolve pinned @playwright/test version" in reporter
 
 
-def test_public_sources_page_states_current_composition_evidence_boundary():
+def test_public_sources_page_states_current_composition_and_rps_boundaries():
     page = read("apps/web/app/sources/page.tsx")
     assert "Official Q2 2025 and Q2 2026 Basic Monthly" in page
     assert "composition inputs, not RPS residuals" in page
     assert "Robustness input validated" in page
+    assert "Authorized aggregate release path" in page
+    assert "bounded presentation view" in page
+    assert "historical subgroup panel" in page
+    assert "bulk download product" in page
+    assert "generic source query API" in page
     assert "Still outside Release 1 claims" in page
     assert "causal firm effects" in page
     assert "Sources, provenance" in page
@@ -93,7 +99,8 @@ def test_methodology_keeps_savings_distinct_from_productivity():
     assert "residual" in page
     assert "CPS composition foundation has been executed and validated" in page
     assert "published-aggregate project use is recorded as permitted" in sources.lower()
-    assert "live source-check schedule remains disabled" in sources
+    assert "unrestricted RPS" in page
+    assert "private source-input bytes" in page
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():
@@ -108,12 +115,19 @@ def test_explorers_use_registry_entity_names_instead_of_slug_labels():
 
 def test_source_provenance_matches_rights_safe_architecture():
     text = read("docs/source-provenance.md")
-    assert "rights-safe release" in text
-    assert "does not redistribute that raw audit fixture" in text
-    assert "fred_live_no_store" in text
+    lower = text.lower()
+    assert "authorized release pipeline" in lower
+    assert "private candidate workspace" in lower
+    assert "bounded attributed aggregate presentation view" in lower
+    assert "historical subgroup source panel" in lower
+    assert "bulk download" in lower
+    assert "generic query api" in lower
+    assert "private source-input" in lower
     assert "Official Q2 2025 and Q2 2026 Basic Monthly CPS inputs have been executed" in text
     assert "Official May 2025 staffing data have been executed" in text
-    assert "does **not** yet publish the RPS-dependent occupation-adjusted industry residual" in text
+    assert "occupation-adjusted RPS industry-context residual artifacts" in text
+    assert "derived descriptive diagnostics" in text
+    assert "no class-4 causal claim" in lower
 
 
 def test_navigation_routes_exist():
