@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import importlib.util
 import json
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Callable
+from typing import Any
 
 
 def _release_script() -> ModuleType:
@@ -18,7 +19,7 @@ def _release_script() -> ModuleType:
 
 
 def test_stage_identity_does_not_depend_on_runner_filesystem_path(tmp_path: Path) -> None:
-    stage_payload = getattr(_release_script(), "_stage_payload")
+    stage_payload = _release_script()._stage_payload
     assert callable(stage_payload)
     build_stage: Callable[..., dict[str, Any]] = stage_payload
 
