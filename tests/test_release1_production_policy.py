@@ -83,6 +83,22 @@ def test_github_pages_workflow_is_pinned_and_fail_closed():
     assert "vercel" not in workflow.lower()
 
 
+def test_github_pages_workflow_audits_the_live_deployment_after_deploy():
+    workflow = read(".github/workflows/pages.yml")
+    assert "live-audit:" in workflow
+    assert "name: Audit deployed Release 1 origin" in workflow
+    assert "needs: deploy" in workflow
+    assert "DEPLOYED_PAGE_URL: ${{ needs.deploy.outputs.page_url }}" in workflow
+    assert "EXPECTED_COMMIT_SHA: ${{ github.sha }}" in workflow
+    assert "https://fraware.github.io/ai-adoption-us" in workflow
+    assert "/release-manifest.json" in workflow
+    assert "/data/audit/private/rps_subgroup_5q_audit.json" in workflow
+    assert "/api/rps/raw" in workflow
+    assert "application_controlled_http_security_headers=false" in workflow
+    assert "r1-g3-live-pages-audit" in workflow
+    assert "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02" in workflow
+
+
 def test_production_environment_and_policy_are_explicit():
     env = read("apps/web/.env.example")
     policy = read("docs/RELEASE1_PRODUCTION_POLICY.md")
