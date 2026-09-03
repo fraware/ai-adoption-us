@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "binding_id": "observatory-v1-rps-repository-bindings-2026-09-03",
+  "source_id": "rps-genai-tracker-fred-release-6",
+  "source_vintage_bindings": [
+    {
+      "binding_id": "rps-cps-residual-source-vintage",
+      "repository_path": "data/derived/composition/rps-cps-residuals-2026-09-02/provenance.json",
+      "digest_field": "source_content_sha256",
+      "artifact_ids": [
+        "rps-cps-primary-residuals",
+        "rps-cps-residual-persistence",
+        "rps-cps-residual-robustness",
+        "rps-cps-residual-validation",
+        "rps-cps-residual-provenance"
+      ]
+    },
+    {
+      "binding_id": "oews-rps-source-vintage",
+      "repository_path": "data/derived/composition/oews-rps-adoption-2026-09-02/provenance.json",
+      "digest_field": "rps_source.source_content_sha256",
+      "artifact_ids": [
+        "oews-rps-primary-counterfactuals",
+        "oews-rps-cps-comparison",
+        "oews-rps-summary",
+        "oews-rps-validation",
+        "oews-rps-provenance"
+      ]
+    }
+  ],
+  "source_value_bindings": [
+    {
+      "binding_id": "btos-rps-q2-2026-industry-adoption-input",
+      "repository_path": "data/registry/rps_industry_adoption_q2_2026_v1.json",
+      "candidate_period": "2026-Q2",
+      "checkpoint_period": "Q2 2026",
+      "entity_type": "industry",
+      "metric_id": "adoption_work",
+      "expected_rows": 20,
+      "artifact_ids": [
+        "btos-rps-industry-triangulation",
+        "btos-rps-execution-state"
+      ]
+    }
+  ]
+}
