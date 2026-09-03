@@ -15,7 +15,8 @@
       "rps-longitudinal-diagnostics",
       "rps-quarter-diagnostics",
       "rps-rank-stability",
-      "rps-longitudinal-validation"
+      "rps-longitudinal-validation",
+      "rps-public-observation-view"
     ],
     "require_claims": true,
     "require_source_input_bytes_publication_false": true
