@@ -184,12 +184,20 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
             )
 
     backend = rows["operator_controlled_private_vintage_backend_configured"]
+    backend_id: str | None = None
+    configuration_ref: str | None = None
+    configuration_sha256: str | None = None
     if statuses["operator_controlled_private_vintage_backend_configured"] == "passed":
         backend_context = (
             "policy.activation_evidence.operator_controlled_private_vintage_backend_configured"
         )
-        _string(backend, "backend_id", context=backend_context)
-        _string(backend, "configuration_evidence_ref", context=backend_context)
+        backend_id = _string(backend, "backend_id", context=backend_context)
+        configuration_ref = _string(
+            backend, "configuration_evidence_ref", context=backend_context
+        )
+        configuration_sha256 = _hex64(
+            backend, "configuration_evidence_sha256", context=backend_context
+        )
         _string(backend, "verified_on", context=backend_context)
 
     rehearsal = rows["private_backend_write_read_verify_rehearsal_passed"]
@@ -207,6 +215,32 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
             "write_read_verify_evidence_ref",
             context=rehearsal_context,
         )
+        _hex64(
+            rehearsal,
+            "write_read_verify_evidence_sha256",
+            context=rehearsal_context,
+        )
+        rehearsal_backend_id = _string(
+            rehearsal, "backend_id", context=rehearsal_context
+        )
+        rehearsal_configuration_ref = _string(
+            rehearsal, "configuration_evidence_ref", context=rehearsal_context
+        )
+        rehearsal_configuration_sha256 = _hex64(
+            rehearsal, "configuration_evidence_sha256", context=rehearsal_context
+        )
+        if rehearsal_backend_id != backend_id:
+            raise RpsRefreshPolicyError(
+                "Private backend rehearsal backend_id must match configured backend evidence"
+            )
+        if rehearsal_configuration_ref != configuration_ref:
+            raise RpsRefreshPolicyError(
+                "Private backend rehearsal configuration reference must match configured backend evidence"
+            )
+        if rehearsal_configuration_sha256 != configuration_sha256:
+            raise RpsRefreshPolicyError(
+                "Private backend rehearsal configuration SHA-256 must match configured backend evidence"
+            )
         _string(rehearsal, "verified_on", context=rehearsal_context)
 
     return {gate for gate, status in statuses.items() if status == "passed"}
