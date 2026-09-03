@@ -40,6 +40,7 @@ PUBLIC_ROW_FIELDS = (
     "period",
     "entity_type",
     "entity_id",
+    "entity_name",
     "metric_id",
     "value",
     "unit",
@@ -52,6 +53,12 @@ def _mapping(value: object, context: str) -> dict[str, Any]:
     if not isinstance(value, Mapping):
         raise RpsReleaseError(f"{context} must be an object")
     return {str(key): item for key, item in value.items()}
+
+
+def _rows(value: object, context: str) -> list[dict[str, Any]]:
+    if not isinstance(value, list) or not all(isinstance(item, Mapping) for item in value):
+        raise RpsReleaseError(f"{context} must be a list of objects")
+    return [{str(key): item for key, item in row.items()} for row in value]
 
 
 def _strings(value: object, context: str) -> list[str]:
@@ -125,15 +132,67 @@ def validate_rps_public_observation_contract(contract: Mapping[str, Any]) -> Non
             raise RpsReleaseError(f"RPS public observation attribution.{field} is invalid")
 
 
-def _public_row(row: Mapping[str, Any]) -> dict[str, Any]:
-    missing = [field for field in PUBLIC_ROW_FIELDS if field not in row]
+def _entity_names(canonical_manifest: Mapping[str, Any]) -> dict[tuple[str, str], str]:
+    """Return one immutable display name for every canonical RPS entity."""
+
+    names: dict[tuple[str, str], str] = {}
+    for index, row in enumerate(_rows(canonical_manifest.get("series"), "canonical_manifest.series")):
+        context = f"canonical_manifest.series[{index}]"
+        entity_type = row.get("entity_type")
+        entity_id = row.get("entity_id")
+        entity_name = row.get("entity_name")
+        if not isinstance(entity_type, str) or not entity_type:
+            raise RpsReleaseError(f"{context}.entity_type is invalid")
+        if not isinstance(entity_id, str) or not entity_id:
+            raise RpsReleaseError(f"{context}.entity_id is invalid")
+        if not isinstance(entity_name, str) or not entity_name.strip():
+            raise RpsReleaseError(f"{context}.entity_name is invalid")
+        key = (entity_type, entity_id)
+        previous = names.get(key)
+        if previous is not None and previous != entity_name:
+            raise RpsReleaseError(
+                f"Canonical entity name conflicts for {entity_type}/{entity_id}: "
+                f"{previous!r} != {entity_name!r}"
+            )
+        names[key] = entity_name
+
+    expected_counts = {"national": 1, **REQUIRED_ENTITY_COUNTS}
+    for entity_type, expected in expected_counts.items():
+        observed = sum(1 for key in names if key[0] == entity_type)
+        if observed != expected:
+            raise RpsReleaseError(
+                f"Canonical entity-name inventory for {entity_type} must contain "
+                f"{expected} entities, observed {observed}"
+            )
+    return names
+
+
+def _public_row(
+    row: Mapping[str, Any],
+    names: Mapping[tuple[str, str], str],
+) -> dict[str, Any]:
+    required_source_fields = tuple(field for field in PUBLIC_ROW_FIELDS if field != "entity_name")
+    missing = [field for field in required_source_fields if field not in row]
     if missing:
         raise RpsReleaseError(f"RPS public observation source row is missing fields: {missing}")
-    return {field: row[field] for field in PUBLIC_ROW_FIELDS}
+    entity_type = str(row["entity_type"])
+    entity_id = str(row["entity_id"])
+    entity_name = names.get((entity_type, entity_id))
+    if entity_name is None:
+        raise RpsReleaseError(
+            f"RPS public observation entity is absent from canonical taxonomy: "
+            f"{entity_type}/{entity_id}"
+        )
+    public = {field: row[field] for field in required_source_fields}
+    public["entity_name"] = entity_name
+    return {field: public[field] for field in PUBLIC_ROW_FIELDS}
 
 
-def _sort_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    public = [_public_row(row) for row in rows]
+def _sort_rows(
+    rows: Sequence[Mapping[str, Any]],
+    names: Mapping[tuple[str, str], str],
+) -> list[dict[str, Any]]:
+    public = [_public_row(row, names) for row in rows]
     return sorted(
         public,
         key=lambda row: (
@@ -151,13 +210,15 @@ def build_rps_public_observation_view(
     source_id: str,
     source_vintage_id: str,
     source_reference_periods: Sequence[str],
+    canonical_manifest: Mapping[str, Any],
     contract: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Materialize the bounded public view from a validated private RPS panel.
 
-    Historical industry/occupation rows are deliberately excluded even though the
-    private panel can contain them. A source or contract change that would expand
-    the public surface fails closed.
+    National history contains every source quarter for which the complete five-
+    metric national work family is actually observed. Quarters with only a
+    partial national family are outside that view rather than treated as source
+    failures. Historical industry/occupation rows remain deliberately excluded.
     """
 
     validate_rps_public_observation_contract(contract)
@@ -171,11 +232,15 @@ def build_rps_public_observation_view(
     reference_periods = tuple(str(period) for period in source_reference_periods)
     if not reference_periods:
         raise RpsReleaseError("RPS public view requires source reference periods")
+    if len(set(reference_periods)) != len(reference_periods):
+        raise RpsReleaseError("RPS public view source reference periods contain duplicates")
     latest_period = panel.periods[-1]
     if latest_period not in reference_periods:
         raise RpsReleaseError("Latest complete subgroup period is outside source history")
 
+    names = _entity_names(canonical_manifest)
     national_rows: list[Mapping[str, Any]] = []
+    national_complete_periods: list[str] = []
     for period in reference_periods:
         rows = [
             row
@@ -183,9 +248,17 @@ def build_rps_public_observation_view(
             if row.get("entity_type") == "national" and row.get("metric_id") in NATIONAL_METRICS
         ]
         metrics = {str(row.get("metric_id")) for row in rows}
-        if len(rows) != len(NATIONAL_METRICS) or metrics != set(NATIONAL_METRICS):
-            raise RpsReleaseError(f"Incomplete national public-view family for {period}")
-        national_rows.extend(rows)
+        if len(rows) == len(NATIONAL_METRICS) and metrics == set(NATIONAL_METRICS):
+            national_rows.extend(rows)
+            national_complete_periods.append(period)
+        elif len(rows) > len(metrics):
+            raise RpsReleaseError(f"Duplicate national public-view metric for {period}")
+    if not national_complete_periods:
+        raise RpsReleaseError("RPS public view has no complete national work-family period")
+    if latest_period not in national_complete_periods:
+        raise RpsReleaseError(
+            "Latest complete subgroup period lacks the complete national work family"
+        )
 
     latest_rows = panel.period_rows.get(latest_period, ())
     subgroup_views: dict[str, list[dict[str, Any]]] = {}
@@ -200,11 +273,18 @@ def build_rps_public_observation_view(
         expected_rows = expected_entities * len(PUBLIC_SUBGROUP_METRICS)
         entities = {str(row.get("entity_id")) for row in rows}
         metrics = {str(row.get("metric_id")) for row in rows}
+        identities = {
+            (str(row.get("entity_id")), str(row.get("metric_id"))) for row in rows
+        }
+        if len(identities) != len(rows):
+            raise RpsReleaseError(
+                f"Duplicate latest {entity_type} public-view observation for {latest_period}"
+            )
         if len(rows) != expected_rows or len(entities) != expected_entities or metrics != set(PUBLIC_SUBGROUP_METRICS):
             raise RpsReleaseError(
                 f"Incomplete latest {entity_type} public view for {latest_period}"
             )
-        subgroup_views[entity_type] = _sort_rows(rows)
+        subgroup_views[entity_type] = _sort_rows(rows, names)
 
     attribution = _mapping(contract.get("attribution"), "attribution")
     return {
@@ -216,8 +296,9 @@ def build_rps_public_observation_view(
         "source_input_bytes_included": False,
         "generic_query_api_included": False,
         "historical_subgroup_panel_included": False,
+        "national_complete_periods": national_complete_periods,
         "latest_subgroup_period": latest_period,
-        "national_history": _sort_rows(national_rows),
+        "national_history": _sort_rows(national_rows, names),
         "industry_latest": subgroup_views["industry"],
         "occupation_latest": subgroup_views["occupation"],
         "attribution": dict(attribution),

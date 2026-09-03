@@ -40,7 +40,8 @@ def build_rps_observatory_release_candidate(
 
     The returned manifest includes all v3 longitudinal artifacts plus one bounded
     public observation view. Source input bytes remain private and are never
-    copied into the public artifact namespace.
+    copied into the public artifact namespace. Public entity labels are bound to
+    the same canonical source-series manifest used to validate source identity.
     """
 
     candidate = build_rps_release_candidate_complete_history(
@@ -60,6 +61,7 @@ def build_rps_observatory_release_candidate(
         source_id=str(source["source_id"]),
         source_vintage_id=str(source["source_vintage_id"]),
         source_reference_periods=prepared.source_periods,
+        canonical_manifest=canonical_manifest,
         contract=public_view_contract,
     )
     view_sha256, view_size = _write_json(output_dir / PUBLIC_VIEW_ARTIFACT_PATH, view)
