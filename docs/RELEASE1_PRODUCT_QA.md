@@ -213,7 +213,7 @@ The project owner explicitly removed human/manual checks and physical-device spo
 
 Accordingly, the following are **not Release 1 blockers and are not claimed as completed evidence**:
 
-- VoiceOver traversal;
+- **Screen-reader traversal** with VoiceOver;
 - NVDA or another human-operated second screen reader;
 - human-operated full keyboard/focus inspection beyond the automated contracts;
 - manual chart tooltip/label/color/heading review;
@@ -238,5 +238,7 @@ The following remain genuine external/post-R1-G2 work:
 The Release 1 browser evidence supports the statement that the rights-safe production candidate compiled, served, and passed the recorded Chrome/Firefox/WebKit matrix, explicit Pixel 7 and iPhone 15 Pro device-emulation proxies, automated navigation/resize/404 interaction contracts, and native macOS Safari desktop automation.
 
 It does **not** support claims of native iOS Safari, physical-device validation, human screen-reader usability, manual accessibility completion, field performance, or production-deployment correctness.
+
+**No public-launch claim** should imply that any of those unperformed or deployment-specific checks were completed.
 
 Published-aggregate RPS use is rights-cleared under the recorded project-owner attestation, but the separate durable live-refresh backend remains unactivated and the public Release 1 web path remains `derived_only`.
