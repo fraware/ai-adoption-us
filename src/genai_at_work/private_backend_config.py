@@ -11,15 +11,17 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from genai_at_work.private_vintage import PrivateVintageError, sha256_file
+from genai_at_work.private_vintage import sha256_file
 
 _EVIDENCE_TYPE = "rps_private_backend_configuration"
 _ENVIRONMENT_SCOPE = "production_rps_refresh"
 _ALLOWED_STORAGE_INTERFACES = {"mounted_filesystem", "object_store_mount"}
 _BACKEND_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_REFERENCE_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/-]{0,255}$")
 _CONFIG_KEYS = {
     "schema_version",
     "evidence_type",
@@ -42,7 +44,7 @@ _CONFIG_KEYS = {
 }
 
 
-class PrivateBackendConfigurationError(PrivateVintageError):
+class PrivateBackendConfigurationError(ValueError):
     """Raised when private-backend configuration evidence is invalid."""
 
 
@@ -64,6 +66,30 @@ def _bool(mapping: Mapping[str, Any], key: str) -> bool:
     return value
 
 
+def _reference(mapping: Mapping[str, Any], key: str) -> str:
+    value = _string(mapping, key)
+    if _REFERENCE_RE.fullmatch(value) is None:
+        raise PrivateBackendConfigurationError(
+            f"configuration.{key} must be a non-secret path-like review identifier"
+        )
+    return value
+
+
+def _reviewed_at(mapping: Mapping[str, Any]) -> str:
+    value = _string(mapping, "reviewed_at")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise PrivateBackendConfigurationError(
+            "configuration.reviewed_at must be an ISO-8601 timestamp"
+        ) from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise PrivateBackendConfigurationError(
+            "configuration.reviewed_at must include an explicit timezone"
+        )
+    return value
+
+
 def validate_private_backend_configuration(config: Mapping[str, Any]) -> None:
     """Validate the exact v1 configuration-attestation schema and safety claims."""
 
@@ -72,9 +98,7 @@ def validate_private_backend_configuration(config: Mapping[str, Any]) -> None:
             "private-backend configuration fields must exactly match the v1 contract"
         )
     if config.get("schema_version") != 1:
-        raise PrivateBackendConfigurationError(
-            "configuration.schema_version must equal 1"
-        )
+        raise PrivateBackendConfigurationError("configuration.schema_version must equal 1")
     if config.get("evidence_type") != _EVIDENCE_TYPE:
         raise PrivateBackendConfigurationError(
             "configuration.evidence_type must identify RPS private backend configuration"
@@ -85,7 +109,7 @@ def validate_private_backend_configuration(config: Mapping[str, Any]) -> None:
         raise PrivateBackendConfigurationError(
             "configuration.backend_id must be filesystem-safe"
         )
-    _string(config, "configuration_ref")
+    _reference(config, "configuration_ref")
     if _string(config, "environment_scope") != _ENVIRONMENT_SCOPE:
         raise PrivateBackendConfigurationError(
             "configuration.environment_scope must equal production_rps_refresh"
@@ -119,16 +143,16 @@ def validate_private_backend_configuration(config: Mapping[str, Any]) -> None:
                 f"configuration.{key} must be false"
             )
 
-    if _string(config, "source_rights_decision_ref") != (
+    if _reference(config, "source_rights_decision_ref") != (
         "docs/source-rights/RPS_SOURCE_DECISION.md"
     ):
         raise PrivateBackendConfigurationError(
             "configuration.source_rights_decision_ref must bind the canonical RPS rights decision"
         )
-    _string(config, "access_control_review_ref")
-    _string(config, "durability_review_ref")
-    _string(config, "retention_policy_ref")
-    _string(config, "reviewed_at")
+    _reference(config, "access_control_review_ref")
+    _reference(config, "durability_review_ref")
+    _reference(config, "retention_policy_ref")
+    _reviewed_at(config)
 
 
 def load_private_backend_configuration(path: Path) -> tuple[dict[str, Any], str]:
