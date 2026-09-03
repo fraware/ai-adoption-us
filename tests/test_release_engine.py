@@ -577,7 +577,22 @@ def test_stage_promote_baseline_then_stage_new_wave_without_source_redistributio
     assert frozen["reviewed_at"] == "2026-09-01T14:00:00Z"
     assert frozen["promoted_at"] != frozen["reviewed_at"]
     assert review_record["ci_passed_attested"] is True
-    assert review_record["ci_evidence_verified_by_release_engine"] is False
+    assert review_record["ci_evidence_verified_by_release_engine"] is True
+    assert review_record["ci_evidence_policy_id"] == "observatory-release-ci-v1"
+    assert len(review_record["ci_evidence_digest"]) == 64
+    assert review_record["ci_verified_runs"] == [
+        {
+            "id": 12345,
+            "name": "Release candidate CI",
+            "path": ".github/workflows/ci.yml",
+            "event": "push",
+            "head_branch": "main",
+            "head_sha": BUILDER_COMMIT,
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1,
+        }
+    ]
     assert review_record["candidate_commit"] == BUILDER_COMMIT
     assert review_record["artifact_sha256"]["result"] == baseline["artifacts"][0]["sha256"]
     registry_value = json.loads(registry.read_text())
@@ -585,6 +600,8 @@ def test_stage_promote_baseline_then_stage_new_wave_without_source_redistributio
     assert registry_value["status"] == "CURRENT_RELEASE_PROMOTED"
     assert registry_value["releases"][0]["promoted_at"] == frozen["promoted_at"]
     assert registry_value["releases"][0]["candidate_commit"] == BUILDER_COMMIT
+    assert registry_value["releases"][0]["ci_evidence_policy_id"] == "observatory-release-ci-v1"
+    assert registry_value["releases"][0]["ci_evidence_digest"] == review_record["ci_evidence_digest"]
 
     next_root = tmp_path / "next"
     next_release = _candidate(
