@@ -27,108 +27,156 @@ jobs:
 
       - name: Retrieve occupation-family direct SEs
         shell: bash
+        env:
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
         run: |
           set -euo pipefail
           python - <<'PY'
           import hashlib
           import json
           import os
+          import sys
           import urllib.error
           import urllib.request
           from pathlib import Path
 
           base = 'https://api.bls.gov/publicAPI/v2/timeseries/data/'
-          rows = []
-          for suffix in range(1, 21):
-              series_id = f'LNU020322{suffix:02d}'
-              url = f'{base}{series_id}?aspects=true'
-              request = urllib.request.Request(
-                  url,
-                  headers={'User-Agent': 'ai-adoption-us/1.0 public-data-validation'},
-              )
-              row = {'series_id': series_id, 'request_url': url}
-              try:
-                  with urllib.request.urlopen(request, timeout=60) as response:
-                      raw = response.read()
-              except urllib.error.HTTPError as exc:
-                  row['retrieval_error_type'] = 'HTTPError'
-                  row['retrieval_error'] = exc.code
-                  rows.append(row)
-                  continue
-              except urllib.error.URLError as exc:
-                  row['retrieval_error_type'] = 'URLError'
-                  row['retrieval_error'] = str(exc.reason)
-                  rows.append(row)
-                  continue
+          series_ids = [f'LNU020322{suffix:02d}' for suffix in range(1, 21)]
+          api_key = os.environ.get('BLS_API_KEY', '').strip()
 
-              row.update({
-                  'transport_response_sha256': hashlib.sha256(raw).hexdigest(),
-                  'transport_response_size_bytes': len(raw),
-              })
-              try:
-                  payload = json.loads(raw.decode('utf-8'))
-              except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-                  row['parse_error_type'] = type(exc).__name__
-                  row['parse_error'] = str(exc)
-                  rows.append(row)
-                  continue
+          # BLS documents multi-series POST requests and the `aspects` option. A configured
+          # registration key is used when available, but its value is never written to logs or
+          # artifacts. Keeping the request to one batch avoids exhausting the keyless per-day
+          # request quota merely by enumerating this 20-series validation family.
+          payload = {
+              'seriesid': series_ids,
+              'startyear': '2026',
+              'endyear': '2026',
+              'aspects': True,
+          }
+          if api_key:
+              payload['registrationkey'] = api_key
 
-              row['status'] = payload.get('status')
-              row['message'] = payload.get('message')
-              results = payload.get('Results')
-              series = results.get('series', []) if isinstance(results, dict) else []
-              matching_series = [
-                  item for item in series
-                  if isinstance(item, dict) and item.get('seriesID') == series_id
-              ]
-              if len(matching_series) == 1:
-                  observations = matching_series[0].get('data', [])
-                  matches = [
-                      item for item in observations
-                      if isinstance(item, dict)
-                      and item.get('year') == '2026'
-                      and item.get('period') == 'M07'
-                  ]
-                  if len(matches) == 1:
-                      observation = matches[0]
-                      raw_value = observation.get('value')
-                      try:
-                          row['value_thousands'] = float(str(raw_value).replace(',', ''))
-                      except ValueError:
-                          row['value_parse_error'] = repr(raw_value)
-                      aspects = observation.get('aspects', [])
-                      se = [
-                          item for item in aspects
-                          if isinstance(item, dict)
-                          and str(item.get('name', '')).strip().casefold() == 'standard error'
-                      ]
-                      if len(se) == 1:
-                          raw_se = se[0].get('value')
-                          try:
-                              row['standard_error_thousands'] = float(
-                                  str(raw_se).replace(',', '')
-                              )
-                          except ValueError:
-                              row['standard_error_parse_error'] = repr(raw_se)
-                          row['standard_error_footnotes'] = se[0].get('footnotes', [])
-                      else:
-                          row['standard_error_match_count'] = len(se)
-                  else:
-                      row['reference_period_match_count'] = len(matches)
-              else:
-                  row['series_match_count'] = len(matching_series)
-              rows.append(row)
-
+          public_payload = {key: value for key, value in payload.items() if key != 'registrationkey'}
           result = {
-              'schema_version': 1,
+              'schema_version': 2,
               'reference_period': '2026-M07',
               'series_family_probe': 'LNU02032201 through LNU02032220',
-              'raw_api_responses_published': False,
-              'rows': rows,
+              'request_method': 'POST',
+              'request_url': base,
+              'request_payload': public_payload,
+              'registration_key_used': bool(api_key),
+              'raw_api_response_published': False,
+              'rows': [],
           }
           output = Path(os.environ['RUNNER_TEMP']) / 'cps-occupation-se-probe.json'
+
+          request = urllib.request.Request(
+              base,
+              data=json.dumps(payload, separators=(',', ':')).encode('utf-8'),
+              headers={
+                  'Content-Type': 'application/json',
+                  'User-Agent': 'ai-adoption-us/1.0 public-data-validation',
+              },
+              method='POST',
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=120) as response:
+                  raw = response.read()
+          except (urllib.error.HTTPError, urllib.error.URLError) as exc:
+              result['retrieval_error_type'] = type(exc).__name__
+              result['retrieval_error'] = getattr(exc, 'code', None) or str(getattr(exc, 'reason', exc))
+              output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+              print(json.dumps(result, indent=2, sort_keys=True))
+              raise SystemExit(1) from exc
+
+          result['transport_response_sha256'] = hashlib.sha256(raw).hexdigest()
+          result['transport_response_size_bytes'] = len(raw)
+          try:
+              response_payload = json.loads(raw.decode('utf-8'))
+          except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+              result['parse_error_type'] = type(exc).__name__
+              result['parse_error'] = str(exc)
+              output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+              print(json.dumps(result, indent=2, sort_keys=True))
+              raise SystemExit(1) from exc
+
+          result['status'] = response_payload.get('status')
+          result['message'] = response_payload.get('message')
+          results = response_payload.get('Results')
+          returned_series = results.get('series', []) if isinstance(results, dict) else []
+          by_id = {
+              item.get('seriesID'): item
+              for item in returned_series
+              if isinstance(item, dict) and isinstance(item.get('seriesID'), str)
+          }
+
+          complete = response_payload.get('status') == 'REQUEST_SUCCEEDED'
+          for series_id in series_ids:
+              row = {'series_id': series_id}
+              series = by_id.get(series_id)
+              if series is None:
+                  row['series_match_count'] = 0
+                  complete = False
+                  result['rows'].append(row)
+                  continue
+
+              catalog = series.get('catalog')
+              if isinstance(catalog, dict):
+                  # Catalog availability depends on BLS series/API support. Retain only the
+                  # returned public metadata; never infer a label when BLS does not provide one.
+                  row['catalog'] = catalog
+
+              observations = series.get('data', [])
+              matches = [
+                  item for item in observations
+                  if isinstance(item, dict)
+                  and item.get('year') == '2026'
+                  and item.get('period') == 'M07'
+              ]
+              if len(matches) != 1:
+                  row['reference_period_match_count'] = len(matches)
+                  complete = False
+                  result['rows'].append(row)
+                  continue
+
+              observation = matches[0]
+              raw_value = observation.get('value')
+              try:
+                  row['value_thousands'] = float(str(raw_value).replace(',', ''))
+              except (TypeError, ValueError):
+                  row['value_parse_error'] = repr(raw_value)
+                  complete = False
+
+              aspects = observation.get('aspects', [])
+              se = [
+                  item for item in aspects
+                  if isinstance(item, dict)
+                  and str(item.get('name', '')).strip().casefold() == 'standard error'
+              ]
+              if len(se) == 1:
+                  raw_se = se[0].get('value')
+                  try:
+                      row['standard_error_thousands'] = float(str(raw_se).replace(',', ''))
+                  except (TypeError, ValueError):
+                      row['standard_error_parse_error'] = repr(raw_se)
+                      complete = False
+                  row['standard_error_footnotes'] = se[0].get('footnotes', [])
+              else:
+                  row['standard_error_match_count'] = len(se)
+                  complete = False
+
+              result['rows'].append(row)
+
+          result['returned_series_count'] = len(by_id)
+          result['expected_series_count'] = len(series_ids)
+          result['complete_direct_se_grid'] = complete and len(by_id) == len(series_ids)
           output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
           print(json.dumps(result, indent=2, sort_keys=True))
+
+          if not result['complete_direct_se_grid']:
+              print('Direct-SE validation grid is incomplete; failing closed.', file=sys.stderr)
+              raise SystemExit(1)
           PY
 
       - name: Upload rights-safe direct-SE probe
