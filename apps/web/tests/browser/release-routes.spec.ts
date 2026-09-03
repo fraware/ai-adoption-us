@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const routes = [
   { slug: "home", path: "/" },
@@ -21,7 +21,7 @@ const primaryNavigation = [
 const ANDROID_PROJECT = "android-chrome-pixel-7-emulation";
 const IOS_PROJECT = "ios-webkit-iphone-15-pro-emulation";
 
-async function assertMobileEmulationContract(page: Parameters<typeof test>[0] extends never ? never : any) {
+async function assertMobileEmulationContract(page: Page) {
   const projectName = test.info().project.name;
   if (projectName !== ANDROID_PROJECT && projectName !== IOS_PROJECT) {
     return;
