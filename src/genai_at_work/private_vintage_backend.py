@@ -48,6 +48,8 @@ _CHALLENGE_KEYS = {
     "builder_commit",
     "storage_scope",
     "public_archive",
+    "source_bytes_in_evidence",
+    "public_evidence_approved",
     "activation_gates_updated",
     "durability_established_by_software_alone",
 }
@@ -124,11 +126,13 @@ def write_backend_challenge(
     builder_commit: str,
     previous_snapshot_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Write one immutable event and return a rights-safe read-back challenge.
+    """Write one immutable event and return source-byte-free review evidence.
 
     The challenge proves what was written, not that the supplied backend root is
     actually durable or access-controlled. Infrastructure durability remains a
     separately reviewed fact identified by ``configuration_evidence_ref``.
+    Backend/configuration identifiers may themselves be operationally sensitive,
+    so the challenge is not automatically approved for public distribution.
     """
 
     normalized_backend_id = _backend_id(backend_id)
@@ -170,6 +174,8 @@ def write_backend_challenge(
         "builder_commit": normalized_builder_commit,
         "storage_scope": manifest["rights"]["storage_scope"],
         "public_archive": manifest["public_archive"],
+        "source_bytes_in_evidence": False,
+        "public_evidence_approved": False,
         "activation_gates_updated": False,
         "durability_established_by_software_alone": False,
     }
@@ -178,7 +184,7 @@ def write_backend_challenge(
 
 
 def validate_backend_challenge(challenge: Mapping[str, Any]) -> None:
-    """Validate a rights-safe backend read-back challenge."""
+    """Validate a source-byte-free backend read-back challenge."""
 
     if set(challenge) != _CHALLENGE_KEYS:
         raise PrivateVintageBackendError(
@@ -221,6 +227,14 @@ def validate_backend_challenge(challenge: Mapping[str, Any]) -> None:
         raise PrivateVintageBackendError("challenge.storage_scope must remain private")
     if challenge.get("public_archive") is not False:
         raise PrivateVintageBackendError("challenge.public_archive must remain false")
+    if challenge.get("source_bytes_in_evidence") is not False:
+        raise PrivateVintageBackendError(
+            "backend challenge must not include source bytes"
+        )
+    if challenge.get("public_evidence_approved") is not False:
+        raise PrivateVintageBackendError(
+            "backend challenge is review evidence and must not self-approve public distribution"
+        )
     if challenge.get("activation_gates_updated") is not False:
         raise PrivateVintageBackendError(
             "backend challenge must not claim activation-gate mutation"
@@ -313,6 +327,7 @@ def verify_backend_challenge(
         "storage_scope": "private",
         "public_archive": False,
         "source_bytes_in_evidence": False,
+        "public_evidence_approved": False,
         "activation_gates_updated": False,
         "durability_established_by_software_alone": False,
         "requires_independent_backend_configuration_review": True,
