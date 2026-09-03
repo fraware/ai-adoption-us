@@ -1,15 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ReleaseNotice } from "../components/ReleaseNotice";
+import { configuredSiteOrigin } from "../lib/site";
 import "./globals.css";
 
+const siteOrigin = configuredSiteOrigin();
+
 export const metadata: Metadata = {
+  ...(siteOrigin ? { metadataBase: new URL(siteOrigin) } : {}),
   title: {
     default: "GenAI at Work",
     template: "%s · GenAI at Work",
   },
   description:
     "An auditable technical data publication separating workplace GenAI adoption, workflow penetration, and reported time savings.",
+  ...(siteOrigin ? { alternates: { canonical: "/" } } : {}),
+  openGraph: {
+    type: "website",
+    siteName: "GenAI at Work",
+    title: "GenAI at Work",
+    description:
+      "An auditable technical data publication separating workplace GenAI adoption, workflow penetration, and reported time savings.",
+    ...(siteOrigin ? { url: siteOrigin } : {}),
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
