@@ -9,21 +9,23 @@ export default function SourcesPage() {
       <p className="eyebrow">Source registry &amp; release boundary</p>
       <h1>Sources, provenance, and what is not in this release.</h1>
       <p className="lede">
-        Release 1 is intentionally narrower than the private research environment. It publishes
-        rights-safe descriptive evidence without redistributing the reviewed raw RPS subgroup fixture.
+        Release 1 is intentionally narrower than the private release-candidate environment. It publishes
+        attributed aggregate views and derived descriptive evidence without redistributing the complete RPS
+        source history as a public database.
       </p>
 
       <section className="section" aria-labelledby="source-status-heading">
         <h2 id="source-status-heading">Source status</h2>
         <div className="status-grid">
           <div className="status-card">
-            <span className="status-tag ready">Validated research source</span>
+            <span className="status-tag ready">Authorized aggregate release path</span>
             <h3>RPS / GenAI Adoption Tracker</h3>
             <p>
               Primary measurement family for worker adoption, recent/routine use, assisted work hours,
               and reported time savings. Published-aggregate project use is recorded as permitted. The
-              public Release 1 bundle remains <code>derived_only</code>; the separate live refresh path is
-              not activated until its durable private-backend gates pass.
+              release pipeline retrieves the registered FRED series into a private candidate workspace;
+              the public <code>derived_only</code> bundle is limited to the contracted attributed aggregate
+              views and derived artifacts.
             </p>
           </div>
           <div className="status-card">
@@ -68,10 +70,11 @@ export default function SourcesPage() {
           occupation records.
         </p>
         <p>
-          Public source links are preserved in the registry. Release 1 does not expose a downloadable
-          static database of the reviewed RPS observations and does not silently fall back from a live
-          source to the private audit fixture. The live source-check schedule remains disabled until the
-          separate durable-private-backend activation contract is satisfied.
+          Public source links are preserved in the registry. Release 1 exposes a bounded presentation view:
+          seven complete national-history quarters through Q2 2026 plus the latest complete industry and
+          occupation A/H/S cross-sections. It does not expose an unrestricted static database, historical
+          subgroup panel, bulk download product, or generic source query API. Private source-input bytes are
+          excluded from the public release.
         </p>
         <p>
           <a href="https://fred.stlouisfed.org/release?rid=6">FRED RPS release page</a>
@@ -85,14 +88,16 @@ export default function SourcesPage() {
         <dl className="definition-grid">
           <dt>Public bundle</dt>
           <dd>
-            Source metadata, formulas, crosswalks, deterministic code, longitudinal derived diagnostics,
-            versioned CPS/OEWS composition evidence, BTOS–RPS triangulation, methodology, and the technical
-            publication. It runs in <code>derived_only</code> mode.
+            Source metadata, formulas, crosswalks, deterministic code, the bounded attributed RPS
+            observation view, longitudinal derived diagnostics, versioned CPS/OEWS composition evidence,
+            BTOS–RPS triangulation, methodology, and the technical publication. It runs in
+            <code> derived_only</code> mode.
           </dd>
-          <dt>Private research bundle</dt>
+          <dt>Private release-candidate workspace</dt>
           <dd>
-            Adds the reviewed five-wave subgroup fixture used to regenerate and regression-test the
-            longitudinal publication artifacts.
+            Holds the authorized RPS source inputs needed to validate the complete registered history and
+            regenerate the release artifacts. Those source-input files are hash-bound to the candidate but
+            excluded from the public review and release bundles.
           </dd>
           <dt>Produced composition evidence</dt>
           <dd>
@@ -102,7 +107,7 @@ export default function SourcesPage() {
           </dd>
           <dt>Still outside Release 1 claims</dt>
           <dd>
-            A standalone public composition-residual explorer, design-based CPS covariance for the custom
+            An unrestricted historical RPS subgroup product, design-based CPS covariance for the custom
             composition vectors, causal firm effects, and measured labor-productivity effects.
           </dd>
         </dl>
