@@ -1,27 +1,69 @@
 {
   "all_passed": true,
-  "check_count": 21,
+  "analysis_metric_periods": {
+    "adoption_work": [
+      "2024-Q3",
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ],
+    "assisted_hours_share": [
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ],
+    "reported_time_savings_share": [
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ]
+  },
+  "check_count": 9,
   "checks": {
-    "all_private": true,
-    "entities_42": true,
-    "industry_H_beats_A_in_3_of_5": true,
-    "industry_adoption_rank_more_stable_than_H_all_10": true,
-    "industry_adoption_rank_more_stable_than_S_all_10": true,
-    "occupation_AH_pearson_gt_industry_all_5": true,
-    "occupation_AH_spearman_gt_industry_all_5": true,
-    "occupation_A_predicts_S_gt_H_all_5": true,
-    "occupation_LOO_A_beats_H_all_110": true,
-    "occupation_adoption_rank_more_stable_than_H_all_10": true,
-    "occupation_adoption_rank_more_stable_than_S_all_10": true,
-    "periods_5": true,
-    "q2_industry_r2_H_A": true,
-    "q2_industry_r2_S_A": true,
-    "q2_industry_r2_S_A_H": true,
-    "q2_industry_r2_S_H": true,
-    "rights_marked": true,
-    "row_count_630": true,
-    "series_126": true,
-    "unique_key_630": true,
+    "canonical_series_count": true,
+    "complete_period_source_rows": true,
+    "industry_entities_complete": true,
+    "metrics_exact": true,
+    "occupation_entities_complete": true,
+    "period_count_at_least_two": true,
+    "subgroup_observation_count": true,
+    "unique_subgroup_keys": true,
     "values_finite_0_100": true
-  }
+  },
+  "national_series_count": 5,
+  "periods": [
+    "2024-Q4",
+    "2025-Q1",
+    "2025-Q2",
+    "2025-Q3",
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2"
+  ],
+  "schema_version": 1,
+  "source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+  "source_history_observation_count": 962,
+  "source_history_periods": [
+    "2024-Q3",
+    "2024-Q4",
+    "2025-Q1",
+    "2025-Q2",
+    "2025-Q3",
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2"
+  ],
+  "subgroup_series_count": 126
 }
