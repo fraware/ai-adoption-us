@@ -26,8 +26,8 @@ from genai_at_work.release_engine import (
     sha256_file,
     validate_release_manifest,
 )
+from genai_at_work.rps_public_view import CONTRACT_ID as RPS_PUBLIC_VIEW_CONTRACT_ID
 from genai_at_work.rps_public_view import (
-    CONTRACT_ID as RPS_PUBLIC_VIEW_CONTRACT_ID,
     NATIONAL_METRICS,
     PUBLIC_SUBGROUP_METRICS,
 )
