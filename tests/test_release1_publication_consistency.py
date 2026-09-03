@@ -27,6 +27,10 @@ def test_sources_page_matches_current_r1_source_and_qa_state():
     assert "published triangulation" in lower
     assert "future triangulation" not in lower
     assert "published-aggregate project use is recorded as permitted" in lower
+    assert "authorized aggregate release path" in lower
+    assert "bounded presentation view" in lower
+    assert "historical subgroup panel" in lower
+    assert "generic source query api" in lower
     assert "native\n          macos safari" in lower
     assert "human screen-reader traversal" in lower
     assert "not release 1 evidence" in lower
@@ -46,23 +50,61 @@ def test_methodology_matches_executed_composition_boundary():
     assert "until source permissions are resolved" not in lower
 
 
-def test_essay_no_longer_claims_cps_composition_is_unexecuted():
+def test_essay_matches_executed_composition_and_dynamic_longitudinal_evidence():
     essay = read("apps/web/app/blog/after-adoption/page.tsx")
     lower = essay.lower()
 
-    assert "official cps q2 2025 and q2 2026 inputs now provide" in lower
+    assert "official cps q2 2025 and q2 2026 inputs provide" in lower
     assert "occupation-adjusted industry-context residual diagnostics" in lower
     assert "full design-based uncertainty" in lower
+    assert "periods.length" in essay
+    assert "adoption_rank_corr_gt_assisted_hours_rank_corr" in essay
+    assert "five audited waves" not in lower
+    assert "full five-wave window" not in lower
     assert "until the required cps microdata are executed" not in lower
     assert '<Link href="/methodology">' in essay
     assert '<Link href="/sources">' in essay
 
 
-def test_release1_direct_feed_language_matches_activation_state():
+def test_release1_bounded_view_and_live_adapter_boundaries_are_distinct():
     release_notice = read("apps/web/components/ReleaseNotice.tsx")
     home = read("apps/web/app/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
 
+    # The application-controlled live adapter remains separately gated.
     assert "live adapter remains fail-closed until its operational activation gates pass" in release_notice
-    assert "direct national observation feed is not activated in Release 1" in home
-    assert "live source-check schedule remains disabled" in sources
+
+    # Release 1 may carry only the contracted rights-bounded observation artifact.
+    assert "bounded public observation view is unavailable in this build" in home.lower()
+    assert "bounded presentation view" in sources.lower()
+    assert "seven complete national-history quarters through q2 2026" in sources.lower()
+    assert "latest complete industry and" in sources.lower()
+    assert "occupation a/h/s cross-sections" in sources.lower()
+    assert "unrestricted static database" in sources.lower()
+    assert "bulk download product" in sources.lower()
+    assert "generic source query api" in sources.lower()
+
+
+def test_governed_longitudinal_surfaces_do_not_reintroduce_five_wave_state():
+    surfaces = [
+        "apps/web/app/page.tsx",
+        "apps/web/app/explore/industries/page.tsx",
+        "apps/web/app/explore/occupations/page.tsx",
+        "apps/web/app/blog/after-adoption/page.tsx",
+        "README.md",
+        "docs/RESULTS.md",
+        "docs/source-provenance.md",
+    ]
+    stale_phrases = (
+        "five-wave",
+        "five wave",
+        "five audited waves",
+        "all five",
+        "10/10 quarter-pair",
+        "110/110",
+        "630 cells",
+    )
+    for relative in surfaces:
+        lower = read(relative).lower()
+        for phrase in stale_phrases:
+            assert phrase not in lower, f"{relative} reintroduced stale longitudinal state: {phrase}"
