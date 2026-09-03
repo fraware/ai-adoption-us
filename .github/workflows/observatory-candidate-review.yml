@@ -1,0 +1,256 @@
+name: Observatory candidate review
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/observatory-candidate-review.yml'
+      - 'scripts/prepare_rps_refresh_candidate.py'
+      - 'scripts/prepare_rps_observatory_candidate.py'
+      - 'scripts/prepare_observatory_v1_candidate.py'
+      - 'scripts/observatory_release.py'
+      - 'src/genai_at_work/release_engine.py'
+      - 'src/genai_at_work/rps_release.py'
+      - 'src/genai_at_work/rps_release_complete.py'
+      - 'src/genai_at_work/rps_release_public.py'
+      - 'src/genai_at_work/rps_public_view.py'
+      - 'src/genai_at_work/observatory_baseline.py'
+      - 'src/genai_at_work/observatory_rps_bindings.py'
+      - 'data/registry/observatory_release_registry.json'
+      - 'data/registry/observatory_v1_baseline_contract.json'
+      - 'data/registry/observatory_v1_rps_repository_bindings.json'
+      - 'data/registry/rps_public_observation_delivery_v1.json'
+      - 'data/registry/rps_source_series_manifest.json'
+      - 'data/registry/rps_provider_catalog_scope.json'
+      - 'data/registry/rps_industry_adoption_q2_2026_v1.json'
+      - 'data/derived/composition/rps-cps-residuals-2026-09-02/**'
+      - 'data/derived/composition/oews-rps-adoption-2026-09-02/**'
+      - 'data/derived/btos_rps/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: observatory-candidate-review-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    name: Build and stage exact Observatory candidate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Check out canonical repository state
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install release-engine dependencies
+        run: python -m pip install -e .
+
+      - name: Require authorized FRED credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FRED_API_KEY:-}" ]; then
+            echo "FRED_API_KEY repository secret is required for the authorized RPS source path." >&2
+            exit 1
+          fi
+
+      - name: Retrieve and validate live RPS aggregate source
+        run: >-
+          PYTHONPATH=src python scripts/prepare_rps_refresh_candidate.py
+          --output-dir /tmp/rps-refresh
+
+      - name: Build private v4 RPS Observatory component
+        run: >-
+          PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py
+          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+          --output-dir /tmp/rps-observatory
+          --release-id rps-observatory-review-${GITHUB_RUN_ID}
+
+      - name: Compose vintage-bound global Observatory candidate
+        run: >-
+          PYTHONPATH=src python scripts/prepare_observatory_v1_candidate.py
+          --rps-candidate-root /tmp/rps-observatory
+          --output-dir /tmp/observatory-v1-candidate
+          --release-id observatory-v1-review-${GITHUB_RUN_ID}
+
+      - name: Stage immutable candidate for explicit review
+        run: >-
+          PYTHONPATH=src python scripts/observatory_release.py stage
+          --candidate-manifest /tmp/observatory-v1-candidate/release.json
+          --candidate-root /tmp/observatory-v1-candidate
+          --staging-dir /tmp/observatory-v1-stage
+
+      - name: Require clean review gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          gate = json.loads(Path('/tmp/observatory-v1-stage/publication_gate.json').read_text())
+          if gate.get('status') != 'BLOCKED_REVIEW_REQUIRED':
+              raise SystemExit(f"Expected BLOCKED_REVIEW_REQUIRED, observed {gate.get('status')!r}")
+          if gate.get('failures') != []:
+              raise SystemExit(f"Candidate has release-gate failures: {gate.get('failures')!r}")
+          if gate.get('source_input_bytes_publishable_by_this_engine') is not False:
+              raise SystemExit('Release engine widened source-input publication scope')
+          PY
+
+      - name: Assemble rights-safe exact-candidate review package
+        shell: bash
+        run: |
+          set -euo pipefail
+          review="$RUNNER_TEMP/observatory-candidate-review"
+          mkdir -p "$review/candidate-artifacts" "$review/stage"
+
+          cp -R /tmp/observatory-v1-candidate/artifacts/. "$review/candidate-artifacts/"
+          cp /tmp/observatory-v1-stage/stage_manifest.json "$review/stage/"
+          cp /tmp/observatory-v1-stage/release_diff.json "$review/stage/"
+          cp /tmp/observatory-v1-stage/review_package.json "$review/stage/"
+          cp /tmp/observatory-v1-stage/publication_gate.json "$review/stage/"
+
+          PYTHONPATH=src python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from genai_at_work.release_engine import sanitized_public_manifest, sha256_file
+
+          review = Path(os.environ['RUNNER_TEMP']) / 'observatory-candidate-review'
+          candidate_root = Path('/tmp/observatory-v1-candidate')
+          candidate_path = candidate_root / 'release.json'
+          candidate = json.loads(candidate_path.read_text())
+          stage = json.loads((review / 'stage' / 'stage_manifest.json').read_text())
+          diff = json.loads((review / 'stage' / 'release_diff.json').read_text())
+          gate = json.loads((review / 'stage' / 'publication_gate.json').read_text())
+
+          public_manifest = sanitized_public_manifest(candidate)
+          (review / 'sanitized-candidate-manifest.json').write_text(
+              json.dumps(public_manifest, indent=2, sort_keys=True) + '\n'
+          )
+
+          artifact_hashes = {
+              row['artifact_id']: row['sha256'] for row in candidate['artifacts']
+          }
+          for artifact in candidate['artifacts']:
+              copied = review / 'candidate-artifacts' / Path(artifact['path']).relative_to('artifacts')
+              if not copied.is_file():
+                  raise SystemExit(f"Review package is missing artifact {artifact['artifact_id']}")
+              if sha256_file(copied) != artifact['sha256']:
+                  raise SystemExit(f"Review artifact checksum mismatch: {artifact['artifact_id']}")
+
+          binding = candidate.get('component_builds', {}).get('rps_repository_bindings', {})
+          if binding.get('status') != 'pass':
+              raise SystemExit('Global candidate lacks a passing RPS repository binding')
+
+          attestation_template = {
+              'stage_id': stage['stage_id'],
+              'release_id': candidate['release_id'],
+              'candidate_manifest_sha256': stage['candidate_manifest_sha256'],
+              'candidate_commit': candidate['build']['builder_commit'],
+              'candidate_review_run_id': int(os.environ['GITHUB_RUN_ID']),
+              'ci_run_ids': [],
+              'artifact_sha256': artifact_hashes,
+              'reviewed_source_ids': diff['changed_source_ids'],
+              'reviewed_artifact_ids': diff['changed_artifact_ids'],
+              'reviewed_diagnostic_ids': diff['changed_diagnostic_ids'],
+              'reviewed_claim_ids': diff['affected_claim_ids'],
+              'reviewer': '',
+              'reviewed_at': '',
+              'scientific_reviewed': False,
+              'editorial_reviewed': False,
+              'source_rights_reviewed': False,
+              'ci_passed': False,
+          }
+          (review / 'review-attestation-template.json').write_text(
+              json.dumps(attestation_template, indent=2, sort_keys=True) + '\n'
+          )
+
+          source = next(
+              row for row in candidate['sources']
+              if row['source_id'] == 'rps-genai-tracker-fred-release-6'
+          )
+          summary = {
+              'schema_version': 1,
+              'review_type': 'observatory_v1_exact_candidate',
+              'github_run_id': int(os.environ['GITHUB_RUN_ID']),
+              'github_sha': os.environ['GITHUB_SHA'],
+              'release_id': candidate['release_id'],
+              'release_type': candidate['release_type'],
+              'candidate_manifest_sha256': stage['candidate_manifest_sha256'],
+              'stage_id': stage['stage_id'],
+              'gate_status': gate['status'],
+              'rps_source_vintage_id': source['source_vintage_id'],
+              'rps_reference_periods': source['reference_periods'],
+              'rps_analysis_reference_periods': source['analysis_reference_periods'],
+              'rps_repository_binding_id': binding.get('binding_id'),
+              'rps_repository_binding_status': binding.get('status'),
+              'artifact_count': len(candidate['artifacts']),
+              'diagnostic_count': len(candidate['diagnostics']),
+              'claim_count': len(candidate['claims']),
+              'explicit_review_completed': False,
+              'promotion_performed': False,
+              'source_input_bytes_included': False,
+          }
+          (review / 'review-summary.json').write_text(
+              json.dumps(summary, indent=2, sort_keys=True) + '\n'
+          )
+          PY
+
+      - name: Audit review package for private-source leakage
+        shell: bash
+        run: |
+          set -euo pipefail
+          review="$RUNNER_TEMP/observatory-candidate-review"
+          test ! -e "$review/rps_source_snapshot.json"
+          test ! -e "$review/rps_refresh_diff.json"
+          if find "$review" -type d -name inputs -print -quit | grep -q .; then
+            echo 'Review package contains a private inputs directory.' >&2
+            exit 1
+          fi
+          if grep -R -q '"local_path"' "$review"; then
+            echo 'Review package contains a private source local_path.' >&2
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP']) / 'observatory-candidate-review'
+          summary = json.loads((root / 'review-summary.json').read_text())
+          template = json.loads((root / 'review-attestation-template.json').read_text())
+          if summary.get('source_input_bytes_included') is not False:
+              raise SystemExit('Review summary widened private-source publication')
+          if summary.get('explicit_review_completed') is not False:
+              raise SystemExit('Workflow may not self-attest explicit review')
+          if template.get('ci_run_ids') != []:
+              raise SystemExit('Workflow may not pre-attest external CI evidence')
+          for field in (
+              'scientific_reviewed',
+              'editorial_reviewed',
+              'source_rights_reviewed',
+              'ci_passed',
+          ):
+              if template.get(field) is not False:
+                  raise SystemExit(f'Workflow may not self-attest {field}')
+          PY
+
+      - name: Upload rights-safe candidate review evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: observatory-candidate-review-${{ github.run_id }}-${{ github.sha }}
+          path: ${{ runner.temp }}/observatory-candidate-review
+          if-no-files-found: error
+          retention-days: 14

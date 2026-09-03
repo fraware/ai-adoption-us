@@ -5,8 +5,9 @@ The input RPS component and resulting global candidate contain authorized RPS
 source-observation bytes under ``inputs/``. Repository-local output is therefore
 restricted to ``data/audit/private/``. External private paths are also allowed.
 
-This command composes and validates a candidate only. It never stages, reviews,
-or promotes a release.
+Before composition, every repository artifact that depends on RPS is required to
+match the exact RPS source vintage in the candidate. This command composes and
+validates a candidate only. It never stages, reviews, or promotes a release.
 """
 
 from __future__ import annotations
@@ -17,15 +18,18 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from genai_at_work.observatory_baseline import (
-    ObservatoryBaselineError,
-    compose_v1_global_baseline,
+from genai_at_work.observatory_baseline import ObservatoryBaselineError
+from genai_at_work.observatory_rps_bindings import (
+    BINDINGS_REPOSITORY_PATH,
+    ObservatoryRpsBindingError,
+    compose_v1_global_baseline_bound,
 )
 from genai_at_work.release_engine import load_json_object
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = ROOT / "data" / "audit" / "private"
 DEFAULT_CONTRACT = ROOT / "data" / "registry" / "observatory_v1_baseline_contract.json"
+DEFAULT_BINDINGS = ROOT / BINDINGS_REPOSITORY_PATH
 
 
 def _assert_output_boundary(output_dir: Path) -> None:
@@ -106,6 +110,12 @@ def main() -> int:
         help="Pinned Observatory v1 baseline composition contract.",
     )
     parser.add_argument(
+        "--rps-repository-bindings",
+        type=Path,
+        default=DEFAULT_BINDINGS,
+        help="Pinned registry binding RPS-dependent repository evidence to source vintage.",
+    )
+    parser.add_argument(
         "--previous-release-manifest",
         type=Path,
         help="Previously promoted global release manifest, when preparing an update.",
@@ -117,28 +127,34 @@ def main() -> int:
         raise SystemExit(f"Output directory must be new and absent: {args.output_dir}")
 
     contract = load_json_object(args.contract)
+    bindings = load_json_object(args.rps_repository_bindings)
     previous = _previous_release(args.previous_release_manifest)
     commit = _builder_commit()
 
     try:
-        candidate = compose_v1_global_baseline(
+        candidate = compose_v1_global_baseline_bound(
             rps_candidate_root=args.rps_candidate_root,
             output_dir=args.output_dir,
             contract=contract,
+            bindings=bindings,
             repo_root=ROOT,
             release_id=args.release_id,
             builder_commit=commit,
             previous_release=previous,
         )
-    except (ObservatoryBaselineError, ValueError) as exc:
+    except (ObservatoryBaselineError, ObservatoryRpsBindingError, ValueError) as exc:
         raise SystemExit(str(exc)) from exc
 
+    binding_build = candidate["component_builds"]["rps_repository_bindings"]
     summary = {
         "release_id": candidate["release_id"],
         "release_type": candidate["release_type"],
         "data_mode": candidate["data_mode"],
         "builder_commit": candidate["build"]["builder_commit"],
         "baseline_contract_id": candidate["baseline_contract_id"],
+        "rps_repository_binding_id": binding_build["binding_id"],
+        "rps_repository_binding_status": binding_build["status"],
+        "rps_source_vintage_id": binding_build["source_vintage_id"],
         "source_ids": [row["source_id"] for row in candidate["sources"]],
         "artifact_count": len(candidate["artifacts"]),
         "diagnostic_count": len(candidate["diagnostics"]),
