@@ -87,12 +87,13 @@ def test_github_pages_workflow_is_pinned_and_fail_closed():
 def test_production_environment_and_policy_are_explicit():
     env = read("apps/web/.env.example")
     policy = read("docs/RELEASE1_PRODUCTION_POLICY.md")
+    lower_policy = policy.lower()
     assert "DATA_MODE=derived_only" in env
     assert "NEXT_PUBLIC_SITE_URL=https://fraware.github.io/ai-adoption-us" in env
     assert "RELEASE_COMMIT_SHA=" in env
     assert "GITHUB_PAGES=true" in env
-    assert "no third-party analytics" in policy.lower()
-    assert "no client-side monitoring" in policy.lower()
-    assert "human/manual and physical-device spot checks remain outside Release 1 scope" in policy
+    assert "no third-party analytics" in lower_policy
+    assert "no client-side monitoring" in lower_policy
+    assert "human/manual and physical-device spot checks remain outside release 1 scope" in lower_policy
     assert "Source: GitHub Actions" in policy
     assert "No alternate hosting service is selected or invoked" in policy
