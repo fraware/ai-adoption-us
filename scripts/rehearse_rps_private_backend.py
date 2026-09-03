@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Write and independently verify an RPS private-vintage backend challenge.
 
-This command produces rights-safe cryptographic evidence only. A successful
-rehearsal does not by itself prove that the supplied backend is durable,
-operator-controlled, or correctly access-controlled; those infrastructure facts
-must be supported by the separately reviewed configuration evidence reference.
+This command produces source-byte-free review evidence. A successful rehearsal
+does not independently prove the truth of the reviewed backend configuration;
+it cryptographically binds write/read/recovery evidence to that exact private
+configuration-attestation file.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from genai_at_work.private_backend_config import PrivateBackendConfigurationError
 from genai_at_work.private_vintage import PrivateVintageError
 from genai_at_work.private_vintage_backend import (
     load_backend_challenge,
@@ -26,8 +27,10 @@ ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = ROOT / "data" / "audit" / "private"
 
 
-def _assert_private_backend_boundary(backend_root: Path) -> None:
-    resolved = backend_root.resolve()
+def _assert_repository_private_boundary(path: Path, *, label: str) -> None:
+    """Reject repository-local sensitive paths outside the ignored private boundary."""
+
+    resolved = path.resolve()
     repository = ROOT.resolve()
     try:
         resolved.relative_to(repository)
@@ -37,8 +40,8 @@ def _assert_private_backend_boundary(backend_root: Path) -> None:
         resolved.relative_to(PRIVATE_ROOT.resolve())
     except ValueError as exc:
         raise SystemExit(
-            "Repository-local private-backend roots may only be written under "
-            "data/audit/private/. Use an external operator-controlled private mount otherwise."
+            f"Repository-local {label} may only exist under data/audit/private/. "
+            "Use an external operator-controlled private path otherwise."
         ) from exc
 
 
@@ -84,31 +87,40 @@ def main() -> int:
 
     write_parser = subparsers.add_parser(
         "write",
-        help="Write one immutable private-vintage event and emit a rights-safe challenge.",
+        help="Write one immutable private-vintage event and emit a bound challenge.",
     )
     write_parser.add_argument("--source-snapshot", type=Path, required=True)
     write_parser.add_argument("--backend-root", type=Path, required=True)
-    write_parser.add_argument("--backend-id", required=True)
-    write_parser.add_argument("--configuration-evidence-ref", required=True)
+    write_parser.add_argument("--configuration-evidence", type=Path, required=True)
     write_parser.add_argument("--challenge-out", type=Path, required=True)
     write_parser.add_argument("--previous-snapshot", type=Path)
 
     verify_parser = subparsers.add_parser(
         "verify",
-        help="Read back the exact challenged event and emit rights-safe verification evidence.",
+        help="Read back the challenged event against the same exact configuration evidence.",
     )
     verify_parser.add_argument("--challenge", type=Path, required=True)
     verify_parser.add_argument("--backend-root", type=Path, required=True)
+    verify_parser.add_argument("--configuration-evidence", type=Path, required=True)
     verify_parser.add_argument("--evidence-out", type=Path, required=True)
 
     args = parser.parse_args()
-    _assert_private_backend_boundary(args.backend_root)
+    _assert_repository_private_boundary(args.backend_root, label="private-backend roots")
+    _assert_repository_private_boundary(
+        args.configuration_evidence,
+        label="backend configuration evidence",
+    )
 
     try:
         if args.command == "write":
             if not args.source_snapshot.is_file():
                 raise SystemExit(
                     f"Source snapshot does not exist: {args.source_snapshot}"
+                )
+            if not args.configuration_evidence.is_file():
+                raise SystemExit(
+                    "Backend configuration evidence does not exist: "
+                    f"{args.configuration_evidence}"
                 )
             if (
                 args.previous_snapshot is not None
@@ -117,11 +129,23 @@ def main() -> int:
                 raise SystemExit(
                     f"Previous snapshot does not exist: {args.previous_snapshot}"
                 )
+            _assert_repository_private_boundary(
+                args.source_snapshot,
+                label="RPS source snapshots",
+            )
+            if args.previous_snapshot is not None:
+                _assert_repository_private_boundary(
+                    args.previous_snapshot,
+                    label="RPS predecessor snapshots",
+                )
+            _assert_repository_private_boundary(
+                args.challenge_out,
+                label="backend review evidence",
+            )
             challenge = write_backend_challenge(
                 args.source_snapshot,
                 args.backend_root,
-                backend_id=args.backend_id,
-                configuration_evidence_ref=args.configuration_evidence_ref,
+                configuration_evidence_path=args.configuration_evidence,
                 builder_commit=_builder_commit(),
                 previous_snapshot_path=args.previous_snapshot,
             )
@@ -129,16 +153,32 @@ def main() -> int:
             print(json.dumps(challenge, indent=2, sort_keys=True))
             return 0
 
+        if not args.challenge.is_file():
+            raise SystemExit(f"Backend challenge does not exist: {args.challenge}")
+        if not args.configuration_evidence.is_file():
+            raise SystemExit(
+                "Backend configuration evidence does not exist: "
+                f"{args.configuration_evidence}"
+            )
+        _assert_repository_private_boundary(
+            args.challenge,
+            label="backend review evidence",
+        )
+        _assert_repository_private_boundary(
+            args.evidence_out,
+            label="backend review evidence",
+        )
         challenge = load_backend_challenge(args.challenge)
         evidence = verify_backend_challenge(
             challenge,
             args.backend_root,
+            configuration_evidence_path=args.configuration_evidence,
             verification_builder_commit=_builder_commit(),
         )
         _write_new_json(args.evidence_out, evidence)
         print(json.dumps(evidence, indent=2, sort_keys=True))
         return 0
-    except PrivateVintageError as exc:
+    except (PrivateVintageError, PrivateBackendConfigurationError) as exc:
         raise SystemExit(str(exc)) from exc
 
 
