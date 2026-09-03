@@ -1,53 +1,6 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
-
-const projects = [
-  {
-    name: "chrome-375",
-    browserName: "chromium" as const,
-    channel: "chrome",
-    viewport: { width: 375, height: 812 },
-  },
-  {
-    name: "chrome-768",
-    browserName: "chromium" as const,
-    channel: "chrome",
-    viewport: { width: 768, height: 1024 },
-  },
-  {
-    name: "chrome-1024",
-    browserName: "chromium" as const,
-    channel: "chrome",
-    viewport: { width: 1024, height: 900 },
-  },
-  {
-    name: "chrome-1440",
-    browserName: "chromium" as const,
-    channel: "chrome",
-    viewport: { width: 1440, height: 1000 },
-  },
-  {
-    name: "firefox-375",
-    browserName: "firefox" as const,
-    viewport: { width: 375, height: 812 },
-  },
-  {
-    name: "firefox-1440",
-    browserName: "firefox" as const,
-    viewport: { width: 1440, height: 1000 },
-  },
-  {
-    name: "webkit-375",
-    browserName: "webkit" as const,
-    viewport: { width: 375, height: 812 },
-  },
-  {
-    name: "webkit-1440",
-    browserName: "webkit" as const,
-    viewport: { width: 1440, height: 1000 },
-  },
-];
 
 export default defineConfig({
   testDir: "./tests/browser",
@@ -69,12 +22,81 @@ export default defineConfig({
     screenshot: "on",
     trace: "retain-on-failure",
   },
-  projects: projects.map((project) => ({
-    name: project.name,
-    use: {
-      browserName: project.browserName,
-      channel: "channel" in project ? project.channel : undefined,
-      viewport: project.viewport,
+  projects: [
+    {
+      name: "chrome-375",
+      use: {
+        browserName: "chromium",
+        channel: "chrome",
+        viewport: { width: 375, height: 812 },
+      },
     },
-  })),
+    {
+      name: "chrome-768",
+      use: {
+        browserName: "chromium",
+        channel: "chrome",
+        viewport: { width: 768, height: 1024 },
+      },
+    },
+    {
+      name: "chrome-1024",
+      use: {
+        browserName: "chromium",
+        channel: "chrome",
+        viewport: { width: 1024, height: 900 },
+      },
+    },
+    {
+      name: "chrome-1440",
+      use: {
+        browserName: "chromium",
+        channel: "chrome",
+        viewport: { width: 1440, height: 1000 },
+      },
+    },
+    {
+      name: "firefox-375",
+      use: {
+        browserName: "firefox",
+        viewport: { width: 375, height: 812 },
+      },
+    },
+    {
+      name: "firefox-1440",
+      use: {
+        browserName: "firefox",
+        viewport: { width: 1440, height: 1000 },
+      },
+    },
+    {
+      name: "webkit-375",
+      use: {
+        browserName: "webkit",
+        viewport: { width: 375, height: 812 },
+      },
+    },
+    {
+      name: "webkit-1440",
+      use: {
+        browserName: "webkit",
+        viewport: { width: 1440, height: 1000 },
+      },
+    },
+    {
+      name: "android-chrome-pixel-7-emulation",
+      use: {
+        ...devices["Pixel 7"],
+        browserName: "chromium",
+        channel: "chrome",
+      },
+    },
+    {
+      name: "ios-webkit-iphone-15-pro-emulation",
+      use: {
+        ...devices["iPhone 15 Pro"],
+        browserName: "webkit",
+      },
+    },
+  ],
 });

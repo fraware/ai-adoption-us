@@ -2,9 +2,10 @@
 
 Initial code-level pass: 2026-08-30  
 Networked production-build update: 2026-08-31  
-Automated rendered-browser update: 2026-09-01
+Automated rendered-browser update: 2026-09-01  
+Explicit mobile-emulation update: 2026-09-03
 
-This document records the code-level, networked production-build, and automated rendered-browser QA completed for the rights-safe Release 1 candidate. The automated pass is real browser-engine execution, but it **does not substitute for a real browser** review on native Safari/iOS, Android-device validation, or human assistive-technology testing where those remain required.
+This document records the code-level, networked production-build, and automated rendered-browser QA completed for the rights-safe Release 1 candidate. The automated pass is real browser-engine execution and now includes explicit Pixel 7/Chrome and iPhone 15 Pro/WebKit device contexts. It **does not substitute for a real browser** review on native Safari/iOS, physical-device validation, or human assistive-technology testing where those remain required.
 
 ## Implemented in the code-level pass
 
@@ -82,7 +83,7 @@ The artifact contains the Playwright JSON and HTML reports, screenshots for succ
 
 ### Browser/viewport matrix
 
-The Playwright suite passed **48/48** cases across all six public routes:
+The baseline Playwright suite passed **48/48** cases across all six public routes:
 
 - stable Chrome 151.0.7922.173 at 375, 768, 1024, and 1440 px;
 - Playwright-managed Firefox 153.0 at 375 and 1440 px;
@@ -124,13 +125,45 @@ The baseline artifact correctly recorded browser versions but its `playwrightVer
 
 The browser workflow now also triggers when `docs/qa/**`, `docs/RELEASE1_PRODUCT_QA.md`, or `docs/RELEASE_CHECKLIST.md` changes. This prevents a final QA/checklist documentation commit from bypassing the rendered gate. A post-documentation successful run must therefore be checked on the exact final PR head before merge.
 
+## Explicit mobile-emulation evidence — 2026-09-03
+
+PR #61 extends the automated matrix with two explicit Playwright device contexts:
+
+- Pixel 7 against the stable Chrome channel: viewport 412 × 839, screen 412 × 915, device scale factor 2.625, mobile/touch descriptor enabled;
+- iPhone 15 Pro against Playwright WebKit: viewport 393 × 659, screen 393 × 852, device scale factor 3, mobile/touch descriptor enabled.
+
+The accepted source head `8147cabdc0e0104717762e7955c081de48458532` passed release-candidate CI run `33737876597` and rendered-browser run `33737876591`. The rendered workflow checked out merge candidate `8bb7d5df1ec1bbb28f83323e4eb90f08ec151978`.
+
+The expanded browser suite passed **70/70** cases. Both mobile projects run the six route-level semantic/responsive/accessibility/runtime contracts plus the industries publication/triangulation assertion. In addition to phone-width and Android/iPhone identity checks, each mobile route must receive an actual `touchstart` event generated through Playwright's touchscreen API.
+
+The touch probe runs after fresh-document keyboard and axe checks, preserving the keyboard-entry evidence while still placing touch-triggered runtime or console errors inside the final error assertions.
+
+The retained passing artifact is:
+
+- artifact ID: `9886672185`;
+- artifact name: `r1-g2-browser-qa-8bb7d5df1ec1bbb28f83323e4eb90f08ec151978`;
+- artifact SHA-256: `9d2b73748435c8a23a11d9f21e02aee390c4a5f0320b7a3e71dbc64a3f8862a1`;
+- size: 18,735,411 bytes;
+- creation time: 2026-09-03T09:21:29Z;
+- recorded expiry: 2026-10-03T09:21:26Z.
+
+The successful run reported Playwright 1.62.1, Chrome 151.0.7922.173, Firefox 153.0, and WebKit 26.5. Its seven Lighthouse reports all scored 100 accessibility and 100 performance; the mobile-home lab metrics were LCP 1817 ms, CLS 0.000, and TBT 46 ms. These remain laboratory measurements, not field Core Web Vitals.
+
+### Mobile harness correction
+
+The first expanded run (`33736750083`) failed only the six iPhone/WebKit route contracts because the proposed harness assumed that Playwright's touch-enabled device context must expose `navigator.maxTouchPoints > 0`. The WebKit context did not satisfy that browser-fingerprint assumption. A CSS coarse-pointer assertion relied on the same kind of unsupported fingerprint inference.
+
+Those assertions were removed. The accepted test measures touch behavior directly by installing a `touchstart` listener, issuing a Playwright touchscreen tap, and requiring the page to receive the event. The corrected matrix then passed 70/70. This is recorded as a harness defect discovered by the expanded matrix, not as a product defect.
+
+The detailed evidence and residual limitations are recorded in `docs/qa/2026-09-03-r1-g2-mobile-emulation-qa.md`.
+
 ## Checks that remain external/manual gates
 
 The automated pass materially closes the automated portion of R1-G2. The following are still open unless separately recorded:
 
 1. Native current Safari desktop validation.
-2. Real or defensible iOS Safari validation.
-3. Real or defensible Android/Chrome device validation beyond a narrow desktop-browser viewport.
+2. Native/physical iOS Safari validation beyond the iPhone 15 Pro/WebKit automated compatibility proxy.
+3. Physical Android/Chrome validation beyond the Pixel 7/stable-Chrome automated compatibility proxy, if required by final launch review.
 4. Full keyboard-only traversal beyond the automated skip-link entry contract, including interactive chart/table affordances.
 5. **Screen-reader traversal** with VoiceOver and NVDA or a defensible second screen reader.
 6. Manual chart resize/tooltip/label interaction review.
@@ -141,6 +174,6 @@ The automated pass materially closes the automated portion of R1-G2. The followi
 
 ## Release-language rule
 
-A successful optimized build plus automated rendered QA establishes that the tested rights-safe build compiled, served, and passed the recorded automated browser/accessibility matrix. It does **not** establish native Safari/iOS behavior, human screen-reader usability, field performance, deployment correctness, RPS source-rights resolution, or a completed RPS-dependent composition residual.
+A successful optimized build plus automated rendered QA establishes that the tested rights-safe build compiled, served, and passed the recorded automated browser/accessibility matrix, including the two documented mobile-emulation proxies. It does **not** establish native Safari/iOS behavior, physical-device behavior, human screen-reader usability, field performance, deployment correctness, RPS source-rights resolution, or a completed RPS-dependent composition residual.
 
 **No public-launch claim** should imply those gates are complete until dated execution evidence exists.
