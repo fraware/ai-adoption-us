@@ -10,6 +10,8 @@ The canonical work-focused registry contains **131 source-series metadata record
 - 20 industries × 3 constructs = 60 industry records;
 - 22 occupations × 3 constructs = 66 occupation records.
 
+The repository rights decision treats published-aggregate project use as granted on the basis of a **project-owner attestation that source-owner permission was obtained**. The underlying permission correspondence or agreement is not retained in this public repository and was not independently inspected as part of the code review. The repository therefore asserts only the operational scope recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`; it does not infer unrecorded contractual terms.
+
 The authorized release pipeline retrieves the registered published aggregate series through the official FRED API into a private candidate workspace. The latest verified live candidate binds 962 source observations across the available registered history. The complete common A/H/S subgroup analytical window contains 882 cells across seven quarters, Q4 2024–Q2 2026.
 
 The public `derived_only` release boundary is narrower than the private source candidate. It permits the contracted attributed aggregate presentation view—seven-quarter national history plus the latest complete Q2 2026 industry and occupation A/H/S cross-sections—and derived publication artifacts. It does not authorize or publish the complete historical subgroup source panel as a public database, bulk download, generic query API, or private source-input bundle.
