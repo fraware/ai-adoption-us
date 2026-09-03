@@ -1,33 +1,49 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ReleaseNotice } from "../components/ReleaseNotice";
-import { configuredSiteOrigin } from "../lib/site";
+import { absoluteSiteUrl, configuredSiteBaseUrl } from "../lib/site";
 import "./globals.css";
 
-const siteOrigin = configuredSiteOrigin();
+const siteBaseUrl = configuredSiteBaseUrl();
+const homeUrl = absoluteSiteUrl("/");
+const staticContentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "object-src 'none'",
+  "img-src 'self' data:",
+  "font-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline'",
+  "connect-src 'self'",
+].join("; ");
 
 export const metadata: Metadata = {
-  ...(siteOrigin ? { metadataBase: new URL(siteOrigin) } : {}),
+  ...(siteBaseUrl ? { metadataBase: new URL(`${siteBaseUrl}/`) } : {}),
   title: {
     default: "GenAI at Work",
     template: "%s · GenAI at Work",
   },
   description:
     "An auditable technical data publication separating workplace GenAI adoption, workflow penetration, and reported time savings.",
-  ...(siteOrigin ? { alternates: { canonical: "/" } } : {}),
+  referrer: "strict-origin-when-cross-origin",
+  ...(homeUrl ? { alternates: { canonical: homeUrl } } : {}),
   openGraph: {
     type: "website",
     siteName: "GenAI at Work",
     title: "GenAI at Work",
     description:
       "An auditable technical data publication separating workplace GenAI adoption, workflow penetration, and reported time savings.",
-    ...(siteOrigin ? { url: siteOrigin } : {}),
+    ...(homeUrl ? { url: homeUrl } : {}),
   },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <meta httpEquiv="Content-Security-Policy" content={staticContentSecurityPolicy} />
+      </head>
       <body>
         <a className="skip-link" href="#main-content">Skip to main content</a>
         <ReleaseNotice />
