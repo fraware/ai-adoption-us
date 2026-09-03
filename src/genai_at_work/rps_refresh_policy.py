@@ -14,6 +14,49 @@ _REQUIRED_ACTIVATION_GATES = {
     "private_backend_write_read_verify_rehearsal_passed",
 }
 _ALLOWED_ACTIVATION_EVIDENCE_STATUSES = {"passed", "pending"}
+_PENDING_EVIDENCE_KEYS = {"status", "reason"}
+_LIVE_EVIDENCE_KEYS = {
+    "status",
+    "github_run_id",
+    "github_sha",
+    "workflow",
+    "artifact_id",
+    "artifact_digest",
+    "source_content_sha256",
+    "source_snapshot_file_sha256",
+    "retrieved_at",
+    "revision_status",
+    "provider_series_count",
+    "observatory_series_count",
+    "excluded_series_count",
+    "observation_count",
+    "archive_contract_rehearsed",
+    "archive_persisted_durably",
+    "verified_on",
+}
+_CREDENTIAL_EVIDENCE_KEYS = {
+    "status",
+    "github_run_id",
+    "evidence_basis",
+    "verified_on",
+}
+_BACKEND_EVIDENCE_KEYS = {
+    "status",
+    "backend_id",
+    "configuration_evidence_ref",
+    "configuration_evidence_sha256",
+    "verified_on",
+}
+_REHEARSAL_EVIDENCE_KEYS = {
+    "status",
+    "rehearsal_id",
+    "write_read_verify_evidence_ref",
+    "write_read_verify_evidence_sha256",
+    "backend_id",
+    "configuration_evidence_ref",
+    "configuration_evidence_sha256",
+    "verified_on",
+}
 _TIME_RE = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
 _COMMIT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 _HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -78,6 +121,18 @@ def _hex64(mapping: Mapping[str, Any], key: str, *, context: str) -> str:
     return value
 
 
+def _require_exact_keys(
+    mapping: Mapping[str, Any],
+    expected: set[str],
+    *,
+    context: str,
+) -> None:
+    if set(mapping) != expected:
+        raise RpsRefreshPolicyError(
+            f"{context} fields must exactly match the activation-evidence contract"
+        )
+
+
 def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
     evidence = _mapping(
         policy.get("activation_evidence"), context="policy.activation_evidence"
@@ -90,24 +145,23 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
     rows: dict[str, Mapping[str, Any]] = {}
     statuses: dict[str, str] = {}
     for gate in sorted(_REQUIRED_ACTIVATION_GATES):
-        row = _mapping(
-            evidence.get(gate), context=f"policy.activation_evidence.{gate}"
-        )
-        status = _string(
-            row, "status", context=f"policy.activation_evidence.{gate}"
-        )
+        context = f"policy.activation_evidence.{gate}"
+        row = _mapping(evidence.get(gate), context=context)
+        status = _string(row, "status", context=context)
         if status not in _ALLOWED_ACTIVATION_EVIDENCE_STATUSES:
             raise RpsRefreshPolicyError(
                 f"Unsupported activation evidence status for {gate}: {status}"
             )
         if status == "pending":
-            _string(row, "reason", context=f"policy.activation_evidence.{gate}")
+            _require_exact_keys(row, _PENDING_EVIDENCE_KEYS, context=context)
+            _string(row, "reason", context=context)
         rows[gate] = row
         statuses[gate] = status
 
     live = rows["successful_live_validation"]
     if statuses["successful_live_validation"] == "passed":
         live_context = "policy.activation_evidence.successful_live_validation"
+        _require_exact_keys(live, _LIVE_EVIDENCE_KEYS, context=live_context)
         live_run_id = _positive_int(live, "github_run_id", context=live_context)
         live_sha = _string(live, "github_sha", context=live_context).lower()
         if _COMMIT_RE.fullmatch(live_sha) is None:
@@ -167,6 +221,11 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
         credential_context = (
             "policy.activation_evidence.fred_api_key_verified_in_execution_environment"
         )
+        _require_exact_keys(
+            credential,
+            _CREDENTIAL_EVIDENCE_KEYS,
+            context=credential_context,
+        )
         credential_run_id = _positive_int(
             credential,
             "github_run_id",
@@ -191,6 +250,7 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
         backend_context = (
             "policy.activation_evidence.operator_controlled_private_vintage_backend_configured"
         )
+        _require_exact_keys(backend, _BACKEND_EVIDENCE_KEYS, context=backend_context)
         backend_id = _string(backend, "backend_id", context=backend_context)
         configuration_ref = _string(
             backend, "configuration_evidence_ref", context=backend_context
@@ -208,6 +268,11 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
             )
         rehearsal_context = (
             "policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed"
+        )
+        _require_exact_keys(
+            rehearsal,
+            _REHEARSAL_EVIDENCE_KEYS,
+            context=rehearsal_context,
         )
         _string(rehearsal, "rehearsal_id", context=rehearsal_context)
         _string(
