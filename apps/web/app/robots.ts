@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
-import { configuredSiteOrigin } from "../lib/site";
+import { absoluteSiteUrl, configuredSiteBaseUrl } from "../lib/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const origin = configuredSiteOrigin();
+  const baseUrl = configuredSiteBaseUrl();
+  const sitemapUrl = absoluteSiteUrl("/sitemap.xml");
 
   return {
     rules: {
       userAgent: "*",
       allow: "/",
     },
-    ...(origin ? { sitemap: `${origin}/sitemap.xml`, host: origin } : {}),
+    ...(baseUrl && sitemapUrl ? { sitemap: sitemapUrl, host: baseUrl } : {}),
   };
 }
