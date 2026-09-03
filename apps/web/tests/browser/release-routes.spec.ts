@@ -163,6 +163,59 @@ test.describe("Release 1 rendered browser QA", () => {
     });
   }
 
+  test("primary navigation links perform real end-to-end route transitions", async ({ page }) => {
+    for (const href of primaryNavigation) {
+      const response = await page.goto("/", { waitUntil: "networkidle" });
+      expect(response?.ok()).toBeTruthy();
+      const link = page.locator(`nav[aria-label="Primary navigation"] a[href="${href}"]`);
+      await expect(link).toBeVisible();
+      await link.click();
+      await expect(page).toHaveURL(new RegExp(`${href.replaceAll("/", "\\/")}$`));
+      await expect(page.locator("main")).toHaveCount(1);
+      await expect(page.locator("h1")).toHaveCount(1);
+    }
+  });
+
+  test("home: responsive plot redraws after an explicit runtime resize", async ({ page }) => {
+    test.skip(test.info().project.name !== "chrome-1440", "One stable-Chrome desktop execution is sufficient for the redraw contract.");
+
+    const response = await page.goto("/", { waitUntil: "networkidle" });
+    expect(response?.ok()).toBeTruthy();
+    const canvas = page.locator(".chart-canvas").first();
+    await expect(canvas).toBeVisible();
+    const plot = canvas.locator("svg");
+    await expect(plot).toHaveCount(1);
+
+    const initialWidth = await plot.evaluate((element) => element.getBoundingClientRect().width);
+    expect(initialWidth).toBeGreaterThan(800);
+
+    await page.setViewportSize({ width: 720, height: 900 });
+    await expect
+      .poll(async () => plot.evaluate((element) => element.getBoundingClientRect().width))
+      .toBeLessThan(initialWidth - 100);
+
+    const resizedWidth = await plot.evaluate((element) => element.getBoundingClientRect().width);
+    expect(resizedWidth).toBeGreaterThanOrEqual(280);
+    expect(resizedWidth).toBeLessThan(initialWidth);
+  });
+
+  test("production not-found route returns an intelligible fail-closed 404 surface", async ({ page }) => {
+    const consoleErrors: string[] = [];
+    const pageErrors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") consoleErrors.push(message.text());
+    });
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+
+    const response = await page.goto("/__qa_not_a_release_route__", { waitUntil: "networkidle" });
+    expect(response).not.toBeNull();
+    expect(response?.status()).toBe(404);
+    await expect(page.locator("body")).toContainText(/404|not found/i);
+    await expect(page.locator("body")).not.toContainText("data/audit/private");
+    expect(pageErrors).toEqual([]);
+    expect(consoleErrors).toEqual([]);
+  });
+
   test("industries: canonical BTOS-RPS triangulation is explicit and inspectable", async ({ page }) => {
     const response = await page.goto("/explore/industries", { waitUntil: "networkidle" });
     expect(response?.ok()).toBeTruthy();
