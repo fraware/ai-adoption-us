@@ -15,7 +15,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from genai_at_work.longitudinal import REQUIRED_ENTITY_COUNTS
-from genai_at_work.rps_release import PreparedRpsPanel, RpsReleaseError, SUBGROUP_METRICS
+from genai_at_work.rps_release import SUBGROUP_METRICS, PreparedRpsPanel, RpsReleaseError
 
 CONTRACT_ID = "rps-public-observation-delivery-v1"
 SOURCE_ID = "rps-genai-tracker-fred-release-6"
