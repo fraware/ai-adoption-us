@@ -60,6 +60,27 @@ def summary(
     }
 
 
+def fully_evidenced_policy() -> dict[str, Any]:
+    value = copy.deepcopy(policy())
+    value["activation_evidence"][
+        "operator_controlled_private_vintage_backend_configured"
+    ] = {
+        "status": "passed",
+        "backend_id": "private-vintage-production-v1",
+        "configuration_evidence_ref": "ops/private-vintage-backend/configuration-v1",
+        "verified_on": "2026-09-03",
+    }
+    value["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ] = {
+        "status": "passed",
+        "rehearsal_id": "private-vintage-write-read-verify-v1",
+        "write_read_verify_evidence_ref": "ops/private-vintage-backend/rehearsal-v1",
+        "verified_on": "2026-09-03",
+    }
+    return value
+
+
 def test_pinned_policy_is_valid_and_scheduled_activation_remains_deferred() -> None:
     value = policy()
     validate_rps_refresh_policy(value)
@@ -124,15 +145,28 @@ def test_recorded_activation_evidence_has_exact_two_passed_runtime_gates() -> No
         ]["status"]
         == "pending"
     )
-    assert activation_gates_satisfied(value, recorded_activation_gates(value)) is False
+    assert activation_gates_satisfied(value) is False
 
 
-def test_activation_requires_every_exact_gate() -> None:
-    value = policy()
-    gates = value["source_check"]["activation_requirements"]
-    assert activation_gates_satisfied(value, gates) is True
-    assert activation_gates_satisfied(value, gates[:-1]) is False
-    assert activation_gates_satisfied(value, [*gates, "invented_gate"]) is False
+def test_activation_status_is_derived_only_from_validated_recorded_evidence() -> None:
+    value = fully_evidenced_policy()
+    assert recorded_activation_gates(value) == set(
+        value["source_check"]["activation_requirements"]
+    )
+    assert activation_gates_satisfied(value) is True
+
+    missing_backend = copy.deepcopy(value)
+    missing_backend["activation_evidence"][
+        "operator_controlled_private_vintage_backend_configured"
+    ] = {
+        "status": "pending",
+        "reason": "synthetic pending backend",
+    }
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="cannot pass before backend configuration",
+    ):
+        activation_gates_satisfied(missing_backend)
 
 
 def test_activation_evidence_inventory_and_dependencies_fail_closed() -> None:
