@@ -1,11 +1,6 @@
 name: CPS occupation direct-SE probe
 
 on:
-  push:
-    branches:
-      - research/cps-gvf-lender-calibration
-    paths:
-      - '.github/workflows/cps-occupation-se-probe.yml'
   workflow_dispatch:
 
 permissions:
