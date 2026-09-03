@@ -41,13 +41,14 @@ jobs:
           from pathlib import Path
 
           base = 'https://api.bls.gov/publicAPI/v2/timeseries/data/'
-          series_ids = [f'LNU020322{suffix:02d}' for suffix in range(1, 21)]
+          series_ids = [f'LNU020322{suffix:02d}' for suffix in range(1, 15)]
           api_key = os.environ.get('BLS_API_KEY', '').strip()
 
           # BLS documents multi-series POST requests and the `aspects` option. A configured
           # registration key is used when available, but its value is never written to logs or
-          # artifacts. Keeping the request to one batch avoids exhausting the keyless per-day
-          # request quota merely by enumerating this 20-series validation family.
+          # artifacts. A prior live probe established that LNU02032201--14 are the valid
+          # published series in this direct-SE validation family; 15--20 were explicitly
+          # reported by the BLS API as nonexistent and are not silently treated as missing data.
           payload = {
               'seriesid': series_ids,
               'startyear': '2026',
@@ -59,9 +60,21 @@ jobs:
 
           public_payload = {key: value for key, value in payload.items() if key != 'registrationkey'}
           result = {
-              'schema_version': 2,
+              'schema_version': 3,
               'reference_period': '2026-M07',
-              'series_family_probe': 'LNU02032201 through LNU02032220',
+              'series_family_probe': 'LNU02032201 through LNU02032214',
+              'series_family_boundary_evidence': {
+                  'prior_probe_run_id': 33724132574,
+                  'prior_probe_head_sha': '6b345e316826ec4797bdfb61ad7307771c603eb4',
+                  'nonexistent_series_ids_reported_by_bls': [
+                      'LNU02032215',
+                      'LNU02032216',
+                      'LNU02032217',
+                      'LNU02032218',
+                      'LNU02032219',
+                      'LNU02032220',
+                  ],
+              },
               'request_method': 'POST',
               'request_url': base,
               'request_payload': public_payload,
@@ -120,12 +133,6 @@ jobs:
                   complete = False
                   result['rows'].append(row)
                   continue
-
-              catalog = series.get('catalog')
-              if isinstance(catalog, dict):
-                  # Catalog availability depends on BLS series/API support. Retain only the
-                  # returned public metadata; never infer a label when BLS does not provide one.
-                  row['catalog'] = catalog
 
               observations = series.get('data', [])
               matches = [
