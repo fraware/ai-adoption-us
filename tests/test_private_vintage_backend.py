@@ -112,7 +112,7 @@ def _challenge(tmp_path: Path) -> tuple[Path, Path, dict[str, Any]]:
     return snapshot, backend, challenge
 
 
-def test_two_phase_write_read_verify_is_exact_and_rights_safe(tmp_path: Path) -> None:
+def test_two_phase_write_read_verify_is_exact_and_source_byte_free(tmp_path: Path) -> None:
     snapshot, backend, challenge = _challenge(tmp_path)
     validate_backend_challenge(challenge)
 
@@ -133,6 +133,8 @@ def test_two_phase_write_read_verify_is_exact_and_rights_safe(tmp_path: Path) ->
         "builder_commit": WRITE_COMMIT,
         "storage_scope": "private",
         "public_archive": False,
+        "source_bytes_in_evidence": False,
+        "public_evidence_approved": False,
         "activation_gates_updated": False,
         "durability_established_by_software_alone": False,
     }
@@ -149,6 +151,7 @@ def test_two_phase_write_read_verify_is_exact_and_rights_safe(tmp_path: Path) ->
     assert evidence["source_snapshot_sha256"] == sha256_file(snapshot)
     assert evidence["package_digest"] == challenge["package_digest"]
     assert evidence["source_bytes_in_evidence"] is False
+    assert evidence["public_evidence_approved"] is False
     assert evidence["activation_gates_updated"] is False
     assert evidence["durability_established_by_software_alone"] is False
     assert evidence["requires_independent_backend_configuration_review"] is True
@@ -296,8 +299,26 @@ def test_challenge_schema_and_commit_identity_fail_closed(tmp_path: Path) -> Non
         )
 
 
-def test_challenge_cannot_claim_durability_or_activation(tmp_path: Path) -> None:
+def test_challenge_cannot_self_approve_publication_durability_or_activation(
+    tmp_path: Path,
+) -> None:
     _, _, challenge = _challenge(tmp_path)
+
+    false_publication = copy.deepcopy(challenge)
+    false_publication["public_evidence_approved"] = True
+    with pytest.raises(
+        PrivateVintageBackendError,
+        match="must not self-approve public distribution",
+    ):
+        validate_backend_challenge(false_publication)
+
+    false_source_bytes = copy.deepcopy(challenge)
+    false_source_bytes["source_bytes_in_evidence"] = True
+    with pytest.raises(
+        PrivateVintageBackendError,
+        match="must not include source bytes",
+    ):
+        validate_backend_challenge(false_source_bytes)
 
     false_durability = copy.deepcopy(challenge)
     false_durability["durability_established_by_software_alone"] = True
