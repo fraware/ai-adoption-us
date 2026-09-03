@@ -95,6 +95,16 @@ def test_recorded_activation_evidence_has_exact_two_passed_runtime_gates() -> No
         "workflow": "RPS live validation",
         "artifact_id": 9868969207,
         "artifact_digest": "sha256:fd8b4ed3f828755efaaa00c80b7d444480f7d0e058b88dddf2ffae8f17539de7",
+        "source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+        "source_snapshot_file_sha256": "66b3ffbaebf43c3c8434556eec9329a232d8f17483ba3a613e6b00d214af3f74",
+        "retrieved_at": "2026-09-02T21:56:17.680314Z",
+        "revision_status": "baseline",
+        "provider_series_count": 137,
+        "observatory_series_count": 131,
+        "excluded_series_count": 6,
+        "observation_count": 962,
+        "archive_contract_rehearsed": True,
+        "archive_persisted_durably": False,
         "verified_on": "2026-09-03",
     }
     credential = value["activation_evidence"][
@@ -156,6 +166,26 @@ def test_activation_evidence_inventory_and_dependencies_fail_closed() -> None:
         match="must be bound to the successful live-validation run",
     ):
         validate_rps_refresh_policy(mismatched_run)
+
+    inconsistent_inventory = copy.deepcopy(policy())
+    inconsistent_inventory["activation_evidence"]["successful_live_validation"][
+        "provider_series_count"
+    ] = 138
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="series inventory does not reconcile",
+    ):
+        validate_rps_refresh_policy(inconsistent_inventory)
+
+    false_durable_claim = copy.deepcopy(policy())
+    false_durable_claim["activation_evidence"]["successful_live_validation"][
+        "archive_persisted_durably"
+    ] = True
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="cannot be recorded as durable archive persistence",
+    ):
+        validate_rps_refresh_policy(false_durable_claim)
 
     rehearsal_without_backend = copy.deepcopy(policy())
     rehearsal_without_backend["activation_evidence"][
