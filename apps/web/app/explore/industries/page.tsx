@@ -31,6 +31,7 @@ export default async function IndustriesPage() {
     }));
 
   const rank = longitudinal.rank_stability.industry;
+  const dominance = longitudinal.rank_stability_dominance.industry;
   const quarters = Object.entries(longitudinal.quarter_diagnostics.industry);
   const industryHBeatsAWaves = quarters.filter(([, d]) => d.r2_S_H > d.r2_S_A).length;
 
@@ -126,8 +127,8 @@ export default async function IndustriesPage() {
           ]}
         />
         <p className="note">
-          Adoption ranks are more stable than assisted-hours ranks in all
-          {` ${longitudinal.rank_stability_dominance.industry.quarter_pairs} `}
+          Adoption ranks are more stable than assisted-hours ranks in
+          {` ${dominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${dominance.quarter_pairs} `}
           possible quarter-pair comparisons. These diagnostics use RPS only and are separate from the
           BTOS-RPS comparison above.
         </p>
@@ -175,8 +176,8 @@ export default async function IndustriesPage() {
           <div className="callout">
             <p className="callout-label">Derived-only mode</p>
             <p>
-              Raw industry observations are unavailable in this public configuration. The five-wave
-              diagnostics above remain available because they are derived publication artifacts.
+              The bounded public industry view is unavailable in this build. The longitudinal derived
+              diagnostics remain available without exposing the historical subgroup source panel.
             </p>
           </div>
         )}
