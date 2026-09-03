@@ -6,6 +6,8 @@ export type QuarterDiagnostic = {
   increment_H_given_A: number;
   loo_A_beats_H: number;
   loo_H_beats_A: number;
+  loo_H_minus_A_max: number;
+  loo_H_minus_A_min: number;
   n: number;
   r2_H_A: number;
   r2_S_A: number;
@@ -16,23 +18,34 @@ export type QuarterDiagnostic = {
 };
 
 export type RankStability = {
+  consecutive: [string, string, number][];
   endpoint: number;
   max_pairwise: number;
   median_pairwise: number;
   min_pairwise: number;
 };
 
+export type CrossLevelComparison = {
+  industry_H_minus_A_for_S_r2: number;
+  industry_incremental_H_given_A_r2: number;
+  occupation_A_minus_H_for_S_r2: number;
+  occupation_incremental_H_given_A_r2: number;
+  occupation_minus_industry_pearson_A_H: number;
+  occupation_minus_industry_spearman_A_H: number;
+};
+
 export type LongitudinalDiagnostics = {
-  checkpoint_date: string;
-  input_private_fixture_rows: number;
+  schema_version: number;
+  source_content_sha256: string;
   input_scope: {
     industry_entities: number;
     occupation_entities: number;
     metrics: string[];
     periods: string[];
-    source_vintage_note: string;
+    subgroup_series: number;
   };
   interpretive_guardrails: string[];
+  cross_level_comparison: Record<string, CrossLevelComparison>;
   quarter_diagnostics: {
     industry: Record<string, QuarterDiagnostic>;
     occupation: Record<string, QuarterDiagnostic>;
