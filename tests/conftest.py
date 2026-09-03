@@ -11,7 +11,7 @@ _SYNTHETIC_COMMIT = "0123456789abcdef0123456789abcdef01234567"
 
 
 class _GithubRunHandler(BaseHTTPRequestHandler):
-    def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
+    def do_GET(self) -> None:
         if self.path != "/repos/fraware/ai-adoption-us/actions/runs/12345":
             self.send_response(404)
             self.end_headers()
