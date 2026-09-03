@@ -130,8 +130,11 @@ def main() -> int:
             return 0
 
         challenge = load_backend_challenge(args.challenge)
-        evidence = verify_backend_challenge(challenge, args.backend_root)
-        evidence["verification_builder_commit"] = _builder_commit()
+        evidence = verify_backend_challenge(
+            challenge,
+            args.backend_root,
+            verification_builder_commit=_builder_commit(),
+        )
         _write_new_json(args.evidence_out, evidence)
         print(json.dumps(evidence, indent=2, sort_keys=True))
         return 0
