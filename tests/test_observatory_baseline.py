@@ -371,8 +371,10 @@ def test_global_composer_detects_tampered_private_rps_input_and_cleans_up(
 ) -> None:
     rps_root = tmp_path / "rps"
     _rps_candidate(rps_root)
+    # Same byte length as the registered payload so this specifically exercises
+    # cryptographic integrity, not the earlier size check.
     (rps_root / "inputs/rps/2026-Q2.json").write_text(
-        '{"period":"2026-Q2","tampered":true}\n'
+        '{"period":"2026-Q2","changed":[]}\n'
     )
     output = tmp_path / "global"
 
