@@ -17,6 +17,10 @@ from genai_at_work.rps_refresh_policy import (
 
 ROOT = Path(__file__).parents[1]
 POLICY = ROOT / "data" / "registry" / "rps_refresh_policy.json"
+BACKEND_ID = "private-vintage-production-v1"
+CONFIG_REF = "ops/private-vintage-backend/configuration-v1"
+CONFIG_SHA256 = "c" * 64
+VERIFY_EVIDENCE_SHA256 = "d" * 64
 
 
 def policy() -> dict[str, Any]:
@@ -66,8 +70,9 @@ def fully_evidenced_policy() -> dict[str, Any]:
         "operator_controlled_private_vintage_backend_configured"
     ] = {
         "status": "passed",
-        "backend_id": "private-vintage-production-v1",
-        "configuration_evidence_ref": "ops/private-vintage-backend/configuration-v1",
+        "backend_id": BACKEND_ID,
+        "configuration_evidence_ref": CONFIG_REF,
+        "configuration_evidence_sha256": CONFIG_SHA256,
         "verified_on": "2026-09-03",
     }
     value["activation_evidence"][
@@ -76,6 +81,10 @@ def fully_evidenced_policy() -> dict[str, Any]:
         "status": "passed",
         "rehearsal_id": "private-vintage-write-read-verify-v1",
         "write_read_verify_evidence_ref": "ops/private-vintage-backend/rehearsal-v1",
+        "write_read_verify_evidence_sha256": VERIFY_EVIDENCE_SHA256,
+        "backend_id": BACKEND_ID,
+        "configuration_evidence_ref": CONFIG_REF,
+        "configuration_evidence_sha256": CONFIG_SHA256,
         "verified_on": "2026-09-03",
     }
     return value
@@ -169,6 +178,63 @@ def test_activation_status_is_derived_only_from_validated_recorded_evidence() ->
         activation_gates_satisfied(missing_backend)
 
 
+def test_backend_and_rehearsal_evidence_are_bound_to_same_configuration() -> None:
+    value = fully_evidenced_policy()
+    validate_rps_refresh_policy(value)
+
+    bad_backend_id = copy.deepcopy(value)
+    bad_backend_id["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ]["backend_id"] = "different-backend"
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="backend_id must match configured backend evidence",
+    ):
+        validate_rps_refresh_policy(bad_backend_id)
+
+    bad_ref = copy.deepcopy(value)
+    bad_ref["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ]["configuration_evidence_ref"] = "ops/private-vintage-backend/configuration-v2"
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="configuration reference must match configured backend evidence",
+    ):
+        validate_rps_refresh_policy(bad_ref)
+
+    bad_config_sha = copy.deepcopy(value)
+    bad_config_sha["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ]["configuration_evidence_sha256"] = "e" * 64
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="configuration SHA-256 must match configured backend evidence",
+    ):
+        validate_rps_refresh_policy(bad_config_sha)
+
+
+def test_backend_activation_hashes_fail_closed() -> None:
+    invalid_backend_sha = fully_evidenced_policy()
+    invalid_backend_sha["activation_evidence"][
+        "operator_controlled_private_vintage_backend_configured"
+    ]["configuration_evidence_sha256"] = "not-a-hash"
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="configuration_evidence_sha256 must be a 64-character SHA-256 digest",
+    ):
+        validate_rps_refresh_policy(invalid_backend_sha)
+
+    invalid_rehearsal_sha = fully_evidenced_policy()
+    invalid_rehearsal_sha["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ]["write_read_verify_evidence_sha256"] = "not-a-hash"
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="write_read_verify_evidence_sha256 must be a 64-character SHA-256 digest",
+    ):
+        validate_rps_refresh_policy(invalid_rehearsal_sha)
+
+
 def test_activation_evidence_inventory_and_dependencies_fail_closed() -> None:
     missing = copy.deepcopy(policy())
     del missing["activation_evidence"][
@@ -228,6 +294,10 @@ def test_activation_evidence_inventory_and_dependencies_fail_closed() -> None:
         "status": "passed",
         "rehearsal_id": "synthetic-rehearsal",
         "write_read_verify_evidence_ref": "synthetic-evidence",
+        "write_read_verify_evidence_sha256": VERIFY_EVIDENCE_SHA256,
+        "backend_id": BACKEND_ID,
+        "configuration_evidence_ref": CONFIG_REF,
+        "configuration_evidence_sha256": CONFIG_SHA256,
         "verified_on": "2026-09-03",
     }
     with pytest.raises(
