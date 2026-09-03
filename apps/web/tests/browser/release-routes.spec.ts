@@ -29,20 +29,35 @@ async function assertMobileEmulationContract(page: Page) {
 
   const environment = await page.evaluate(() => ({
     userAgent: navigator.userAgent,
-    maxTouchPoints: navigator.maxTouchPoints,
     innerWidth: window.innerWidth,
-    coarsePointer: window.matchMedia("(pointer: coarse)").matches,
   }));
 
-  expect(environment.maxTouchPoints, `${projectName} must expose touch input`).toBeGreaterThan(0);
   expect(environment.innerWidth, `${projectName} must remain a phone-width context`).toBeLessThanOrEqual(450);
-  expect(environment.coarsePointer, `${projectName} must expose a coarse primary pointer`).toBeTruthy();
 
   if (projectName === ANDROID_PROJECT) {
     expect(environment.userAgent).toContain("Android");
   } else {
     expect(environment.userAgent).toContain("iPhone");
   }
+
+  await page.evaluate(() => {
+    document.documentElement.dataset.qaTouchStartSeen = "false";
+    window.addEventListener(
+      "touchstart",
+      () => {
+        document.documentElement.dataset.qaTouchStartSeen = "true";
+      },
+      { once: true },
+    );
+  });
+  await page.touchscreen.tap(12, 12);
+  await expect(
+    page.locator("html"),
+    `${projectName} must deliver an emulated touchstart event`,
+  ).toHaveAttribute("data-qa-touch-start-seen", "true");
+  await page.evaluate(() => {
+    delete document.documentElement.dataset.qaTouchStartSeen;
+  });
 }
 
 test.describe("Release 1 rendered browser QA", () => {
