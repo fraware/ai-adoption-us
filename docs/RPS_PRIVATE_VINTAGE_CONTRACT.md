@@ -1,200 +1,198 @@
-# RPS private-vintage storage contract
+# RPS private-vintage storage and backend conformance contract
 
-Status: **D-G1 storage-format tranche — vendor-neutral private archive contract; D-G1 remains open**
+Status: **D-G1 package/integrity and backend-conformance software implemented; production durable backend still pending**
 
-Date: 2026-09-02
+Date: 2026-09-03
 
 ## Purpose
 
-A production longitudinal observatory must be able to prove exactly which source bytes were retrieved, compare a later source state with a previously frozen retrieval, and rebuild a reviewed candidate from the same source vintage without silently re-fetching mutable upstream data.
+A production longitudinal observatory must be able to prove which exact source bytes were retrieved, preserve a changed source vintage without silently re-fetching mutable upstream data, and later recover the same immutable package before release construction.
 
-The manual RPS source probe intentionally keeps source bytes transient because this repository is public. That is safe for a compatibility probe, but it is insufficient for a production release history.
+The repository therefore separates three questions that must not be conflated:
 
-This contract defines the missing durable private-vintage **package format and integrity semantics**. It deliberately does not select a storage vendor. The same package may live on an operator-controlled private filesystem, a private mounted object store, or a future backend adapter that preserves the contract below.
+1. **What is an immutable private RPS vintage?** The package codec and store define its exact bytes, namespace, rights metadata, comparison binding, and create-only semantics.
+2. **Can a configured backend return the same package later?** The two-phase backend conformance protocol writes a challenge and independently reads back, recovers, and verifies the exact event.
+3. **Is that backend genuinely durable, private, operator-controlled, and correctly retained?** This is an infrastructure fact. It requires separately reviewed configuration/access-control evidence and cannot be inferred from successful filesystem I/O alone.
+
+The third question remains unresolved in the current production environment.
+
+## Current D-G1 state
+
+The live provider path is already evidenced. `RPS live validation` run `33687737639` succeeded on merged `main`, establishing both successful live retrieval and the configured FRED credential path for that execution. Its rights-safe artifact records 137 provider series, 131 observatory series, six intentional exclusions, 962 observations, and an exact source-snapshot SHA-256 of `66b3ffbaebf43c3c8434556eec9329a232d8f17483ba3a613e6b00d214af3f74`.
+
+That run also records `archive_contract_rehearsed=true` and `archive_persisted_durably=false`. It therefore validates package semantics while explicitly failing to establish durable storage.
+
+The complete Observatory v1 global-baseline composition software is also merged on `main` through PR #57 at commit `28e2141869c35f92faf20d796f3b2b2f003e4c3a`. Activation evidence is merged through PR #58 at commit `6aa39dfa3ef9630d87a610e01d6b8376a3098b65`: two of four source-check activation gates are recorded as passed, while durable backend configuration and backend write/read/verify remain pending.
+
+No first global release has been staged or promoted by those changes.
 
 ## Trust and rights boundary
 
-The archive contains the exact private `rps_source_snapshot.json`, including published aggregate source observations. It may also contain a detailed source comparison diff with old/new aggregate cell values.
+A private vintage contains the exact `rps_source_snapshot.json`, including authorized published aggregate source observations. When a predecessor is supplied it may also contain a detailed `rps_refresh_diff.json` with old/new aggregate values.
 
 Accordingly:
 
 - storage scope is `private`;
 - `public_archive = false`;
-- the package must never be committed to the public repository;
-- the package must never be uploaded as an ordinary public-repository Actions artifact;
-- repository-local development archives are permitted only beneath the ignored `data/audit/private/` boundary;
+- exact source snapshots and detailed diffs must never be committed to the public repository;
+- they must never be uploaded as ordinary public-repository Actions artifacts;
+- repository-local development archives are permitted only beneath ignored `data/audit/private/`;
 - external archive roots must be operator-controlled private storage;
-- archiving does not widen the source-owner permission or authorize public bulk redistribution.
+- archival does not widen source-owner permission or authorize public bulk redistribution.
 
-The CLI enforces the repository-local boundary. A future remote backend must enforce equivalent access control outside this repository.
+The operator commands enforce the repository-local path boundary. A production backend must enforce equivalent privacy outside the repository through its own access controls.
 
-## Two identities: retrieval event versus scientific content
+## Two identities: retrieval event and scientific content
 
-RPS/FRED retrievals contain transport/realtime envelope fields whose values may change across retrieval dates even when the scientific observations and stable definitions are identical.
+RPS/FRED retrievals include transport/realtime-envelope fields that may change between acquisitions even when stable scientific observations are unchanged. The archive retains two different identities:
 
-The archive therefore retains two different SHA-256 identities:
+1. `archive_event_id` / `source_snapshot_sha256`: SHA-256 of the exact snapshot-file bytes.
+2. `source_content_sha256`: the scientific content digest that excludes query-time transport-envelope variation.
 
-1. `archive_event_id` / `source_snapshot_sha256` — SHA-256 of the **exact snapshot file bytes**. This identifies the acquisition event exactly.
-2. `source_content_sha256` — the existing RPS scientific content digest that excludes query-time transport-envelope changes.
+Two retrieval events may therefore have different exact file identities while sharing one scientific content identity. A stable-definition or observation change advances the scientific identity.
 
-This distinction is mandatory.
+This distinction is mandatory for revision classification and release reproducibility.
 
-Two retrievals may legitimately have different `archive_event_id` values while sharing the same `source_content_sha256`. Such a pair is an auditable repeated retrieval of scientifically unchanged content, not a source revision.
+## Immutable package namespace
 
-A real observation or stable-definition change advances `source_content_sha256`.
-
-## Package namespace
-
-The private archive layout is:
+The package layout is:
 
 ```text
-<archive-root>/
+<backend-root>/
   <source-id>/
     <exact-source-snapshot-sha256>/
       private_vintage_manifest.json
       rps_source_snapshot.json
-      rps_refresh_diff.json        # present when a previous snapshot was supplied
+      rps_refresh_diff.json        # when a previous snapshot was supplied
 ```
 
-The event directory name is the exact snapshot-file SHA-256. The manifest's `archive_event_id` and `source_snapshot_sha256` must equal that directory name.
+The event directory name, manifest `archive_event_id`, and `source_snapshot_sha256` must agree. There is no mutable `latest` pointer in the package contract. Any later pointer/index mechanism requires separate review because predecessor selection is part of provenance.
 
-The source ID is restricted to a filesystem-safe identifier. Path traversal or alternate namespace construction is rejected.
+## Manifest and exact-byte contract
 
-No mutable `latest` pointer is part of this package contract. Production orchestration must choose the previous vintage explicitly or implement a separately reviewed private index/pointer mechanism. This prevents a mutable pointer from becoming an unexamined part of source identity.
+`private_vintage_manifest.json` records the source/event identities, exact source size and SHA-256, scientific content SHA-256, retrieval timestamp, provider release ID, inventory counts, rights decision reference, private storage scope, builder commit, predecessor binding, revision classification, exact hashes/sizes of archived files, `immutable=true`, and `public_archive=false`.
 
-## Manifest contract
+The source snapshot is copied byte-for-byte rather than parsed and reserialized. Installation verifies source size and SHA-256. Later package verification recomputes both exact-byte and scientific-content identities.
 
-`private_vintage_manifest.json` records:
+When a previous snapshot is supplied, the private comparison diff is bound to the exact predecessor snapshot SHA-256, prior scientific identity, current scientific identity, revision classification, change counts, and detailed changes. An existing event cannot later be rebound to a different predecessor.
 
-- schema and archive type;
-- exact retrieval-event ID;
-- source ID;
-- scientific content SHA-256;
-- exact source-snapshot SHA-256 and byte size;
-- retrieval timestamp;
-- provider release ID;
-- observation count;
-- provider/observatory/excluded inventory counts and inventory status;
-- rights decision reference and explicit private/nonpublic scope;
-- exact builder Git commit;
-- comparison binding to a previous exact snapshot when supplied;
-- new-wave/revision/mixed/unchanged status and change counts;
-- exact hashes and sizes for every archived file;
-- `immutable = true` and `public_archive = false`.
+## Create-only and concurrency semantics
 
-The manifest does not claim that a source was published or promoted. It is private source provenance only.
+The operator-facing store acquires a per-event lock using exclusive creation before installation. A competing or stale lock fails closed and requires operator inspection; it is never silently deleted.
 
-## Exact source-byte preservation
+Once an event exists:
 
-The archive copies `rps_source_snapshot.json` byte-for-byte. It does not parse and reserialize the source snapshot as the archived source object.
+- byte-identical replay with the same predecessor binding is idempotent;
+- corrupt packages are rejected and never overwritten;
+- alternate predecessor bindings are rejected;
+- event files are never updated in place.
 
-After the copy, the writer verifies both file size and SHA-256 against the original before installation. Later verification recomputes the exact file SHA-256 and the scientific content digest from the archived snapshot.
+On ordinary POSIX filesystems the store also applies owner-only permissions (`0700` directories and `0600` files) and fails if privacy hardening cannot be applied. Remote backends require equivalent authorization through their native controls.
 
-This permits downstream candidate construction to consume the exact archived file:
+## Two-phase backend conformance protocol
+
+`src/genai_at_work/private_vintage_backend.py` and `scripts/rehearse_rps_private_backend.py` add a vendor-neutral recovery protocol on top of the immutable package store.
+
+It is deliberately two-phase so a later process or execution can prove read-back independently from the write transaction.
+
+### Phase 1: write challenge
+
+The `write` command stores the exact source package and emits a rights-safe challenge. The challenge contains only identities and control metadata:
+
+- backend ID and separately reviewable configuration-evidence reference;
+- exact backend namespace;
+- source ID and archive event ID;
+- scientific and exact snapshot SHA-256 identities;
+- predecessor snapshot identity when present;
+- canonical package digest over the manifest and archived files;
+- exact writer Git commit;
+- private/nonpublic flags;
+- explicit `activation_gates_updated=false`;
+- explicit `durability_established_by_software_alone=false`.
+
+The challenge has an exact v1 field inventory. Unknown fields, malformed identities, unsafe IDs, widened publication scope, false activation claims, or false durability claims fail closed.
+
+Example:
+
+```bash
+PYTHONPATH=src python scripts/rehearse_rps_private_backend.py write \
+  --source-snapshot /private/rps-refresh/rps_source_snapshot.json \
+  --backend-root /mounted/private-rps-vault \
+  --backend-id private-rps-vault-v1 \
+  --configuration-evidence-ref ops/private-rps-vault/configuration-v1 \
+  --challenge-out /private/review/backend-write-challenge.json
+```
+
+For a later source state, `--previous-snapshot` may bind the event to an exact predecessor.
+
+### Phase 2: independent read-back verification
+
+The `verify` command loads the previously emitted challenge and locates the exact event by source/event identity. It then:
+
+1. verifies the backend package and every archived byte against its manifest;
+2. requires the archived writer commit to match the challenge;
+3. verifies scientific identity, exact snapshot identity, and predecessor binding;
+4. recomputes the canonical package digest;
+5. copies the retrieved package into a fresh recovery namespace;
+6. verifies the recovered package again;
+7. binds the verification evidence to the verifier's clean Git commit.
+
+Example:
+
+```bash
+PYTHONPATH=src python scripts/rehearse_rps_private_backend.py verify \
+  --challenge /private/review/backend-write-challenge.json \
+  --backend-root /mounted/private-rps-vault \
+  --evidence-out /private/review/backend-readback-evidence.json
+```
+
+The strongest operational rehearsal runs `verify` in a separate process/execution after the write, with the backend remounted or reacquired through the normal production credential path. That separation is operational evidence, not something a local library can manufacture.
+
+## Rights-safe conformance evidence
+
+Neither challenge nor verification evidence contains source observations or detailed private diffs. Verification output records cryptographic identities, backend/configuration references, writer/verifier commits, recovery result, private/nonpublic flags, and two explicit limitations:
+
+- `durability_established_by_software_alone=false`;
+- `requires_independent_backend_configuration_review=true`.
+
+A successful conformance rehearsal therefore proves that the exact challenged package was later recoverable and internally valid at that backend path. It does not prove that the path is durable across infrastructure loss, that its ACLs are correct, that retention is adequate, or that the operator actually controls the underlying service.
+
+## Relationship to the activation gates
+
+The pinned source-check policy contains four activation gates:
+
+1. successful live validation — **passed**;
+2. FRED credential verified in the execution environment — **passed**;
+3. operator-controlled durable private-vintage backend configured — **pending**;
+4. independent private-backend write/read/verify rehearsal passed — **pending**.
+
+This conformance software supplies the mechanism needed to evidence Gate 4 once Gate 3 is genuinely configured. It does not mutate `data/registry/rps_refresh_policy.json` and cannot mark either gate passed automatically.
+
+Gate 3 requires separately reviewable infrastructure evidence describing the actual backend, production reachability, private authorization model, and retention/control boundary. Gate 4 requires a successful challenge/read-back verification against that same reviewed backend identity. Only after both pieces are inspected should a separate reviewed change update activation evidence.
+
+## Release reconstruction
+
+Once an exact vintage is durably retained and verified, downstream candidate construction consumes the archived snapshot directly:
 
 ```bash
 PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py \
   --source-snapshot <private-package>/rps_source_snapshot.json \
-  --output-dir <private-candidate-dir> \
-  --release-id <candidate-id>
+  --output-dir <private-rps-candidate-dir> \
+  --release-id <rps-candidate-id>
 ```
 
-A later refresh comparison may likewise use the exact archived snapshot as `--previous-snapshot`.
-
-## Private revision evidence
-
-When `--previous-snapshot` is supplied, the archive calculates the existing RPS source diff and stores `rps_refresh_diff.json` privately.
-
-That diff is bound to:
-
-- the exact prior snapshot SHA-256;
-- the prior scientific content SHA-256;
-- the current scientific content SHA-256;
-- the classified revision state;
-- change counts and detailed changed cells/definitions.
-
-The detailed diff is intentionally private because it may reproduce old/new source values. The public/review-safe Actions evidence remains the summarized change counts and cryptographic identities.
-
-An existing archived retrieval event may not later be rebound to a different previous snapshot. Comparison provenance is immutable. A conflicting re-archive request fails closed.
-
-## Create-only and concurrency semantics
-
-The operator-facing store acquires a per-event lock using exclusive file creation (`O_EXCL`) before installing a new package.
-
-This prevents two cooperating writers from concurrently installing the same retrieval event. The lock records the event SHA and process ID for operator diagnosis.
-
-A stale lock is **not** silently deleted. It is treated as evidence of another or interrupted writer and requires explicit inspection before removal.
-
-Once a package exists:
-
-- byte-identical re-archival with the same previous-vintage binding is idempotent;
-- a corrupt existing package is rejected and never overwritten;
-- a different previous-vintage binding is rejected;
-- no file in the event package is updated in place.
-
-The low-level package codec verifies package immutability; the operator-facing `private_vintage_store` adds exclusive locking and comparison-binding enforcement.
-
-## Local filesystem privacy hardening
-
-On ordinary POSIX filesystems, the store attempts to apply owner-only permissions:
-
-- event/source directories: `0700`;
-- files: `0600`.
-
-Failure to apply these permissions fails the store operation rather than silently weakening local confidentiality.
-
-This filesystem mode is not a substitute for a remote backend's access-control policy. A cloud/object-store implementation must provide equivalent private authorization and exact-byte retrieval guarantees through its own controls.
-
-## Operator command
-
-Archive a first private retrieval event:
-
-```bash
-PYTHONPATH=src python scripts/archive_rps_private_vintage.py \
-  --source-snapshot /private/rps-refresh/rps_source_snapshot.json \
-  --archive-root /private/rps-vintages
-```
-
-Archive a later retrieval and retain exact private comparison evidence:
-
-```bash
-PYTHONPATH=src python scripts/archive_rps_private_vintage.py \
-  --source-snapshot /private/rps-refresh-next/rps_source_snapshot.json \
-  --previous-snapshot /private/rps-vintages/<source>/<prior-event>/rps_source_snapshot.json \
-  --archive-root /private/rps-vintages
-```
-
-The command requires a clean Git worktree. Its output reports the event ID, scientific content hash, exact snapshot hash, retrieval time, comparison status, previous exact snapshot hash, builder commit, and private storage status.
-
-## What this tranche establishes
-
-The implementation establishes a testable source-vintage storage format with:
-
-- exact-byte preservation;
-- separate scientific and retrieval-event identities;
-- immutable source/comparison provenance;
-- detailed private revision evidence;
-- tamper detection;
-- create-only event locking;
-- idempotent replay under the same provenance binding;
-- explicit rights/private-storage metadata;
-- storage-vendor-neutral retrieval by ordinary file path.
-
-This is sufficient to define what a future durable backend must preserve.
+The complete Observatory v1 composer can then consume that validated private RPS component together with the pinned repository evidence. Candidate construction remains non-promoting until exact-candidate scientific, editorial, rights, and CI review are complete.
 
 ## What remains unresolved
 
-This tranche does **not** configure a durable remote/private storage service for GitHub-hosted execution. The current repository tooling does not expose such a backend, and selecting one without an explicit access-control/retention decision would move the problem instead of solving it.
+Repository software can define and verify the storage contract, but it cannot create an operator's private infrastructure by assertion. D-G1 still requires:
 
-Before D-G1 can close, production execution still needs:
+1. configure a real operator-controlled durable private storage location reachable from the production refresh environment;
+2. retain separately reviewable configuration/access-control evidence for that backend;
+3. execute the two-phase write/read/verify protocol against that backend, preferably across separate executions;
+4. review the backend configuration and cryptographic recovery evidence and only then record Gates 3 and 4 as passed;
+5. activate the pinned weekly Wednesday 18:00 UTC source check through a separate reviewed repository change;
+6. create the first complete global candidate from the exact durably archived RPS vintage and bind all release reviews to its hashes;
+7. rehearse a subsequent new-wave or source-revision transition against a frozen predecessor.
 
-1. a real operator-controlled private storage location reachable from the source-refresh execution environment;
-2. credentials and access control for that private backend;
-3. an explicit retention rule for retrieval events, including treatment of non-promoted probes versus release-referenced vintages;
-4. a reviewed mechanism for selecting the prior event without introducing a silent mutable-source fallback;
-5. successful live source retrieval and archival;
-6. reconstruction of a candidate from the archived exact bytes;
-7. complete global observatory baseline composition and reviewed promotion;
-8. a subsequent-wave/revision rehearsal against a frozen archived predecessor.
-
-The package contract intentionally precedes the backend choice so those later decisions cannot alter source identity, revision semantics, or public/private boundaries implicitly.
+Until the first four items are complete, periodic checking must remain disabled. Until exact-candidate review and explicit release-engine promotion are complete, no global release should be claimed as staged or public.
