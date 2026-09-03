@@ -2,54 +2,63 @@
 
 Date: 2026-09-03
 
-This document defines the repository-side production contract for the public **GenAI at Work** Release 1 deployment. The live deployment audit must verify the deployed system against this contract; platform defaults are not treated as evidence.
+This document defines the repository-side production contract for the public **GenAI at Work** Release 1 deployment on GitHub Pages. The live deployment audit must verify the deployed site against this contract; repository configuration and platform assumptions are not themselves deployment evidence.
 
-## 1. Public data mode
+## 1. Hosting and public data mode
 
-Release 1 production runs only with:
+Release 1 uses GitHub Pages as a static host at the default project site:
+
+```text
+https://fraware.github.io/ai-adoption-us/
+```
+
+The production build runs only with:
 
 ```text
 DATA_MODE=derived_only
+GITHUB_PAGES=true
+NEXT_PUBLIC_SITE_URL=https://fraware.github.io/ai-adoption-us
 ```
 
-The public deployment must not contain `data/audit/private/`, raw RPS subgroup observations, private fixture files, or an endpoint that exposes those materials. The live RPS refresh/backend program is a separate operational track and is not activated by Release 1 deployment.
+`GITHUB_PAGES=true` enables the Next.js static-export profile with `output: export`, `basePath: /ai-adoption-us`, `assetPrefix: /ai-adoption-us`, and trailing-slash routes. The public deployment must not contain `data/audit/private/`, raw RPS subgroup observations, private fixture files, or an endpoint exposing those materials. The live RPS refresh/backend program remains a separate operational track and is not activated by Release 1 deployment.
 
 ## 2. Deployment identity
 
-The application exposes `/release-manifest.json`. The manifest is intentionally rights-safe and contains only:
+The static export contains `/release-manifest.json`. The manifest is intentionally rights-safe and contains only non-sensitive deployment identity:
 
 - schema version;
 - product identity;
+- hosting target (`github-pages`);
 - public data mode;
-- deployed Git commit SHA;
-- configured public site origin;
+- exact Git commit SHA supplied at build time;
+- configured public site base URL;
 - analytics posture;
-- client-monitoring posture.
+- client-monitoring posture;
+- an explicit declaration that source bytes are not published.
 
 For an accepted production deployment:
 
 - `dataMode` must equal `derived_only`;
 - `commitSha` must equal the audited Git commit and must not be `UNBOUND`;
-- `siteOrigin` must equal the canonical production origin;
-- `analytics` must equal `disabled`;
-- `clientMonitoring` must equal `disabled`.
+- `siteBaseUrl` must equal `https://fraware.github.io/ai-adoption-us`;
+- `analytics` and `clientMonitoring` must equal `disabled`;
+- `sourceBytesPublished` must equal `false`.
 
-The deployment audit must also retain an immutable platform deployment identifier or a checksum/digest of the deployment artifact where the platform exposes one.
+The GitHub Pages deployment workflow/run ID and uploaded Pages artifact identity are retained as the immutable platform-side deployment evidence.
 
 ## 3. Canonical URL, robots, and sitemap
 
-`NEXT_PUBLIC_SITE_URL` is the single configured production origin. It must be an HTTP(S) origin with no path, query, or fragment. Release 1 production should use HTTPS.
+`NEXT_PUBLIC_SITE_URL` is the canonical public site base URL and may include the GitHub Pages project path. It must use HTTP(S) and contain no query or fragment. Release 1 uses HTTPS.
 
-When configured, the origin supplies:
+The configured base URL supplies:
 
-- Next.js `metadataBase`;
-- the homepage canonical URL;
+- Next.js metadata base and homepage canonical URL;
 - Open Graph site URL;
 - `robots.txt` host and sitemap declaration;
 - absolute URLs in `sitemap.xml`;
 - `/release-manifest.json` site identity.
 
-The public pages are indexable. The sitemap contains only the six primary public content routes:
+The sitemap contains only the six primary public content routes beneath `/ai-adoption-us`:
 
 - `/`;
 - `/explore/industries`;
@@ -58,68 +67,77 @@ The public pages are indexable. The sitemap contains only the six primary public
 - `/methodology`;
 - `/sources`.
 
-Private, audit, source-refresh, and internal QA paths must never be added to the sitemap.
+Private, audit, refresh, and QA paths are excluded.
 
-## 4. HTTP security baseline
+## 4. Security baseline and GitHub Pages limitation
 
-The application defines the following response-header baseline for all paths:
+GitHub Pages is static hosting. Next.js static export does not support the framework `headers()` feature, so Release 1 must **not** claim application-controlled HTTP security headers on the deployed Pages responses.
 
-- `Content-Security-Policy` with same-origin defaults, no frames, no objects, no external connections, and only the inline script/style allowances currently required by the static Next.js application;
-- `Referrer-Policy: strict-origin-when-cross-origin`;
-- `X-Content-Type-Options: nosniff`;
-- `X-Frame-Options: DENY`;
-- a restrictive `Permissions-Policy` disabling camera, microphone, geolocation, payment, and USB;
-- `Cross-Origin-Opener-Policy: same-origin`;
-- `Strict-Transport-Security: max-age=31536000`;
-- the default `X-Powered-By` header disabled.
+The application still uses two defenses that survive static export:
 
-The live audit must verify the actual production responses. If the deployment platform adds, removes, or overrides headers, the observed production behavior governs the audit result.
+- a restrictive HTML `Content-Security-Policy` meta policy covering default/base/form/object/image/font/style/script/connect sources;
+- `Referrer-Policy: strict-origin-when-cross-origin` expressed through document metadata.
+
+A CSP meta element cannot provide all response-header protections; in particular, frame-ancestor enforcement and headers such as `X-Content-Type-Options`, `X-Frame-Options`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, or application-selected HSTS are outside the application's control on GitHub Pages. The live audit records the headers GitHub actually serves and treats them as platform behavior, not repository guarantees.
+
+The non-Pages Next.js profile retains a stricter response-header configuration for local/self-hosted validation, but those headers are not Release 1 GitHub Pages evidence.
 
 ## 5. Caching policy
 
-Release 1 does not add a blanket application-level `Cache-Control` header to all Next.js pages because that could override framework/platform handling of content-addressed assets. The intended behavior is:
+The application cannot define GitHub Pages CDN response caching policy. The live audit therefore records observed `Cache-Control`, `Age`, `ETag`, `Last-Modified`, and relevant GitHub/Fastly cache headers for:
 
-- hashed `/_next/static/` assets may be cached immutably by the framework/platform;
-- HTML and generated route responses must not be allowed to remain indefinitely stale after a production deployment;
-- `/release-manifest.json` explicitly uses `public, max-age=0, must-revalidate` so deployment identity is always revalidated.
+- the homepage;
+- one hashed `/_next/static/` asset beneath the project base path;
+- `/release-manifest.json`.
 
-The live deployment audit must record the observed `Cache-Control`, `Age`, `ETag`, and relevant platform cache headers for the homepage, one hashed static asset, and `/release-manifest.json`. Any behavior that can serve a superseded release indefinitely fails the gate.
+Release correctness is established primarily through immutable deployment identity and post-deployment URL verification, not by assuming a particular GitHub Pages TTL. A deployment that continues serving a prior `release-manifest.json` after the Pages deployment is reported successful fails the audit until convergence is verified.
 
 ## 6. Analytics and privacy
 
-Release 1 deliberately ships with **no third-party analytics, advertising, tracking pixel, consent framework, or analytics cookie**. No analytics SDK appears in the application dependency set or page source by design.
+Release 1 ships with **no third-party analytics, advertising, tracking pixel, consent framework, analytics cookie, or client telemetry SDK**. No analytics dependency is present in the application dependency set by design.
 
-The production Content Security Policy restricts network connections to same-origin resources, providing an additional technical guard against silently adding external telemetry without changing this policy.
+The static CSP meta policy restricts network connections to same-origin resources, providing an additional client-side guard against silently adding external telemetry without changing the policy.
 
-If analytics are introduced after Release 1, the privacy decision, dependency/configuration, user disclosure, and CSP must be reviewed as a separate change.
+Any later analytics integration requires a separate privacy/security review.
 
 ## 7. Monitoring and logging
 
-Release 1 deliberately ships with **no client-side monitoring or error-reporting SDK**. The launch baseline relies on deployment-platform build/runtime/request logs and the existing reproducible CI/browser QA evidence.
+Release 1 ships with **no client-side monitoring or error-reporting SDK**. Operational visibility is limited to GitHub Actions build/deployment evidence and whatever aggregate request/availability information GitHub Pages itself exposes. No private RPS fixtures can enter host logs because those fixtures are excluded from the public source/build boundary.
 
-The live audit must confirm that no monitoring SDK or external telemetry endpoint is present in the delivered client. Host-side operational logs must not ingest private RPS fixtures because those fixtures are absent from the public deployment boundary.
-
-A future monitoring integration requires a separate privacy/security review.
+A future monitoring integration requires separate privacy/security review.
 
 ## 8. Secrets
 
-No secret may use a `NEXT_PUBLIC_` prefix. `NEXT_PUBLIC_SITE_URL` is public configuration, not a secret. The public release manifest must never expose environment variables other than the explicitly listed non-sensitive identity fields.
+No secret may use a `NEXT_PUBLIC_` prefix. `NEXT_PUBLIC_SITE_URL` is public configuration. `RELEASE_COMMIT_SHA` is a public deployment identity, not a secret.
 
-The live deployment audit must inspect delivered HTML/JavaScript and the release manifest for accidental secret/configuration leakage. The absence of private source files from the repository and optimized build remains a separate CI gate.
+CI injects a synthetic server-only secret marker during ordinary production-build tests and verifies it is absent from HTML and client assets. The Pages static-export workflow separately scans the `out/` artifact for private paths, source observations, and forbidden markers before upload.
 
 ## 9. Failure paths
 
-The automated R1-G2 browser suite already requires an unknown route to return HTTP 404, render an intelligible not-found surface, avoid private-path disclosure, and emit no unexpected runtime/console failures. R1-G3 additionally verifies this behavior on the deployed production origin.
+R1-G2 already requires an unknown route to return a coherent not-found surface under the Node production server. GitHub Pages static export produces `404.html`; the Pages artifact audit requires that file to exist and the live deployment audit verifies an unknown Pages URL resolves to the expected 404 surface without private-path disclosure.
 
-## 10. Release 1 publication gate
+## 10. GitHub Pages deployment workflow
+
+The repository uses a custom GitHub Actions workflow that:
+
+1. checks out the exact commit;
+2. installs locked dependencies;
+3. builds with `DATA_MODE=derived_only` and `GITHUB_PAGES=true`;
+4. verifies the static artifact and release manifest;
+5. uploads `apps/web/out` as the GitHub Pages artifact;
+6. deploys only on pushes to `main`.
+
+GitHub Pages must be enabled with **Source: GitHub Actions** in repository settings. The normal workflow token cannot enable Pages if it is disabled; that repository setting is therefore an external platform prerequisite, not something the application silently bypasses.
+
+## 11. Release 1 publication gate
 
 A public Release 1 tag/release may be created only after all of the following are recorded:
 
 1. R1-G2 is complete.
-2. The production-hardening commit passes release CI and rendered browser QA.
-3. A production deployment exists with exact commit identity.
-4. The deployment audit verifies rights, headers, robots/sitemap, caching, privacy, monitoring, failure paths, and manifest identity.
-5. Source citations and methodology links are checked against the deployed content.
-6. Release notes state the scientific and evidence limitations without implying human screen-reader, native-iOS, physical-device, field-CWV, causal, or unsupported design-based evidence.
+2. The production-hardening commit passes release CI, rendered browser QA, native Safari QA, and the GitHub Pages static-export build.
+3. GitHub Pages reports a successful deployment of that exact commit.
+4. The live site audit verifies data mode, artifact identity, base-path routing, robots/sitemap, failure paths, platform-served headers/caching, privacy/telemetry posture, and release-manifest identity.
+5. Source citations and methodology links are checked against the deployed content through automated/public-surface inspection where feasible.
+6. Release notes state the scientific and evidence limitations without implying human screen-reader, native-iOS, physical-device, field-CWV, causal, design-based, or application-controlled GitHub Pages response-header evidence.
 
 Human/manual and physical-device spot checks remain outside Release 1 scope under the 2026-09-03 R1-G2 scope decision.
