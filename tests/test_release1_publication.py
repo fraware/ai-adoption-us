@@ -5,6 +5,19 @@ import pytest
 from scripts import publish_release1 as publication
 
 
+def _successful_runs() -> list[dict[str, object]]:
+    return [
+        {
+            "id": index,
+            "name": name,
+            "event": "push",
+            "status": "completed",
+            "conclusion": "success",
+        }
+        for index, name in enumerate(publication.REQUIRED_WORKFLOWS, start=1)
+    ]
+
+
 def test_local_release_contract_requires_only_formal_tag_unchecked(tmp_path: Path) -> None:
     docs = tmp_path / "docs"
     docs.mkdir()
@@ -27,10 +40,7 @@ def test_local_release_contract_requires_only_formal_tag_unchecked(tmp_path: Pat
 
 
 def test_required_workflow_classifier_requires_every_exact_push_gate() -> None:
-    runs = [
-        {"id": index, "name": name, "event": "push", "status": "completed", "conclusion": "success"}
-        for index, name in enumerate(publication.REQUIRED_WORKFLOWS, start=1)
-    ]
+    runs = _successful_runs()
     complete, states = publication.classify_required_workflows(runs)
     assert complete
     assert set(states) == set(publication.REQUIRED_WORKFLOWS)
@@ -42,10 +52,7 @@ def test_required_workflow_classifier_requires_every_exact_push_gate() -> None:
 
 
 def test_required_workflow_classifier_fails_closed_on_red_gate() -> None:
-    runs = [
-        {"id": index, "name": name, "event": "push", "status": "completed", "conclusion": "success"}
-        for index, name in enumerate(publication.REQUIRED_WORKFLOWS, start=1)
-    ]
+    runs = _successful_runs()
     runs[0]["conclusion"] = "failure"
     with pytest.raises(publication.ReleaseError, match="required workflow failed"):
         publication.classify_required_workflows(runs)
@@ -64,6 +71,24 @@ def test_publication_workflow_is_one_shot_and_write_scoped() -> None:
     assert "contents: write" in workflow
     assert "actions: read" in workflow
     assert "issues: read" in workflow
-    assert "startsWith(github.event.head_commit.message, 'Authorize Release 1 publication')" in workflow
+    assert (
+        "startsWith(github.event.head_commit.message, 'Authorize Release 1 publication')"
+        in workflow
+    )
     assert "python scripts/publish_release1.py" in workflow
     assert "workflow_dispatch" not in workflow
+
+
+def test_publication_changes_force_exact_head_browser_and_safari_gates() -> None:
+    required_paths = (
+        ".github/workflows/release1-publish.yml",
+        "scripts/publish_release1.py",
+        "tests/test_release1_publication.py",
+    )
+    for workflow_path in (
+        ".github/workflows/browser-qa.yml",
+        ".github/workflows/native-safari-qa.yml",
+    ):
+        workflow = Path(workflow_path).read_text(encoding="utf-8")
+        for path in required_paths:
+            assert workflow.count(f"- '{path}'") == 2
