@@ -1,0 +1,124 @@
+name: Native Safari desktop QA
+
+on:
+  pull_request:
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/native-safari-qa.yml'
+      - 'docs/qa/**'
+      - 'docs/RELEASE1_PRODUCT_QA.md'
+      - 'docs/RELEASE_CHECKLIST.md'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - '.github/workflows/native-safari-qa.yml'
+      - 'docs/qa/**'
+      - 'docs/RELEASE1_PRODUCT_QA.md'
+      - 'docs/RELEASE_CHECKLIST.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-safari-qa-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-safari:
+    name: SafariDriver on macOS 15
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      DATA_MODE: derived_only
+      NEXT_TELEMETRY_DISABLED: '1'
+      SAFARI_QA_BASE_URL: http://127.0.0.1:3000
+      SAFARI_WEBDRIVER_URL: http://127.0.0.1:4444
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Record native Safari environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa-results/native-safari
+          sw_vers | tee qa-results/native-safari/macos-version.txt
+          /usr/bin/safaridriver --version | tee qa-results/native-safari/safaridriver-version.txt
+          defaults read /Applications/Safari.app/Contents/Info CFBundleShortVersionString \
+            | tee qa-results/native-safari/safari-version.txt
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate TypeScript and production build
+        run: |
+          set -euo pipefail
+          npm run lint
+          npm run build
+
+      - name: Run native Safari QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p qa-results/native-safari
+
+          npm run start -- -H 127.0.0.1 -p 3000 >qa-results/native-safari/server.log 2>&1 &
+          server_pid=$!
+          safari_pid=''
+          trap 'kill "$server_pid" 2>/dev/null || true; if [ -n "$safari_pid" ]; then kill "$safari_pid" 2>/dev/null || true; fi' EXIT
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "$SAFARI_QA_BASE_URL/" >/dev/null; then
+              break
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'Production server did not become ready.' >&2
+              cat qa-results/native-safari/server.log >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          sudo /usr/bin/safaridriver --enable
+          /usr/bin/safaridriver -p 4444 >qa-results/native-safari/safaridriver.log 2>&1 &
+          safari_pid=$!
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "$SAFARI_WEBDRIVER_URL/status" >/dev/null; then
+              break
+            fi
+            if ! kill -0 "$safari_pid" 2>/dev/null; then
+              echo 'SafariDriver exited before becoming ready.' >&2
+              cat qa-results/native-safari/safaridriver.log >&2
+              exit 1
+            fi
+            if [ "$attempt" -eq 30 ]; then
+              echo 'SafariDriver did not become ready.' >&2
+              cat qa-results/native-safari/safaridriver.log >&2
+              exit 1
+            fi
+            sleep 1
+          done
+
+          node scripts/native-safari-qa.mjs qa-results/native-safari
+
+      - name: Upload native Safari QA evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: r1-g2-native-safari-${{ github.sha }}
+          path: apps/web/qa-results/native-safari
+          if-no-files-found: warn
+          retention-days: 30

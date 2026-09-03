@@ -20,6 +20,8 @@ const primaryNavigation = [
 
 const ANDROID_PROJECT = "android-chrome-pixel-7-emulation";
 const IOS_PROJECT = "ios-webkit-iphone-15-pro-emulation";
+const EXPECTED_404_CONSOLE_ERROR =
+  "Failed to load resource: the server responded with a status of 404 (Not Found)";
 
 async function assertMobileEmulationContract(page: Page) {
   const projectName = test.info().project.name;
@@ -162,6 +164,81 @@ test.describe("Release 1 rendered browser QA", () => {
       expect(consoleErrors, `Console errors on ${route.path}`).toEqual([]);
     });
   }
+
+  test("primary navigation links perform real end-to-end route transitions", async ({ page }) => {
+    const response = await page.goto("/", { waitUntil: "networkidle" });
+    expect(response, "No initial home document response").not.toBeNull();
+    expect(response?.ok(), `Initial home HTTP ${response?.status()}`).toBeTruthy();
+
+    for (const href of primaryNavigation) {
+      const link = page.locator(`nav[aria-label="Primary navigation"] a[href="${href}"]`);
+      await expect(link).toBeVisible();
+      await link.click();
+      await expect.poll(() => new URL(page.url()).pathname).toBe(href);
+      await expect(page.locator("main")).toHaveCount(1);
+      await expect(page.locator("h1")).toHaveCount(1);
+
+      const homeLink = page.locator('a.brand[href="/"]');
+      await expect(homeLink).toBeVisible();
+      await homeLink.click();
+      await expect.poll(() => new URL(page.url()).pathname).toBe("/");
+      await expect(page.locator("main")).toHaveCount(1);
+      await expect(page.locator("h1")).toHaveCount(1);
+    }
+  });
+
+  test("industry scatter plot redraws after an explicit runtime resize", async ({ page }) => {
+    test.skip(
+      test.info().project.name !== "chrome-1440",
+      "One stable-Chrome desktop execution is sufficient for the ResizeObserver redraw contract.",
+    );
+
+    const response = await page.goto("/explore/industries", { waitUntil: "networkidle" });
+    expect(response?.ok()).toBeTruthy();
+    const canvas = page
+      .locator('figure[aria-label="RPS worker GenAI adoption (%) versus BTOS business AI use (%)"] .chart-canvas')
+      .first();
+    await expect(canvas).toBeVisible();
+    const plot = canvas.locator("svg");
+    await expect(plot).toHaveCount(1);
+
+    const initialWidth = await plot.evaluate((element) => element.getBoundingClientRect().width);
+    expect(initialWidth).toBeGreaterThan(800);
+
+    await page.setViewportSize({ width: 720, height: 900 });
+    await expect
+      .poll(async () => plot.evaluate((element) => element.getBoundingClientRect().width))
+      .toBeLessThan(initialWidth - 100);
+
+    const resizedWidth = await plot.evaluate((element) => element.getBoundingClientRect().width);
+    expect(resizedWidth).toBeGreaterThanOrEqual(280);
+    expect(resizedWidth).toBeLessThan(initialWidth);
+  });
+
+  test("production not-found route returns an intelligible fail-closed 404 surface", async ({ page }) => {
+    const consoleErrors: string[] = [];
+    const pageErrors: string[] = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") consoleErrors.push(message.text());
+    });
+    page.on("pageerror", (error) => pageErrors.push(error.message));
+
+    const response = await page.goto("/__qa_not_a_release_route__", { waitUntil: "networkidle" });
+    expect(response).not.toBeNull();
+    expect(response?.status()).toBe(404);
+    await expect(page.locator("body")).toContainText(/404|not found/i);
+    await expect(page.locator("body")).not.toContainText("data/audit/private");
+    expect(pageErrors).toEqual([]);
+
+    // Chromium/WebKit emit one browser-generated console error for an intentional
+    // top-level 404 navigation. Firefox currently emits none. Any other console error
+    // remains a failure, as does more than one copy of the expected diagnostic.
+    const unexpectedConsoleErrors = consoleErrors.filter(
+      (message) => message !== EXPECTED_404_CONSOLE_ERROR,
+    );
+    expect(unexpectedConsoleErrors).toEqual([]);
+    expect(consoleErrors.length).toBeLessThanOrEqual(1);
+  });
 
   test("industries: canonical BTOS-RPS triangulation is explicit and inspectable", async ({ page }) => {
     const response = await page.goto("/explore/industries", { waitUntil: "networkidle" });
