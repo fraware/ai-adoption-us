@@ -1,6 +1,6 @@
 # Release checklist
 
-A release is not launch-ready until every applicable item below is explicitly resolved. Checked items are backed by an execution record or committed code inspection; unchecked items remain open. Items explicitly designated **out of Release 1 scope** are not claimed as completed and are not launch blockers under the 2026-09-03 R1-G2 scope decision. See `VALIDATION_2026-08-30.md`, `VALIDATION_2026-08-31.md`, `docs/RELEASE1_PRODUCT_QA.md`, and the dated records under `docs/qa/` for the private/public/build/rendered distinction.
+A release is not launch-ready until every applicable item below is explicitly resolved. Checked items are backed by an execution record or committed code inspection; unchecked items remain open. Items explicitly designated **out of Release 1 scope** are not claimed as completed and are not launch blockers under the 2026-09-03 R1-G2 scope decision. See `VALIDATION_2026-08-30.md`, `VALIDATION_2026-08-31.md`, `docs/RELEASE1_PRODUCT_QA.md`, `docs/qa/R1_G3_DEPLOYMENT_AUDIT_2026-09-03.md`, and the other dated records under `docs/qa/` for the private/public/build/rendered/deployment distinction.
 
 ## A. Scientific integrity
 
@@ -18,7 +18,7 @@ A release is not launch-ready until every applicable item below is explicitly re
 - [x] `data/audit/private/` is absent from the public Git tree.
 - [x] `.gitignore` explicitly excludes `data/audit/private/` as defense in depth.
 - [x] Permanent CI verifies the private audit path is absent from the public source tree and optimized build tree.
-- [ ] Verify `data/audit/private/` is absent from the final GitHub Pages artifact and live deployment during R1-G3.
+- [x] `data/audit/private/` is absent from the audited GitHub Pages artifact and the live deployment fails the guarded private/raw paths closed; see `docs/qa/R1_G3_DEPLOYMENT_AUDIT_2026-09-03.md`.
 - [x] Rights-safe export/governance tests pass on the validated public source surface.
 - [x] Rights-safe ZIP export contains exactly one generated provenance record and fails on duplicate archive member names.
 - [x] Sources/Provenance page describes the current RPS/CPS/OEWS/BTOS evidence roles and fail-closed boundaries.
@@ -51,7 +51,7 @@ A release is not launch-ready until every applicable item below is explicitly re
 - [x] Permanent CI HTTP-smoke-tests every public route successfully in the non-Pages profile.
 - [x] The optimized build-tree private-path scan passes.
 - [x] Automated rendered QA on the tested Chrome/Firefox/WebKit matrix reports no uncaught page errors or unexpected browser-console errors on any primary success-path route.
-- [ ] GitHub Pages static-export workflow passes on the exact R1-G3 candidate head.
+- [x] GitHub Pages static-export workflow passes on the exact deployed R1-G3 evidence head and is preserved as a permanent deployment gate.
 
 ## E. Browser and responsive QA
 
@@ -89,25 +89,25 @@ R1-G2 is complete under the recorded automation/native scope. Evidence is retain
 - **Post-deployment measurement, not a prelaunch blocker:** field Core Web Vitals remain unavailable until a real deployment and traffic source make them meaningful.
 - [x] Build/static-file inventory reviewed for severe regressions.
 - [x] production 404/not-found behavior tested in the browser matrix.
-- [x] GitHub Pages HTTP-header limitation and retained static/meta security posture documented; live platform headers still require deployed-origin observation.
-- [x] GitHub Pages caching documented as platform-controlled; live cache behavior still requires deployed-origin observation.
-- [x] Release 1 analytics/privacy decision: no third-party analytics, tracking, advertising, analytics cookie, or client telemetry SDK.
+- [x] GitHub Pages HTTP-header limitation and retained static/meta security posture documented; the live audit observed platform-delivered HTTPS HSTS and records that application-controlled response headers are not claimed.
+- [x] GitHub Pages caching documented as platform-controlled; the live audit observed `cache-control: max-age=600` on the homepage and release manifest at audit time without treating that value as application-controlled.
+- [x] Release 1 analytics/privacy decision: no third-party analytics, tracking, advertising, analytics cookie, or client telemetry SDK; the live homepage audit found none of the guarded third-party telemetry identifiers.
 - [x] Release 1 monitoring/logging decision: no client-side monitoring SDK; operational evidence uses GitHub Actions/Pages platform records.
 
 ## H. Publication and deployment
 
 - [x] Release 1 production target selected: GitHub Pages project site `https://fraware.github.io/ai-adoption-us/`.
 - [x] page metadata/title/description and homepage canonical/Open Graph identity are bound to the configured GitHub Pages base URL.
-- [ ] GitHub Pages static export passes on the exact release candidate.
-- [ ] GitHub Pages repository setting confirms **Source: GitHub Actions**; if disabled, repository owner must enable it because the normal workflow token cannot self-enable Pages.
-- [ ] source citations receive final automated/editorial consistency review against the release candidate.
-- [ ] methodology links are verified from all material empirical claim surfaces.
-- [ ] final editorial consistency pass completed after R1-G3 changes.
-- [ ] rights-safe GitHub Pages production deployment audited.
-- [ ] deployed Pages artifact/run identity recorded.
-- [ ] release commit/tag created.
-- [ ] release notes summarize evidence, rights boundaries, hosting limitations, and scientific limitations.
-- [ ] public-launch wording reviewed so it does not imply causal, unsupported residual, native-iOS, human screen-reader, physical-device, field-CWV, or application-controlled GitHub Pages response-header evidence that has not been completed.
+- [x] GitHub Pages static export passes on the exact deployed R1-G3 evidence commit.
+- [x] GitHub Pages repository setting is **Source: GitHub Actions**, established operationally by successful Pages deployments from the workflow.
+- [x] source citations and public source-state wording received the final automated/editorial consistency review in the Release 1 publication-state tranche.
+- [x] Methodology and Sources are globally reachable from the primary navigation, with explicit methodology/source links retained on the technical essay and regression coverage for the public release surfaces.
+- [x] final editorial consistency pass completed after the Release 1 publication-state corrections and protected by regression tests against stale candidate/future/unexecuted wording.
+- [x] rights-safe GitHub Pages production deployment audited; see `docs/qa/R1_G3_DEPLOYMENT_AUDIT_2026-09-03.md`.
+- [x] deployed Pages artifact/run identity recorded in the dated R1-G3 audit record.
+- [ ] formal Release 1 tag/release created for the final audited release commit.
+- [x] release notes summarize evidence, rights boundaries, hosting limitations, and scientific limitations in `docs/RELEASE1_NOTES.md`.
+- [x] public-launch wording reviewed so it does not imply causal, unsupported residual, native-iOS, human screen-reader, physical-device, field-CWV, or application-controlled GitHub Pages response-header evidence that has not been completed.
 
 ## I. Release 1.1 / later research guardrails
 
