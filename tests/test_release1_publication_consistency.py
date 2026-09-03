@@ -13,7 +13,9 @@ def test_public_release_surfaces_do_not_revert_to_candidate_language():
     sources = read("apps/web/app/sources/page.tsx")
     methodology = read("apps/web/app/methodology/page.tsx")
 
-    assert "Release 1 · rights-safe derived evidence" in release_notice
+    assert "Release 1 · rights-bounded public evidence" in release_notice
+    assert "private source-input bytes" in release_notice
+    assert "unrestricted historical subgroup data" in release_notice
     assert "Public candidate · derived diagnostics only" not in release_notice
     assert "public candidate" not in home.lower()
     assert "public candidate" not in sources.lower()
@@ -83,6 +85,37 @@ def test_release1_bounded_view_and_live_adapter_boundaries_are_distinct():
     assert "unrestricted static database" in sources.lower()
     assert "bulk download product" in sources.lower()
     assert "generic source query api" in sources.lower()
+
+
+def test_derived_only_resolves_observations_and_diagnostics_from_one_promoted_release():
+    release = read("apps/web/lib/release.ts")
+    data = read("apps/web/lib/data.ts")
+    longitudinal = read("apps/web/lib/longitudinal.ts")
+
+    assert "observatory_release_registry.json" in release
+    assert "current_release_manifest_sha256" in release
+    assert "PROMOTED_AFTER_EXPLICIT_REVIEW" in release
+    assert "Promoted release artifact checksum mismatch" in release
+
+    assert 'PUBLIC_VIEW_ARTIFACT_ID = "rps-public-observation-view"' in data
+    assert 'if (mode === "derived_only") return loadPromotedPublicView();' in data
+    assert "historical_subgroup_panel_included !== false" in data
+    assert "generic_query_api_included !== false" in data
+    assert "source_vintage_id !== result.value.source_vintage_id" in data
+
+    assert 'LONGITUDINAL_ARTIFACT_ID = "rps-longitudinal-diagnostics"' in longitudinal
+    assert "readCurrentReleaseJsonArtifact<LongitudinalDiagnostics>" in longitudinal
+    assert "Longitudinal diagnostics are not bound to the promoted RPS source vintage" in longitudinal
+
+
+def test_repository_longitudinal_fallback_matches_current_live_source_identity():
+    diagnostics = read("data/derived/longitudinal/longitudinal_diagnostics.json")
+    assert '"2024-Q4"' in diagnostics
+    assert '"2025-Q1"' in diagnostics
+    assert '"quarter_pairs": 21' in diagnostics
+    assert '"source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73"' in diagnostics
+    assert '"input_private_fixture_rows"' not in diagnostics
+    assert '"checkpoint_date"' not in diagnostics
 
 
 def test_governed_longitudinal_surfaces_do_not_reintroduce_five_wave_state():
