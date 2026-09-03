@@ -29,6 +29,8 @@ const nextConfig = {
   poweredByHeader: false,
   ...(pagesBuild
     ? {
+        // GitHub Pages is a static host. Next response headers are unsupported in
+        // export mode, so the deployed header boundary is audited as platform behavior.
         output: 'export',
         basePath: pagesBasePath,
         assetPrefix: pagesBasePath,
