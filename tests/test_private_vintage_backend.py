@@ -23,6 +23,29 @@ BACKEND_ID = "rps-private-vault-v1"
 CONFIG_REF = "ops/private-vintage-backend/configuration-v1"
 
 
+def _configuration(*, reviewed_at: str = "2026-09-03T10:00:00Z") -> dict[str, Any]:
+    return {
+        "schema_version": 1,
+        "evidence_type": "rps_private_backend_configuration",
+        "backend_id": BACKEND_ID,
+        "configuration_ref": CONFIG_REF,
+        "environment_scope": "production_rps_refresh",
+        "storage_interface": "mounted_filesystem",
+        "operator_controlled": True,
+        "private_access_required": True,
+        "ephemeral": False,
+        "persists_beyond_execution": True,
+        "source_storage_rights_approved": True,
+        "source_rights_decision_ref": "docs/source-rights/RPS_SOURCE_DECISION.md",
+        "credentials_embedded": False,
+        "public_evidence_approved": False,
+        "access_control_review_ref": "ops/private-vintage-backend/access-control-v1",
+        "durability_review_ref": "ops/private-vintage-backend/durability-v1",
+        "retention_policy_ref": "ops/private-vintage-backend/retention-v1",
+        "reviewed_at": reviewed_at,
+    }
+
+
 def _snapshot(
     *,
     retrieved_at: str = "2026-09-02T12:00:00Z",
@@ -99,21 +122,21 @@ def _write(path: Path, value: dict[str, Any]) -> Path:
     return path
 
 
-def _challenge(tmp_path: Path) -> tuple[Path, Path, dict[str, Any]]:
+def _challenge(tmp_path: Path) -> tuple[Path, Path, Path, dict[str, Any]]:
     snapshot = _write(tmp_path / "source.json", _snapshot())
+    configuration = _write(tmp_path / "backend-configuration.json", _configuration())
     backend = tmp_path / "backend"
     challenge = write_backend_challenge(
         snapshot,
         backend,
-        backend_id=BACKEND_ID,
-        configuration_evidence_ref=CONFIG_REF,
+        configuration_evidence_path=configuration,
         builder_commit=WRITE_COMMIT,
     )
-    return snapshot, backend, challenge
+    return snapshot, backend, configuration, challenge
 
 
 def test_two_phase_write_read_verify_is_exact_and_source_byte_free(tmp_path: Path) -> None:
-    snapshot, backend, challenge = _challenge(tmp_path)
+    snapshot, backend, configuration, challenge = _challenge(tmp_path)
     validate_backend_challenge(challenge)
 
     assert challenge == {
@@ -121,6 +144,7 @@ def test_two_phase_write_read_verify_is_exact_and_source_byte_free(tmp_path: Pat
         "challenge_type": "rps_private_backend_write_challenge",
         "backend_id": BACKEND_ID,
         "configuration_evidence_ref": CONFIG_REF,
+        "configuration_evidence_sha256": sha256_file(configuration),
         "backend_namespace": (
             "rps-genai-tracker-fred-release-6/" + sha256_file(snapshot)
         ),
@@ -142,6 +166,7 @@ def test_two_phase_write_read_verify_is_exact_and_source_byte_free(tmp_path: Pat
     evidence = verify_backend_challenge(
         challenge,
         backend,
+        configuration_evidence_path=configuration,
         verification_builder_commit=VERIFY_COMMIT,
     )
     assert evidence["write_read_verify_passed"] is True
@@ -149,6 +174,7 @@ def test_two_phase_write_read_verify_is_exact_and_source_byte_free(tmp_path: Pat
     assert evidence["write_builder_commit"] == WRITE_COMMIT
     assert evidence["verification_builder_commit"] == VERIFY_COMMIT
     assert evidence["source_snapshot_sha256"] == sha256_file(snapshot)
+    assert evidence["configuration_evidence_sha256"] == sha256_file(configuration)
     assert evidence["package_digest"] == challenge["package_digest"]
     assert evidence["source_bytes_in_evidence"] is False
     assert evidence["public_evidence_approved"] is False
@@ -161,6 +187,51 @@ def test_two_phase_write_read_verify_is_exact_and_source_byte_free(tmp_path: Pat
     assert '"value": 50.0' not in serialized
 
 
+def test_configuration_evidence_is_cryptographically_immutable_across_phases(
+    tmp_path: Path,
+) -> None:
+    _, backend, configuration, challenge = _challenge(tmp_path)
+    original_sha = challenge["configuration_evidence_sha256"]
+
+    _write(
+        configuration,
+        _configuration(reviewed_at="2026-09-03T11:00:00Z"),
+    )
+    assert sha256_file(configuration) != original_sha
+
+    with pytest.raises(
+        PrivateVintageBackendError,
+        match="configuration evidence SHA-256 does not match",
+    ):
+        verify_backend_challenge(
+            challenge,
+            backend,
+            configuration_evidence_path=configuration,
+            verification_builder_commit=VERIFY_COMMIT,
+        )
+
+
+def test_configuration_identity_cannot_be_rebound_at_readback(tmp_path: Path) -> None:
+    _, backend, configuration, challenge = _challenge(tmp_path)
+    other = _configuration()
+    other["backend_id"] = "different-private-vault"
+    other["configuration_ref"] = "ops/private-vintage-backend/configuration-v2"
+    other_path = _write(tmp_path / "other-configuration.json", other)
+
+    with pytest.raises(
+        PrivateVintageBackendError,
+        match="configuration backend_id does not match",
+    ):
+        verify_backend_challenge(
+            challenge,
+            backend,
+            configuration_evidence_path=other_path,
+            verification_builder_commit=VERIFY_COMMIT,
+        )
+
+    assert sha256_file(configuration) == challenge["configuration_evidence_sha256"]
+
+
 def test_previous_snapshot_binding_survives_write_and_recovery(tmp_path: Path) -> None:
     previous = _write(
         tmp_path / "previous.json",
@@ -170,12 +241,12 @@ def test_previous_snapshot_binding_survives_write_and_recovery(tmp_path: Path) -
         tmp_path / "current.json",
         _snapshot(retrieved_at="2026-09-02T12:00:00Z", value=50.0),
     )
+    configuration = _write(tmp_path / "backend-configuration.json", _configuration())
     backend = tmp_path / "backend"
     challenge = write_backend_challenge(
         current,
         backend,
-        backend_id=BACKEND_ID,
-        configuration_evidence_ref=CONFIG_REF,
+        configuration_evidence_path=configuration,
         builder_commit=WRITE_COMMIT,
         previous_snapshot_path=previous,
     )
@@ -184,6 +255,7 @@ def test_previous_snapshot_binding_survives_write_and_recovery(tmp_path: Path) -
     evidence = verify_backend_challenge(
         challenge,
         backend,
+        configuration_evidence_path=configuration,
         verification_builder_commit=VERIFY_COMMIT,
     )
     assert evidence["previous_snapshot_sha256"] == sha256_file(previous)
@@ -191,7 +263,7 @@ def test_previous_snapshot_binding_survives_write_and_recovery(tmp_path: Path) -
 
 
 def test_backend_source_byte_tampering_fails_readback(tmp_path: Path) -> None:
-    _, backend, challenge = _challenge(tmp_path)
+    _, backend, configuration, challenge = _challenge(tmp_path)
     source = (
         backend
         / str(challenge["source_id"])
@@ -208,12 +280,13 @@ def test_backend_source_byte_tampering_fails_readback(tmp_path: Path) -> None:
         verify_backend_challenge(
             challenge,
             backend,
+            configuration_evidence_path=configuration,
             verification_builder_commit=VERIFY_COMMIT,
         )
 
 
 def test_missing_backend_package_fails_closed(tmp_path: Path) -> None:
-    _, backend, challenge = _challenge(tmp_path)
+    _, backend, configuration, challenge = _challenge(tmp_path)
     shutil.rmtree(
         backend / str(challenge["source_id"]) / str(challenge["archive_event_id"])
     )
@@ -221,12 +294,13 @@ def test_missing_backend_package_fails_closed(tmp_path: Path) -> None:
         verify_backend_challenge(
             challenge,
             backend,
+            configuration_evidence_path=configuration,
             verification_builder_commit=VERIFY_COMMIT,
         )
 
 
 def test_challenge_tampering_fails_closed(tmp_path: Path) -> None:
-    _, backend, challenge = _challenge(tmp_path)
+    _, backend, configuration, challenge = _challenge(tmp_path)
 
     bad_digest = copy.deepcopy(challenge)
     bad_digest["package_digest"] = "0" * 64
@@ -237,6 +311,20 @@ def test_challenge_tampering_fails_closed(tmp_path: Path) -> None:
         verify_backend_challenge(
             bad_digest,
             backend,
+            configuration_evidence_path=configuration,
+            verification_builder_commit=VERIFY_COMMIT,
+        )
+
+    bad_config_digest = copy.deepcopy(challenge)
+    bad_config_digest["configuration_evidence_sha256"] = "0" * 64
+    with pytest.raises(
+        PrivateVintageBackendError,
+        match="configuration evidence SHA-256 does not match",
+    ):
+        verify_backend_challenge(
+            bad_config_digest,
+            backend,
+            configuration_evidence_path=configuration,
             verification_builder_commit=VERIFY_COMMIT,
         )
 
@@ -249,6 +337,7 @@ def test_challenge_tampering_fails_closed(tmp_path: Path) -> None:
         verify_backend_challenge(
             bad_scientific_identity,
             backend,
+            configuration_evidence_path=configuration,
             verification_builder_commit=VERIFY_COMMIT,
         )
 
@@ -261,12 +350,14 @@ def test_challenge_tampering_fails_closed(tmp_path: Path) -> None:
         verify_backend_challenge(
             bad_writer,
             backend,
+            configuration_evidence_path=configuration,
             verification_builder_commit=VERIFY_COMMIT,
         )
 
 
 def test_challenge_schema_and_commit_identity_fail_closed(tmp_path: Path) -> None:
     snapshot = _write(tmp_path / "source.json", _snapshot())
+    configuration = _write(tmp_path / "backend-configuration.json", _configuration())
     with pytest.raises(
         PrivateVintageBackendError,
         match="builder_commit must be a 40- or 64-character Git commit digest",
@@ -274,12 +365,11 @@ def test_challenge_schema_and_commit_identity_fail_closed(tmp_path: Path) -> Non
         write_backend_challenge(
             snapshot,
             tmp_path / "backend-invalid",
-            backend_id=BACKEND_ID,
-            configuration_evidence_ref=CONFIG_REF,
+            configuration_evidence_path=configuration,
             builder_commit="not-a-commit",
         )
 
-    _, backend, challenge = _challenge(tmp_path / "valid")
+    _, backend, configuration, challenge = _challenge(tmp_path / "valid")
     unknown_field = copy.deepcopy(challenge)
     unknown_field["durable"] = True
     with pytest.raises(
@@ -295,6 +385,7 @@ def test_challenge_schema_and_commit_identity_fail_closed(tmp_path: Path) -> Non
         verify_backend_challenge(
             challenge,
             backend,
+            configuration_evidence_path=configuration,
             verification_builder_commit="not-a-commit",
         )
 
@@ -302,7 +393,7 @@ def test_challenge_schema_and_commit_identity_fail_closed(tmp_path: Path) -> Non
 def test_challenge_cannot_self_approve_publication_durability_or_activation(
     tmp_path: Path,
 ) -> None:
-    _, _, challenge = _challenge(tmp_path)
+    _, _, _, challenge = _challenge(tmp_path)
 
     false_publication = copy.deepcopy(challenge)
     false_publication["public_evidence_approved"] = True
