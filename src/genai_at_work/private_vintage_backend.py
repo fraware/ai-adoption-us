@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from genai_at_work.private_backend_config import load_private_backend_configuration
 from genai_at_work.private_vintage import (
     MANIFEST_NAME,
     PrivateVintageError,
@@ -38,6 +39,7 @@ _CHALLENGE_KEYS = {
     "challenge_type",
     "backend_id",
     "configuration_evidence_ref",
+    "configuration_evidence_sha256",
     "backend_namespace",
     "source_id",
     "archive_event_id",
@@ -117,33 +119,35 @@ def _package_digest(package_dir: Path, manifest: Mapping[str, Any]) -> str:
     return canonical_digest(digests)
 
 
+def _configuration_binding(path: Path) -> tuple[str, str, str]:
+    config, file_sha256 = load_private_backend_configuration(path)
+    backend_id = _backend_id(str(config["backend_id"]))
+    configuration_ref = str(config["configuration_ref"])
+    return backend_id, configuration_ref, file_sha256
+
+
 def write_backend_challenge(
     snapshot_path: Path,
     backend_root: Path,
     *,
-    backend_id: str,
-    configuration_evidence_ref: str,
+    configuration_evidence_path: Path,
     builder_commit: str,
     previous_snapshot_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Write one immutable event and return source-byte-free review evidence.
+    """Write one immutable event and bind it to exact configuration evidence.
 
-    The challenge proves what was written, not that the supplied backend root is
-    actually durable or access-controlled. Infrastructure durability remains a
-    separately reviewed fact identified by ``configuration_evidence_ref``.
-    Backend/configuration identifiers may themselves be operationally sensitive,
-    so the challenge is not automatically approved for public distribution.
+    The challenge proves what was written and which exact configuration
+    attestation governed the write. It does not independently prove the truth of
+    that attestation or the durability/access-control properties of the backend.
     """
 
-    normalized_backend_id = _backend_id(backend_id)
+    backend_id, configuration_ref, configuration_sha256 = _configuration_binding(
+        configuration_evidence_path
+    )
     normalized_builder_commit = _commit(
         builder_commit,
         context="builder_commit",
     )
-    if not configuration_evidence_ref.strip():
-        raise PrivateVintageBackendError(
-            "configuration_evidence_ref must identify separately reviewable backend configuration evidence"
-        )
 
     package_dir, manifest = store_rps_private_vintage(
         snapshot_path,
@@ -162,8 +166,9 @@ def write_backend_challenge(
     challenge = {
         "schema_version": 1,
         "challenge_type": _CHALLENGE_TYPE,
-        "backend_id": normalized_backend_id,
-        "configuration_evidence_ref": configuration_evidence_ref,
+        "backend_id": backend_id,
+        "configuration_evidence_ref": configuration_ref,
+        "configuration_evidence_sha256": configuration_sha256,
         "backend_namespace": namespace,
         "source_id": manifest["source_id"],
         "archive_event_id": manifest["archive_event_id"],
@@ -196,6 +201,7 @@ def validate_backend_challenge(challenge: Mapping[str, Any]) -> None:
         raise PrivateVintageBackendError("Unsupported private-backend challenge type")
     _backend_id(_string(challenge, "backend_id", context="challenge"))
     _string(challenge, "configuration_evidence_ref", context="challenge")
+    _hex64(challenge, "configuration_evidence_sha256", context="challenge")
     source_id = _source_id(_string(challenge, "source_id", context="challenge"))
     event_id = _hex64(challenge, "archive_event_id", context="challenge")
     _hex64(challenge, "source_content_sha256", context="challenge")
@@ -249,11 +255,28 @@ def verify_backend_challenge(
     challenge: Mapping[str, Any],
     backend_root: Path,
     *,
+    configuration_evidence_path: Path,
     verification_builder_commit: str,
 ) -> dict[str, Any]:
-    """Independently read back and verify the exact package named by a challenge."""
+    """Read back the package and re-bind it to the exact configuration evidence."""
 
     validate_backend_challenge(challenge)
+    backend_id, configuration_ref, configuration_sha256 = _configuration_binding(
+        configuration_evidence_path
+    )
+    if backend_id != challenge["backend_id"]:
+        raise PrivateVintageBackendError(
+            "read-back configuration backend_id does not match the write challenge"
+        )
+    if configuration_ref != challenge["configuration_evidence_ref"]:
+        raise PrivateVintageBackendError(
+            "read-back configuration reference does not match the write challenge"
+        )
+    if configuration_sha256 != challenge["configuration_evidence_sha256"]:
+        raise PrivateVintageBackendError(
+            "read-back configuration evidence SHA-256 does not match the write challenge"
+        )
+
     normalized_verification_commit = _commit(
         verification_builder_commit,
         context="verification_builder_commit",
@@ -312,6 +335,7 @@ def verify_backend_challenge(
         "verification_type": _VERIFICATION_TYPE,
         "backend_id": challenge["backend_id"],
         "configuration_evidence_ref": challenge["configuration_evidence_ref"],
+        "configuration_evidence_sha256": challenge["configuration_evidence_sha256"],
         "backend_namespace": challenge["backend_namespace"],
         "source_id": source_id,
         "archive_event_id": event_id,
