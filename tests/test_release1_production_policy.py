@@ -8,8 +8,20 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
-def test_security_header_baseline_is_repository_defined():
-    text = read("apps/web/next.config.mjs")
+def test_pages_static_export_and_non_pages_security_baseline_are_explicit():
+    config = read("apps/web/next.config.mjs")
+    layout = read("apps/web/app/layout.tsx")
+    policy = read("docs/RELEASE1_PRODUCTION_POLICY.md")
+
+    assert "GITHUB_PAGES === 'true'" in config
+    assert "output: 'export'" in config
+    assert "basePath: pagesBasePath" in config
+    assert "assetPrefix: pagesBasePath" in config
+    assert "trailingSlash: true" in config
+    assert "poweredByHeader: false" in config
+
+    # The stronger response-header policy remains available for non-Pages/self-hosted validation,
+    # while Pages deployment is explicitly documented as static-host limited.
     for required in (
         "Content-Security-Policy",
         "Referrer-Policy",
@@ -18,12 +30,13 @@ def test_security_header_baseline_is_repository_defined():
         "Permissions-Policy",
         "Cross-Origin-Opener-Policy",
         "Strict-Transport-Security",
-        "poweredByHeader: false",
     ):
-        assert required in text
-    assert "connect-src 'self'" in text
-    assert "frame-ancestors 'none'" in text
-    assert "object-src 'none'" in text
+        assert required in config
+
+    assert 'httpEquiv="Content-Security-Policy"' in layout
+    assert 'referrer: "strict-origin-when-cross-origin"' in layout
+    assert "does not support the framework `headers()` feature" in policy
+    assert "must **not** claim application-controlled HTTP security headers" in policy
 
 
 def test_public_indexing_surfaces_are_explicit_and_limited():
@@ -48,21 +61,36 @@ def test_release_manifest_is_rights_safe_and_identity_bound():
     text = read("apps/web/app/release-manifest.json/route.ts")
     assert '"derived_only"' not in text  # must report the actual deployment env, not hard-code success
     assert "RELEASE_COMMIT_SHA" in text
-    assert "VERCEL_GIT_COMMIT_SHA" in text
+    assert "GITHUB_PAGES" in text
+    assert "VERCEL" not in text
     assert '"UNBOUND"' in text
     assert 'analytics: "disabled"' in text
     assert 'clientMonitoring: "disabled"' in text
-    assert "Cache-Control" in text
+    assert "sourceBytesPublished: false" in text
     for forbidden in ("FRED_API_KEY", "data/audit/private", "rps_subgroup_5q_audit"):
         assert forbidden not in text
+
+
+def test_github_pages_workflow_is_pinned_and_fail_closed():
+    workflow = read(".github/workflows/pages.yml")
+    assert "DATA_MODE: derived_only" in workflow
+    assert "GITHUB_PAGES: 'true'" in workflow
+    assert "NEXT_PUBLIC_SITE_URL: https://fraware.github.io/ai-adoption-us" in workflow
+    assert "actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b" in workflow
+    assert "actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e" in workflow
+    assert "data/audit/private" in workflow
+    assert "sourceBytesPublished" in workflow
+    assert "github.event_name != 'pull_request'" in workflow
 
 
 def test_production_environment_and_policy_are_explicit():
     env = read("apps/web/.env.example")
     policy = read("docs/RELEASE1_PRODUCTION_POLICY.md")
     assert "DATA_MODE=derived_only" in env
-    assert "NEXT_PUBLIC_SITE_URL=" in env
+    assert "NEXT_PUBLIC_SITE_URL=https://fraware.github.io/ai-adoption-us" in env
     assert "RELEASE_COMMIT_SHA=" in env
+    assert "GITHUB_PAGES=true" in env
     assert "no third-party analytics" in policy.lower()
     assert "no client-side monitoring" in policy.lower()
     assert "human/manual and physical-device spot checks remain outside Release 1 scope" in policy
+    assert "Settings" not in policy or "Source: GitHub Actions" in policy
