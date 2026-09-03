@@ -78,11 +78,11 @@ export default function MethodologyPage() {
           </dd>
         </dl>
         <p className="note">
-          Official CPS Q2 2025 and Q2 2026 composition inputs have been executed and validated. The
-          project also produces occupation-adjusted industry-context residual evidence as a derived
-          descriptive diagnostic. Release 1 does not interpret those residuals as organizational quality,
-          efficiency, productivity, or causal firm effects, and it does not claim design-based confidence
-          intervals for the custom pooled CPS composition vectors.
+          The CPS composition foundation has been executed and validated on official Q2 2025 and Q2 2026
+          inputs. The project also produces occupation-adjusted industry-context residual evidence as a
+          derived descriptive diagnostic. Release 1 does not interpret those residuals as organizational
+          quality, efficiency, productivity, or causal firm effects, and it does not claim design-based
+          confidence intervals for the custom pooled CPS composition vectors.
         </p>
       </section>
 
