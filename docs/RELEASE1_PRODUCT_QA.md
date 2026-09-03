@@ -1,11 +1,20 @@
-# Release 1 product QA — code, build, and automated rendered pass
+# Release 1 product QA — code, build, automated rendered, and native Safari pass
 
 Initial code-level pass: 2026-08-30  
 Networked production-build update: 2026-08-31  
 Automated rendered-browser update: 2026-09-01  
-Explicit mobile-emulation update: 2026-09-03
+Explicit mobile-emulation update: 2026-09-03  
+Native Safari and automated-interaction completion: 2026-09-03
 
-This document records the code-level, networked production-build, and automated rendered-browser QA completed for the rights-safe Release 1 candidate. The automated pass is real browser-engine execution and now includes explicit Pixel 7/Chrome and iPhone 15 Pro/WebKit device contexts. It **does not substitute for a real browser** review on native Safari/iOS, physical-device validation, or human assistive-technology testing where those remain required.
+This document records the code-level, networked production-build, automated rendered-browser, explicit mobile-emulation, and native Safari desktop QA completed for the rights-safe Release 1 candidate.
+
+The automated cross-engine pass is real browser-engine execution, and the separate macOS workflow launches the installed native Safari application through SafariDriver. Automated execution **does not substitute for a real browser** or human assistive-technology review where those claims are desired. Under the project-owner scope decision dated 2026-09-03, human/manual QA and physical-device spot checks are outside the Release 1 launch gate and are therefore not claimed as completed evidence.
+
+The current Release 1 R1-G2 evidence boundary is recorded in:
+
+- `docs/qa/2026-09-03-r1-g2-scope-decision.md`;
+- `docs/qa/2026-09-03-r1-g2-native-safari-desktop-qa.md`;
+- `docs/qa/2026-09-03-r1-g2-automated-native-completion.md`.
 
 ## Implemented in the code-level pass
 
@@ -35,6 +44,7 @@ This document records the code-level, networked production-build, and automated 
 - Methodology page separates direct measurements, derived diagnostics, composition counterfactuals, and causal/mechanism claims.
 - Public/private evidence boundaries are described in user-facing language.
 - `docs/source-provenance.md` matches the fail-closed `derived_only` architecture rather than the retired static-FRED design.
+- `docs/source-rights/RPS_SOURCE_DECISION.md` records the published-aggregate RPS gate as **GRANTED — live aggregate observatory gate** as of 2026-09-02. That decision does not extend automatically to microdata, the separate occupation/task-index artifact, unrestricted bulk mirroring, or a full-source public API.
 
 ### Editorial and construct discipline
 
@@ -42,18 +52,19 @@ This document records the code-level, networked production-build, and automated 
 - The Q2-2026 industry `R²(S~H) > R²(S~A)` ordering is described as a **3-of-5-wave** result, not a structural law.
 - Occupation–industry comparisons are phrased as aggregate alignment differences, not identified organizational mechanisms.
 - A/H/S notation is defined near diagnostic tables.
-- Composition/residual language remains experimental and non-causal; zero real RPS-dependent residual values are claimed.
+- Composition/residual language remains descriptive and non-causal; unsupported design-based inference remains fail-closed.
+- BTOS and RPS are presented as different firm-side and worker-side constructs rather than interchangeable adoption measures.
 
 ## Networked production-build evidence — 2026-08-31
 
-The 2026-08-30 code-only QA explicitly listed **Genuine `npm install` and `next build`** as unverified external gates. That historical statement remains important provenance; it is no longer the current state.
+The 2026-08-30 code-only QA explicitly listed genuine networked dependency installation and `next build` execution as unverified external gates. That historical statement remains provenance; it is no longer the current state.
 
 GitHub Actions run `33411128343` validated the rights-safe public handoff in a networked Ubuntu 24.04 environment.
 
 Python/public surface:
 
 - CPython 3.12.14;
-- 52 tests passed;
+- 52 tests passed at that historical checkpoint;
 - 6 private-fixture-dependent tests skipped as expected;
 - `compileall` passed;
 - Ruff passed.
@@ -68,9 +79,9 @@ Web surface:
 
 Permanent PR CI subsequently strengthened that proof by requiring strict `mypy src`, locked `npm ci`, production-server startup, route smoke tests, private-path build scans, and repository-governance checks.
 
-## Automated rendered-browser evidence — 2026-09-01
+## Automated rendered-browser baseline — 2026-09-01
 
-The successful baseline execution is GitHub Actions run `33501320183`, associated with PR #19 source head `6ed9da2074c2ee042c88912e2c3bdb05806e88f7`. GitHub checked out the PR merge candidate for execution, while artifact metadata records the source head separately.
+The successful baseline execution is GitHub Actions run `33501320183`, associated with PR #19 source head `6ed9da2074c2ee042c88912e2c3bdb05806e88f7`.
 
 The retained artifact from that run is:
 
@@ -79,101 +90,153 @@ The retained artifact from that run is:
 - artifact SHA-256: `c096aed747fd8fd7dd67195243185c1c5618e03c91e671c7747cf361783ebbf0`;
 - retention at creation: 30 days.
 
-The artifact contains the Playwright JSON and HTML reports, screenshots for successful cases, Lighthouse JSON reports, browser-version metadata, production-server log, optimized build-size record, and largest-static-file inventory.
+The baseline Playwright suite passed 48/48 cases across all six public routes using stable Chrome at 375, 768, 1024, and 1440 px plus Playwright-managed Firefox and WebKit at 375 and 1440 px. WebKit in this matrix is an engine-compatibility signal only and is not the native-Safari evidence described later in this document.
 
-### Browser/viewport matrix
+For each route/project case, the suite verified successful document response, application-icon loading, expected semantic surfaces, primary-navigation links, no page-level horizontal overflow, visible table fallbacks inside horizontal-scroll wrappers, keyboard entry through the skip link, visible focus styling, skip-link transfer to `main`, reduced-motion behavior, no serious/critical axe violations under the configured WCAG tags, and no uncaught page or console errors.
 
-The baseline Playwright suite passed **48/48** cases across all six public routes:
+At that historical baseline, full navigation clicking and explicit runtime chart redraw were not yet asserted. Those limitations were subsequently closed by the final 2026-09-03 automated tranche below.
 
-- stable Chrome 151.0.7922.173 at 375, 768, 1024, and 1440 px;
-- Playwright-managed Firefox 153.0 at 375 and 1440 px;
-- Playwright WebKit 26.5 at 375 and 1440 px.
+### Historical Lighthouse baseline
 
-WebKit is an engine-compatibility signal only. It is **not** evidence that native Safari, macOS Safari, or iOS Safari QA is complete.
+Seven Lighthouse reports completed successfully: all six desktop routes plus the mobile homepage. Every accessibility report scored 100, above the configured >=95 launch threshold. Performance scores and timing values are CI laboratory evidence only and are **not field Core Web Vitals**.
 
-For each route/project case, the suite verifies successful document response, application-icon loading, expected semantic surfaces, primary-navigation links, no page-level horizontal overflow, visible table fallbacks inside horizontal-scroll wrappers, keyboard entry through the skip link, visible focus styling, skip-link transfer to `main`, reduced-motion behavior, no serious/critical axe violations under the configured WCAG tags, and no uncaught page or console errors.
+The optimized `.next` directory was approximately 60 MB in the runner. That is build-output size, not a browser transfer-size claim.
 
-The test does not currently click every navigation link, exercise every chart tooltip, or assert a redraw after an explicit runtime resize. Those manual/interaction checks remain open where the release checklist says so.
+### Provenance hardening after the baseline
 
-### Lighthouse evidence
+The browser reporter was changed to read the pinned `@playwright/test` version directly from `apps/web/package.json` and fail closed if it cannot resolve it. A repository test guards that contract.
 
-Seven Lighthouse reports completed successfully: all six desktop routes plus the mobile homepage.
-
-| Report | Accessibility | Performance | LCP (ms) | CLS | TBT (ms) |
-|---|---:|---:|---:|---:|---:|
-| after-adoption desktop | 100 | 100 | 445 | 0.000 | 0 |
-| home desktop | 100 | 100 | 528 | 0.000 | 0 |
-| home mobile | 100 | 100 | 1855 | 0.000 | 48 |
-| industries desktop | 100 | 100 | 506 | 0.000 | 0 |
-| methodology desktop | 100 | 100 | 459 | 0.000 | 0 |
-| occupations desktop | 100 | 100 | 494 | 0.000 | 0 |
-| sources desktop | 100 | 100 | 449 | 0.000 | 0 |
-
-The accessibility launch gate in automation is `>=95`; every report scored 100. Performance scores and timing values are CI laboratory evidence only and are **not field Core Web Vitals**.
-
-The optimized `.next` directory was approximately 60 MB in the runner. That is build-output size, not a browser transfer-size claim. The retained largest-static-file inventory is the appropriate artifact for client-bundle regression inspection.
-
-### Visual evidence review
-
-The retained successful screenshots were reviewed for the tested main-content states. No clipping, page-level horizontal spill, or obvious breakpoint failure was observed, including the previously failing 375-px methodology page in Chrome, Firefox, and WebKit.
-
-The screenshots are captured after the skip-link exercise transfers focus to `main`, so they are useful responsive-content regression evidence but not a complete manual visual review of the header/navigation state.
-
-### Provenance hardening after the baseline run
-
-The baseline artifact correctly recorded browser versions but its `playwrightVersion` field was null because the reporter relied on an npm environment variable that was not populated in that invocation. The reporter has been changed to read the pinned `@playwright/test` version directly from `apps/web/package.json` and fail closed if it cannot resolve it. A repository test guards that contract.
-
-The browser workflow now also triggers when `docs/qa/**`, `docs/RELEASE1_PRODUCT_QA.md`, or `docs/RELEASE_CHECKLIST.md` changes. This prevents a final QA/checklist documentation commit from bypassing the rendered gate. A post-documentation successful run must therefore be checked on the exact final PR head before merge.
+The browser workflow also triggers when `docs/qa/**`, `docs/RELEASE1_PRODUCT_QA.md`, or `docs/RELEASE_CHECKLIST.md` changes. This prevents final QA/checklist documentation from bypassing the rendered gate.
 
 ## Explicit mobile-emulation evidence — 2026-09-03
 
-PR #61 extends the automated matrix with two explicit Playwright device contexts:
+PR #61 added two explicit Playwright device contexts:
 
 - Pixel 7 against the stable Chrome channel: viewport 412 × 839, screen 412 × 915, device scale factor 2.625, mobile/touch descriptor enabled;
 - iPhone 15 Pro against Playwright WebKit: viewport 393 × 659, screen 393 × 852, device scale factor 3, mobile/touch descriptor enabled.
 
-The accepted source head `8147cabdc0e0104717762e7955c081de48458532` passed release-candidate CI run `33737876597` and rendered-browser run `33737876591`. The rendered workflow checked out merge candidate `8bb7d5df1ec1bbb28f83323e4eb90f08ec151978`.
+The accepted mobile-emulation tranche passed 70/70 cases. Each mobile route had to receive an actual `touchstart` event generated through Playwright's touchscreen API, in addition to phone-width and Android/iPhone identity checks.
 
-The expanded browser suite passed **70/70** cases. Both mobile projects run the six route-level semantic/responsive/accessibility/runtime contracts plus the industries publication/triangulation assertion. In addition to phone-width and Android/iPhone identity checks, each mobile route must receive an actual `touchstart` event generated through Playwright's touchscreen API.
+The first proposed iPhone/WebKit expansion exposed a harness defect: the test incorrectly assumed that Playwright `hasTouch: true` required `navigator.maxTouchPoints > 0`, and a CSS coarse-pointer assertion relied on the same unsupported fingerprint inference. Those assertions were removed and replaced with the direct touch-behavior contract. This is recorded as a test-harness correction, not a product defect.
 
-The touch probe runs after fresh-document keyboard and axe checks, preserving the keyboard-entry evidence while still placing touch-triggered runtime or console errors inside the final error assertions.
+Detailed evidence is retained in `docs/qa/2026-09-03-r1-g2-mobile-emulation-qa.md`.
 
-The retained passing artifact is:
+The mobile contexts remain defensible automated proxies. They are not evidence of native iOS Safari or physical Android/iPhone behavior, and those physical/native-iOS claims are outside the Release 1 scope decision.
 
-- artifact ID: `9886672185`;
-- artifact name: `r1-g2-browser-qa-8bb7d5df1ec1bbb28f83323e4eb90f08ec151978`;
-- artifact SHA-256: `9d2b73748435c8a23a11d9f21e02aee390c4a5f0320b7a3e71dbc64a3f8862a1`;
-- size: 18,735,411 bytes;
-- creation time: 2026-09-03T09:21:29Z;
-- recorded expiry: 2026-10-03T09:21:26Z.
+## Native Safari desktop evidence — 2026-09-03
 
-The successful run reported Playwright 1.62.1, Chrome 151.0.7922.173, Firefox 153.0, and WebKit 26.5. Its seven Lighthouse reports all scored 100 accessibility and 100 performance; the mobile-home lab metrics were LCP 1817 ms, CLS 0.000, and TBT 46 ms. These remain laboratory measurements, not field Core Web Vitals.
+PR #62 added a separate native-Safari workflow on a GitHub-hosted macOS 15 runner.
 
-### Mobile harness correction
+The workflow:
 
-The first expanded run (`33736750083`) failed only the six iPhone/WebKit route contracts because the proposed harness assumed that Playwright's touch-enabled device context must expose `navigator.maxTouchPoints > 0`. The WebKit context did not satisfy that browser-fingerprint assumption. A CSS coarse-pointer assertion relied on the same kind of unsupported fingerprint inference.
+- records macOS, Safari, and SafariDriver versions;
+- enables the installed SafariDriver;
+- starts the rights-safe Next.js production build in `DATA_MODE=derived_only`;
+- opens a real W3C WebDriver session requesting `browserName: safari`;
+- renders all six primary routes in the installed Safari application;
+- validates expected path, semantic surfaces, primary navigation, page overflow, and table containment;
+- captures native Safari screenshots and a machine-readable report.
 
-Those assertions were removed. The accepted test measures touch behavior directly by installing a `touchstart` listener, issuing a Playwright touchscreen tap, and requiring the page to receive the event. The corrected matrix then passed 70/70. This is recorded as a harness defect discovered by the expanded matrix, not as a product defect.
+The first inspected successful artifact recorded macOS 15.7.7, Safari 26.5.2, bundled SafariDriver 26.5.2, `browserName: Safari`, `platformName: macOS`, and `safari:useSimulator: false`.
 
-The detailed evidence and residual limitations are recorded in `docs/qa/2026-09-03-r1-g2-mobile-emulation-qa.md`.
+The exact final automated/native source head `3391c39337519715e45d33c5d79053feb6038964` revalidated native Safari successfully in run `33742551142`.
 
-## Checks that remain external/manual gates
+Final native Safari artifact:
 
-The automated pass materially closes the automated portion of R1-G2. The following are still open unless separately recorded:
+- artifact ID: `9888324310`;
+- artifact name: `r1-g2-native-safari-c612a1a8d24f068f1eaa5caf1ade35c0299b53ac`;
+- artifact SHA-256: `7b7176f31a87af9ab0104ab17fa8a4ce5c5a0403f641b0874f4c309ecefe0d3e`;
+- size: 837,491 bytes;
+- created: 2026-09-03T10:07:45Z;
+- recorded expiry: 2026-10-03T10:07:44Z.
 
-1. Native current Safari desktop validation.
-2. Native/physical iOS Safari validation beyond the iPhone 15 Pro/WebKit automated compatibility proxy.
-3. Physical Android/Chrome validation beyond the Pixel 7/stable-Chrome automated compatibility proxy, if required by final launch review.
-4. Full keyboard-only traversal beyond the automated skip-link entry contract, including interactive chart/table affordances.
-5. **Screen-reader traversal** with VoiceOver and NVDA or a defensible second screen reader.
-6. Manual chart resize/tooltip/label interaction review.
-7. Manual review that no critical meaning depends only on color.
-8. Manual heading/landmark review with assistive technology.
-9. Field performance/Core Web Vitals once a real deployment and traffic source make them meaningful.
-10. Production deployment, headers, caching, artifact identity, analytics/privacy, secrets, and monitoring review.
+This closes the native **desktop Safari** requirement for Release 1. It does not establish native iOS Safari.
+
+## Final automated/native interaction completion — 2026-09-03
+
+The exact source head `3391c39337519715e45d33c5d79053feb6038964` passed all three independent required workflows:
+
+1. Release candidate CI — run `33742551179` — success.
+2. Native Safari desktop QA — run `33742551142` — success.
+3. Rendered browser and accessibility QA — run `33742551185` — success.
+
+### Final cross-engine test matrix
+
+Run `33742551185` executed 100 Playwright instances:
+
+- **91 passed**;
+- **9 skipped intentionally** because the explicit runtime plot-redraw contract runs once on stable Chrome at 1440 px instead of redundantly on every project.
+
+Recorded browser/tool versions:
+
+- Playwright 1.62.1;
+- stable Chrome 152.0.7977.64;
+- Firefox 153.0;
+- WebKit 26.5.
+
+The final matrix includes all established route semantics, responsive overflow, table containment, skip-link/focus-entry, reduced-motion, axe, runtime/console, and mobile-touch contracts. It additionally requires:
+
+- actual primary-navigation clicks, exact target-path transitions, semantic target rendering, and actual brand-link clicks back to `/`;
+- an explicit viewport resize of the published BTOS–RPS industry scatter plot, followed by a required SVG-width redraw through the `ResizeObserver` contract;
+- a deliberate unknown production route returning HTTP 404, rendering an intelligible 404/not-found surface, excluding the private audit path, and emitting no page errors or unexpected console errors.
+
+The 404 test permits at most the one exact browser-generated Chromium/WebKit diagnostic associated with the intentionally failing top-level 404 request; all other console errors remain failures.
+
+Final rendered-browser artifact:
+
+- artifact ID: `9888453686`;
+- artifact name: `r1-g2-browser-qa-c612a1a8d24f068f1eaa5caf1ade35c0299b53ac`;
+- artifact SHA-256: `5550fd4ede8e5c46713ab690d4eef6d72babf79ed9db724183225ff86ec1717f`;
+- size: 22,115,399 bytes;
+- created: 2026-09-03T10:11:27Z;
+- recorded expiry: 2026-10-03T10:11:26Z.
+
+### Final Lighthouse evidence
+
+| Report | Accessibility | Performance | LCP (ms) | CLS | TBT (ms) |
+|---|---:|---:|---:|---:|---:|
+| after-adoption desktop | 100 | 100 | 447 | 0.000 | 0 |
+| home desktop | 100 | 100 | 506 | 0.000 | 0 |
+| home mobile | 100 | 99 | 2267 | 0.000 | 44 |
+| industries desktop | 100 | 100 | 503 | 0.000 | 0 |
+| methodology desktop | 100 | 100 | 462 | 0.000 | 0 |
+| occupations desktop | 100 | 100 | 491 | 0.000 | 0 |
+| sources desktop | 100 | 100 | 446 | 0.000 | 0 |
+
+All seven accessibility reports scored 100, above the >=95 automation threshold. The performance values remain lab evidence only; they are not field Core Web Vitals.
+
+Detailed exact-head evidence is retained in `docs/qa/2026-09-03-r1-g2-automated-native-completion.md`.
+
+## Release 1 scope decision and residual limitations
+
+The project owner explicitly removed human/manual checks and physical-device spot checks from the Release 1 launch critical path on 2026-09-03. The decision is recorded in `docs/qa/2026-09-03-r1-g2-scope-decision.md`.
+
+Accordingly, the following are **not Release 1 blockers and are not claimed as completed evidence**:
+
+- VoiceOver traversal;
+- NVDA or another human-operated second screen reader;
+- human-operated full keyboard/focus inspection beyond the automated contracts;
+- manual chart tooltip/label/color/heading review;
+- physical iPhone/iOS Safari testing;
+- physical Android/Chrome testing;
+- native iOS Safari beyond the accepted WebKit/iPhone emulation proxy.
+
+The following remain genuine external/post-R1-G2 work:
+
+- production deployment and deployed-artifact audit;
+- deployment headers/security baseline;
+- caching policy;
+- analytics/privacy decision;
+- monitoring/logging decision;
+- canonical production URL/domain and metadata binding;
+- deployed artifact identity/checksum;
+- field Core Web Vitals after a real deployment and traffic source make them meaningful;
+- durable private RPS backend activation and real backend recovery rehearsal, which are separate from the `derived_only` Release 1 public web path.
 
 ## Release-language rule
 
-A successful optimized build plus automated rendered QA establishes that the tested rights-safe build compiled, served, and passed the recorded automated browser/accessibility matrix, including the two documented mobile-emulation proxies. It does **not** establish native Safari/iOS behavior, physical-device behavior, human screen-reader usability, field performance, deployment correctness, RPS source-rights resolution, or a completed RPS-dependent composition residual.
+The Release 1 browser evidence supports the statement that the rights-safe production candidate compiled, served, and passed the recorded Chrome/Firefox/WebKit matrix, explicit Pixel 7 and iPhone 15 Pro device-emulation proxies, automated navigation/resize/404 interaction contracts, and native macOS Safari desktop automation.
 
-**No public-launch claim** should imply those gates are complete until dated execution evidence exists.
+It does **not** support claims of native iOS Safari, physical-device validation, human screen-reader usability, manual accessibility completion, field performance, or production-deployment correctness.
+
+Published-aggregate RPS use is rights-cleared under the recorded project-owner attestation, but the separate durable live-refresh backend remains unactivated and the public Release 1 web path remains `derived_only`.
