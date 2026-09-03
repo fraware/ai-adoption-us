@@ -26,6 +26,11 @@ from genai_at_work.release_engine import (
     sha256_file,
     validate_release_manifest,
 )
+from genai_at_work.rps_public_view import (
+    CONTRACT_ID as RPS_PUBLIC_VIEW_CONTRACT_ID,
+    NATIONAL_METRICS,
+    PUBLIC_SUBGROUP_METRICS,
+)
 
 V1_CONTRACT_REPOSITORY_PATH = "data/registry/observatory_v1_baseline_contract.json"
 
@@ -35,13 +40,16 @@ REQUIRED_COMPONENTS = {
     "oews_robustness",
     "btos_triangulation",
 }
+RPS_PUBLIC_VIEW_ARTIFACT_ID = "rps-public-observation-view"
+RPS_PUBLIC_VIEW_ARTIFACT_PATH = "artifacts/public/rps_public_observation_view.json"
 REQUIRED_RPS_ARTIFACT_IDS = {
     "rps-longitudinal-diagnostics",
     "rps-quarter-diagnostics",
     "rps-rank-stability",
     "rps-longitudinal-validation",
+    RPS_PUBLIC_VIEW_ARTIFACT_ID,
 }
-REQUIRED_RPS_BUILDER_ID = "rps-published-aggregate-construct-window-release-v3"
+REQUIRED_RPS_BUILDER_ID = "rps-published-aggregate-observatory-release-v4"
 REQUIRED_RPS_METRICS = {
     "adoption_work",
     "assisted_hours_share",
@@ -338,7 +346,7 @@ def validate_v1_baseline_contract(
     )
     if required_rps_artifacts != REQUIRED_RPS_ARTIFACT_IDS:
         raise ObservatoryBaselineError(
-            "RPS component must require the complete v3 longitudinal artifact set"
+            "RPS component must require the complete v4 observatory artifact set"
         )
     if rps.get("require_claims") is not True:
         raise ObservatoryBaselineError("RPS component must require claim traceability")
@@ -560,12 +568,157 @@ def validate_v1_baseline_contract(
         )
 
 
+def _validate_public_observation_rows(
+    rows: object,
+    *,
+    context: str,
+    entity_type: str,
+    expected_entity_count: int,
+    expected_metrics: set[str],
+    required_period: str | None,
+) -> None:
+    records = _rows(rows, context)
+    expected_row_count = expected_entity_count * len(expected_metrics)
+    if len(records) != expected_row_count:
+        raise ObservatoryBaselineError(
+            f"{context} must contain exactly {expected_row_count} rows"
+        )
+    identities: set[tuple[str, str]] = set()
+    entities: set[str] = set()
+    metrics: set[str] = set()
+    periods: set[str] = set()
+    for index, row in enumerate(records):
+        row_context = f"{context}[{index}]"
+        if row.get("entity_type") != entity_type:
+            raise ObservatoryBaselineError(
+                f"{row_context}.entity_type must equal {entity_type}"
+            )
+        entity_id = _string(row, "entity_id", row_context)
+        metric_id = _string(row, "metric_id", row_context)
+        period = _string(row, "period", row_context)
+        if metric_id not in expected_metrics:
+            raise ObservatoryBaselineError(
+                f"{row_context}.metric_id is outside the bounded public view"
+            )
+        identity = (entity_id, metric_id)
+        if identity in identities:
+            raise ObservatoryBaselineError(
+                f"Duplicate bounded public observation identity: {identity!r}"
+            )
+        identities.add(identity)
+        entities.add(entity_id)
+        metrics.add(metric_id)
+        periods.add(period)
+    if len(entities) != expected_entity_count or metrics != expected_metrics:
+        raise ObservatoryBaselineError(f"{context} has incomplete entity/metric coverage")
+    if required_period is not None and periods != {required_period}:
+        raise ObservatoryBaselineError(
+            f"{context} must use only latest complete period {required_period}"
+        )
+
+
+def _validate_rps_public_view(
+    rps_candidate: Mapping[str, Any],
+    rps_root: Path,
+    *,
+    source_id: str,
+    analysis_periods: Sequence[str],
+) -> None:
+    artifacts = [
+        row
+        for row in rps_candidate.get("artifacts", [])
+        if isinstance(row, Mapping)
+        and row.get("artifact_id") == RPS_PUBLIC_VIEW_ARTIFACT_ID
+    ]
+    if len(artifacts) != 1:
+        raise ObservatoryBaselineError(
+            "RPS component must contain exactly one bounded public observation artifact"
+        )
+    artifact = artifacts[0]
+    if artifact.get("path") != RPS_PUBLIC_VIEW_ARTIFACT_PATH:
+        raise ObservatoryBaselineError("RPS public observation artifact path changed")
+    if artifact.get("evidence_class") != 1 or artifact.get("source_ids") != [source_id]:
+        raise ObservatoryBaselineError(
+            "RPS public observation artifact evidence/source binding changed"
+        )
+
+    payload = load_json_object(rps_root / RPS_PUBLIC_VIEW_ARTIFACT_PATH)
+    if payload.get("view_contract_id") != RPS_PUBLIC_VIEW_CONTRACT_ID:
+        raise ObservatoryBaselineError("RPS public observation view contract changed")
+    if payload.get("source_id") != source_id:
+        raise ObservatoryBaselineError("RPS public observation source binding changed")
+    if payload.get("publication_scope") != "selected_attributed_aggregate_views":
+        raise ObservatoryBaselineError("RPS public observation publication scope changed")
+    for field in (
+        "source_input_bytes_included",
+        "generic_query_api_included",
+        "historical_subgroup_panel_included",
+    ):
+        if payload.get(field) is not False:
+            raise ObservatoryBaselineError(
+                f"RPS public observation view must keep {field}=false"
+            )
+    if not analysis_periods:
+        raise ObservatoryBaselineError("RPS public observation view has no analysis period")
+    latest_period = analysis_periods[-1]
+    if payload.get("latest_subgroup_period") != latest_period:
+        raise ObservatoryBaselineError(
+            "RPS public observation latest subgroup period does not match analysis window"
+        )
+
+    national = _rows(payload.get("national_history"), "rps_public_view.national_history")
+    national_periods: dict[str, set[str]] = {}
+    national_identities: set[tuple[str, str]] = set()
+    for index, row in enumerate(national):
+        context = f"rps_public_view.national_history[{index}]"
+        if row.get("entity_type") != "national" or row.get("entity_id") != "us":
+            raise ObservatoryBaselineError(
+                f"{context} must be a U.S. national aggregate observation"
+            )
+        period = _string(row, "period", context)
+        metric_id = _string(row, "metric_id", context)
+        if metric_id not in set(NATIONAL_METRICS):
+            raise ObservatoryBaselineError(
+                f"{context}.metric_id is outside the bounded national family"
+            )
+        identity = (period, metric_id)
+        if identity in national_identities:
+            raise ObservatoryBaselineError(
+                f"Duplicate bounded national observation identity: {identity!r}"
+            )
+        national_identities.add(identity)
+        national_periods.setdefault(period, set()).add(metric_id)
+    if not national_periods or any(
+        metrics != set(NATIONAL_METRICS) for metrics in national_periods.values()
+    ):
+        raise ObservatoryBaselineError(
+            "RPS public national history must contain the complete five-metric family per period"
+        )
+
+    _validate_public_observation_rows(
+        payload.get("industry_latest"),
+        context="rps_public_view.industry_latest",
+        entity_type="industry",
+        expected_entity_count=20,
+        expected_metrics=set(PUBLIC_SUBGROUP_METRICS),
+        required_period=latest_period,
+    )
+    _validate_public_observation_rows(
+        payload.get("occupation_latest"),
+        context="rps_public_view.occupation_latest",
+        entity_type="occupation",
+        expected_entity_count=22,
+        expected_metrics=set(PUBLIC_SUBGROUP_METRICS),
+        required_period=latest_period,
+    )
+
+
 def _validate_rps_component(
     rps_candidate: Mapping[str, Any],
     rps_root: Path,
     contract: Mapping[str, Any],
 ) -> None:
-    """Require the actual complete-history RPS v3 component, not a name-compatible stub."""
+    """Require the actual complete-history RPS v4 observatory component."""
 
     validate_release_manifest(rps_candidate, rps_root)
     if rps_candidate.get("data_mode") != "derived_only":
@@ -656,8 +809,14 @@ def _validate_rps_component(
     }
     if actual_artifacts != required_artifacts:
         raise ObservatoryBaselineError(
-            "RPS v1 component artifact inventory must exactly match the reviewed v3 set"
+            "RPS v1 component artifact inventory must exactly match the reviewed v4 set"
         )
+    _validate_rps_public_view(
+        rps_candidate,
+        rps_root,
+        source_id=source_id,
+        analysis_periods=analysis_periods,
+    )
     if rps_contract.get("require_claims") is True:
         claims = rps_candidate.get("claims")
         if not isinstance(claims, list) or not claims:
@@ -941,12 +1100,12 @@ def _compose_into(
         },
         "baseline_contract_id": contract["contract_id"],
         "candidate_scope": (
-            "Complete Observatory v1 candidate: RPS longitudinal evidence, CPS "
-            "composition and occupation-adjusted descriptive residuals, OEWS "
-            "composition robustness, and BTOS cross-construct industry "
-            "triangulation. Unsupported CPS design-based composition inference "
-            "remains fail-closed. Promotion still requires exact-candidate "
-            "scientific, editorial, source-rights, and CI review."
+            "Complete Observatory v1 candidate: RPS longitudinal evidence and its "
+            "rights-bounded public observation projection, CPS composition and "
+            "occupation-adjusted descriptive residuals, OEWS composition robustness, "
+            "and BTOS cross-construct industry triangulation. Unsupported CPS "
+            "design-based composition inference remains fail-closed. Promotion still "
+            "requires exact-candidate scientific, editorial, source-rights, and CI review."
         ),
         "source_input_bytes_publication": False,
     }
