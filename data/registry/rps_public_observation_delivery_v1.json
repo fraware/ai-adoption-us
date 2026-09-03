@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "contract_id": "rps-public-observation-delivery-v1",
+  "source_id": "rps-genai-tracker-fred-release-6",
+  "rights_decision": "docs/source-rights/RPS_SOURCE_DECISION.md",
+  "publication_model": "bounded_surface_projection",
+  "public_bulk_redistribution_approved": false,
+  "generic_series_api_approved": false,
+  "historical_subgroup_panel_approved": false,
+  "raw_source_objects_public": false,
+  "views": {
+    "national_history": {
+      "entity_type": "national",
+      "metrics": [
+        "adoption_work",
+        "work_use_last_week",
+        "work_use_daily",
+        "assisted_hours_share",
+        "reported_time_savings_share"
+      ],
+      "period_mode": "complete_available_work_family"
+    },
+    "industry_latest": {
+      "entity_type": "industry",
+      "metrics": [
+        "adoption_work",
+        "assisted_hours_share",
+        "reported_time_savings_share"
+      ],
+      "period_mode": "latest_complete_common",
+      "entity_count": 20
+    },
+    "occupation_latest": {
+      "entity_type": "occupation",
+      "metrics": [
+        "adoption_work",
+        "assisted_hours_share",
+        "reported_time_savings_share"
+      ],
+      "period_mode": "latest_complete_common",
+      "entity_count": 22
+    }
+  },
+  "excluded_public_products": [
+    "complete_rps_source_history_bundle",
+    "historical_industry_observation_panel",
+    "historical_occupation_observation_panel",
+    "generic_rps_series_query_api",
+    "unrestricted_bulk_source_mirror"
+  ],
+  "attribution": {
+    "dataset": "Real-Time Population Survey: Generative Artificial Intelligence Adoption Tracker",
+    "authors": "Alexander Bick, Adam Blandin, and David Deming",
+    "transport": "FRED/ALFRED",
+    "citation_required": true
+  },
+  "interpretation_boundary": "This contract authorizes only the bounded presentation-oriented observation views enumerated above. It does not convert source observations into an unrestricted public database, historical subgroup panel, bulk download product, or generic query API."
+}
