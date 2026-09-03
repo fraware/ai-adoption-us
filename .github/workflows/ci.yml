@@ -80,6 +80,9 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       DATA_MODE: derived_only
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3000
+      RELEASE_COMMIT_SHA: ${{ github.sha }}
+      R1_QA_SERVER_SECRET: R1_QA_DO_NOT_EXPOSE_7f2d3b8761
       NEXT_TELEMETRY_DISABLED: '1'
     defaults:
       run:
@@ -104,7 +107,7 @@ jobs:
       - name: Build optimized production application
         run: npm run build
 
-      - name: Verify private data is absent from build tree
+      - name: Verify private data and synthetic secret are absent from client build
         shell: bash
         run: |
           set -euo pipefail
@@ -112,8 +115,16 @@ jobs:
             echo 'Private audit path found in production build tree.' >&2
             exit 1
           fi
+          if grep -R --binary-files=text -F "$R1_QA_SERVER_SECRET" .next/static >/dev/null 2>&1; then
+            echo 'Synthetic server-only secret leaked into client static assets.' >&2
+            exit 1
+          fi
+          if grep -R --binary-files=text -E 'rps_subgroup_5q_audit|data/audit/private' .next/static >/dev/null 2>&1; then
+            echo 'Private/raw audit identifier leaked into client static assets.' >&2
+            exit 1
+          fi
 
-      - name: Smoke-test production server and all public routes
+      - name: Smoke-test production server and Release 1 production policy
         shell: bash
         run: |
           set -euo pipefail
@@ -138,8 +149,72 @@ jobs:
             /explore/industries \
             /explore/occupations \
             /methodology \
-            /sources; do
+            /sources \
+            /robots.txt \
+            /sitemap.xml \
+            /release-manifest.json; do
             curl --fail --silent --show-error "http://127.0.0.1:3000${route}" >/dev/null
+          done
+
+          curl --silent --show-error --dump-header /tmp/home-headers.txt --output /tmp/home.html http://127.0.0.1:3000/
+          for header in \
+            content-security-policy \
+            referrer-policy \
+            x-content-type-options \
+            x-frame-options \
+            permissions-policy \
+            cross-origin-opener-policy \
+            strict-transport-security; do
+            grep -Eiq "^${header}:" /tmp/home-headers.txt || {
+              echo "Required production header missing: ${header}" >&2
+              cat /tmp/home-headers.txt >&2
+              exit 1
+            }
+          done
+          if grep -Eiq '^x-powered-by:' /tmp/home-headers.txt; then
+            echo 'X-Powered-By must be disabled.' >&2
+            exit 1
+          fi
+
+          curl --fail --silent --show-error http://127.0.0.1:3000/robots.txt >/tmp/robots.txt
+          grep -F 'User-Agent: *' /tmp/robots.txt >/dev/null
+          grep -F 'Allow: /' /tmp/robots.txt >/dev/null
+          grep -F 'Sitemap: http://127.0.0.1:3000/sitemap.xml' /tmp/robots.txt >/dev/null
+
+          curl --fail --silent --show-error http://127.0.0.1:3000/sitemap.xml >/tmp/sitemap.xml
+          for route in \
+            /explore/industries \
+            /explore/occupations \
+            /blog/after-adoption \
+            /methodology \
+            /sources; do
+            grep -F "http://127.0.0.1:3000${route}" /tmp/sitemap.xml >/dev/null
+          done
+          if grep -Eq 'data/audit/private|rps_subgroup' /tmp/sitemap.xml; then
+            echo 'Private/raw audit identifier found in sitemap.' >&2
+            exit 1
+          fi
+
+          curl --fail --silent --show-error http://127.0.0.1:3000/release-manifest.json >/tmp/release-manifest.json
+          grep -F '"dataMode":"derived_only"' /tmp/release-manifest.json >/dev/null
+          grep -F "\"commitSha\":\"${GITHUB_SHA}\"" /tmp/release-manifest.json >/dev/null
+          grep -F '"siteOrigin":"http://127.0.0.1:3000"' /tmp/release-manifest.json >/dev/null
+          grep -F '"analytics":"disabled"' /tmp/release-manifest.json >/dev/null
+          grep -F '"clientMonitoring":"disabled"' /tmp/release-manifest.json >/dev/null
+          if grep -F "$R1_QA_SERVER_SECRET" /tmp/home.html /tmp/release-manifest.json >/dev/null; then
+            echo 'Synthetic server-only secret leaked into delivered content.' >&2
+            exit 1
+          fi
+
+          for private_path in \
+            /data/audit/private/rps_subgroup_5q_audit.json \
+            /rps_subgroup_5q_audit.json \
+            /api/rps/raw; do
+            status=$(curl --silent --output /dev/null --write-out '%{http_code}' "http://127.0.0.1:3000${private_path}")
+            if [ "$status" != '404' ]; then
+              echo "Private/raw path did not fail closed: ${private_path} -> ${status}" >&2
+              exit 1
+            fi
           done
 
           kill "$server_pid"
