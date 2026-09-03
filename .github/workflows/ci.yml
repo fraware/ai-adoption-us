@@ -166,7 +166,7 @@ jobs:
             cross-origin-opener-policy \
             strict-transport-security; do
             grep -Eiq "^${header}:" /tmp/home-headers.txt || {
-              echo "Required production header missing: ${header}" >&2
+              echo "Required non-Pages preview header missing: ${header}" >&2
               cat /tmp/home-headers.txt >&2
               exit 1
             }
@@ -196,11 +196,13 @@ jobs:
           fi
 
           curl --fail --silent --show-error http://127.0.0.1:3000/release-manifest.json >/tmp/release-manifest.json
+          grep -F '"hostingTarget":"unhosted-preview"' /tmp/release-manifest.json >/dev/null
           grep -F '"dataMode":"derived_only"' /tmp/release-manifest.json >/dev/null
           grep -F "\"commitSha\":\"${GITHUB_SHA}\"" /tmp/release-manifest.json >/dev/null
-          grep -F '"siteOrigin":"http://127.0.0.1:3000"' /tmp/release-manifest.json >/dev/null
+          grep -F '"siteBaseUrl":"http://127.0.0.1:3000"' /tmp/release-manifest.json >/dev/null
           grep -F '"analytics":"disabled"' /tmp/release-manifest.json >/dev/null
           grep -F '"clientMonitoring":"disabled"' /tmp/release-manifest.json >/dev/null
+          grep -F '"sourceBytesPublished":false' /tmp/release-manifest.json >/dev/null
           if grep -F "$R1_QA_SERVER_SECRET" /tmp/home.html /tmp/release-manifest.json >/dev/null; then
             echo 'Synthetic server-only secret leaked into delivered content.' >&2
             exit 1
