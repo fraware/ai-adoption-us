@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { latestNational, loadObservations } from "../../../lib/data";
 import { loadLongitudinalDiagnostics } from "../../../lib/longitudinal";
 
@@ -43,8 +44,9 @@ export default async function AfterAdoptionPage() {
           <div className="callout">
             <p className="callout-label">Public release boundary</p>
             <p>
-              This release does not contain a rights-cleared national observation feed. The empirical
-              claims below are generated from the validated five-wave derived diagnostics.
+              Release 1 does not activate a direct national observation feed. The empirical claims below
+              are generated from validated five-wave derived diagnostics; raw subgroup observations remain
+              outside the public bundle.
             </p>
           </div>
         )}
@@ -112,13 +114,19 @@ export default async function AfterAdoptionPage() {
         </section>
 
         <section className="section" aria-labelledby="composition-frontier">
-          <h2 id="composition-frontier">The next empirical frontier is composition</h2>
+          <h2 id="composition-frontier">Composition narrows the question; it does not identify the mechanism</h2>
           <p>
-            The next test is whether industry differences remain once occupational composition is held
-            fixed. That requires worker-share weights for adoption and actual-main-job-hour weights for
-            assisted-hours and reported-savings counterfactuals. Until the required CPS microdata are
-            executed, this project does not label the remaining industry variation as organizational
-            amplification.
+            Official CPS Q2 2025 and Q2 2026 inputs now provide worker-share weights for adoption and
+            actual-main-job-hour weights for assisted-hours and reported-savings counterfactuals. The
+            project can therefore compare observed industry values with occupation-composition predictions
+            and form occupation-adjusted industry-context residual diagnostics.
+          </p>
+          <p>
+            Those residuals remain descriptive. They are not organizational quality, management effects,
+            efficiency, or productivity. Full design-based uncertainty for the custom pooled CPS
+            composition vectors is also unsupported in Release 1, while OEWS supplies a separate
+            establishment-side robustness check. The next empirical frontier is to explain the remaining
+            variation with stronger task, firm, and outcome data—not to rename the residual as a causal mechanism.
           </p>
         </section>
 
@@ -126,6 +134,11 @@ export default async function AfterAdoptionPage() {
           All numeric longitudinal claims on this page are generated from the same versioned derived
           diagnostic artifact used by the explorers. The public release does not require the private raw
           audit fixture to render them.
+        </p>
+        <p>
+          <Link href="/methodology">Measurement contract</Link>
+          {" · "}
+          <Link href="/sources">Sources and provenance</Link>
         </p>
       </article>
     </main>

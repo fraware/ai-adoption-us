@@ -77,13 +77,14 @@ def test_public_sources_page_states_current_composition_evidence_boundary():
     assert "Official Q2 2025 and Q2 2026 Basic Monthly" in page
     assert "composition inputs, not RPS residuals" in page
     assert "Robustness input validated" in page
-    assert "Still gated" in page
-    assert "organizational effects" in page
+    assert "Still outside Release 1 claims" in page
+    assert "causal firm effects" in page
     assert "Sources, provenance" in page
 
 
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
+    sources = read("apps/web/app/sources/page.tsx")
     assert "Reported time savings are not an observed measure of labor productivity" in page
     assert "occupation_" in page
     assert "adjusted_" in page
@@ -91,7 +92,8 @@ def test_methodology_keeps_savings_distinct_from_productivity():
     assert "context_" in page
     assert "residual" in page
     assert "CPS composition foundation has been executed and validated" in page
-    assert "RPS observation path remains rights-gated" in page
+    assert "published-aggregate project use is recorded as permitted" in sources.lower()
+    assert "live source-check schedule remains disabled" in sources
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():

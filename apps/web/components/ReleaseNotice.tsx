@@ -18,8 +18,8 @@ export function ReleaseNotice() {
     return (
       <div className="release-strip" role="status">
         <div>
-          <strong>Public candidate · derived diagnostics only</strong>
-          <span>Raw RPS observations are excluded from this bundle.</span>
+          <strong>Release 1 · rights-safe derived evidence</strong>
+          <span>Raw RPS observations are excluded from the public bundle.</span>
           <Link href="/sources">Source and rights boundary</Link>
         </div>
       </div>
@@ -31,7 +31,7 @@ export function ReleaseNotice() {
       <div className="release-strip" role="status">
         <div>
           <strong>Reviewed live-source mode</strong>
-          <span>The live adapter remains fail-closed in this candidate.</span>
+          <span>The live adapter remains fail-closed until its operational activation gates pass.</span>
           <Link href="/sources">Source status</Link>
         </div>
       </div>

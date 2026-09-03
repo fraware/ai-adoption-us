@@ -132,11 +132,11 @@ export default async function HomePage() {
         <h2 id="national-heading">National snapshot</h2>
         {national.size === 0 ? (
           <div className="callout">
-            <p className="callout-label">Rights-safe release boundary</p>
+            <p className="callout-label">Rights-safe Release 1 boundary</p>
             <p>
-              This public candidate does not contain a rights-cleared national observation feed. The
-              five-wave statistics elsewhere on the site are derived publication artifacts generated
-              from a private reviewed fixture; the raw subgroup observations are not included here.
+              The direct national observation feed is not activated in Release 1. The five-wave
+              statistics elsewhere on the site are derived publication artifacts generated from a
+              reviewed private fixture; raw subgroup observations are excluded from the public bundle.
             </p>
             <p><Link href="/sources">Read the source and redistribution boundary →</Link></p>
           </div>
