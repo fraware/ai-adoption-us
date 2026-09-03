@@ -57,7 +57,7 @@ The current Release 1 R1-G2 evidence boundary is recorded in:
 
 ## Networked production-build evidence — 2026-08-31
 
-The 2026-08-30 code-only QA explicitly listed genuine networked dependency installation and `next build` execution as unverified external gates. That historical statement remains provenance; it is no longer the current state.
+The 2026-08-30 code-only QA explicitly listed **Genuine `npm install` and `next build`** as unverified external gates. That historical statement remains provenance; it is no longer the current state.
 
 GitHub Actions run `33411128343` validated the rights-safe public handoff in a networked Ubuntu 24.04 environment.
 
