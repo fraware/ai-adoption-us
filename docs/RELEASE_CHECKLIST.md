@@ -56,15 +56,15 @@ A release is not launch-ready until every applicable item below is explicitly re
 
 ## E. Browser and responsive QA
 
-Automated execution record: `docs/qa/2026-09-01-r1-g2-automated-browser-qa.md`.
+Automated execution records: `docs/qa/2026-09-01-r1-g2-automated-browser-qa.md` and `docs/qa/2026-09-03-r1-g2-mobile-emulation-qa.md`.
 
 Test at minimum:
 
 - [x] stable Chrome desktop engine on Ubuntu CI (Chrome 151.0.7922.173); native/manual desktop review remains separate;
 - [ ] current native Safari desktop;
 - [x] Playwright-managed Firefox 153.0 on Ubuntu CI;
-- [ ] real or defensible emulated iOS Safari environment;
-- [ ] real or defensible emulated Android/Chrome environment beyond narrow viewport sizing;
+- [x] defensible automated iOS/WebKit mobile proxy: iPhone 15 Pro Playwright device context with phone-width rendering and delivered touch events; this is not native or physical iOS Safari evidence;
+- [x] defensible automated Android/Chrome mobile proxy beyond narrow viewport sizing: Pixel 7 Playwright device context against stable Chrome with phone-width rendering and delivered touch events; this is not physical-device evidence;
 - [x] ~375 px width;
 - [x] ~768 px width in stable Chrome;
 - [x] ~1024 px width in stable Chrome;
@@ -90,7 +90,7 @@ Automated accessibility evidence is complete for the tested matrix; human assist
 - [x] rendered skip link is verified as the first keyboard focus target and transfers focus to `main`;
 - [ ] VoiceOver test;
 - [ ] NVDA or equivalent second screen-reader test;
-- [x] axe automated browser scan: zero unresolved serious/critical violations in all 48 executed cases;
+- [x] axe automated browser scan: zero unresolved serious/critical violations in all 70 executed cases of the expanded matrix;
 - [x] Lighthouse accessibility audit: 100/100 on all seven recorded reports, above the >=95 automated threshold;
 - [ ] chart-equivalent data tables require keyboard/screen-reader verification beyond automated visibility/containment;
 - [ ] no-critical-meaning-by-color requires manual rendered review;
