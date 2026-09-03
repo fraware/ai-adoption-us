@@ -16,6 +16,7 @@ _REQUIRED_ACTIVATION_GATES = {
 _ALLOWED_ACTIVATION_EVIDENCE_STATUSES = {"passed", "pending"}
 _TIME_RE = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
 _COMMIT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+_HEX64_RE = re.compile(r"^[0-9a-f]{64}$")
 _ARTIFACT_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
@@ -50,11 +51,25 @@ def _positive_int(mapping: Mapping[str, Any], key: str, *, context: str) -> int:
     return value
 
 
+def _nonnegative_int(mapping: Mapping[str, Any], key: str, *, context: str) -> int:
+    value = mapping.get(key)
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise RpsRefreshPolicyError(f"{context}.{key} must be a non-negative integer")
+    return value
+
+
 def _strings(mapping: Mapping[str, Any], key: str, *, context: str) -> list[str]:
     value = mapping.get(key)
     if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
         raise RpsRefreshPolicyError(f"{context}.{key} must be a list of non-empty strings")
     return list(value)
+
+
+def _hex64(mapping: Mapping[str, Any], key: str, *, context: str) -> str:
+    value = _string(mapping, key, context=context).lower()
+    if _HEX64_RE.fullmatch(value) is None:
+        raise RpsRefreshPolicyError(f"{context}.{key} must be a 64-character SHA-256 digest")
+    return value
 
 
 def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
@@ -80,70 +95,62 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
 
     live = rows["successful_live_validation"]
     if statuses["successful_live_validation"] == "passed":
-        live_run_id = _positive_int(
-            live,
-            "github_run_id",
-            context="policy.activation_evidence.successful_live_validation",
-        )
-        live_sha = _string(
-            live,
-            "github_sha",
-            context="policy.activation_evidence.successful_live_validation",
-        ).lower()
+        live_context = "policy.activation_evidence.successful_live_validation"
+        live_run_id = _positive_int(live, "github_run_id", context=live_context)
+        live_sha = _string(live, "github_sha", context=live_context).lower()
         if _COMMIT_RE.fullmatch(live_sha) is None:
             raise RpsRefreshPolicyError(
                 "successful_live_validation.github_sha must be a Git commit digest"
             )
-        if (
-            _string(
-                live,
-                "workflow",
-                context="policy.activation_evidence.successful_live_validation",
-            )
-            != "RPS live validation"
-        ):
+        if _string(live, "workflow", context=live_context) != "RPS live validation":
             raise RpsRefreshPolicyError(
                 "successful_live_validation.workflow must identify the canonical RPS live validation workflow"
             )
-        _positive_int(
-            live,
-            "artifact_id",
-            context="policy.activation_evidence.successful_live_validation",
-        )
-        artifact_digest = _string(
-            live,
-            "artifact_digest",
-            context="policy.activation_evidence.successful_live_validation",
-        ).lower()
+        _positive_int(live, "artifact_id", context=live_context)
+        artifact_digest = _string(live, "artifact_digest", context=live_context).lower()
         if _ARTIFACT_DIGEST_RE.fullmatch(artifact_digest) is None:
             raise RpsRefreshPolicyError(
                 "successful_live_validation.artifact_digest must be a sha256: digest"
             )
-        _string(
-            live,
-            "verified_on",
-            context="policy.activation_evidence.successful_live_validation",
-        )
+        _hex64(live, "source_content_sha256", context=live_context)
+        _hex64(live, "source_snapshot_file_sha256", context=live_context)
+        _string(live, "retrieved_at", context=live_context)
+        if _string(live, "revision_status", context=live_context) not in _ALLOWED_REFRESH_STATUSES:
+            raise RpsRefreshPolicyError(
+                "successful_live_validation.revision_status is unsupported"
+            )
+        provider_count = _positive_int(live, "provider_series_count", context=live_context)
+        observatory_count = _positive_int(live, "observatory_series_count", context=live_context)
+        excluded_count = _nonnegative_int(live, "excluded_series_count", context=live_context)
+        if provider_count != observatory_count + excluded_count:
+            raise RpsRefreshPolicyError(
+                "successful_live_validation series inventory does not reconcile"
+            )
+        _positive_int(live, "observation_count", context=live_context)
+        if _bool(live, "archive_contract_rehearsed", context=live_context) is not True:
+            raise RpsRefreshPolicyError(
+                "successful live validation must record archive_contract_rehearsed=true"
+            )
+        if _bool(live, "archive_persisted_durably", context=live_context) is not False:
+            raise RpsRefreshPolicyError(
+                "transient live validation cannot be recorded as durable archive persistence"
+            )
+        _string(live, "verified_on", context=live_context)
     else:
         live_run_id = None
 
     credential = rows["fred_api_key_verified_in_execution_environment"]
     if statuses["fred_api_key_verified_in_execution_environment"] == "passed":
+        credential_context = (
+            "policy.activation_evidence.fred_api_key_verified_in_execution_environment"
+        )
         credential_run_id = _positive_int(
             credential,
             "github_run_id",
-            context="policy.activation_evidence.fred_api_key_verified_in_execution_environment",
+            context=credential_context,
         )
-        _string(
-            credential,
-            "evidence_basis",
-            context="policy.activation_evidence.fred_api_key_verified_in_execution_environment",
-        )
-        _string(
-            credential,
-            "verified_on",
-            context="policy.activation_evidence.fred_api_key_verified_in_execution_environment",
-        )
+        _string(credential, "evidence_basis", context=credential_context)
+        _string(credential, "verified_on", context=credential_context)
         if statuses["successful_live_validation"] != "passed":
             raise RpsRefreshPolicyError(
                 "FRED credential evidence cannot pass before successful live validation"
@@ -155,21 +162,12 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
 
     backend = rows["operator_controlled_private_vintage_backend_configured"]
     if statuses["operator_controlled_private_vintage_backend_configured"] == "passed":
-        _string(
-            backend,
-            "backend_id",
-            context="policy.activation_evidence.operator_controlled_private_vintage_backend_configured",
+        backend_context = (
+            "policy.activation_evidence.operator_controlled_private_vintage_backend_configured"
         )
-        _string(
-            backend,
-            "configuration_evidence_ref",
-            context="policy.activation_evidence.operator_controlled_private_vintage_backend_configured",
-        )
-        _string(
-            backend,
-            "verified_on",
-            context="policy.activation_evidence.operator_controlled_private_vintage_backend_configured",
-        )
+        _string(backend, "backend_id", context=backend_context)
+        _string(backend, "configuration_evidence_ref", context=backend_context)
+        _string(backend, "verified_on", context=backend_context)
 
     rehearsal = rows["private_backend_write_read_verify_rehearsal_passed"]
     if statuses["private_backend_write_read_verify_rehearsal_passed"] == "passed":
@@ -177,21 +175,16 @@ def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
             raise RpsRefreshPolicyError(
                 "Private backend rehearsal cannot pass before backend configuration"
             )
-        _string(
-            rehearsal,
-            "rehearsal_id",
-            context="policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed",
+        rehearsal_context = (
+            "policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed"
         )
+        _string(rehearsal, "rehearsal_id", context=rehearsal_context)
         _string(
             rehearsal,
             "write_read_verify_evidence_ref",
-            context="policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed",
+            context=rehearsal_context,
         )
-        _string(
-            rehearsal,
-            "verified_on",
-            context="policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed",
-        )
+        _string(rehearsal, "verified_on", context=rehearsal_context)
 
     return {gate for gate, status in statuses.items() if status == "passed"}
 
