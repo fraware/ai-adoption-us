@@ -5,6 +5,9 @@ on:
     paths:
       - 'apps/web/**'
       - '.github/workflows/native-safari-qa.yml'
+      - '.github/workflows/release1-publish.yml'
+      - 'scripts/publish_release1.py'
+      - 'tests/test_release1_publication.py'
       - 'docs/qa/**'
       - 'docs/RELEASE1_PRODUCT_QA.md'
       - 'docs/RELEASE_CHECKLIST.md'
@@ -13,6 +16,9 @@ on:
     paths:
       - 'apps/web/**'
       - '.github/workflows/native-safari-qa.yml'
+      - '.github/workflows/release1-publish.yml'
+      - 'scripts/publish_release1.py'
+      - 'tests/test_release1_publication.py'
       - 'docs/qa/**'
       - 'docs/RELEASE1_PRODUCT_QA.md'
       - 'docs/RELEASE_CHECKLIST.md'
