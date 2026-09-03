@@ -21,16 +21,19 @@ export default async function OccupationsPage() {
     y: row.values.assisted_hours_share,
   }));
 
+  const periods = longitudinal.input_scope.periods;
   const rank = longitudinal.rank_stability.occupation;
+  const dominance = longitudinal.rank_stability_dominance.occupation;
   const quarters = Object.entries(longitudinal.quarter_diagnostics.occupation);
+  const occupationABeatsHWaves = quarters.filter(([, d]) => d.r2_S_A > d.r2_S_H).length;
   const occupationLooABeatsH = quarters.reduce((total, [, d]) => total + d.loo_A_beats_H, 0);
 
   return (
     <main>
-      <p className="eyebrow">Five-wave evidence</p>
+      <p className="eyebrow">{periods.length}-wave evidence</p>
       <h1>Occupation explorer</h1>
       <p className="lede">
-        Occupations are bundles of tasks, not proxies for firms. Across all five audited waves,
+        Occupations are bundles of tasks, not proxies for firms. Across all {periods.length} audited waves,
         the aggregate relationship between occupation adoption and assisted working time is tighter than
         the corresponding relationship across industries.
       </p>
@@ -46,8 +49,8 @@ export default async function OccupationsPage() {
           ]}
         />
         <p className="note">
-          Adoption ranks are more stable than assisted-hours ranks in all
-          {` ${longitudinal.rank_stability_dominance.occupation.quarter_pairs} `}
+          Adoption ranks are more stable than assisted-hours ranks in
+          {` ${dominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${dominance.quarter_pairs} `}
           possible quarter-pair comparisons.
         </p>
       </section>
@@ -78,7 +81,7 @@ export default async function OccupationsPage() {
           </table>
         </div>
         <p className="note">
-          Adoption has the higher univariate R² for reported savings in all five occupation waves and
+          Adoption has the higher univariate R² for reported savings in {occupationABeatsHWaves} of {periods.length} occupation waves and
           in all {occupationLooABeatsH} leave-one-occupation checks. This is descriptive aggregate
           evidence, not an individual-level behavioral model.
         </p>
@@ -95,8 +98,8 @@ export default async function OccupationsPage() {
           <div className="callout">
             <p className="callout-label">Derived-only mode</p>
             <p>
-              Raw occupation observations are unavailable in this public configuration. The five-wave
-              derived diagnostics above remain available.
+              The bounded public occupation view is unavailable in this build. The longitudinal derived
+              diagnostics remain available without exposing the historical subgroup source panel.
             </p>
           </div>
         )}
