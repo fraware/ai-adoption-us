@@ -9,7 +9,7 @@ export default function MethodologyPage() {
       <p className="eyebrow">Measurement contract</p>
       <h1>Methodology before interpretation.</h1>
       <p className="lede">
-        The publication separates direct survey responses, reconstructed assisted-hours estimates,
+        The publication separates direct survey measurements, reconstructed assisted-hours estimates,
         and self-reported counterfactual time savings. Those quantities do not have interchangeable
         denominators or economic interpretations.
       </p>
@@ -78,10 +78,11 @@ export default function MethodologyPage() {
           </dd>
         </dl>
         <p className="note">
-          The CPS composition foundation has been executed and validated on official Q2 2025 and Q2 2026
-          inputs. The current public candidate still does not publish occupation-adjusted RPS industry
-          residuals because the compatible RPS observation path remains rights-gated; that join stays
-          fail-closed until source permissions are resolved and the residual robustness checks can run.
+          Official CPS Q2 2025 and Q2 2026 composition inputs have been executed and validated. The
+          project also produces occupation-adjusted industry-context residual evidence as a derived
+          descriptive diagnostic. Release 1 does not interpret those residuals as organizational quality,
+          efficiency, productivity, or causal firm effects, and it does not claim design-based confidence
+          intervals for the custom pooled CPS composition vectors.
         </p>
       </section>
 
@@ -89,9 +90,13 @@ export default function MethodologyPage() {
         <h2 id="evidence-heading">Evidence classes</h2>
         <div className="status-grid">
           <div className="status-card">
-            <span className="status-tag ready">Direct</span>
+            <span className="status-tag ready">Direct source construct</span>
             <h3>Survey measurements</h3>
-            <p>RPS/FRED observations for adoption, recent/routine use, assisted hours, and reported savings.</p>
+            <p>
+              RPS/FRED defines adoption, recent/routine use, assisted hours, and reported savings. Release
+              1 renders rights-safe derived publication evidence and does not redistribute the reviewed raw
+              subgroup fixture.
+            </p>
           </div>
           <div className="status-card">
             <span className="status-tag ready">Derived</span>
@@ -99,17 +104,20 @@ export default function MethodologyPage() {
             <p>Changes, correlations, regressions, rank stability, and leave-one-group-out checks.</p>
           </div>
           <div className="status-card">
-            <span className="status-tag gated">RPS join gated</span>
+            <span className="status-tag ready">Derived descriptive</span>
             <h3>Composition counterfactuals</h3>
             <p>
-              CPS occupation weights are executed and validated; observed-versus-counterfactual RPS
-              residuals remain blocked until a rights-cleared RPS observation path is available.
+              CPS occupation weights, standardized counterfactuals, occupation-adjusted industry-context
+              residual evidence, and OEWS robustness are available under explicit descriptive boundaries.
             </p>
           </div>
           <div className="status-card">
             <span className="status-tag gated">Not identified</span>
             <h3>Causal mechanisms</h3>
-            <p>Organizational effects, productivity effects, and economic realization require stronger designs.</p>
+            <p>
+              Organizational effects, productivity effects, and design-based uncertainty for the custom
+              pooled CPS composition vectors require stronger evidence than Release 1 supplies.
+            </p>
           </div>
         </div>
       </section>
@@ -117,14 +125,14 @@ export default function MethodologyPage() {
       <section className="section" aria-labelledby="release-heading">
         <h2 id="release-heading">Reproducibility and release boundary</h2>
         <p>
-          The private research candidate retains the reviewed subgroup fixture and can regenerate the
-          committed longitudinal publication artifacts. The public candidate uses <code>DATA_MODE=derived_only</code>
+          The private research environment retains the reviewed subgroup fixture and can regenerate the
+          committed longitudinal publication artifacts. Release 1 uses <code>DATA_MODE=derived_only</code>
           and excludes the raw RPS audit fixture by construction.
         </p>
         <p>
           Source-series identities, crosswalk versions, deterministic validators, and interpretive
-          guardrails are versioned with the code. A source-definition or rights change blocks automatic
-          publication until it is reviewed.
+          guardrails are versioned with the code. A source-definition, rights, or release-state change
+          blocks automatic publication until it is reviewed through the project&apos;s release controls.
         </p>
         <p><Link href="/sources">See source status and provenance →</Link></p>
       </section>
