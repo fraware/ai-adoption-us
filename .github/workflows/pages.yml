@@ -1,0 +1,119 @@
+name: GitHub Pages Release 1
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and audit GitHub Pages artifact
+    runs-on: ubuntu-24.04
+    env:
+      DATA_MODE: derived_only
+      GITHUB_PAGES: 'true'
+      NEXT_PUBLIC_SITE_URL: https://fraware.github.io/ai-adoption-us
+      RELEASE_COMMIT_SHA: ${{ github.sha }}
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install locked dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate TypeScript
+        working-directory: apps/web
+        run: npm run lint
+
+      - name: Build static GitHub Pages export
+        working-directory: apps/web
+        run: npm run build
+
+      - name: Audit static Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f apps/web/out/index.html
+          test -f apps/web/out/404.html
+          test -f apps/web/out/robots.txt
+          test -f apps/web/out/sitemap.xml
+          test -f apps/web/out/release-manifest.json
+          touch apps/web/out/.nojekyll
+
+          if find apps/web/out -path '*data/audit/private*' -print | grep -q .; then
+            echo 'Private audit path found in Pages artifact.' >&2
+            exit 1
+          fi
+          if grep -R --binary-files=text -E 'rps_subgroup_5q_audit|data/audit/private' apps/web/out >/dev/null 2>&1; then
+            echo 'Private/raw audit identifier leaked into Pages artifact.' >&2
+            exit 1
+          fi
+
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path('apps/web/out/release-manifest.json').read_text())
+          expected = {
+              'hostingTarget': 'github-pages',
+              'dataMode': 'derived_only',
+              'commitSha': '${{ github.sha }}',
+              'siteBaseUrl': 'https://fraware.github.io/ai-adoption-us',
+              'analytics': 'disabled',
+              'clientMonitoring': 'disabled',
+              'sourceBytesPublished': False,
+          }
+          for key, value in expected.items():
+              if manifest.get(key) != value:
+                  raise SystemExit(f'manifest mismatch for {key}: {manifest.get(key)!r} != {value!r}')
+          PY
+
+          grep -F 'https://fraware.github.io/ai-adoption-us/sitemap.xml' apps/web/out/robots.txt >/dev/null
+          for url in \
+            https://fraware.github.io/ai-adoption-us/ \
+            https://fraware.github.io/ai-adoption-us/explore/industries \
+            https://fraware.github.io/ai-adoption-us/explore/occupations \
+            https://fraware.github.io/ai-adoption-us/blog/after-adoption \
+            https://fraware.github.io/ai-adoption-us/methodology \
+            https://fraware.github.io/ai-adoption-us/sources; do
+            grep -F "$url" apps/web/out/sitemap.xml >/dev/null
+          done
+
+          grep -R --binary-files=text -F '/ai-adoption-us/_next/' apps/web/out/index.html >/dev/null
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: apps/web/out
+
+  deploy:
+    name: Deploy GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
