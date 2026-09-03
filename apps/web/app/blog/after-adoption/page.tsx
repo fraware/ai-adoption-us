@@ -17,8 +17,13 @@ export default async function AfterAdoptionPage() {
   const assisted = national.get("assisted_hours_share");
   const savings = national.get("reported_time_savings_share");
 
+  const periods = longitudinal.input_scope.periods;
+  const firstPeriod = periods[0];
+  const lastPeriod = periods[periods.length - 1];
   const industry = longitudinal.rank_stability.industry;
   const occupation = longitudinal.rank_stability.occupation;
+  const industryDominance = longitudinal.rank_stability_dominance.industry;
+  const occupationDominance = longitudinal.rank_stability_dominance.occupation;
   const industryQuarters = Object.values(longitudinal.quarter_diagnostics.industry);
   const industryHBeatsAWaves = industryQuarters.filter((d) => d.r2_S_H > d.r2_S_A).length;
 
@@ -28,8 +33,8 @@ export default async function AfterAdoptionPage() {
         <p className="eyebrow">Technical essay</p>
         <h1>After adoption: where AI enters actual work</h1>
         <p className="lede">
-          Adoption is the most visible workplace-AI statistic. Five waves of subgroup data show why it
-          is only the first layer of the economic story.
+          Adoption is the most visible workplace-AI statistic. {periods.length} common subgroup quarters
+          from {firstPeriod} through {lastPeriod} show why it is only the first layer of the economic story.
         </p>
 
         {adoption && weekly && daily && assisted && savings ? (
@@ -44,9 +49,9 @@ export default async function AfterAdoptionPage() {
           <div className="callout">
             <p className="callout-label">Public release boundary</p>
             <p>
-              Release 1 does not activate a direct national observation feed. The empirical claims below
-              are generated from validated five-wave derived diagnostics; raw subgroup observations remain
-              outside the public bundle.
+              The bounded national observation view is unavailable in this build. The empirical claims
+              below are generated from validated longitudinal derived diagnostics; private source-input
+              bytes remain outside the public bundle.
             </p>
           </div>
         )}
@@ -64,12 +69,15 @@ export default async function AfterAdoptionPage() {
         <section className="section" aria-labelledby="persistence">
           <h2 id="persistence">Adoption looks more persistent than depth of use</h2>
           <p>
-            Across industries, the median pairwise rank correlation over the five audited waves is
+            Across industries, the median pairwise rank correlation over the {periods.length} audited waves is
             {` ${industry.A.median_pairwise.toFixed(2)} `}for adoption and {industry.H.median_pairwise.toFixed(2)} for assisted hours.
             Across occupations the corresponding values are {occupation.A.median_pairwise.toFixed(2)} and
             {` ${occupation.H.median_pairwise.toFixed(2)}.`} Adoption ranks are more stable than
-            assisted-hours ranks in every one of the ten possible quarter-pair comparisons at both
-            aggregation levels.
+            assisted-hours ranks in
+            {` ${industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${industryDominance.quarter_pairs} `}
+            industry quarter-pair comparisons and
+            {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${occupationDominance.quarter_pairs} `}
+            occupation comparisons.
           </p>
           <p>
             This supports a useful empirical distinction. The relative ranking of industries and occupations on adoption is comparatively persistent, while
@@ -94,11 +102,11 @@ export default async function AfterAdoptionPage() {
         </section>
 
         <section className="section" aria-labelledby="wave-dependence">
-          <h2 id="wave-dependence">One attractive Q2 result does not survive as a universal rule</h2>
+          <h2 id="wave-dependence">One attractive Q2 result does not persist as a universal rule</h2>
           <p>
             In Q2 2026, assisted hours explain more cross-industry variation in reported savings than
-            adoption does. Across the full five-wave window, however, that ordering occurs in only
-            {` ${industryHBeatsAWaves} of ${longitudinal.input_scope.periods.length} waves.`} The relationship changes direction. The publication therefore reports the wave-by-wave
+            adoption does. Across the full {periods.length}-wave window, that ordering occurs in
+            {` ${industryHBeatsAWaves} of ${periods.length} waves.`} The relationship changes direction. The publication therefore reports the wave-by-wave
             evidence instead of turning the latest quarter into a structural claim.
           </p>
         </section>
@@ -116,7 +124,7 @@ export default async function AfterAdoptionPage() {
         <section className="section" aria-labelledby="composition-frontier">
           <h2 id="composition-frontier">Composition narrows the question; it does not identify the mechanism</h2>
           <p>
-            Official CPS Q2 2025 and Q2 2026 inputs now provide worker-share weights for adoption and
+            Official CPS Q2 2025 and Q2 2026 inputs provide worker-share weights for adoption and
             actual-main-job-hour weights for assisted-hours and reported-savings counterfactuals. The
             project can therefore compare observed industry values with occupation-composition predictions
             and form occupation-adjusted industry-context residual diagnostics.
@@ -126,14 +134,14 @@ export default async function AfterAdoptionPage() {
             efficiency, or productivity. Full design-based uncertainty for the custom pooled CPS
             composition vectors is also unsupported in Release 1, while OEWS supplies a separate
             establishment-side robustness check. The next empirical frontier is to explain the remaining
-            variation with stronger task, firm, and outcome data—not to rename the residual as a causal mechanism.
+            variation with stronger task, firm, and outcome data without relabeling the residual as a causal mechanism.
           </p>
         </section>
 
         <p className="note">
           All numeric longitudinal claims on this page are generated from the same versioned derived
           diagnostic artifact used by the explorers. The public release does not require the private raw
-          audit fixture to render them.
+          source history to render them.
         </p>
         <p>
           <Link href="/methodology">Measurement contract</Link>
