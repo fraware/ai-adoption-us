@@ -18,6 +18,33 @@ const primaryNavigation = [
   "/sources",
 ] as const;
 
+const ANDROID_PROJECT = "android-chrome-pixel-7-emulation";
+const IOS_PROJECT = "ios-webkit-iphone-15-pro-emulation";
+
+async function assertMobileEmulationContract(page: Parameters<typeof test>[0] extends never ? never : any) {
+  const projectName = test.info().project.name;
+  if (projectName !== ANDROID_PROJECT && projectName !== IOS_PROJECT) {
+    return;
+  }
+
+  const environment = await page.evaluate(() => ({
+    userAgent: navigator.userAgent,
+    maxTouchPoints: navigator.maxTouchPoints,
+    innerWidth: window.innerWidth,
+    coarsePointer: window.matchMedia("(pointer: coarse)").matches,
+  }));
+
+  expect(environment.maxTouchPoints, `${projectName} must expose touch input`).toBeGreaterThan(0);
+  expect(environment.innerWidth, `${projectName} must remain a phone-width context`).toBeLessThanOrEqual(450);
+  expect(environment.coarsePointer, `${projectName} must expose a coarse primary pointer`).toBeTruthy();
+
+  if (projectName === ANDROID_PROJECT) {
+    expect(environment.userAgent).toContain("Android");
+  } else {
+    expect(environment.userAgent).toContain("iPhone");
+  }
+}
+
 test.describe("Release 1 rendered browser QA", () => {
   for (const route of routes) {
     test(`${route.slug}: semantics, keyboard, responsive and axe contract`, async ({ page }) => {
@@ -34,6 +61,8 @@ test.describe("Release 1 rendered browser QA", () => {
       const response = await page.goto(route.path, { waitUntil: "networkidle" });
       expect(response, `No document response for ${route.path}`).not.toBeNull();
       expect(response?.ok(), `HTTP ${response?.status()} for ${route.path}`).toBeTruthy();
+
+      await assertMobileEmulationContract(page);
 
       const icon = page.locator('link[rel~="icon"]').first();
       await expect(icon, `No application icon metadata on ${route.path}`).toHaveCount(1);
@@ -65,7 +94,11 @@ test.describe("Release 1 rendered browser QA", () => {
       for (let index = 0; index < tableCount; index += 1) {
         const table = visibleTables.nth(index);
         await expect(table).toBeVisible();
-        await expect(table.locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' table-wrap ')][1]")).toHaveCount(1);
+        await expect(
+          table.locator(
+            "xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' table-wrap ')][1]",
+          ),
+        ).toHaveCount(1);
       }
 
       // Test keyboard entry from the freshly loaded document. A pointer click before Tab
@@ -121,10 +154,18 @@ test.describe("Release 1 rendered browser QA", () => {
 
     const section = page.locator('section[aria-labelledby="cross-source-triangulation"]');
     await expect(section).toBeVisible();
-    await expect(section.getByRole("heading", { name: "Two different measures, one sector pattern" })).toBeVisible();
-    await expect(section.locator(".metric").filter({ hasText: "Primary sectors" }).locator("strong")).toHaveText("14");
-    await expect(section.locator(".metric").filter({ hasText: "Spearman rank correlation" }).locator("strong")).toHaveText("0.704");
-    await expect(section.locator(".metric").filter({ hasText: "Pearson correlation" }).locator("strong")).toHaveText("0.797");
+    await expect(
+      section.getByRole("heading", { name: "Two different measures, one sector pattern" }),
+    ).toBeVisible();
+    await expect(
+      section.locator(".metric").filter({ hasText: "Primary sectors" }).locator("strong"),
+    ).toHaveText("14");
+    await expect(
+      section.locator(".metric").filter({ hasText: "Spearman rank correlation" }).locator("strong"),
+    ).toHaveText("0.704");
+    await expect(
+      section.locator(".metric").filter({ hasText: "Pearson correlation" }).locator("strong"),
+    ).toHaveText("0.797");
 
     const boundary = section.locator("#btos-rps-measurement-boundary");
     await expect(boundary).toContainText("responding employer businesses");
