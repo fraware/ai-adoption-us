@@ -14,7 +14,7 @@ import json
 import math
 import os
 import shutil
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from copy import deepcopy
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -34,12 +34,6 @@ BINDING_DIAGNOSTIC_ID = "global-rps-repository-source-binding"
 
 class ObservatoryRpsBindingError(ValueError):
     """Raised when repository RPS evidence is not bound to the candidate vintage."""
-
-
-def _mapping(value: object, context: str) -> dict[str, Any]:
-    if not isinstance(value, Mapping):
-        raise ObservatoryRpsBindingError(f"{context} must be an object")
-    return {str(key): item for key, item in value.items()}
 
 
 def _rows(value: object, context: str) -> list[dict[str, Any]]:
@@ -324,14 +318,6 @@ def validate_rps_repository_bindings(
     binding_id = _string(bindings, "binding_id", "bindings")
     source_id = _string(bindings, "source_id", "bindings")
 
-    canonical_bindings = load_json_object(
-        _repo_path(repo_root, BINDINGS_REPOSITORY_PATH)
-    )
-    if canonical_digest(bindings) != canonical_digest(canonical_bindings):
-        raise ObservatoryRpsBindingError(
-            "RPS repository binding validation must use the exact repository-pinned registry"
-        )
-
     source = _rps_source(rps_candidate, source_id)
     source_vintage = _string(source, "source_vintage_id", "rps_candidate.source")
     source_digest = _digest(source_vintage, "rps_candidate.source.source_vintage_id")
@@ -369,6 +355,14 @@ def validate_rps_repository_bindings(
             repo_root=repo_root,
             candidate_root=rps_candidate_root,
             source=source,
+        )
+
+    canonical_bindings = load_json_object(
+        _repo_path(repo_root, BINDINGS_REPOSITORY_PATH)
+    )
+    if canonical_digest(bindings) != canonical_digest(canonical_bindings):
+        raise ObservatoryRpsBindingError(
+            "RPS repository binding validation must use the exact repository-pinned registry"
         )
 
     return {
