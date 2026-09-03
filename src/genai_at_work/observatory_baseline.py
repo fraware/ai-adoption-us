@@ -27,6 +27,8 @@ from genai_at_work.release_engine import (
     validate_release_manifest,
 )
 
+V1_CONTRACT_REPOSITORY_PATH = "data/registry/observatory_v1_baseline_contract.json"
+
 REQUIRED_COMPONENTS = {
     "rps_longitudinal",
     "cps_composition",
@@ -549,6 +551,14 @@ def validate_v1_baseline_contract(
             "V1 global claim inventory does not match the required construct boundaries"
         )
 
+    canonical_contract = load_json_object(
+        _repo_path(repo_root, V1_CONTRACT_REPOSITORY_PATH)
+    )
+    if canonical_digest(contract) != canonical_digest(canonical_contract):
+        raise ObservatoryBaselineError(
+            "V1 composition must use the exact repository-pinned baseline contract"
+        )
+
 
 def _validate_rps_component(
     rps_candidate: Mapping[str, Any],
@@ -921,7 +931,13 @@ def _compose_into(
                 "builder_id": rps_candidate["build"]["builder_id"],
                 "builder_commit": rps_candidate["build"]["builder_commit"],
             },
-            "baseline_contract_sha256": canonical_digest(contract),
+            "baseline_contract": {
+                "repository_path": V1_CONTRACT_REPOSITORY_PATH,
+                "canonical_digest": canonical_digest(contract),
+                "file_sha256": sha256_file(
+                    _repo_path(repo_root, V1_CONTRACT_REPOSITORY_PATH)
+                ),
+            },
         },
         "baseline_contract_id": contract["contract_id"],
         "candidate_scope": (
