@@ -200,7 +200,7 @@ def test_backend_source_byte_tampering_fails_readback(tmp_path: Path) -> None:
 
     with pytest.raises(
         PrivateVintageError,
-        match="byte identity mismatch|content hash mismatch",
+        match=r"byte identity mismatch|content hash mismatch",
     ):
         verify_backend_challenge(
             challenge,
