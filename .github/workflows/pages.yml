@@ -171,9 +171,9 @@ jobs:
               "$EXPECTED_BASE_URL$route"
           done
 
-          cp live-audit/__release-manifest_json.body.txt live-audit/release-manifest.json
-          cp live-audit/__robots_txt.body.txt live-audit/robots.txt
-          cp live-audit/__sitemap_xml.body.txt live-audit/sitemap.xml
+          cp live-audit/_release-manifest_json.body.txt live-audit/release-manifest.json
+          cp live-audit/_robots_txt.body.txt live-audit/robots.txt
+          cp live-audit/_sitemap_xml.body.txt live-audit/sitemap.xml
 
           python - <<'PY'
           import json
@@ -245,7 +245,7 @@ jobs:
             echo 'header_and_cache_observations_follow'
           } > live-audit/summary.txt
           cat live-audit/_.headers.txt >> live-audit/summary.txt
-          cat live-audit/__release-manifest_json.headers.txt >> live-audit/summary.txt
+          cat live-audit/_release-manifest_json.headers.txt >> live-audit/summary.txt
 
       - name: Upload live deployment audit evidence
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
