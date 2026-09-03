@@ -11,6 +11,7 @@ from genai_at_work.rps_refresh_policy import (
     RpsRefreshPolicyError,
     action_for_refresh_summary,
     activation_gates_satisfied,
+    recorded_activation_gates,
     validate_rps_refresh_policy,
 )
 
@@ -80,12 +81,96 @@ def test_pinned_policy_is_valid_and_scheduled_activation_remains_deferred() -> N
     assert value["publication"]["automatic"] is False
 
 
+def test_recorded_activation_evidence_has_exact_two_passed_runtime_gates() -> None:
+    value = policy()
+    assert recorded_activation_gates(value) == {
+        "successful_live_validation",
+        "fred_api_key_verified_in_execution_environment",
+    }
+    live = value["activation_evidence"]["successful_live_validation"]
+    assert live == {
+        "status": "passed",
+        "github_run_id": 33687737639,
+        "github_sha": "3fb2cff4a9b1cbc2f340c8db00328efaa2c30130",
+        "workflow": "RPS live validation",
+        "artifact_id": 9868969207,
+        "artifact_digest": "sha256:fd8b4ed3f828755efaaa00c80b7d444480f7d0e058b88dddf2ffae8f17539de7",
+        "verified_on": "2026-09-03",
+    }
+    credential = value["activation_evidence"][
+        "fred_api_key_verified_in_execution_environment"
+    ]
+    assert credential["status"] == "passed"
+    assert credential["github_run_id"] == live["github_run_id"]
+    assert (
+        value["activation_evidence"][
+            "operator_controlled_private_vintage_backend_configured"
+        ]["status"]
+        == "pending"
+    )
+    assert (
+        value["activation_evidence"][
+            "private_backend_write_read_verify_rehearsal_passed"
+        ]["status"]
+        == "pending"
+    )
+    assert activation_gates_satisfied(value, recorded_activation_gates(value)) is False
+
+
 def test_activation_requires_every_exact_gate() -> None:
     value = policy()
     gates = value["source_check"]["activation_requirements"]
     assert activation_gates_satisfied(value, gates) is True
     assert activation_gates_satisfied(value, gates[:-1]) is False
     assert activation_gates_satisfied(value, [*gates, "invented_gate"]) is False
+
+
+def test_activation_evidence_inventory_and_dependencies_fail_closed() -> None:
+    missing = copy.deepcopy(policy())
+    del missing["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ]
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="exactly cover every pinned activation requirement",
+    ):
+        validate_rps_refresh_policy(missing)
+
+    credential_without_live = copy.deepcopy(policy())
+    credential_without_live["activation_evidence"]["successful_live_validation"] = {
+        "status": "pending",
+        "reason": "synthetic pending state",
+    }
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="credential evidence cannot pass before successful live validation",
+    ):
+        validate_rps_refresh_policy(credential_without_live)
+
+    mismatched_run = copy.deepcopy(policy())
+    mismatched_run["activation_evidence"][
+        "fred_api_key_verified_in_execution_environment"
+    ]["github_run_id"] = 33687737640
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="must be bound to the successful live-validation run",
+    ):
+        validate_rps_refresh_policy(mismatched_run)
+
+    rehearsal_without_backend = copy.deepcopy(policy())
+    rehearsal_without_backend["activation_evidence"][
+        "private_backend_write_read_verify_rehearsal_passed"
+    ] = {
+        "status": "passed",
+        "rehearsal_id": "synthetic-rehearsal",
+        "write_read_verify_evidence_ref": "synthetic-evidence",
+        "verified_on": "2026-09-03",
+    }
+    with pytest.raises(
+        RpsRefreshPolicyError,
+        match="cannot pass before backend configuration",
+    ):
+        validate_rps_refresh_policy(rehearsal_without_backend)
 
 
 def test_unchanged_source_retains_only_review_safe_check_evidence() -> None:
