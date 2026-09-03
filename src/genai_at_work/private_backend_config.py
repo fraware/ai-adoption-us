@@ -14,7 +14,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from genai_at_work.private_vintage import sha256_file
+from genai_at_work.private_vintage import PrivateVintageError, sha256_file
 
 _EVIDENCE_TYPE = "rps_private_backend_configuration"
 _ENVIRONMENT_SCOPE = "production_rps_refresh"
@@ -42,7 +42,7 @@ _CONFIG_KEYS = {
 }
 
 
-class PrivateBackendConfigurationError(ValueError):
+class PrivateBackendConfigurationError(PrivateVintageError):
     """Raised when private-backend configuration evidence is invalid."""
 
 
@@ -72,7 +72,9 @@ def validate_private_backend_configuration(config: Mapping[str, Any]) -> None:
             "private-backend configuration fields must exactly match the v1 contract"
         )
     if config.get("schema_version") != 1:
-        raise PrivateBackendConfigurationError("configuration.schema_version must equal 1")
+        raise PrivateBackendConfigurationError(
+            "configuration.schema_version must equal 1"
+        )
     if config.get("evidence_type") != _EVIDENCE_TYPE:
         raise PrivateBackendConfigurationError(
             "configuration.evidence_type must identify RPS private backend configuration"
