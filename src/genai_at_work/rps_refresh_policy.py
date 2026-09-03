@@ -13,7 +13,10 @@ _REQUIRED_ACTIVATION_GATES = {
     "operator_controlled_private_vintage_backend_configured",
     "private_backend_write_read_verify_rehearsal_passed",
 }
+_ALLOWED_ACTIVATION_EVIDENCE_STATUSES = {"passed", "pending"}
 _TIME_RE = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
+_COMMIT_RE = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+_ARTIFACT_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 class RpsRefreshPolicyError(ValueError):
@@ -40,6 +43,13 @@ def _bool(mapping: Mapping[str, Any], key: str, *, context: str) -> bool:
     return value
 
 
+def _positive_int(mapping: Mapping[str, Any], key: str, *, context: str) -> int:
+    value = mapping.get(key)
+    if not isinstance(value, int) or isinstance(value, bool) or value <= 0:
+        raise RpsRefreshPolicyError(f"{context}.{key} must be a positive integer")
+    return value
+
+
 def _strings(mapping: Mapping[str, Any], key: str, *, context: str) -> list[str]:
     value = mapping.get(key)
     if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
@@ -47,8 +57,147 @@ def _strings(mapping: Mapping[str, Any], key: str, *, context: str) -> list[str]
     return list(value)
 
 
+def _validate_activation_evidence(policy: Mapping[str, Any]) -> set[str]:
+    evidence = _mapping(policy.get("activation_evidence"), context="policy.activation_evidence")
+    if set(evidence) != _REQUIRED_ACTIVATION_GATES:
+        raise RpsRefreshPolicyError(
+            "policy.activation_evidence must exactly cover every pinned activation requirement"
+        )
+
+    rows: dict[str, Mapping[str, Any]] = {}
+    statuses: dict[str, str] = {}
+    for gate in sorted(_REQUIRED_ACTIVATION_GATES):
+        row = _mapping(evidence.get(gate), context=f"policy.activation_evidence.{gate}")
+        status = _string(row, "status", context=f"policy.activation_evidence.{gate}")
+        if status not in _ALLOWED_ACTIVATION_EVIDENCE_STATUSES:
+            raise RpsRefreshPolicyError(
+                f"Unsupported activation evidence status for {gate}: {status}"
+            )
+        if status == "pending":
+            _string(row, "reason", context=f"policy.activation_evidence.{gate}")
+        rows[gate] = row
+        statuses[gate] = status
+
+    live = rows["successful_live_validation"]
+    if statuses["successful_live_validation"] == "passed":
+        live_run_id = _positive_int(
+            live,
+            "github_run_id",
+            context="policy.activation_evidence.successful_live_validation",
+        )
+        live_sha = _string(
+            live,
+            "github_sha",
+            context="policy.activation_evidence.successful_live_validation",
+        ).lower()
+        if _COMMIT_RE.fullmatch(live_sha) is None:
+            raise RpsRefreshPolicyError(
+                "successful_live_validation.github_sha must be a Git commit digest"
+            )
+        if (
+            _string(
+                live,
+                "workflow",
+                context="policy.activation_evidence.successful_live_validation",
+            )
+            != "RPS live validation"
+        ):
+            raise RpsRefreshPolicyError(
+                "successful_live_validation.workflow must identify the canonical RPS live validation workflow"
+            )
+        _positive_int(
+            live,
+            "artifact_id",
+            context="policy.activation_evidence.successful_live_validation",
+        )
+        artifact_digest = _string(
+            live,
+            "artifact_digest",
+            context="policy.activation_evidence.successful_live_validation",
+        ).lower()
+        if _ARTIFACT_DIGEST_RE.fullmatch(artifact_digest) is None:
+            raise RpsRefreshPolicyError(
+                "successful_live_validation.artifact_digest must be a sha256: digest"
+            )
+        _string(
+            live,
+            "verified_on",
+            context="policy.activation_evidence.successful_live_validation",
+        )
+    else:
+        live_run_id = None
+
+    credential = rows["fred_api_key_verified_in_execution_environment"]
+    if statuses["fred_api_key_verified_in_execution_environment"] == "passed":
+        credential_run_id = _positive_int(
+            credential,
+            "github_run_id",
+            context="policy.activation_evidence.fred_api_key_verified_in_execution_environment",
+        )
+        _string(
+            credential,
+            "evidence_basis",
+            context="policy.activation_evidence.fred_api_key_verified_in_execution_environment",
+        )
+        _string(
+            credential,
+            "verified_on",
+            context="policy.activation_evidence.fred_api_key_verified_in_execution_environment",
+        )
+        if statuses["successful_live_validation"] != "passed":
+            raise RpsRefreshPolicyError(
+                "FRED credential evidence cannot pass before successful live validation"
+            )
+        if live_run_id != credential_run_id:
+            raise RpsRefreshPolicyError(
+                "FRED credential evidence must be bound to the successful live-validation run"
+            )
+
+    backend = rows["operator_controlled_private_vintage_backend_configured"]
+    if statuses["operator_controlled_private_vintage_backend_configured"] == "passed":
+        _string(
+            backend,
+            "backend_id",
+            context="policy.activation_evidence.operator_controlled_private_vintage_backend_configured",
+        )
+        _string(
+            backend,
+            "configuration_evidence_ref",
+            context="policy.activation_evidence.operator_controlled_private_vintage_backend_configured",
+        )
+        _string(
+            backend,
+            "verified_on",
+            context="policy.activation_evidence.operator_controlled_private_vintage_backend_configured",
+        )
+
+    rehearsal = rows["private_backend_write_read_verify_rehearsal_passed"]
+    if statuses["private_backend_write_read_verify_rehearsal_passed"] == "passed":
+        if statuses["operator_controlled_private_vintage_backend_configured"] != "passed":
+            raise RpsRefreshPolicyError(
+                "Private backend rehearsal cannot pass before backend configuration"
+            )
+        _string(
+            rehearsal,
+            "rehearsal_id",
+            context="policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed",
+        )
+        _string(
+            rehearsal,
+            "write_read_verify_evidence_ref",
+            context="policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed",
+        )
+        _string(
+            rehearsal,
+            "verified_on",
+            context="policy.activation_evidence.private_backend_write_read_verify_rehearsal_passed",
+        )
+
+    return {gate for gate, status in statuses.items() if status == "passed"}
+
+
 def validate_rps_refresh_policy(policy: Mapping[str, Any]) -> None:
-    """Validate the pinned source-check, retention, and publication separation."""
+    """Validate the pinned source-check, retention, publication, and activation evidence."""
 
     if policy.get("schema_version") != 1:
         raise RpsRefreshPolicyError("policy.schema_version must equal 1")
@@ -79,6 +228,7 @@ def validate_rps_refresh_policy(policy: Mapping[str, Any]) -> None:
         raise RpsRefreshPolicyError(
             "RPS schedule activation requirements must exactly cover live validation, credential, private backend, and backend rehearsal"
         )
+    _validate_activation_evidence(policy)
 
     unchanged = _mapping(policy.get("unchanged_source"), context="policy.unchanged_source")
     for key in (
@@ -185,6 +335,13 @@ def action_for_refresh_summary(
         "requires_human_review": True,
         "retain_private_detailed_diff": status != "baseline",
     }
+
+
+def recorded_activation_gates(policy: Mapping[str, Any]) -> set[str]:
+    """Return activation gates backed by the evidence recorded in the policy."""
+
+    validate_rps_refresh_policy(policy)
+    return _validate_activation_evidence(policy)
 
 
 def activation_gates_satisfied(policy: Mapping[str, Any], satisfied: Sequence[str]) -> bool:
