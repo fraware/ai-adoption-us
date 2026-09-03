@@ -10,6 +10,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from genai_at_work.github_ci import (
+    GithubCiVerificationError,
+    fetch_and_verify_github_ci,
+)
 from genai_at_work.release_engine import (
     candidate_gate_failures,
     canonical_digest,
@@ -25,6 +29,7 @@ from genai_at_work.release_engine import (
 )
 
 ROOT = Path(__file__).parents[1]
+CI_POLICY = ROOT / "data/registry/observatory_release_ci_policy.json"
 RELEASE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 
 
@@ -101,13 +106,21 @@ def _stage_payload(
     review: dict[str, Any],
     status: str,
 ) -> dict[str, Any]:
+    """Build the portable immutable identity of one staged candidate.
+
+    The stage identity deliberately excludes filesystem locations. Absolute runner
+    paths do not describe scientific content, release state, or review scope and
+    would make an otherwise identical candidate impossible to rehydrate on a
+    later trusted runner. Candidate bytes remain bound by both the file SHA-256
+    and the canonical manifest digest.
+    """
+
     payload: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "registry_current_release_id": _current_id(registry),
         "registry_current_manifest_sha256": registry.get("current_release_manifest_sha256"),
         "candidate_release_id": candidate["release_id"],
         "candidate_data_mode": candidate["data_mode"],
-        "candidate_manifest_path": str(candidate_manifest.resolve()),
         "candidate_manifest_sha256": sha256_file(candidate_manifest),
         "candidate_manifest_digest": canonical_digest(candidate),
         "release_diff_digest": canonical_digest(release_diff),
@@ -130,6 +143,40 @@ def _gate_payload(stage_id: str, status: str, failures: list[dict[str, str]]) ->
 
 def _promotion_timestamp() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _verify_ci_evidence(attestation: dict[str, Any]) -> dict[str, Any]:
+    """Resolve attested run IDs and prove they passed for the exact candidate commit."""
+
+    policy = load_json_object(CI_POLICY)
+    repository = os.environ.get("GITHUB_REPOSITORY", "").strip()
+    token = os.environ.get("GITHUB_TOKEN", "").strip()
+    api_url = os.environ.get("GITHUB_API_URL", "https://api.github.com").strip()
+    raw_run_ids = attestation.get("ci_run_ids")
+    if not isinstance(raw_run_ids, list) or not all(
+        isinstance(value, int) and not isinstance(value, bool) and value > 0
+        for value in raw_run_ids
+    ):
+        raise SystemExit("Review attestation contains invalid ci_run_ids")
+    candidate_commit = attestation.get("candidate_commit")
+    if not isinstance(candidate_commit, str):
+        raise SystemExit("Review attestation candidate_commit is invalid")
+    if not repository:
+        raise SystemExit("GITHUB_REPOSITORY is required for promotion CI verification")
+    if not token:
+        raise SystemExit("GITHUB_TOKEN is required for promotion CI verification")
+
+    try:
+        return fetch_and_verify_github_ci(
+            repository=repository,
+            run_ids=raw_run_ids,
+            candidate_commit=candidate_commit,
+            token=token,
+            policy=policy,
+            api_url=api_url,
+        )
+    except GithubCiVerificationError as exc:
+        raise SystemExit(f"Promotion CI verification failed: {exc}") from exc
 
 
 def stage(args: argparse.Namespace) -> int:
@@ -217,6 +264,7 @@ def promote(args: argparse.Namespace) -> int:
         candidate=candidate,
         release_diff=release_diff,
     )
+    ci_evidence = _verify_ci_evidence(attestation)
 
     release_id = _safe_release_id(candidate["release_id"], context="Candidate release_id")
     target = args.releases_root / release_id
@@ -252,7 +300,10 @@ def promote(args: argparse.Namespace) -> int:
                 "editorial_reviewed": True,
                 "source_rights_reviewed": True,
                 "ci_passed_attested": True,
-                "ci_evidence_verified_by_release_engine": False,
+                "ci_evidence_verified_by_release_engine": True,
+                "ci_evidence_policy_id": ci_evidence["policy_id"],
+                "ci_evidence_digest": ci_evidence["evidence_digest"],
+                "ci_verified_runs": ci_evidence["runs"],
                 "candidate_commit": attestation["candidate_commit"],
                 "ci_run_ids": attestation["ci_run_ids"],
                 "artifact_sha256": attestation["artifact_sha256"],
@@ -289,6 +340,8 @@ def promote(args: argparse.Namespace) -> int:
             "data_mode": candidate["data_mode"],
             "candidate_commit": attestation["candidate_commit"],
             "ci_run_ids": attestation["ci_run_ids"],
+            "ci_evidence_policy_id": ci_evidence["policy_id"],
+            "ci_evidence_digest": ci_evidence["evidence_digest"],
         },
     ]
     try:
@@ -303,6 +356,7 @@ def promote(args: argparse.Namespace) -> int:
                 "release_manifest_sha256": manifest_sha,
                 "release_directory": str(target),
                 "promoted_at": promotion_time,
+                "ci_evidence_verified_by_release_engine": True,
                 "source_input_bytes_included": False,
                 "status": "PROMOTED_AFTER_EXPLICIT_REVIEW",
             },

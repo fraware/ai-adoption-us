@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "policy_id": "observatory-release-ci-v1",
+  "repository": "fraware/ai-adoption-us",
+  "required_head_branch": "main",
+  "required_workflows": [
+    {
+      "name": "Release candidate CI",
+      "path": ".github/workflows/ci.yml",
+      "allowed_events": [
+        "push"
+      ]
+    }
+  ]
+}
