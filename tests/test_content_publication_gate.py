@@ -56,17 +56,21 @@ def test_content_publication_path_allowlist_is_presentation_only():
         assert not validator._path_allowed(path), path
 
 
-def test_content_workflow_is_manual_for_deployment_and_keeps_release_gate_separate():
+def test_content_workflow_requires_empty_authorization_for_push_deployment():
     content = WORKFLOW.read_text(encoding="utf-8")
     release = RELEASE_WORKFLOW.read_text(encoding="utf-8")
 
     assert "content_publication_sha" in content
     assert "validate_content_publication_commit.py" in content
     assert "current canonical main commit" in content
+    assert "Authorize Observatory content publication " in content
+    assert "Content publication authorization must have exactly one parent" in content
+    assert "tree-identical to its parent" in content
+    assert "CONTENT_SOURCE_SHA" in content
     assert "Release candidate CI" in content
     assert "Rendered browser and accessibility QA" in content
     assert "Native Safari desktop QA" in content
-    assert "if: github.event_name == 'workflow_dispatch'" in content
+    assert "github.event_name != 'pull_request'" in content
     assert "publication_mode=content_only_over_unchanged_promoted_evidence" in content
 
     assert "validate_observatory_publication_commit.py" in release
