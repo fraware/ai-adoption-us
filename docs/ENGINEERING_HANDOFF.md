@@ -1,398 +1,201 @@
 # Engineering handoff — current implementation and acceptance contracts
 
+Status date: **2026-09-04**
+
 ## 1. Mission
 
-GenAI at Work is not a generic dashboard. It is an empirical publication whose credibility depends on preserving measurement distinctions, source rights, reproducibility, and explicit limits on inference while making the adoption-to-workflow-conversion problem legible.
+GenAI at Work is an empirical publication and data product for studying how generative AI moves from work adoption into routine use, AI-assisted working time, and reported counterfactual time savings in the United States.
 
-Engineering and research work must satisfy three simultaneous constraints:
+Engineering changes must satisfy three simultaneous requirements:
 
-1. **scientific correctness** — constructs and denominators cannot drift;
-2. **rights safety** — private or uncleared source observations cannot leak into public artifacts;
-3. **product quality** — a sophisticated reader should be able to understand evidence, caveats, and provenance without opening the code.
+1. **scientific integrity** — constructs, populations, periods, weighting rules, and interpretation boundaries remain explicit;
+2. **rights safety** — private or unauthorized source material never leaks into public artifacts;
+3. **release integrity** — public claims and artifacts are tied to an exact reviewed source/candidate/repository identity before promotion and deployment.
+
+A green build alone does not authorize publication.
 
 ## 2. Non-negotiable scientific contracts
 
-### Metric semantics
+### RPS constructs
 
-`A` — work adoption/use, extensive margin.
+`A` — work adoption/use, an extensive-margin measure.
 
-`H` — share of work hours during which GenAI was actively used; a workflow-penetration measure, not time saved.
+`H` — share of work hours during which GenAI was actively used, a workflow-penetration measure.
 
-`S` — self-reported counterfactual hours saved as a share of work time; not measured labor productivity.
+`S` — self-reported counterfactual hours saved as a share of work time.
 
-Do not rename `S/H` as efficiency. If used at all, describe it mechanically as **reported saved hours per actively assisted hour** and explain why it may exceed 1.
+`A`, `H`, and `S` are distinct measurement objects. `S` is not measured labor productivity. A ratio such as `S/H`, if used, is only a mechanical ratio of reported saved hours to actively assisted hours; it is not an efficiency estimator.
 
-### Cross-sectional analysis
+### Cross-sectional and longitudinal interpretation
 
-Every R²/correlation in the current RPS result layer is descriptive and aggregate.
+Current correlations, rank relationships, regressions, residuals, and triangulation outputs are descriptive aggregate evidence unless a separate inferential or causal design states otherwise.
 
-Do not use significance language unless subgroup uncertainty becomes available and an explicit inferential procedure is implemented.
+Do not use significance, treatment-effect, productivity, organizational-quality, or causal language without a methodology that supports those estimands.
 
 ### Composition weighting
 
-Adoption → CPS worker shares.
+- adoption counterfactuals use CPS worker-share composition;
+- assisted-hours and reported-savings counterfactuals use CPS actual-main-job-hour shares;
+- usual hours remain a labeled sensitivity, not the primary H/S weighting basis;
+- OEWS is an independent establishment-side robustness source, not a replacement for the primary CPS worker-survey composition basis.
 
-Assisted hours and savings → CPS actual-main-job-hour shares.
-
-This distinction is a hard testable invariant. Do not reuse worker-share weights for H/S.
-
-Usual hours are a labeled sensitivity only.
+Unsupported or suppressed composition cells fail closed. Do not silently renormalize them into apparently complete estimates.
 
 ### Residual language
 
 Canonical term: **occupation-adjusted industry-context residual**.
 
-Forbidden interpretations absent a separate identification strategy:
+The residual is:
 
-- organizational effect;
-- organizational quality;
-- organizational efficiency;
-- productivity effect.
+`observed industry value - occupation-composition counterfactual`
+
+It is a descriptive standardization residual. It is not, by itself, an identified organizational effect, management-quality measure, efficiency measure, productivity effect, or causal mechanism.
 
 ## 3. Source and rights contracts
 
-The public repository is rights-safe.
+The public repository is rights-safe. Private RPS source-input bytes and respondent-level material are excluded from the public Git tree and public release bundle.
 
-Never commit:
+The current published-aggregate RPS source decision is recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`. That reviewed scope does not automatically extend to respondent microdata, the separate task-index artifact, unrestricted bulk mirroring, a historical subgroup database, or a generic public raw-source API.
 
-`data/audit/private/rps_subgroup_5q_audit.json`
+Public availability of a source is not sufficient evidence of redistribution permission.
 
-Public builds use `DATA_MODE=derived_only` unless a future source-rights decision explicitly changes the architecture.
+Any new source or source adapter must document:
 
-Any new source adapter must document:
+- provider and canonical source identity;
+- retrieval time and source/release vintage;
+- registered series/entity inventory;
+- revision behavior and missing/schema-change handling;
+- storage/cache and public-output boundaries;
+- redistribution permission and attribution/disclaimer requirements;
+- available uncertainty or methodology metadata.
 
-- provider;
-- terms;
-- storage/cache policy;
-- redistribution permission;
-- attribution/disclaimer requirements;
-- source vintage;
-- retrieval/revision behavior.
+Credentials, private source paths, and private source-input bytes must never appear in public review packages or client artifacts.
 
-Do not reintroduce persistent FRED observation caching as a shortcut around unresolved rights.
+## 4. Current verified evidence surface
 
-The RPS source decision is split into three independent gates in `docs/source-rights/RPS_PERMISSION_REQUEST.md`:
+### RPS
 
-1. current/future Tracker aggregate publication and delivery rights;
-2. historical paper replication-package reuse;
-3. detailed task/occupation respondent-data research access.
+The current source registry contains **131 work-focused series**: 5 national, 60 industry, and 66 occupation series.
 
-A positive answer on one gate does not imply permission on another.
+The latest validated live candidate evidence contains **962 registered source observations** across the available source history. The complete common A/H/S subgroup panel contains **882 cells** across seven quarters, Q4 2024–Q2 2026:
 
-## 4. Current verified implementation surface
+`(20 industries + 22 occupations) × 3 constructs × 7 quarters = 882`.
 
-Python/research modules cover:
+The bounded public RPS observation contract exposes national history plus the latest authorized industry/occupation A/H/S views. It does not expose the private source snapshot or an unrestricted historical subgroup mirror.
 
-- canonical RPS source identities;
-- five-wave longitudinal diagnostics;
-- CPS parsing and composition weighting;
-- historical CPS layout handling;
-- composition reliability;
-- OEWS composition and cross-vintage robustness;
-- composition evidence-tier logic;
-- residual generation logic;
-- canonical normalization/model utilities;
-- fail-closed source adapter/governance behavior.
+### Longitudinal diagnostics
 
-Primary execution scripts include:
+The current longitudinal result layer is synchronized to all seven common quarters. It includes cross-sectional A/H/S relationships, rank stability, regression diagnostics, and leave-one-group-out robustness.
 
-- `build_longitudinal.py`;
-- `execute_cps_composition.py`;
-- `execute_cps_2025_composition.py`;
-- `execute_cps_composition_reliability.py`;
-- `execute_oews_composition.py`;
-- `compare_oews_cps_vintages.py`;
-- `build_composition_evidence_tiers.py`;
-- `build_composition_residuals.py`;
-- `export_rights_safe.py`;
-- `build_rps.py`, intentionally retired/fail-closed.
+The current descriptive headline result is that adoption and assisted-hours are more tightly aligned across occupations than industries over the common seven-quarter window, while occupation-level reported savings are more consistently aligned with adoption than assisted hours. Industry-level ordering varies by quarter. Exact values and interpretation limits live in `docs/RESULTS.md` and governed derived artifacts.
 
-Public web surface:
+### CPS composition
 
-- narrative home;
-- industry explorer;
-- occupation explorer;
-- technical essay;
-- methodology;
-- sources/provenance;
-- release-mode disclosure;
-- responsive Observable Plot charts;
-- chart-equivalent HTML tables.
+Official Basic Monthly CPS inputs have been executed for Q2 2025 and Q2 2026. The repository contains versioned worker-share and actual-main-job-hour composition outputs, coverage diagnostics, sensitivity analyses, reliability checks, and evidence-tier metadata.
 
-Release CI validates the public research/application surface with Python tests, compilation, Ruff, strict mypy, governance/privacy checks, locked `npm ci`, TypeScript, optimized `derived_only` production build, private-build scanning, production-server startup, and route smoke tests.
+The Q4 2025 composition quarter is unavailable because October 2025 CPS data were not collected. Do not construct a synthetic full quarter from November–December records.
 
-Rendered-browser QA is now a separate executable workflow using stable Chrome, Firefox, and a WebKit engine proxy at representative responsive widths with keyboard, overflow, axe, runtime/console, Lighthouse, screenshot, trace, browser-version, and build-size evidence.
+Custom pooled CPS composition vectors do not currently have a supported full design-based covariance model. Kish weight-dispersion measures, month-to-quarter movement, leave-one-month-out sensitivity, and cross-vintage stability are descriptive quality diagnostics, not design-based standard errors.
 
-WebKit evidence is not real Safari/iOS validation. Automated browser evidence is not screen-reader validation.
+### OEWS robustness
 
-## 5. Current empirical/evidence state
+Official May 2025 OEWS staffing data are used as an independent establishment-side composition robustness source. Coverage/population differences from CPS and RPS remain explicit, including partial-identification handling for unsupported cells.
 
-### RPS longitudinal layer
+### BTOS–RPS triangulation
 
-The frozen five-wave private panel contains:
+The repository contains preregistered descriptive firm-side/worker-side triangulation. BTOS and RPS constructs remain distinct; cross-source agreement or disagreement is interpreted as triangulation across measurement objects, not as interchangeable measures.
 
-- 20 industries;
-- 22 occupations;
-- A/H/S;
-- Q2 2025 through Q2 2026;
-- 630 audited subgroup cells.
+## 5. Current release architecture
 
-The generated longitudinal layer must preserve these assertions unless a legitimate source revision changes the audited input fixture:
+### Candidate construction
 
-- occupation Pearson A-H > industry Pearson A-H in all five waves;
-- occupation Spearman A-H > industry Spearman A-H in all five waves;
-- occupation R²(S~A) > R²(S~H) in all five waves;
-- occupation leave-one-out A beats H = **110/110**;
-- industry H beats A for S in **3/5** waves, not 5/5;
-- adoption rank stability > H stability in every frozen quarter-pair comparison at both aggregation levels;
-- adoption rank stability > S stability in every frozen quarter-pair comparison at both levels.
+Release-sensitive changes build a complete Observatory candidate from canonical repository state and the authorized live RPS source. The source is retrieved into a private/external workspace, validated against the registered series contract, and assigned exact scientific/source identities.
 
-These results are descriptive, aggregate, and non-causal.
+The RPS component, bounded public observation view, longitudinal diagnostics, CPS/OEWS/BTOS evidence, and governed claim surfaces are composed into one candidate manifest.
 
-### CPS composition foundation
+### Claim-surface binding
 
-Real official CPS execution is complete for the current composition foundation:
+Governed empirical claims are bound to the exact public files that present them. A change to a governed page/document, source client, source-refresh logic, release component, or relevant registry invalidates the candidate-review state and requires a new candidate.
 
-- Q2 2026 primary composition package: `data/derived/composition/cps-q2-2026/`;
-- Q2 2025 historical-layout comparison package: `data/derived/composition/cps-q2-2025/`;
-- cross-quarter reliability evidence: `data/derived/composition/cps-q2-reliability/`.
+### Staging and human review
 
-The associated validation records are under `docs/validation/`.
+Staging creates immutable candidate/stage identities, a release diff, review package, and fail-closed publication gate. A valid unreviewed candidate has gate status `BLOCKED_REVIEW_REQUIRED` with zero contract failures.
 
-This establishes composition inputs and reliability evidence. It does **not** establish an RPS industry residual.
+The candidate-review workflow produces rights-safe artifacts and an uncompleted attestation template. It cannot self-attest scientific, editorial, source-rights, CI, or rehydration completion.
 
-### OEWS robustness foundation
+### Exact rehydration
 
-Official May 2025 OEWS staffing data have been executed as an independent establishment-side robustness basis:
+Promotion does not trust a stale source snapshot. The trusted workflow re-fetches the source on the exact reviewed repository commit and requires the same scientific source identity. It rebuilds the candidate and stage and requires exact equality with the reviewed candidate/stage records.
 
-- `data/derived/composition/oews-may-2025/`;
-- `data/derived/composition/oews-may-2025-cross-vintage/`.
+Any source-identity or candidate/stage drift fails closed and requires renewed review.
 
-Population and coverage differences from CPS/RPS remain explicit. OEWS is robustness evidence, not the primary worker-survey composition basis.
+### Promotion
 
-### Composition residual
+Promotion requires a human attestation bound to the deterministic exact-rehydration identity and independently verified exact-commit CI evidence. Only declared public artifacts are copied into a new immutable release directory. Private candidate inputs remain excluded.
 
-The observed-versus-counterfactual RPS industry join remains blocked on the rights-cleared RPS observation path.
+The release registry is append-only. A promoted release cannot rewrite an existing release ID.
 
-Do not publish an occupation-adjusted industry-context residual until:
+### Publication commit and deployment
 
-1. the compatible RPS observation source is explicitly authorized for the required use;
-2. the source vintage/construct alignment is documented;
-3. the validated CPS composition weights are joined without violating the source-rights contract;
-4. suppression/coverage propagates correctly;
-5. actual-versus-usual-hours, influence, temporal, and other prespecified robustness checks pass;
-6. uncertainty limitations are exposed.
+Public deployment is not triggered by arbitrary `main` pushes. The promotion workflow creates a single authorization commit constrained to:
 
-## 6. Permanent CI specification
+- the Observatory release registry; and
+- one new immutable `data/releases/<release-id>/` directory.
 
-`.github/workflows/ci.yml` is the permanent PR/main validation contract.
+The publication-commit validator verifies that the release did not exist in the parent, the registry transition appends exactly one release, the release manifest points to the correct predecessor, the parent is the exact reviewed candidate commit, and release/review/rehydration/artifact identities agree.
 
-Workflow dependencies must remain pinned to immutable commit SHAs.
+GitHub Pages deploys only after that authorization commit passes validation. A live-origin audit must then bind the deployed state to the release identity before formal publication.
 
-### Python/governance job
+## 6. FRED operational contract
 
-Required:
+FRED documents a maximum API rate of two requests per second. The production `FredClient` therefore paces request starts below that ceiling using a monotonic clock.
+
+All release-critical workflows that retrieve the authorized live FRED source share the repository concurrency group `authorized-rps-fred-source` with cancellation disabled. Candidate review, independent live validation, and exact rehydration/promotion must never run simultaneous full-source retrievals inside this repository.
+
+HTTP 429 and selected transient failures retain bounded retry/backoff and fail closed after exhaustion. Do not remove rate pacing or workflow serialization as a convenience optimization.
+
+## 7. Permanent CI contract
+
+`.github/workflows/ci.yml` is the permanent PR/main software and governance contract.
+
+The Python/governance job requires:
 
 - Python 3.12;
-- public-tree scan rejects `data/audit/private/`;
-- scan rejects bootstrap transfer material;
-- scan rejects tracked TypeScript build metadata;
-- canonical RPS registry cardinality check;
+- public-tree governance/privacy scan;
+- canonical RPS registry checks;
 - install `.[dev]`;
-- `pytest -q`;
-- `python -m compileall -q src scripts`;
-- `ruff check src tests scripts`;
+- full public pytest suite;
+- Python compilation;
+- Ruff;
 - strict `mypy src`;
-- `git diff --check`.
+- Git whitespace validation.
 
-The public checkout may skip only tests whose sole required input is the deliberately excluded private fixture.
-
-### Web job
-
-Required:
+The web job requires:
 
 - Node 22;
-- `npm ci` from `apps/web/package-lock.json`;
+- locked `npm ci`;
 - TypeScript validation;
 - `DATA_MODE=derived_only` optimized production build;
 - private-data build-tree scan;
 - production-server startup;
-- HTTP smoke tests for every public route;
-- no private fixture required.
+- public-route HTTP smoke tests.
 
-### Rendered-browser job
+Workflow dependencies are pinned to immutable action commit SHAs. Do not weaken tests, typing, scans, dependency locking, or release checks to obtain a green result.
 
-The R1-G2 automated baseline must exercise the optimized production candidate rather than a development server.
+## 8. Browser, accessibility, and deployment evidence
 
-Required automated evidence includes:
+Rendered QA and native Safari QA are separate from ordinary unit/build CI. Automated WebKit is not equivalent to native Safari/iOS, and automated accessibility checks are not equivalent to full human screen-reader review.
 
-- stable Chrome at approximately 375/768/1024/1440 px;
-- Firefox at narrow/wide representative widths;
-- WebKit engine proxy at narrow/wide representative widths;
-- route response and semantic structure;
-- primary navigation;
-- page-level overflow;
-- table containment/readability;
-- skip-link keyboard entry and focus transfer;
-- visible focus;
-- reduced-motion behavior;
-- serious/critical axe violations;
-- uncaught runtime and browser-console errors;
-- Lighthouse accessibility and performance evidence;
-- screenshots/traces and exact browser versions.
+Release 1 claims only the evidence actually recorded by the applicable workflows and checklist. Physical mobile-device testing, complete human assistive-technology traversal, and field Core Web Vitals remain outside the current automated evidence unless separately performed and recorded.
 
-A CI failure is evidence. Do not weaken scientific tests, typing, rights scans, source boundaries, accessibility assertions, or production dependencies merely to obtain a green check.
+## 9. Contribution and review expectations
 
-## 7. Product implementation standards
+See `CONTRIBUTING.md` and `.github/pull_request_template.md`.
 
-### Charts
+Every substantial pull request should state its scientific/public-claim impact, source/rights impact, validation evidence, and release impact. Documentation that changes how an empirical result is interpreted is treated as a scientific change for review purposes.
 
-Every core chart must have:
+Historical validation and reconstruction records remain provenance and are explicitly labeled historical. Current operational truth lives in the README, `docs/ROADMAP.md`, `docs/RELEASE_CHECKLIST.md`, the release registry, and immutable release manifests.
 
-- descriptive title;
-- metric definition/caveat near the chart;
-- accessible HTML data equivalent;
-- responsive width behavior;
-- direct labels where practical;
-- no decorative score/gauge metaphor.
+## 10. Release definition of done
 
-### Tables
-
-- semantic headers/scopes;
-- explicit units;
-- period/source context;
-- stable sorting behavior;
-- no leaderboard framing for unstable/noisy cells without stability context.
-
-### No-data behavior
-
-Missing/suppressed data must state **why** it is unavailable.
-
-Examples:
-
-- unsupported quarter;
-- private fixture absent;
-- coverage suppression;
-- production source disabled;
-- rights-gated observation path.
-
-Never render zero for missing.
-
-### Evidence labeling
-
-Keep direct measurements, derived descriptive transformations, composition evidence/counterfactuals, and causal/mechanism claims visibly distinct. Experimental composition content must not inherit the visual authority of direct RPS measurements without disclosure.
-
-## 8. Release 1 completion work
-
-The production compilation/build gate is complete. Remaining launch work is evidence-based, not cosmetic.
-
-Current product gates:
-
-1. complete the automated rendered-browser baseline on the exact merge candidate;
-2. perform real Safari/iOS and appropriate Android/Chrome review;
-3. perform VoiceOver plus a second screen-reader review;
-4. manually review chart interaction, labels/tooltips, color dependence, and visual regression;
-5. record meaningful performance evidence where deployment permits it;
-6. complete the production deployment audit;
-7. perform final source-citation/editorial review;
-8. create immutable release identity/tag only after the applicable gates close.
-
-The RPS source-rights decision proceeds in parallel and governs whether the full direct-observation observatory can be published. A technically deployable `derived_only` site is not evidence that direct observation rights exist.
-
-## 9. Release 1.1 composition work
-
-The **composition foundation is executed**. The remaining Release 1.1 scientific work is the RPS-dependent empirical join and its robustness, not rerunning the already-completed inputs as if they did not exist.
-
-Before any public residual/explorer:
-
-- confirm authorized compatible RPS occupation and industry observations;
-- bind the exact RPS vintage and construct definitions;
-- join adoption with worker-share composition and H/S with actual-hour-share composition;
-- propagate unsupported CPS mapping/validity coverage as null;
-- compare actual-hours and usual-hours specifications;
-- run leave-one-occupation/influence checks;
-- test temporal persistence wherever compatible composition periods exist;
-- incorporate formal uncertainty or partial-identification bounds where supported;
-- keep CPS/OEWS population differences visible;
-- avoid a one-quarter residual leaderboard.
-
-The experimental composition explorer remains blocked until the residual evidence is scientifically green.
-
-## 10. Source-rights work
-
-`docs/source-rights/RPS_SOURCE_DECISION.md` is the governing decision record once an authorized response exists.
-
-Record:
-
-- provider/contact;
-- date;
-- exact language/attachments/links;
-- scope requested;
-- permission result by gate;
-- permitted storage/cache behavior;
-- permitted transformation;
-- permitted display/redistribution/API behavior;
-- attribution/disclaimer language;
-- update mechanism;
-- uncertainty/microdata availability;
-- engineering consequence.
-
-Do not mark outreach as sent based on intent or an unverified mail-history assumption.
-
-## 11. Observatory governance
-
-The project is intended to be a longitudinal observatory, not a one-time static release.
-
-For every new RPS wave/source revision:
-
-1. verify source rights/terms;
-2. record source vintage and retrieval identity;
-3. detect revisions to previously frozen observations/definitions;
-4. regenerate dependent artifacts;
-5. compare against the prior freeze;
-6. identify every changed chart/text claim;
-7. run stability/influence/regression contracts;
-8. require explicit scientific/editorial review;
-9. publish only after CI and review pass;
-10. retain immutable analytical history.
-
-Any authorized private RPS fixture revision must also force full longitudinal regeneration and claim review. The private fixture remains outside the public repository.
-
-## 12. Review standard
-
-A PR touching empirical logic must answer:
-
-1. What estimand/construct changes?
-2. What denominator changes?
-3. What source/version changes?
-4. What generated results change?
-5. Are old results invalidated or merely extended?
-6. Does the rights boundary change?
-7. What new test prevents regression?
-
-A PR touching presentation must state whether any claim or number changed. If yes, it is not “presentation-only.”
-
-A PR touching source ingestion must state storage/cache/redistribution implications before code review can treat it as routine engineering.
-
-## 13. Release/deployment review standard
-
-Before a public release:
-
-- rendered browser behavior must be tested, not inferred from source code;
-- accessibility claims require automated plus real assistive-technology evidence;
-- performance claims require measured evidence;
-- deployment must be tied to an exact commit/artifact identity;
-- private paths and uncleared raw observations must be absent from the deployed artifact;
-- the release must state the difference between direct evidence, derived diagnostics, produced composition inputs, gated residuals, and unexecuted causal/mechanism research.
-
-## 14. Final vision
-
-The long-run system is a versioned empirical observatory that can ingest authorized new RPS waves, detect revisions, regenerate national/industry/occupation evidence, assess stability, combine those observations with independently validated composition evidence where lawful and scientifically aligned, and preserve analytical history.
-
-The evolving measurement sequence is:
-
-**capability/exposure → realized task adoption → work adoption → routine use/workflow penetration → reported savings → separately identified economic outcomes**.
-
-The mature product should answer not just **who uses GenAI**, but where adoption converts into actual work, where that conversion is stable or unstable, how much aggregate industry variation can be explained by occupation composition, and which subsequent research design is required to explain the remaining wedge.
-
-Its credibility comes from refusing to collapse availability, exposure, adoption, workflow penetration, reported savings, and economic realization into one score or one causal story.
+Release 1 is complete only after every release-time item in `docs/RELEASE_CHECKLIST.md` is satisfied on the exact final identities, including human review, exact rehydration, promotion, release-only deployment, live audit, final manual inspection, and formal GitHub tag/Release creation.
