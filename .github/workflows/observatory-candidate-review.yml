@@ -21,6 +21,7 @@ on:
       - 'src/genai_at_work/rps_public_view.py'
       - 'src/genai_at_work/observatory_baseline.py'
       - 'src/genai_at_work/observatory_rps_bindings.py'
+      - 'data/registry/longitudinal_claim_inventory.json'
       - 'data/registry/observatory_v1_baseline_contract.json'
       - 'data/registry/observatory_v1_rps_repository_bindings.json'
       - 'data/registry/rps_public_observation_delivery_v1.json'
@@ -30,6 +31,15 @@ on:
       - 'data/derived/composition/rps-cps-residuals-2026-09-02/**'
       - 'data/derived/composition/oews-rps-adoption-2026-09-02/**'
       - 'data/derived/btos_rps/**'
+      - 'apps/web/app/page.tsx'
+      - 'apps/web/app/explore/industries/page.tsx'
+      - 'apps/web/app/explore/occupations/page.tsx'
+      - 'apps/web/app/blog/after-adoption/page.tsx'
+      - 'apps/web/app/methodology/page.tsx'
+      - 'apps/web/app/sources/page.tsx'
+      - 'README.md'
+      - 'docs/RESULTS.md'
+      - 'docs/source-provenance.md'
   workflow_dispatch:
 
 permissions:
