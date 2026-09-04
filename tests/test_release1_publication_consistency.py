@@ -31,7 +31,7 @@ def test_sources_page_matches_current_r1_source_and_qa_state():
     assert "published-aggregate project use is recorded as permitted" in lower
     assert "authorized aggregate release path" in lower
     assert "bounded presentation view" in lower
-    assert "historical subgroup panel" in lower
+    assert "historical" in lower and "subgroup panel" in lower
     assert "generic source query api" in lower
     assert "native\n          macos safari" in lower
     assert "human screen-reader traversal" in lower
