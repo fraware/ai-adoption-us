@@ -9,13 +9,14 @@ def read(relative: str) -> str:
 
 def test_public_release_surfaces_do_not_revert_to_candidate_language():
     release_notice = read("apps/web/components/ReleaseNotice.tsx")
+    lower_release_notice = release_notice.lower()
     home = read("apps/web/app/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
     methodology = read("apps/web/app/methodology/page.tsx")
 
     assert "Release 1 · reviewed public evidence" in release_notice
-    assert "private source-input" in release_notice
-    assert "unrestricted historical subgroup data" in release_notice
+    assert "private source-input bytes" in lower_release_notice
+    assert "unrestricted historical subgroup data" in lower_release_notice
     assert "Public candidate · derived diagnostics only" not in release_notice
     assert "public candidate" not in home.lower()
     assert "public candidate" not in sources.lower()
