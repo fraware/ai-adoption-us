@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "policy": "Any changed longitudinal publication artifact triggers review of every registered dependent public claim unless a future dependency map proves narrower scope.",
+  "policy": "Any changed longitudinal publication artifact triggers review of every registered dependent public claim unless a future dependency map proves narrower scope. Every registered surface is cryptographically bound into the release claim identity.",
   "claims": [
     {
-      "claim_id": "home-five-wave-summary",
+      "claim_id": "home-longitudinal-summary",
       "surface": "apps/web/app/page.tsx",
       "description": "Homepage longitudinal evidence summary and interpretive framing, with wave counts read from the release artifact."
     },
@@ -23,9 +23,29 @@
       "description": "Technical essay claims derived from the complete common-window RPS subgroup diagnostics."
     },
     {
+      "claim_id": "methodology-longitudinal-scope",
+      "surface": "apps/web/app/methodology/page.tsx",
+      "description": "Public methodology language governing the longitudinal window, estimands, and interpretation boundary."
+    },
+    {
+      "claim_id": "sources-longitudinal-status",
+      "surface": "apps/web/app/sources/page.tsx",
+      "description": "Public source and provenance page statements about the bounded RPS release scope and longitudinal evidence."
+    },
+    {
       "claim_id": "readme-longitudinal-status",
       "surface": "README.md",
       "description": "Repository-level summary of longitudinal findings and validation state."
+    },
+    {
+      "claim_id": "results-longitudinal-summary",
+      "surface": "docs/RESULTS.md",
+      "description": "Canonical public result tables and interpretation limits for the current longitudinal evidence."
+    },
+    {
+      "claim_id": "source-provenance-longitudinal-status",
+      "surface": "docs/source-provenance.md",
+      "description": "Repository provenance record for the RPS longitudinal source scope, rights boundary, and published evidence."
     }
   ]
 }
