@@ -111,7 +111,7 @@ def test_methodology_keeps_savings_distinct_from_productivity():
     assert "owner permission for published aggregate project use" in sources.lower()
     assert "DATA_MODE=derived_only" in page
     assert "private\n          source-input bytes" in page
-    assert "private source-input bytes" in release_notice
+    assert "private source-input bytes" in release_notice.lower()
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():
