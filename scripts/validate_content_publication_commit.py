@@ -45,6 +45,18 @@ ALLOWED_PREFIXES = (
     "tests/",
 )
 
+# Only paths capable of changing the deployed web artifact, its governed evidence,
+# or the publication/release machinery are relevant to this gate. Repository-only
+# documentation and other non-deploy metadata may evolve independently and must not
+# make a later presentation publication impossible.
+DEPLOY_SENSITIVE_PREFIXES = (
+    ".github/workflows/",
+    "apps/web/",
+    "data/",
+    "scripts/",
+    "src/",
+)
+
 
 class ContentPublicationError(RuntimeError):
     """Raised when a presentation-only publication violates evidence boundaries."""
@@ -76,6 +88,10 @@ def _git_json(commit: str, path: str) -> dict[str, Any]:
 
 def _path_allowed(path: str) -> bool:
     return path in ALLOWED_EXACT_PATHS or any(path.startswith(prefix) for prefix in ALLOWED_PREFIXES)
+
+
+def _path_deploy_sensitive(path: str) -> bool:
+    return any(path.startswith(prefix) for prefix in DEPLOY_SENSITIVE_PREFIXES)
 
 
 def _authorization_commit(release_id: str) -> str:
@@ -155,10 +171,11 @@ def validate(commit: str) -> dict[str, Any]:
     changed = [
         line for line in _git("diff", "--name-only", authorization, target).splitlines() if line
     ]
-    unexpected = [path for path in changed if not _path_allowed(path)]
+    deploy_sensitive = [path for path in changed if _path_deploy_sensitive(path)]
+    unexpected = [path for path in deploy_sensitive if not _path_allowed(path)]
     if unexpected:
         raise ContentPublicationError(
-            f"Content publication contains deploy-sensitive or non-presentation changes: {unexpected}"
+            f"Content publication contains deploy-sensitive changes outside the presentation boundary: {unexpected}"
         )
 
     return {
@@ -169,6 +186,8 @@ def validate(commit: str) -> dict[str, Any]:
         "evidence_manifest_sha256": manifest_sha,
         "evidence_authorization_commit": authorization,
         "changed_paths": changed,
+        "deploy_sensitive_paths": deploy_sensitive,
+        "ignored_non_deploy_paths": [path for path in changed if path not in deploy_sensitive],
     }
 
 
