@@ -28,6 +28,7 @@ FORBIDDEN_TERMS = (
     "quiet",
     "concrete",
     "precise",
+    "unsual",
     "unusual",
     "survive",
     "carry",
@@ -59,6 +60,7 @@ FORBIDDEN_PHRASES = (
     "this matters because",
     "what matters is",
     "rather than",
+    "it is not",
 )
 
 STRING_LITERAL_RE = re.compile(
