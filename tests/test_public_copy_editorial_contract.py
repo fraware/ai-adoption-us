@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_COPY_FILES = (
     "apps/web/app/page.tsx",
     "apps/web/app/blog/after-adoption/page.tsx",
+    "apps/web/app/explore/page.tsx",
     "apps/web/app/explore/industries/page.tsx",
     "apps/web/app/explore/occupations/page.tsx",
     "apps/web/app/layout.tsx",
