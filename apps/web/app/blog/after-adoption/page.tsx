@@ -3,7 +3,7 @@ import Link from "next/link";
 import { latestNational, loadObservations } from "../../../lib/data";
 import { loadLongitudinalDiagnostics } from "../../../lib/longitudinal";
 
-export const metadata: Metadata = { title: "After adoption" };
+export const metadata: Metadata = { title: "From adoption to workflow" };
 
 export default async function AfterAdoptionPage() {
   const [rows, longitudinal] = await Promise.all([
@@ -25,125 +25,155 @@ export default async function AfterAdoptionPage() {
   const industryDominance = longitudinal.rank_stability_dominance.industry;
   const occupationDominance = longitudinal.rank_stability_dominance.occupation;
   const industryQuarters = Object.values(longitudinal.quarter_diagnostics.industry);
+  const occupationQuarters = Object.values(longitudinal.quarter_diagnostics.occupation);
   const industryHBeatsAWaves = industryQuarters.filter((d) => d.r2_S_H > d.r2_S_A).length;
+  const occupationABeatsHWaves = occupationQuarters.filter((d) => d.r2_S_A > d.r2_S_H).length;
+  const occupationLooABeatsH = occupationQuarters.reduce((total, d) => total + d.loo_A_beats_H, 0);
 
   return (
     <main>
       <article className="reading">
         <p className="eyebrow">Technical essay</p>
-        <h1>After adoption: where AI enters actual work</h1>
+        <h1>From adoption to workflow: measuring AI at work</h1>
         <p className="lede">
-          Adoption is the most visible workplace-AI statistic. {periods.length} common subgroup quarters
-          from {firstPeriod} through {lastPeriod} show why it is only the first layer of the economic story.
+          Workplace GenAI diffusion is now large enough that adoption alone compresses too much
+          information. {periods.length} common subgroup quarters from {firstPeriod} through {lastPeriod}
+          reveal a second research problem: how reported use converts into recurring use, assisted working
+          time, and reported savings.
         </p>
 
         {adoption && weekly && daily && assisted && savings ? (
           <p>
             In {adoption.period}, {adoption.value.toFixed(1)}% of employed U.S. adults aged 18–64
-            reported using generative AI for work. {weekly.value.toFixed(1)}% had used it for work in
-            the prior week, while {daily.value.toFixed(1)}% used it every workday. GenAI was actively
-            assisting about {assisted.value.toFixed(1)}% of total work hours, and respondents reported
-            time savings equal to {savings.value.toFixed(1)}% of total work hours.
+            reported using generative AI for work. {weekly.value.toFixed(1)}% reported work use in the
+            prior week and {daily.value.toFixed(1)}% reported use on every workday. GenAI assisted
+            {` ${assisted.value.toFixed(1)}% `}of total work hours, alongside reported counterfactual time
+            savings equal to {savings.value.toFixed(1)}% of total work hours. Read together, these measures
+            trace the distance between diffusion and depth of use.
           </p>
         ) : (
           <div className="callout">
             <p className="callout-label">Public release boundary</p>
             <p>
-              The bounded national observation view is unavailable in this build. The empirical claims
-              below are generated from validated longitudinal derived diagnostics; private source-input
-              bytes remain outside the public bundle.
+              This build excludes the bounded national observation view. The longitudinal findings below
+              come from validated derived diagnostics, with private source-input bytes kept outside the
+              public bundle.
             </p>
           </div>
         )}
 
-        <section className="section" aria-labelledby="five-objects">
-          <h2 id="five-objects">Five objects that public discussion collapses into one</h2>
+        <section className="section" aria-labelledby="separate-objects">
+          <h2 id="separate-objects">Adoption and conversion are separate empirical objects</h2>
           <p>
-            Availability, adoption, routine use, workflow penetration, and economic realization are not
-            synonyms. A worker can have adopted a model without using it this week. A weekly user can
-            spend only a small fraction of working time actively using it. Time released by a tool need
-            not translate one-for-one into measured output.
+            Adoption measures reach. Recent and routine use measure recurrence. Assisted hours measure the
+            share of working time in which GenAI is active. Reported savings ask respondents to estimate
+            the additional time the same work would have required without GenAI. A single adoption rate
+            cannot encode movement across these layers.
+          </p>
+          <p>
+            This separation changes the economic question. Diffusion asks how widely a technology spreads
+            across workers. Conversion asks how reported adoption translates into recurring workflow use,
+            time allocation, and reported labor input released. Realized output sits further downstream and
+            requires its own evidence.
           </p>
         </section>
 
         <section className="section" aria-labelledby="persistence">
-          <h2 id="persistence">Adoption looks more persistent than depth of use</h2>
+          <h2 id="persistence">Adoption is more stable than workflow penetration</h2>
           <p>
-            Across industries, the median pairwise rank correlation over the {periods.length} audited waves is
-            {` ${industry.A.median_pairwise.toFixed(2)} `}for adoption and {industry.H.median_pairwise.toFixed(2)} for assisted hours.
-            Across occupations the corresponding values are {occupation.A.median_pairwise.toFixed(2)} and
-            {` ${occupation.H.median_pairwise.toFixed(2)}.`} Adoption ranks are more stable than
-            assisted-hours ranks in
+            Across industries, the median pairwise rank correlation over the {periods.length} audited waves
+            is {industry.A.median_pairwise.toFixed(2)} for adoption and {industry.H.median_pairwise.toFixed(2)}
+            for assisted hours. Across occupations, the corresponding values are
+            {` ${occupation.A.median_pairwise.toFixed(2)} and ${occupation.H.median_pairwise.toFixed(2)}.`}
+            Adoption ranks exceed assisted-hours rank stability in
             {` ${industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${industryDominance.quarter_pairs} `}
             industry quarter-pair comparisons and
             {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${occupationDominance.quarter_pairs} `}
             occupation comparisons.
           </p>
           <p>
-            This supports a useful empirical distinction. The relative ranking of industries and occupations on adoption is comparatively persistent, while
-            their rankings on the share of working time assisted by GenAI are considerably more variable. That does not prove a mechanism, but it locates the unexplained
-            variation more precisely.
+            The cross-group geography of diffusion is more persistent than the geography of use intensity.
+            Groups can retain similar relative positions in adoption and move more strongly in the share of
+            working time assisted by GenAI. That difference places conversion at the center of the unresolved
+            measurement problem.
           </p>
         </section>
 
         <section className="section" aria-labelledby="occupation-structure">
-          <h2 id="occupation-structure">Adoption and penetration are more tightly aligned across occupations</h2>
+          <h2 id="occupation-structure">Occupations organize conversion more strongly than industries</h2>
           <p>
-            In every audited quarter, both Pearson and Spearman correlations between adoption and
-            assisted hours are higher across occupations than across industries. The aggregate adoption-to-penetration relationship is therefore more tightly aligned across
-            occupations than across broad industry categories.
+            In every audited quarter, both Pearson and Spearman correlations between adoption and assisted
+            hours are higher across occupations than across industries. The adoption-to-penetration
+            relationship is consistently tighter at the occupation level.
           </p>
           <p>
-            The interpretation must remain limited. Occupations capture task bundles, while industries
-            combine occupations with firm composition, workflow design, policy, regulation, worker
-            selection, technology stacks, and sampling variation. The additional industry wedge is a
-            research object; the current aggregate data do not identify it as an organizational effect.
-          </p>
-        </section>
-
-        <section className="section" aria-labelledby="wave-dependence">
-          <h2 id="wave-dependence">One attractive Q2 result does not persist as a universal rule</h2>
-          <p>
-            In Q2 2026, assisted hours explain more cross-industry variation in reported savings than
-            adoption does. Across the full {periods.length}-wave window, that ordering occurs in
-            {` ${industryHBeatsAWaves} of ${periods.length} waves.`} The relationship changes direction. The publication therefore reports the wave-by-wave
-            evidence instead of turning the latest quarter into a structural claim.
+            Occupations encode task structure more directly than broad industries. Industry aggregates mix
+            occupation composition with firm context and sampling variation. The additional industry wedge
+            is an empirical target for further work; causal attribution requires data that resolve those
+            channels separately.
           </p>
         </section>
 
-        <section className="section" aria-labelledby="savings-not-productivity">
-          <h2 id="savings-not-productivity">Reported time saved is not productivity</h2>
+        <section className="section" aria-labelledby="savings-structure">
+          <h2 id="savings-structure">Reported savings organize differently across occupations and industries</h2>
           <p>
-            The RPS asks users how many additional hours they believe the same work would have required
-            without GenAI. That is a counterfactual survey measure of perceived released labor input. It
-            is not observed labor productivity. Released time may become more output, higher quality,
-            additional checking, different work, or something else entirely.
+            Across occupations, adoption has the higher univariate R² for reported savings in
+            {` ${occupationABeatsHWaves} of ${periods.length} `}waves and every one of the
+            {` ${occupationLooABeatsH} `}leave-one-occupation comparisons. Across industries, assisted
+            hours has the higher univariate R² in {industryHBeatsAWaves} of {periods.length} waves. The
+            industry ordering shifts across quarters.
+          </p>
+          <p>
+            The contrast constrains simple explanations of reported savings. Across occupations, breadth
+            of adoption contains more cross-group information about reported savings than assisted-hour
+            share throughout the audited window. Industry-level relationships display a less stable
+            ordering, consistent with a larger role for composition and context at that level.
           </p>
         </section>
 
         <section className="section" aria-labelledby="composition-frontier">
-          <h2 id="composition-frontier">Composition narrows the question; it does not identify the mechanism</h2>
+          <h2 id="composition-frontier">Composition separates workforce mix from industry context</h2>
           <p>
-            Official CPS Q2 2025 and Q2 2026 inputs provide worker-share weights for adoption and
-            actual-main-job-hour weights for assisted-hours and reported-savings counterfactuals. The
-            project can therefore compare observed industry values with occupation-composition predictions
-            and form occupation-adjusted industry-context residual diagnostics.
+            CPS occupation weights generate an industry counterfactual from national occupation-specific
+            GenAI rates. Adoption uses worker-share weights; assisted hours and reported savings use
+            actual-main-job-hour weights. Comparing observed industry values with these counterfactuals
+            produces an occupation-adjusted industry-context residual.
           </p>
           <p>
-            Those residuals remain descriptive. They are not organizational quality, management effects,
-            efficiency, or productivity. Full design-based uncertainty for the custom pooled CPS
-            composition vectors is also unsupported in Release 1, while OEWS supplies a separate
-            establishment-side robustness check. The next empirical frontier is to explain the remaining
-            variation with stronger task, firm, and outcome data without relabeling the residual as a causal mechanism.
+            Release 1 treats that residual as a descriptive diagnostic. Organizational effects, management
+            quality, efficiency, and productivity require separate identification. Full design-based
+            uncertainty for the custom pooled CPS composition vectors remains unsupported, and OEWS
+            provides an independent establishment-side robustness check.
           </p>
         </section>
 
+        <section className="section" aria-labelledby="reported-savings">
+          <h2 id="reported-savings">Reported savings measure perceived released time</h2>
+          <p>
+            The RPS asks users to estimate how many additional hours the same work would have required
+            without GenAI. The resulting measure is a self-reported counterfactual estimate of released
+            labor input. Observed productivity requires output data and an identification strategy linking
+            AI use to changes in production.
+          </p>
+        </section>
+
+        <p>
+          The first workplace-AI question asked how widely GenAI had diffused. The evidence now supports a
+          richer question: how adoption converts into recurring use, assisted working time, reported
+          savings, and eventually realized outcomes. The observatory is built to keep those stages separate
+          as the data improve.
+        </p>
+
         <p className="note">
-          All numeric longitudinal claims on this page are generated from the same versioned derived
-          diagnostic artifact used by the explorers. The public release does not require the private raw
-          source history to render them.
+          Numeric longitudinal claims on this page are generated from the same versioned derived diagnostic
+          artifact used by the explorers. Public rendering uses release-bound evidence and excludes private
+          source-input history.
         </p>
         <p>
+          <Link href="/explore/industries">Industry evidence</Link>
+          {" · "}
+          <Link href="/explore/occupations">Occupation evidence</Link>
+          {" · "}
           <Link href="/methodology">Measurement contract</Link>
           {" · "}
           <Link href="/sources">Sources and provenance</Link>
