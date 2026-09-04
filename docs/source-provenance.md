@@ -1,63 +1,110 @@
-# Source provenance and publication boundary
+# Data sources and provenance
 
-## RPS / FRED
+GenAI at Work combines four U.S. data systems that observe different parts of workplace AI use. This document records what each source measures, how it is used, the vintages included in Release 1, and the relevant publication limits.
 
-Primary measurement family: Real-Time Population Survey Generative AI Adoption Tracker by Bick, Blandin, and Deming, surfaced through FRED series.
+The sources are intentionally kept distinct. Worker-reported use, employer-reported use, household-survey staffing composition, and establishment staffing data are not interchangeable measurements.
 
-The canonical work-focused registry contains **131 source-series metadata records**:
+## Real-Time Population Survey / Generative AI Adoption Tracker
 
-- 5 national work-use constructs;
-- 20 industries × 3 constructs = 60 industry records;
-- 22 occupations × 3 constructs = 66 occupation records.
+**Role in the observatory:** primary source for workplace generative-AI adoption, use frequency, AI-assisted working time, and reported time savings.
 
-The repository rights decision treats published-aggregate project use as granted on the basis of a **project-owner attestation that source-owner permission was obtained**. The underlying permission correspondence or agreement is not retained in this public repository and was not independently inspected as part of the code review. The repository therefore asserts only the operational scope recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`; it does not infer unrecorded contractual terms.
+**Source:** the Generative AI Adoption Tracker by Alexander Bick, Adam Blandin, and David Deming, distributed as published aggregate series through FRED/ALFRED.
 
-The authorized release pipeline retrieves the registered published aggregate series through the official FRED API into a private candidate workspace. The latest verified live candidate binds 962 source observations across the available registered history. The complete common A/H/S subgroup analytical window contains 882 cells across seven quarters, Q4 2024–Q2 2026.
+### Series used
 
-The public `derived_only` release boundary is narrower than the private source candidate. It permits the contracted attributed aggregate presentation view—seven-quarter national history plus the latest complete Q2 2026 industry and occupation A/H/S cross-sections—and derived publication artifacts. It does not authorize or publish the complete historical subgroup source panel as a public database, bulk download, generic query API, or private source-input bundle.
+The project registers **131 work-focused series**:
 
-The repository does not silently fall back from the authorized source path to private audit data. Source-input files are hash-bound inside private release candidates and excluded from rights-safe review and promoted public bundles.
+- 5 national work-use measures;
+- 60 industry series: 20 industries × 3 measures;
+- 66 occupation series: 22 occupations × 3 measures.
 
-Do not imply endorsement by the Federal Reserve Bank of St. Louis. Preserve source attribution and source-series links. Rights and source terms remain versioned release inputs: a material definition, distribution, or rights change must fail closed and trigger renewed review.
+The three subgroup measures are work adoption, AI-assisted work-hours share, and reported time-savings share.
 
-## CPS
+Release 1 was built from a source history containing **962 observations** across the registered series where observations were available. The common industry/occupation A/H/S analysis window contains **882 observations** over seven quarters, Q4 2024 through Q2 2026.
 
-Source family: U.S. Census Bureau / Bureau of Labor Statistics Current Population Survey Basic Monthly public-use microdata.
+### Public data included
 
-Purpose: industry-by-occupation composition weights.
+The public RPS presentation includes:
 
-- adoption counterfactuals use worker shares;
-- assisted-hours and reported-savings counterfactuals use actual main-job-hour shares;
-- usual hours are a labeled sensitivity only;
-- Q4 2025 remains unavailable because October 2025 CPS was not collected; no two-month substitute is allowed.
+- seven-quarter national history;
+- the latest complete Q2 2026 industry A/H/S cross-section;
+- the latest complete Q2 2026 occupation A/H/S cross-section;
+- derived longitudinal statistics and diagnostics used in the published analysis.
 
-Official Q2 2025 and Q2 2026 Basic Monthly CPS inputs have been executed through the validated composition pipeline. The public repository contains versioned composition and reliability artifacts for both quarters, including worker-share and actual-main-job-hour occupation weights, coverage/suppression diagnostics, and sensitivity evidence.
+The project does not publish the complete historical subgroup source panel as a general-purpose database, unrestricted bulk mirror, or generic source API.
 
-The global Observatory v1 candidate also includes occupation-adjusted RPS industry-context residual artifacts produced from the authorized RPS source vintage and the validated CPS composition inputs. These residuals remain **derived descriptive diagnostics**. They do not identify organizational quality, management effects, efficiency, productivity, or any causal mechanism. Design-based confidence intervals for the custom pooled CPS composition vectors remain unsupported unless a separately approved survey-covariance method is implemented.
+### Source-use basis
 
-## OEWS
+The repository records published-aggregate project use as permitted on the basis of a project-owner attestation that permission was obtained from the source owner. The underlying correspondence or agreement is not part of the public repository and was not independently inspected as part of the software review.
 
-Source family: U.S. Bureau of Labor Statistics Occupational Employment and Wage Statistics.
+Accordingly, this repository claims only the use described in [source-rights/RPS_SOURCE_DECISION.md](source-rights/RPS_SOURCE_DECISION.md). It does not infer broader rights for respondent-level data, other RPS products, unrestricted redistribution, or third-party reuse.
 
-Official May 2025 staffing data have been executed as an independent establishment-side robustness basis for occupation composition. The public repository contains versioned May 2025 OEWS composition outputs plus cross-vintage/coverage robustness artifacts, and the Observatory v1 candidate binds those reviewed artifacts into the same global release.
+RPS source files used during release preparation are acquired outside the public Git history when redistribution is not covered. Published outputs retain source attribution and series provenance.
 
-OEWS does not reproduce the CPS/RPS worker-survey universe: it is establishment and wage-and-salary-worker oriented, with materially different coverage, including treatment of self-employment. It therefore remains robustness evidence rather than the primary composition basis. OEWS composition persistence or disagreement must be reported directly; OEWS weights do not identify organizational effects or productivity effects.
+FRED is a distribution service for the series and should not be described as endorsing this project.
 
-## BTOS
+## Current Population Survey (CPS)
 
-Source family: U.S. Census Bureau Business Trends and Outlook Survey.
+**Role in the observatory:** primary source for the occupational composition of industries and for worker- and work-hour-based composition weights.
 
-The Observatory v1 industry evidence includes the preregistered Q2 2026 BTOS–RPS descriptive triangulation. BTOS measures responding employer businesses reporting AI use in any business function during the last two weeks. RPS measures employed adults reporting Generative AI use for their jobs. Their units, denominators, technology scope, and reference periods differ.
+**Source:** U.S. Census Bureau / U.S. Bureau of Labor Statistics, Current Population Survey Basic Monthly public-use data.
 
-The primary comparison therefore reports cross-sector concordance only. It does not treat the two percentages as interchangeable, compute an identity-line gap, or infer productivity, organizational quality, or a causal effect from their correlation. Suppressed BTOS sectors are not reconstructed or redistributed.
+Release 1 includes validated composition analyses for:
 
-## Release invariant
+- Q2 2025;
+- Q2 2026.
 
-Every public claim must identify which evidence class it belongs to:
+For work-adoption benchmarks, the project uses CPS worker shares. For AI-assisted working time and reported-savings benchmarks, it uses actual main-job work-hour shares. Usual-hours weights are retained as a sensitivity analysis.
 
-1. direct source construct or contracted aggregate presentation view;
-2. derived descriptive statistic;
-3. composition evidence/counterfactual or cross-source descriptive triangulation;
-4. causal/mechanism claim.
+Q4 2025 is unavailable for CPS composition because October 2025 CPS data were not collected. November and December are not used to construct an artificial three-month quarter.
 
-The Observatory v1 candidate contains bounded class-1 RPS aggregate presentation evidence, class-2 longitudinal RPS diagnostics, and class-3 CPS/OEWS composition plus BTOS–RPS triangulation evidence. It contains no class-4 causal claim. Any future widening of the source, query, redistribution, uncertainty, or causal boundary requires an explicit new release contract and review.
+The CPS analysis produces occupation-composition benchmarks and occupation-adjusted industry residuals. These are descriptive standardization results; they do not identify management quality, organizational effects, efficiency, productivity, or other causal mechanisms.
+
+Release 1 also does not report full design-based confidence intervals for the custom pooled occupation-composition vectors because the necessary multivariate covariance information is not available in the public CPS material used by the project.
+
+## Occupational Employment and Wage Statistics (OEWS)
+
+**Role in the observatory:** independent robustness source for industry × occupation staffing composition.
+
+**Source:** U.S. Bureau of Labor Statistics, Occupational Employment and Wage Statistics.
+
+Release 1 uses **May 2025** OEWS staffing data.
+
+OEWS is establishment-based and primarily covers wage-and-salary employment, whereas CPS is a household survey with a different population and coverage. OEWS is therefore used as a separate robustness comparison, not as a replacement for CPS and not as part of a synthetic combined weighting system.
+
+Agreement or disagreement between CPS and OEWS is reported as source sensitivity. Neither source by itself identifies an organizational or productivity effect.
+
+## Business Trends and Outlook Survey (BTOS)
+
+**Role in the observatory:** employer-side comparison of recent AI use across sectors.
+
+**Source:** U.S. Census Bureau, Business Trends and Outlook Survey.
+
+Release 1 includes the preregistered Q2 2026 BTOS–RPS industry comparison.
+
+The two measures have different units and populations:
+
+- BTOS measures responding employer businesses reporting AI use in any business function during the previous two weeks;
+- RPS measures employed adults reporting generative-AI use for their jobs.
+
+Their technology scope, denominator, and reference period also differ. Sector correlations are therefore interpreted only as descriptive cross-source concordance. The analysis does not treat the two percentages as interchangeable and does not reconstruct suppressed BTOS sectors.
+
+## Source revisions
+
+Source data and definitions can change over time. Each published version of the observatory records the source identities and analytical artifacts used for that version.
+
+When an upstream source changes, the project distinguishes among:
+
+- new observations;
+- revisions to historical values;
+- changes in definitions or wording;
+- changes in classifications or crosswalks;
+- changes in source-access or publication conditions.
+
+Substantive changes trigger regeneration and review of affected results. Previous public releases remain preserved so that revisions are visible rather than silently replacing earlier evidence.
+
+## Attribution and reuse
+
+Third-party data retain their original terms. The project's publication of selected observations or derived results should not be interpreted as granting rights the project does not hold.
+
+For reproducibility, the repository provides source identifiers, metadata, acquisition and analysis code, public derived artifacts, and source-specific documentation. Where source files are intentionally absent, researchers should reacquire them from the authoritative source subject to the applicable terms.
