@@ -8,7 +8,7 @@ export function ReleaseNotice() {
       <div className="release-strip release-strip-private" role="status">
         <div>
           <strong>Private research mode</strong>
-          <span>Audited subgroup observations are loaded locally and are not cleared for redistribution.</span>
+          <span>Audited subgroup observations are loaded locally under redistribution controls.</span>
         </div>
       </div>
     );
@@ -20,8 +20,8 @@ export function ReleaseNotice() {
         <div>
           <strong>Release 1 · rights-bounded public evidence</strong>
           <span>
-            The public bundle is limited to contracted aggregate presentation views and derived artifacts;
-            private source-input bytes and unrestricted historical subgroup data remain excluded.
+            Public artifacts contain contracted aggregate presentation views and derived evidence. Private
+            source-input bytes and unrestricted historical subgroup data stay outside the release.
           </span>
           <Link href="/sources">Source and rights boundary</Link>
         </div>
@@ -34,7 +34,7 @@ export function ReleaseNotice() {
       <div className="release-strip" role="status">
         <div>
           <strong>Reviewed live-source mode</strong>
-          <span>The live adapter remains fail-closed until its operational activation gates pass.</span>
+          <span>The live adapter stays fail-closed until its operational activation gates pass.</span>
           <Link href="/sources">Source status</Link>
         </div>
       </div>
@@ -44,8 +44,8 @@ export function ReleaseNotice() {
   return (
     <div className="release-strip release-strip-warning" role="alert">
       <div>
-        <strong>Data mode is not configured</strong>
-        <span>Set DATA_MODE explicitly before running the publication.</span>
+        <strong>Data mode is unconfigured</strong>
+        <span>Set DATA_MODE explicitly to run the publication.</span>
       </div>
     </div>
   );
