@@ -137,15 +137,20 @@ def promote(args: argparse.Namespace) -> int:
         releases_root=args.releases_root,
         staging_dir=args.staging_dir,
         attestation=args.attestation,
+        _rehydration_verified=True,
     )
     observatory_release.promote(delegated)
 
     try:
         if not release_target.is_dir():
-            raise RehydratedPromotionError("Delegated promotion did not create the release directory")
+            raise RehydratedPromotionError(
+                "Delegated promotion did not create the release directory"
+            )
         destination_identity = release_target / "rehydration_identity.json"
         if destination_identity.exists():
-            raise RehydratedPromotionError("Release already contains a rehydration identity sidecar")
+            raise RehydratedPromotionError(
+                "Release already contains a rehydration identity sidecar"
+            )
         shutil.copyfile(args.rehydration_identity, destination_identity)
         if sha256_file(destination_identity) != identity_sha:
             raise RehydratedPromotionError("Copied rehydration identity checksum mismatch")
@@ -167,7 +172,9 @@ def promote(args: argparse.Namespace) -> int:
             if isinstance(row, dict) and row.get("release_id") == release_id
         ]
         if len(matches) != 1:
-            raise RehydratedPromotionError("Release registry must contain exactly one promoted release row")
+            raise RehydratedPromotionError(
+                "Release registry must contain exactly one promoted release row"
+            )
         matches[0]["rehydration_status"] = "REHYDRATED_EXACT_CANDIDATE"
         matches[0]["rehydration_identity_sha256"] = identity_sha
         _write_json(args.registry, registry)
