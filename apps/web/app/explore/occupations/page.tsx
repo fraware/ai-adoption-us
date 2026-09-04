@@ -27,67 +27,26 @@ export default async function OccupationsPage() {
   const quarters = Object.entries(longitudinal.quarter_diagnostics.occupation);
   const occupationABeatsHWaves = quarters.filter(([, d]) => d.r2_S_A > d.r2_S_H).length;
   const occupationLooABeatsH = quarters.reduce((total, [, d]) => total + d.loo_A_beats_H, 0);
+  const crossLevelAlignedQuarters = Object.values(longitudinal.cross_level_comparison).filter(
+    (row) =>
+      row.occupation_minus_industry_pearson_A_H > 0 &&
+      row.occupation_minus_industry_spearman_A_H > 0,
+  ).length;
 
   return (
     <main>
-      <p className="eyebrow">{periods.length}-wave evidence</p>
-      <h1>Occupation explorer</h1>
-      <p className="lede">
-        Occupation is the strongest organizing layer in the current cross-group evidence. Across every
-        audited wave, adoption and assisted working time align more tightly across occupations than across
-        industries.
-      </p>
-
-      <section className="section" aria-labelledby="occupation-stability">
-        <h2 id="occupation-stability">Adoption ranks persist more than assisted-hour ranks</h2>
-        <StabilityBars
-          title="Occupation rank persistence: median Spearman correlation across quarter pairs"
-          bars={[
-            { label: "Adoption", value: rank.A.median_pairwise },
-            { label: "Assisted hours", value: rank.H.median_pairwise },
-            { label: "Reported savings", value: rank.S.median_pairwise },
-          ]}
-        />
-        <p className="note">
-          Adoption rankings exceed assisted-hours rank stability in
-          {` ${dominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${dominance.quarter_pairs} `}
-          quarter-pair comparisons.
+      <section className="hero hero-compact" aria-labelledby="occupation-title">
+        <p className="eyebrow">{periods.length}-wave evidence</p>
+        <h1 id="occupation-title">Occupation explorer</h1>
+        <p className="lede">
+          Across all {crossLevelAlignedQuarters} of {periods.length} audited waves, adoption and assisted
+          working time align more tightly across occupations than across industries.
         </p>
       </section>
 
-      <section className="section" aria-labelledby="occupation-savings">
-        <h2 id="occupation-savings">Adoption tracks reported savings more consistently across occupations</h2>
-        <div className="table-wrap" tabIndex={0} aria-label="Scrollable occupation wave diagnostics table">
-          <table>
-            <caption>Unweighted cross-occupation descriptive diagnostics by quarter. A = adoption, H = assisted hours, S = reported savings.</caption>
-            <thead>
-              <tr>
-                <th scope="col">Quarter</th>
-                <th scope="col">Corr(A, H)</th>
-                <th scope="col">R²(S ~ A)</th>
-                <th scope="col">R²(S ~ H)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {quarters.map(([quarter, d]) => (
-                <tr key={quarter}>
-                  <th scope="row">{quarter}</th>
-                  <td>{d.r_A_H.toFixed(3)}</td>
-                  <td>{d.r2_S_A.toFixed(3)}</td>
-                  <td>{d.r2_S_H.toFixed(3)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="note">
-          Adoption has the higher univariate R² for reported savings in {occupationABeatsHWaves} of {periods.length} waves and
-          in all {occupationLooABeatsH} leave-one-occupation checks. The result is aggregate and descriptive.
-        </p>
-      </section>
-
-      <section className="section" aria-labelledby="occupation-cross-section">
-        <h2 id="occupation-cross-section">Latest audited cross-section</h2>
+      <section className="section explorer-section" aria-labelledby="occupation-cross-section">
+        <p className="eyebrow">Current structure</p>
+        <h2 id="occupation-cross-section">Adoption and assisted time move together across occupations.</h2>
         {period && data.length > 0 ? (
           <>
             <p><strong>{period}</strong> · each point is a major RPS occupation group.</p>
@@ -104,11 +63,69 @@ export default async function OccupationsPage() {
         )}
       </section>
 
-      <section className="section" aria-labelledby="occupation-boundary">
-        <h2 id="occupation-boundary">What the occupation evidence supports</h2>
+      <section className="section explorer-section" aria-labelledby="occupation-persistence">
+        <p className="eyebrow">Across waves</p>
+        <h2 id="occupation-persistence">Adoption persists and tracks reported savings more consistently.</h2>
+
+        <div className="evidence-facts" aria-label="Occupation longitudinal evidence summary">
+          <div className="evidence-fact">
+            <span>Rank-stability comparisons</span>
+            <strong>{dominance.adoption_rank_corr_gt_assisted_hours_rank_corr}/{dominance.quarter_pairs}</strong>
+            <p>Adoption exceeds assisted-hours persistence</p>
+          </div>
+          <div className="evidence-fact">
+            <span>Savings regressions</span>
+            <strong>{occupationABeatsHWaves}/{periods.length}</strong>
+            <p>Waves where adoption has the higher univariate R²</p>
+          </div>
+          <div className="evidence-fact">
+            <span>Leave-one-out checks</span>
+            <strong>{occupationLooABeatsH}</strong>
+            <p>Checks where adoption has the higher univariate R²</p>
+          </div>
+        </div>
+
+        <StabilityBars
+          title="Occupation rank persistence: median Spearman correlation across quarter pairs"
+          bars={[
+            { label: "Adoption", value: rank.A.median_pairwise },
+            { label: "Assisted hours", value: rank.H.median_pairwise },
+            { label: "Reported savings", value: rank.S.median_pairwise },
+          ]}
+        />
+
+        <details className="technical-disclosure">
+          <summary>Quarter-by-quarter occupation diagnostics</summary>
+          <div className="technical-disclosure-body">
+            <div className="table-wrap" tabIndex={0} aria-label="Scrollable occupation wave diagnostics table">
+              <table>
+                <caption>Unweighted cross-occupation descriptive diagnostics by quarter. A = adoption, H = assisted hours, S = reported savings.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Quarter</th>
+                    <th scope="col">Corr(A, H)</th>
+                    <th scope="col">R²(S ~ A)</th>
+                    <th scope="col">R²(S ~ H)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {quarters.map(([quarter, d]) => (
+                    <tr key={quarter}>
+                      <th scope="row">{quarter}</th>
+                      <td>{d.r_A_H.toFixed(3)}</td>
+                      <td>{d.r2_S_A.toFixed(3)}</td>
+                      <td>{d.r2_S_H.toFixed(3)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
         <p className="note">
-          Occupation-level patterns summarize major task bundles. Individual worker responses, employer
-          policies, and causal productivity effects require microdata or separate identification.
+          These aggregate occupation patterns summarize major task bundles. Individual worker responses,
+          employer policies, and causal productivity effects require microdata or separate identification.
         </p>
       </section>
     </main>
