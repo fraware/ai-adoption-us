@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 const routes = [
   { slug: "home", path: "/" },
+  { slug: "explore", path: "/explore" },
   { slug: "industries", path: "/explore/industries" },
   { slug: "occupations", path: "/explore/occupations" },
   { slug: "methodology", path: "/methodology" },
@@ -11,11 +12,9 @@ const routes = [
 ] as const;
 
 const primaryNavigation = [
-  "/explore/industries",
-  "/explore/occupations",
+  "/explore",
   "/blog/after-adoption",
   "/methodology",
-  "/sources",
 ] as const;
 
 const ANDROID_PROJECT = "android-chrome-pixel-7-emulation";
@@ -116,9 +115,6 @@ test.describe("Release 1 rendered browser QA", () => {
         ).toHaveCount(1);
       }
 
-      // Test keyboard entry from the freshly loaded document. A pointer click before Tab
-      // changes the browser's sequential-focus starting point and does not model a keyboard
-      // user entering the page from browser chrome.
       await page.keyboard.press("Tab");
       const skipLink = page.locator(".skip-link");
       await expect(skipLink).toBeFocused();
@@ -230,9 +226,6 @@ test.describe("Release 1 rendered browser QA", () => {
     await expect(page.locator("body")).not.toContainText("data/audit/private");
     expect(pageErrors).toEqual([]);
 
-    // Chromium/WebKit emit one browser-generated console error for an intentional
-    // top-level 404 navigation. Firefox currently emits none. Any other console error
-    // remains a failure, as does more than one copy of the expected diagnostic.
     const unexpectedConsoleErrors = consoleErrors.filter(
       (message) => message !== EXPECTED_404_CONSOLE_ERROR,
     );
