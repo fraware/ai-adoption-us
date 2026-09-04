@@ -24,7 +24,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: observatory-promotion
+  group: authorized-rps-fred-source
   cancel-in-progress: false
 
 jobs:
