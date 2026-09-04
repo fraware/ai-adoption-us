@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 permissions:
-  actions: read
+  actions: write
   contents: write
 
 concurrency:
@@ -309,6 +309,29 @@ jobs:
             exit 1
           fi
 
+          RELEASE_ID="$release_id" python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          release_id = os.environ['RELEASE_ID']
+          record_path = Path('data/releases') / release_id / 'review_record.json'
+          auth_path = Path('data/registry/release1_owner_authorization.json')
+          record = json.loads(record_path.read_text())
+          auth = json.loads(auth_path.read_text())
+          record.update(
+              {
+                  'review_mode': 'owner_authorized_automated_release_review',
+                  'owner_authorized': True,
+                  'owner_authorization_id': auth['authorization_id'],
+                  'authorized_by': auth['authorized_by'],
+                  'authorized_at': auth['authorized_at'],
+                  'human_review_performed': False,
+              }
+          )
+          record_path.write_text(json.dumps(record, indent=2, sort_keys=True) + '\n')
+          PY
+
           git fetch origin main --depth=1
           if [ "$(git rev-parse origin/main)" != "$CANDIDATE_SHA" ]; then
             echo 'Canonical main advanced after candidate review; release requires a new exact candidate.' >&2
@@ -340,6 +363,16 @@ jobs:
           echo "RELEASE_ID=$release_id" >> "$GITHUB_ENV"
           echo "PUBLICATION_SHA=$publication_sha" >> "$GITHUB_ENV"
 
+      - name: Dispatch exact publication commit to GitHub Pages
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run pages.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main \
+            -f publication_sha="$PUBLICATION_SHA"
+
       - name: Wait for exact release deployment and live audit
         if: env.OWNER_RELEASE_AUTHORIZED == '1'
         shell: bash
@@ -364,14 +397,14 @@ jobs:
 
           selected = None
           for _ in range(120):
-              url = f'{api}/repos/{repo}/actions/runs?head_sha={sha}&event=push&per_page=100'
+              url = f'{api}/repos/{repo}/actions/runs?head_sha={sha}&event=workflow_dispatch&per_page=100'
               req = urllib.request.Request(url, headers=headers)
               with urllib.request.urlopen(req, timeout=30) as response:
                   payload = json.load(response)
               runs = [
                   row for row in payload.get('workflow_runs', [])
                   if row.get('head_sha') == sha
-                  and row.get('event') == 'push'
+                  and row.get('event') == 'workflow_dispatch'
                   and row.get('name') == 'GitHub Pages Release 1'
               ]
               if runs:
@@ -384,10 +417,10 @@ jobs:
                       break
               time.sleep(5)
           else:
-              raise SystemExit('Timed out waiting for the exact release Pages workflow')
+              raise SystemExit('Timed out waiting for the exact dispatched Release 1 Pages workflow')
 
           if selected is None:
-              raise SystemExit('Exact release Pages workflow was not found')
+              raise SystemExit('Exact dispatched Release 1 Pages workflow was not found')
           run_id = int(selected['id'])
           jobs_url = f'{api}/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100'
           req = urllib.request.Request(jobs_url, headers=headers)
