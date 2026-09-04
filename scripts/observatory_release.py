@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""Stage Observatory candidates and execute the internal reviewed promotion kernel.
+
+The public CLI may stage candidates. Direct CLI promotion is deliberately
+fail-closed: a promotion must be invoked by the exact-rehydration wrapper after
+it has independently verified the reviewed candidate, source vintage, artifacts,
+and rehydration identity.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -55,7 +63,9 @@ def _current_id(registry: dict[str, Any]) -> str | None:
     return _safe_release_id(value, context="Release registry current_release_id")
 
 
-def _load_previous(registry: dict[str, Any], releases_root: Path) -> dict[str, Any] | None:
+def _load_previous(
+    registry: dict[str, Any], releases_root: Path
+) -> dict[str, Any] | None:
     current = _current_id(registry)
     if current is None:
         return None
@@ -74,7 +84,9 @@ def _load_previous(registry: dict[str, Any], releases_root: Path) -> dict[str, A
 
 def _validate_supersession(candidate: dict[str, Any], registry: dict[str, Any]) -> None:
     current = _current_id(registry)
-    release_id = _safe_release_id(candidate.get("release_id"), context="Candidate release_id")
+    release_id = _safe_release_id(
+        candidate.get("release_id"), context="Candidate release_id"
+    )
     supersedes = candidate.get("supersedes_release_id")
     if supersedes is not None:
         _safe_release_id(supersedes, context="Candidate supersedes_release_id")
@@ -95,7 +107,15 @@ def _validate_supersession(candidate: dict[str, Any], registry: dict[str, Any]) 
 
 
 def _has_changes(diff: dict[str, Any]) -> bool:
-    return any(bool(diff.get(key)) for key in ("source_changes", "artifact_changes", "diagnostic_changes", "claim_changes"))
+    return any(
+        bool(diff.get(key))
+        for key in (
+            "source_changes",
+            "artifact_changes",
+            "diagnostic_changes",
+            "claim_changes",
+        )
+    )
 
 
 def _stage_payload(
@@ -106,19 +126,14 @@ def _stage_payload(
     review: dict[str, Any],
     status: str,
 ) -> dict[str, Any]:
-    """Build the portable immutable identity of one staged candidate.
-
-    The stage identity deliberately excludes filesystem locations. Absolute runner
-    paths do not describe scientific content, release state, or review scope and
-    would make an otherwise identical candidate impossible to rehydrate on a
-    later trusted runner. Candidate bytes remain bound by both the file SHA-256
-    and the canonical manifest digest.
-    """
+    """Build the portable immutable identity of one staged candidate."""
 
     payload: dict[str, Any] = {
         "schema_version": 2,
         "registry_current_release_id": _current_id(registry),
-        "registry_current_manifest_sha256": registry.get("current_release_manifest_sha256"),
+        "registry_current_manifest_sha256": registry.get(
+            "current_release_manifest_sha256"
+        ),
         "candidate_release_id": candidate["release_id"],
         "candidate_data_mode": candidate["data_mode"],
         "candidate_manifest_sha256": sha256_file(candidate_manifest),
@@ -131,7 +146,9 @@ def _stage_payload(
     return payload
 
 
-def _gate_payload(stage_id: str, status: str, failures: list[dict[str, str]]) -> dict[str, Any]:
+def _gate_payload(
+    stage_id: str, status: str, failures: list[dict[str, str]]
+) -> dict[str, Any]:
     return {
         "stage_id": stage_id,
         "status": status,
@@ -181,7 +198,9 @@ def _verify_ci_evidence(attestation: dict[str, Any]) -> dict[str, Any]:
 
 def stage(args: argparse.Namespace) -> int:
     if args.staging_dir.exists():
-        raise SystemExit(f"Staging directory already exists; use a new immutable path: {args.staging_dir}")
+        raise SystemExit(
+            f"Staging directory already exists; use a new immutable path: {args.staging_dir}"
+        )
     registry = load_json_object(args.registry)
     candidate = load_json_object(args.candidate_manifest)
     validate_release_manifest(candidate, args.candidate_root)
@@ -191,7 +210,14 @@ def stage(args: argparse.Namespace) -> int:
     failures = candidate_gate_failures(candidate, release_diff)
     status = gate_status(failures, _has_changes(release_diff))
     review = review_package(candidate, release_diff)
-    stage_manifest = _stage_payload(registry, args.candidate_manifest, candidate, release_diff, review, status)
+    stage_manifest = _stage_payload(
+        registry,
+        args.candidate_manifest,
+        candidate,
+        release_diff,
+        review,
+        status,
+    )
     gate = _gate_payload(str(stage_manifest["stage_id"]), status, failures)
 
     args.staging_dir.mkdir(parents=True)
@@ -199,11 +225,18 @@ def stage(args: argparse.Namespace) -> int:
     _write_json(args.staging_dir / "release_diff.json", release_diff)
     _write_json(args.staging_dir / "review_package.json", review)
     _write_json(args.staging_dir / "publication_gate.json", gate)
-    print(json.dumps({"stage_id": stage_manifest["stage_id"], "status": status}, indent=2))
+    print(
+        json.dumps(
+            {"stage_id": stage_manifest["stage_id"], "status": status},
+            indent=2,
+        )
+    )
     return 0
 
 
-def _copy_artifacts(candidate: dict[str, Any], candidate_root: Path, release_dir: Path) -> dict[str, Any]:
+def _copy_artifacts(
+    candidate: dict[str, Any], candidate_root: Path, release_dir: Path
+) -> dict[str, Any]:
     public = sanitized_public_manifest(candidate)
     candidate_artifacts = candidate.get("artifacts")
     if not isinstance(candidate_artifacts, list):
@@ -217,11 +250,21 @@ def _copy_artifacts(candidate: dict[str, Any], candidate_root: Path, release_dir
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
         if sha256_file(destination) != str(artifact["sha256"]):
-            raise SystemExit(f"Copied release artifact checksum mismatch: {artifact['artifact_id']}")
+            raise SystemExit(
+                f"Copied release artifact checksum mismatch: {artifact['artifact_id']}"
+            )
     return public
 
 
 def promote(args: argparse.Namespace) -> int:
+    """Internal promotion kernel; callable only after exact rehydration verification."""
+
+    if getattr(args, "_rehydration_verified", False) is not True:
+        raise SystemExit(
+            "Direct Observatory promotion is disabled. Use "
+            "scripts/promote_rehydrated_observatory_v1.py after exact rehydration."
+        )
+
     registry = load_json_object(args.registry)
     candidate = load_json_object(args.candidate_manifest)
     validate_release_manifest(candidate, args.candidate_root)
@@ -231,7 +274,9 @@ def promote(args: argparse.Namespace) -> int:
     failures = candidate_gate_failures(candidate, release_diff)
     status = gate_status(failures, _has_changes(release_diff))
     if status != "BLOCKED_REVIEW_REQUIRED":
-        raise SystemExit(f"Promotion requires a valid changed release awaiting review; found {status}")
+        raise SystemExit(
+            f"Promotion requires a valid changed release awaiting review; found {status}"
+        )
 
     staged_manifest = load_json_object(args.staging_dir / "stage_manifest.json")
     staged_diff = load_json_object(args.staging_dir / "release_diff.json")
@@ -247,7 +292,9 @@ def promote(args: argparse.Namespace) -> int:
         status,
     )
     if recomputed != staged_manifest:
-        raise SystemExit("Release candidate, registry, or stage fingerprint changed after staging")
+        raise SystemExit(
+            "Release candidate, registry, or stage fingerprint changed after staging"
+        )
     if staged_diff != release_diff:
         raise SystemExit("Release diff changed after staging")
     if staged_review != expected_review:
@@ -266,7 +313,9 @@ def promote(args: argparse.Namespace) -> int:
     )
     ci_evidence = _verify_ci_evidence(attestation)
 
-    release_id = _safe_release_id(candidate["release_id"], context="Candidate release_id")
+    release_id = _safe_release_id(
+        candidate["release_id"], context="Candidate release_id"
+    )
     target = args.releases_root / release_id
     temporary = args.releases_root / f".{release_id}.tmp"
     if target.exists():
@@ -276,7 +325,9 @@ def promote(args: argparse.Namespace) -> int:
     promotion_time = _promotion_timestamp()
     temporary.mkdir(parents=True)
     try:
-        public_manifest = _copy_artifacts(candidate, args.candidate_root, temporary)
+        public_manifest = _copy_artifacts(
+            candidate, args.candidate_root, temporary
+        )
         public_manifest["release_status"] = "PROMOTED_AFTER_EXPLICIT_REVIEW"
         public_manifest["reviewed_at"] = attestation["reviewed_at"]
         public_manifest["promoted_at"] = promotion_time
@@ -289,10 +340,16 @@ def promote(args: argparse.Namespace) -> int:
                 "stage_id": staged_manifest["stage_id"],
                 "release_id": release_id,
                 "data_mode": candidate["data_mode"],
-                "candidate_manifest_sha256": staged_manifest["candidate_manifest_sha256"],
-                "candidate_manifest_digest": staged_manifest["candidate_manifest_digest"],
+                "candidate_manifest_sha256": staged_manifest[
+                    "candidate_manifest_sha256"
+                ],
+                "candidate_manifest_digest": staged_manifest[
+                    "candidate_manifest_digest"
+                ],
                 "release_diff_digest": staged_manifest["release_diff_digest"],
-                "review_package_digest": staged_manifest["review_package_digest"],
+                "review_package_digest": staged_manifest[
+                    "review_package_digest"
+                ],
                 "reviewer": attestation["reviewer"],
                 "reviewed_at": attestation["reviewed_at"],
                 "promoted_at": promotion_time,
@@ -308,8 +365,12 @@ def promote(args: argparse.Namespace) -> int:
                 "ci_run_ids": attestation["ci_run_ids"],
                 "artifact_sha256": attestation["artifact_sha256"],
                 "reviewed_source_ids": attestation["reviewed_source_ids"],
-                "reviewed_artifact_ids": attestation["reviewed_artifact_ids"],
-                "reviewed_diagnostic_ids": attestation["reviewed_diagnostic_ids"],
+                "reviewed_artifact_ids": attestation[
+                    "reviewed_artifact_ids"
+                ],
+                "reviewed_diagnostic_ids": attestation[
+                    "reviewed_diagnostic_ids"
+                ],
                 "reviewed_claim_ids": attestation["reviewed_claim_ids"],
                 "source_input_bytes_included": False,
             },
@@ -368,16 +429,28 @@ def promote(args: argparse.Namespace) -> int:
 
 
 def parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Stage and promote immutable observatory releases")
+    parser = argparse.ArgumentParser(
+        description="Stage immutable Observatory candidates; direct promotion is disabled"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--candidate-manifest", type=Path, required=True)
     common.add_argument("--candidate-root", type=Path, required=True)
-    common.add_argument("--registry", type=Path, default=ROOT / "data/registry/observatory_release_registry.json")
-    common.add_argument("--releases-root", type=Path, default=ROOT / "data/releases")
+    common.add_argument(
+        "--registry",
+        type=Path,
+        default=ROOT / "data/registry/observatory_release_registry.json",
+    )
+    common.add_argument(
+        "--releases-root", type=Path, default=ROOT / "data/releases"
+    )
     common.add_argument("--staging-dir", type=Path, required=True)
     sub.add_parser("stage", parents=[common])
-    promote_parser = sub.add_parser("promote", parents=[common])
+    promote_parser = sub.add_parser(
+        "promote",
+        parents=[common],
+        help="Fail-closed legacy entry point; use the exact-rehydration wrapper",
+    )
     promote_parser.add_argument("--attestation", type=Path, required=True)
     return parser
 
