@@ -10,7 +10,9 @@ The project does **not** estimate a single aggregate “AI impact” number and 
 
 ## Current state
 
-No Observatory release has been promoted yet. The Release 1 architecture retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, cryptographically binds governed claim surfaces, and stages an immutable candidate for explicit human review. The trusted promotion path then re-fetches the source on the exact reviewed repository commit, requires the same scientific source identity, rebuilds and re-stages the candidate, and requires byte-identical candidate/stage identities before promotion. Promotion additionally requires independently verified exact-commit CI and a human attestation bound to the deterministic rehydration identity. Public GitHub Pages deployment is restricted to the resulting validated release-only authorization commit.
+**Release status: pre-release. No formal Observatory release has been promoted or tagged yet.**
+
+The Release 1 architecture retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, cryptographically binds governed claim surfaces, and stages an immutable candidate for explicit human review. The trusted promotion path then re-fetches the source on the exact reviewed repository commit, requires the same scientific source identity, rebuilds and re-stages the candidate, and requires byte-identical candidate/stage identities before promotion. Promotion additionally requires independently verified exact-commit CI and a human attestation bound to the deterministic rehydration identity. Public GitHub Pages deployment is restricted to the resulting validated release-only authorization commit.
 
 Verified in the current scientific/release evidence:
 
@@ -114,18 +116,20 @@ Permanent CI enforces the stronger locked-install contract: strict Python checks
 
 Start here:
 
-1. `docs/ENGINEERING_HANDOFF.md` — technical handoff and acceptance contracts.
+1. `docs/ENGINEERING_HANDOFF.md` — current technical handoff and acceptance contracts.
 2. `docs/RESULTS.md` — verified empirical results and interpretation limits.
-3. `docs/ROADMAP.md` — current roadmap, priorities, dependencies, and definitions of done.
+3. `docs/ROADMAP.md` — current release path and post-release research roadmap.
 4. `docs/ARCHITECTURE.md` — system/data architecture and trust boundaries.
 5. `docs/REPRODUCIBILITY.md` — build and regeneration contracts.
-6. `docs/RELEASE_CHECKLIST.md` — launch checklist.
-7. `docs/methodology.md` — scientific methodology.
-8. `docs/product-spec.md` — product specification.
-9. `docs/source-provenance.md` — source and rights provenance.
-10. `docs/source-rights/RPS_SOURCE_DECISION.md` — current source-rights decision record and evidence boundary.
-11. `docs/source-rights/RPS_PERMISSION_REQUEST.md` — historical permission request retained for provenance.
-12. `VALIDATION_2026-08-31.md` — historical public-handoff validation record.
+6. `docs/RELEASE_CHECKLIST.md` — exact launch checklist.
+7. `docs/RELEASE1_NOTES.md` — Release 1 candidate notes; explicitly pre-release until formal publication.
+8. `docs/methodology.md` — scientific methodology.
+9. `docs/product-spec.md` — product specification.
+10. `docs/source-provenance.md` — source and rights provenance.
+11. `docs/source-rights/RPS_SOURCE_DECISION.md` — current source-rights decision record and evidence boundary.
+12. `CONTRIBUTING.md` — contribution, scientific-review, rights, validation, and release expectations.
+
+Dated root validation files and `RECONSTRUCTION_STATUS.md` / `RELEASE_PROVENANCE.json` are retained as historical provenance. They are explicitly historical and are not current release-status documents.
 
 ## Product invariants
 
@@ -153,3 +157,11 @@ These must remain true in every release:
 - **Research v2:** worker × task × occupation × industry/context × time mechanism analysis with stronger identification, uncertainty, and outcome evidence.
 
 The detailed specifications and acceptance criteria are in `docs/ROADMAP.md` and `docs/ENGINEERING_HANDOFF.md`.
+
+## Contributing
+
+Contributions are welcome when they preserve the project's scientific, rights, and release contracts. Read `CONTRIBUTING.md` before opening a substantial pull request. The pull-request template requires explicit scientific/public-claim, source/rights, validation, and release-impact disclosure.
+
+## License and reuse
+
+No repository-wide license is currently declared. Public availability of this repository must not be interpreted as a general grant of reuse or redistribution rights. Third-party source material remains governed by its own terms and the project source-rights records. A repository-wide code/documentation license, if adopted, must be chosen explicitly and must not silently broaden rights for source-derived data.
