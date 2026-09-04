@@ -18,12 +18,12 @@ export function ReleaseNotice() {
     return (
       <div className="release-strip" role="status">
         <div>
-          <strong>Release 1 · rights-bounded public evidence</strong>
+          <strong>Release 1 · reviewed public evidence</strong>
           <span>
-            Public artifacts contain contracted aggregate presentation views and derived evidence. Private
-            source-input bytes and unrestricted historical subgroup data stay outside the release.
+            This release publishes authorized aggregate views and derived evidence. Private source-input
+            bytes and unrestricted historical subgroup data stay outside the public release.
           </span>
-          <Link href="/sources">Source and rights boundary</Link>
+          <Link href="/sources">Source scope</Link>
         </div>
       </div>
     );
