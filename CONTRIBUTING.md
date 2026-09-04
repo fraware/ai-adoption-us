@@ -1,22 +1,55 @@
 # Contributing to GenAI at Work
 
-GenAI at Work is a research data product. Contributions are evaluated for software quality, scientific validity, provenance, rights compatibility, and release integrity at the same time.
+GenAI at Work is both a research project and a public data product. Contributions are reviewed for software quality, scientific validity, reproducibility, source provenance, data-use permissions, and the accuracy of public interpretation.
 
-## Before opening a pull request
+## Before you contribute
 
-Open or reference an issue when a change alters a measurement construct, source relationship, public claim, release contract, or substantial product behavior. Small documentation corrections and narrowly mechanical fixes may proceed directly when their scope is self-evident.
+Open or reference an issue when a change affects any of the following:
 
-Do not add private RPS source-input bytes, respondent-level records, credentials, unreviewed third-party datasets, or material whose redistribution rights are unclear. Public availability of a source is not sufficient evidence of permission to store, mirror, or redistribute it.
+- a measurement definition or population;
+- an upstream data source or source vintage;
+- a weighting, crosswalk, suppression, or uncertainty method;
+- a published empirical result or public interpretation;
+- the public/private data boundary;
+- release behavior or a substantial product feature.
+
+Small documentation corrections and mechanical fixes can usually proceed directly.
+
+Do not add credentials, respondent-level records, private RPS source files, unreviewed third-party datasets, or material whose redistribution status is unclear.
 
 ## Scientific changes
 
-A contribution that changes empirical output must identify the measurement object, source vintage, comparison population, period, weighting rule, suppression rule, and interpretation boundary that it affects. Derived descriptive evidence must remain distinguishable from causal or productivity claims.
+Changes that affect empirical outputs should document:
 
-Changes to registered source series, construct definitions, composition weights, crosswalks, longitudinal windows, uncertainty treatment, or public claim surfaces require corresponding tests and documentation. Unsupported cells and missing evidence must fail closed; they must not be silently imputed, renormalized, or relabeled as complete estimates.
+- the quantity being estimated;
+- the population and period;
+- the source and source vintage;
+- the weighting or aggregation rule;
+- relevant crosswalks or classification mappings;
+- missing-data and suppression rules;
+- uncertainty treatment;
+- the interpretation that the evidence supports.
 
-## Code and validation
+Derived descriptive results must remain distinguishable from causal estimates and productivity claims. Missing or unsupported quantities should remain missing unless a documented method justifies estimating them.
 
-Python changes should run:
+A documentation change that alters the interpretation of a result should be reviewed as a scientific change.
+
+## Source and data-use changes
+
+When introducing or changing a data source, include:
+
+1. the authoritative source location;
+2. the exact series, table, file, or API scope used;
+3. the relevant population, units, and reference period;
+4. source-vintage or revision information;
+5. the basis for storing and publishing the material included in the repository;
+6. any restrictions on redistribution or derived outputs.
+
+Do not assume that public accessibility grants unrestricted permission to copy or redistribute source data.
+
+## Validation
+
+Python changes should pass:
 
 ```bash
 python -m pip install -e '.[dev]'
@@ -26,7 +59,7 @@ ruff check src tests scripts
 mypy src
 ```
 
-Web changes should run from `apps/web`:
+Web changes should pass from `apps/web`:
 
 ```bash
 npm ci
@@ -34,28 +67,35 @@ npm run lint
 DATA_MODE=derived_only npm run build
 ```
 
-The permanent CI workflow remains authoritative for merge evidence. Do not weaken tests, typing, rights/privacy scans, locked dependency installation, or release checks to make a change pass.
+Relevant scientific changes should also regenerate the affected derived artifacts and run the tests that validate their definitions, provenance, and expected output.
 
-## Pull-request scope
+Do not weaken tests, type checks, privacy checks, or source-validation rules simply to make a change pass.
 
-Keep pull requests narrow enough to review. State:
+## Pull requests
 
-- the objective and affected contract;
-- whether scientific values or public claims change;
-- whether source or redistribution rights are affected;
-- whether public/private data boundaries change;
-- the validation performed;
-- known limitations or intentionally deferred work;
-- release impact, including whether a new exact Observatory candidate is required.
+Keep pull requests small enough to review. The description should state:
 
-A documentation-only statement that changes the interpretation of an empirical result is a scientific change for review purposes.
+- what changed and why;
+- whether scientific values changed;
+- whether public interpretation changed;
+- whether source or redistribution permissions are affected;
+- whether public/private data boundaries changed;
+- what validation was run;
+- any remaining limitations;
+- whether a new published release is required.
 
-## Release-sensitive changes
+Where practical, separate formatting or refactoring from scientific changes so reviewers can distinguish changes in presentation from changes in evidence.
 
-The public release process is governed by the repository release engine and `docs/RELEASE_CHECKLIST.md`. A merged pull request does not by itself authorize publication. Release-sensitive changes may invalidate the current candidate and require a fresh candidate-review package, exact source rehydration, human attestation, promotion, deployment audit, and formal release.
+## Documentation
 
-Do not create alternative publication paths around those controls.
+Documentation should be written for a reader who has no knowledge of the project's development history.
 
-## Historical records
+Prefer domain-standard terminology and define project-specific terms on first use. Avoid temporary task labels, development-stage shorthand, pull-request chronology, internal status language, or instructions that are meaningful only to maintainers.
 
-Dated validation reports, closed pull requests, immutable release records, and historical reconstruction documents are retained as provenance. Correct their interpretation with explicit historical-status notes instead of rewriting old evidence as though it had been produced under a later repository state.
+Durable documentation should explain one of four things: the research question, the method, the software/data architecture, or how to reproduce and maintain the public product.
+
+## Publication
+
+Publishing a new version is separate from merging code. A release should correspond to a defined set of source vintages, generated outputs, tests, and public documentation.
+
+Maintainer procedures are documented in [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md). Current published versions are identified by the release registry and the corresponding GitHub release.
