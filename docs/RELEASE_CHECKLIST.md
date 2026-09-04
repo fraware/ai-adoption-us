@@ -166,4 +166,4 @@ Preserve the previous release and record any upstream revision detected after pu
 
 If a post-release error affects public evidence or interpretation, correct it through a new version with explicit release notes rather than silently changing the historical release.
 
-For implementation details of the current release tooling, see [OBSERVATORY_RELEASE_PROTOCOL.md](OBSERVATORY_RELEASE_PROTOCOL.md). For source-dependent reconstruction, see [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+For source-update operations, see [RPS_DATA_UPDATES.md](RPS_DATA_UPDATES.md). For source-dependent reconstruction, see [REPRODUCIBILITY.md](REPRODUCIBILITY.md). For the public hosting configuration and post-deployment checks, see [DEPLOYMENT.md](DEPLOYMENT.md).
