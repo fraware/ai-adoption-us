@@ -28,14 +28,13 @@ def test_app_icon_and_cross_engine_wrap_contract_exist():
     assert "occupation_<wbr />adjusted_<wbr />industry_<wbr />context_<wbr />residual" in methodology
 
 
-def test_labelled_generic_home_groups_have_explicit_roles_and_dynamic_evidence_label():
+def test_home_keeps_headline_metrics_accessible_and_longitudinal_evidence_dynamic():
     home = read("apps/web/app/page.tsx")
-    assert 'className="metric-row" role="group"' in home
-    assert 'aria-label={`${periods.length}-wave evidence summary`}' in home
-    assert (
-        'className="measurement-ladder" role="group" '
-        'aria-label="Measurement chain from adoption to outcomes"'
-    ) in home
+    assert 'className="hero-metrics" role="group"' in home
+    assert 'aria-label="Latest national headline measures"' in home
+    assert "loadLongitudinalDiagnostics" in home
+    assert "crossLevelAlignedQuarters" in home
+    assert "periods.length" in home
 
 
 def test_css_has_keyboard_reduced_motion_and_small_screen_rules():
@@ -150,6 +149,7 @@ def test_source_provenance_matches_rights_safe_architecture():
 
 def test_navigation_routes_exist():
     expected = [
+        "apps/web/app/explore/page.tsx",
         "apps/web/app/explore/industries/page.tsx",
         "apps/web/app/explore/occupations/page.tsx",
         "apps/web/app/blog/after-adoption/page.tsx",

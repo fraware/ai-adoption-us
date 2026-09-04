@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ReleaseNotice } from "../components/ReleaseNotice";
 import { absoluteSiteUrl, configuredSiteBaseUrl } from "../lib/site";
 import "./globals.css";
+import "./design.css";
 
 const siteBaseUrl = configuredSiteBaseUrl();
 const homeUrl = absoluteSiteUrl("/");
@@ -52,11 +53,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div className="site-header-inner">
             <Link className="brand" href="/">GenAI at Work</Link>
             <nav aria-label="Primary navigation">
-              <Link href="/explore/industries">Industries</Link>
-              <Link href="/explore/occupations">Occupations</Link>
+              <Link href="/explore">Explore</Link>
               <Link href="/blog/after-adoption">Essay</Link>
-              <Link href="/methodology">Methodology</Link>
-              <Link href="/sources">Sources</Link>
+              <Link href="/methodology">Data &amp; methods</Link>
             </nav>
           </div>
         </header>
@@ -69,7 +68,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               realized outcomes require separate outcome evidence.
             </p>
             <p className="footer-links">
-              <Link href="/methodology">Methodology</Link>
+              <Link href="/methodology">Data &amp; methods</Link>
               <Link href="/sources">Sources &amp; provenance</Link>
             </p>
           </div>

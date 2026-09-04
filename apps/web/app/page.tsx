@@ -1,18 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { StabilityBars } from "../components/StabilityBars";
 import { TimeSeriesPlot } from "../components/TimeSeriesPlot";
 import { latestNational, loadObservations } from "../lib/data";
 import { loadLongitudinalDiagnostics } from "../lib/longitudinal";
 
 export const metadata: Metadata = {
-  title: "From adoption to workflow",
+  title: "Workplace AI, measured",
 };
 
 const labels: Record<string, string> = {
   adoption_work: "use GenAI for work",
-  work_use_last_week: "used it for work last week",
-  work_use_daily: "used it every workday",
   assisted_hours_share: "of work hours were AI-assisted",
   reported_time_savings_share: "of work hours were reported as saved",
 };
@@ -31,165 +28,104 @@ export default async function HomePage() {
     loadLongitudinalDiagnostics(),
   ]);
   const national = latestNational(rows);
-  const metricOrder = [
+  const chartMetricOrder = [
     "adoption_work",
     "work_use_last_week",
     "work_use_daily",
     "assisted_hours_share",
     "reported_time_savings_share",
   ];
+  const featuredMetricOrder = [
+    "adoption_work",
+    "assisted_hours_share",
+    "reported_time_savings_share",
+  ];
   const timeSeries = rows
-    .filter((row) => row.entity_id === "us" && metricOrder.includes(row.metric_id))
+    .filter((row) => row.entity_id === "us" && chartMetricOrder.includes(row.metric_id))
     .map((row) => ({
       date: row.date,
       value: row.value,
       metric: row.metric_id,
       label: chartLabels[row.metric_id],
     }));
-
   const periods = longitudinal.input_scope.periods;
-  const firstPeriod = periods[0];
-  const lastPeriod = periods[periods.length - 1];
   const crossLevelAlignedQuarters = Object.values(longitudinal.cross_level_comparison).filter(
     (row) =>
       row.occupation_minus_industry_pearson_A_H > 0 &&
       row.occupation_minus_industry_spearman_A_H > 0,
   ).length;
-  const industryRank = longitudinal.rank_stability.industry;
-  const occupationRank = longitudinal.rank_stability.occupation;
-  const industryDominance = longitudinal.rank_stability_dominance.industry;
-  const occupationDominance = longitudinal.rank_stability_dominance.occupation;
 
   return (
     <main>
-      <p className="eyebrow">U.S. workplace generative AI</p>
-      <h1>AI adoption measures reach. The workday reveals depth.</h1>
-      <p className="lede">
-        GenAI at Work measures how reported adoption turns into recurring use, assisted working time, and
-        reported time savings across U.S. workers, industries, and occupations.
-      </p>
-
-      <section className="section" aria-labelledby="evidence-heading">
-        <h2 id="evidence-heading">The {periods.length}-wave record shows a stable distinction</h2>
-        <p className="kicker">
-          Adoption rankings are more stable than assisted-hours rankings. In every audited wave, adoption
-          and assisted time also align more tightly across occupations than across industries.
-        </p>
-        <div className="metric-row" role="group" aria-label={`${periods.length}-wave evidence summary`}>
-          <div className="metric">
-            <span>Audited window</span>
-            <strong>{periods.length} waves</strong>
-            <div>{firstPeriod} through {lastPeriod}</div>
-          </div>
-          <div className="metric">
-            <span>Occupation–industry gap</span>
-            <strong>{crossLevelAlignedQuarters} / {periods.length}</strong>
-            <div>quarters with tighter adoption–assisted-hours alignment by occupation</div>
-          </div>
-          <div className="metric">
-            <span>Adoption rank stability</span>
-            <strong>
-              {industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr}
-              {" / "}
-              {industryDominance.quarter_pairs}
-            </strong>
-            <div>
-              industry quarter pairs; occupations show
-              {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} / ${occupationDominance.quarter_pairs}`}
-            </div>
-          </div>
-        </div>
-
-        <StabilityBars
-          title={`Median pairwise rank correlation across the ${periods.length}-wave window`}
-          bars={[
-            { label: "Industry adoption", value: industryRank.A.median_pairwise },
-            { label: "Industry assisted hours", value: industryRank.H.median_pairwise },
-            { label: "Occupation adoption", value: occupationRank.A.median_pairwise },
-            { label: "Occupation assisted hours", value: occupationRank.H.median_pairwise },
-          ]}
-        />
-        <p className="note">
-          Adoption rankings exceed assisted-hours rank stability in
-          {` ${industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${industryDominance.quarter_pairs} `}
-          industry quarter pairs and
-          {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${occupationDominance.quarter_pairs} `}
-          occupation quarter pairs. These are descriptive aggregate diagnostics. Causal mechanisms require
-          separate identification.
-        </p>
-      </section>
-
-      <section className="section" aria-labelledby="measurement-heading">
-        <h2 id="measurement-heading">Follow the path from diffusion to outcomes</h2>
+      <section className="hero" aria-labelledby="home-title">
+        <p className="eyebrow">U.S. workplace generative AI</p>
+        <h1 id="home-title">AI adoption measures reach. The workday reveals depth.</h1>
         <p className="lede">
-          Each stage answers a different question and uses a different denominator. Together they show how
-          far GenAI has spread and how deeply it enters working time.
+          GenAI at Work tracks how reported workplace use turns into recurring use, assisted working time,
+          and reported time savings across U.S. workers.
         </p>
-        <div className="measurement-ladder" role="group" aria-label="Measurement chain from adoption to outcomes">
-          <div className="measurement-step">
-            <span>01</span><strong>Adoption</strong><p>Share of employed adults reporting GenAI use for work.</p>
-          </div>
-          <div className="measurement-step">
-            <span>02</span><strong>Recent use</strong><p>Share reporting work use in the prior week.</p>
-          </div>
-          <div className="measurement-step">
-            <span>03</span><strong>Routine use</strong><p>Share reporting use on every workday.</p>
-          </div>
-          <div className="measurement-step">
-            <span>04</span><strong>Workflow penetration</strong><p>Share of total work hours actively assisted by GenAI.</p>
-          </div>
-          <div className="measurement-step">
-            <span>05</span><strong>Reported savings</strong><p>Counterfactual share of work hours respondents report saving.</p>
-          </div>
-          <div className="measurement-step">
-            <span>06</span><strong>Realized outcomes</strong><p>Output, productivity, wages, employment, and firm performance require separate outcome data and identification.</p>
-          </div>
-        </div>
-      </section>
 
-      <section className="section" aria-labelledby="national-heading">
-        <h2 id="national-heading">National snapshot</h2>
         {national.size === 0 ? (
-          <div className="callout">
+          <div className="callout hero-callout">
             <p className="callout-label">Public aggregate view</p>
             <p>
-              This build excludes the bounded national observation view. Longitudinal derived evidence
-              remains available through the promoted release.
+              This build excludes the bounded national observation view. Derived evidence remains available
+              through the promoted release.
             </p>
-            <p><Link href="/sources">Read the source and redistribution boundary →</Link></p>
+            <p><Link href="/sources">Read the source boundary →</Link></p>
           </div>
         ) : (
-          <>
-            <section className="metric-row" aria-label="Latest national snapshot">
-              {metricOrder.map((metric) => {
-                const row = national.get(metric);
-                return row ? (
-                  <div className="metric" key={metric}>
-                    <span>{row.period}</span>
-                    <strong>{row.value.toFixed(1)}%</strong>
-                    <div>{labels[metric]}</div>
-                  </div>
-                ) : null;
-              })}
-            </section>
-            <TimeSeriesPlot data={timeSeries} />
-          </>
+          <div className="hero-metrics" role="group" aria-label="Latest national headline measures">
+            {featuredMetricOrder.map((metric) => {
+              const row = national.get(metric);
+              return row ? (
+                <div className="hero-metric" key={metric}>
+                  <span>{row.period}</span>
+                  <strong>{row.value.toFixed(1)}%</strong>
+                  <p>{labels[metric]}</p>
+                </div>
+              ) : null;
+            })}
+          </div>
         )}
       </section>
 
-      <section className="section" aria-labelledby="wedge-heading">
-        <h2 id="wedge-heading">Industry structure adds an unresolved layer</h2>
-        <p>
-          Across every audited wave, adoption and assisted working time align more tightly across
-          occupations than across industries. That repeated difference points to industry variation that
-          is less visible at the occupation level.
+      {national.size > 0 ? (
+        <section className="section section-chart" aria-labelledby="national-heading">
+          <div className="section-intro">
+            <p className="eyebrow">National record</p>
+            <h2 id="national-heading">Five measures, one workday.</h2>
+            <p className="kicker">
+              Adoption, recurrence, assisted working time, and reported savings move together without
+              representing the same construct.
+            </p>
+          </div>
+          <TimeSeriesPlot data={timeSeries} />
+        </section>
+      ) : null}
+
+      <section className="section section-split" aria-labelledby="explore-heading">
+        <div>
+          <p className="eyebrow">Cross-group evidence</p>
+          <h2 id="explore-heading">Occupation structures the conversion from adoption to assisted time more tightly.</h2>
+        </div>
+        <div className="section-copy">
+          <p>
+            Across all {crossLevelAlignedQuarters} of {periods.length} audited waves, adoption and assisted
+            working time align more tightly across occupations than across industries. Industry aggregates
+            retain variation beyond occupation mix.
+          </p>
+          <p className="text-link"><Link href="/explore">Explore the data →</Link></p>
+        </div>
+      </section>
+
+      <section className="section essay-promo" aria-labelledby="essay-heading">
+        <p className="eyebrow">Technical essay</p>
+        <h2 id="essay-heading">After adoption</h2>
+        <p className="lede-small">
+          A measurement argument about depth of use, reported savings, and the limits of productivity inference.
         </p>
-        <p>
-          Industry aggregates combine occupation mix with firm context and sampling variation. The current
-          evidence describes the remaining structure; causal attribution requires richer firm, task, and
-          outcome data.
-        </p>
-        <p><Link href="/blog/after-adoption">Read the technical essay →</Link></p>
+        <p className="text-link"><Link href="/blog/after-adoption">Read the essay →</Link></p>
       </section>
     </main>
   );

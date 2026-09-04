@@ -7,6 +7,7 @@ const outputDir = path.resolve(process.argv[2] ?? "qa-results/native-safari");
 
 const routes = [
   { slug: "home", pathname: "/" },
+  { slug: "explore", pathname: "/explore" },
   { slug: "industries", pathname: "/explore/industries" },
   { slug: "occupations", pathname: "/explore/occupations" },
   { slug: "methodology", pathname: "/methodology" },
@@ -15,11 +16,9 @@ const routes = [
 ];
 
 const primaryNavigation = [
-  "/explore/industries",
-  "/explore/occupations",
+  "/explore",
   "/blog/after-adoption",
   "/methodology",
-  "/sources",
 ];
 
 function endpoint(pathname) {
