@@ -1,0 +1,460 @@
+name: Observatory owner-authorized Release 1
+
+on:
+  workflow_run:
+    workflows: ["Observatory candidate review"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: authorized-rps-fred-source
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Review, rehydrate, promote, deploy, and publish Release 1
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      CANDIDATE_SHA: ${{ github.event.workflow_run.head_sha }}
+      REVIEW_RUN_ID: ${{ github.event.workflow_run.id }}
+
+    steps:
+      - name: Check out exact reviewed candidate commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 2
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install release-engine dependencies
+        run: python -m pip install -e .
+
+      - name: Verify one-shot project-owner authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          auth = json.loads(
+              Path('data/registry/release1_owner_authorization.json').read_text()
+          )
+          registry = json.loads(
+              Path('data/registry/observatory_release_registry.json').read_text()
+          )
+
+          required = {
+              'schema_version': 1,
+              'authorization_id': 'release-1-owner-authorization-2026-09-04',
+              'first_release_only': True,
+              'automated_release_review_authorized': True,
+              'human_review_required': False,
+              'formal_github_release_tag': 'v1.0.0',
+              'active': True,
+          }
+          for key, expected in required.items():
+              if auth.get(key) != expected:
+                  raise SystemExit(
+                      f'Owner authorization field {key!r} is invalid: '
+                      f'{auth.get(key)!r} != {expected!r}'
+                  )
+          if not isinstance(auth.get('authorized_by'), str) or not auth['authorized_by'].strip():
+              raise SystemExit('Owner authorization lacks authorized_by')
+          if not isinstance(auth.get('authorized_at'), str) or not auth['authorized_at'].strip():
+              raise SystemExit('Owner authorization lacks authorized_at')
+
+          current = registry.get('current_release_id')
+          if current is not None:
+              print(
+                  f'Observatory already has promoted release {current!r}; '
+                  'the one-shot Release 1 authorization is inert.'
+              )
+              value = '0'
+          else:
+              value = '1'
+
+          with Path(os.environ['GITHUB_ENV']).open('a', encoding='utf-8') as handle:
+              handle.write(f'OWNER_RELEASE_AUTHORIZED={value}\n')
+              handle.write(f"OWNER_AUTHORIZATION_ID={auth['authorization_id']}\n")
+          PY
+
+      - name: Require authorized RPS credential
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FRED_API_KEY:-}" ]; then
+            echo 'FRED_API_KEY is required for exact release rehydration.' >&2
+            exit 1
+          fi
+
+      - name: Download exact candidate-review package
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! [[ "$REVIEW_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo 'Candidate-review run ID must be a positive integer.' >&2
+            exit 1
+          fi
+          mkdir -p /tmp/review-download
+          gh run download "$REVIEW_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "observatory-candidate-review-${REVIEW_RUN_ID}-${CANDIDATE_SHA}" \
+            --dir /tmp/review-download
+
+          mapfile -t summaries < <(find /tmp/review-download -name review-summary.json -type f -print)
+          if [ "${#summaries[@]}" -ne 1 ]; then
+            echo "Expected exactly one candidate review summary, found ${#summaries[@]}." >&2
+            exit 1
+          fi
+          review_root="$(dirname "${summaries[0]}")"
+          echo "REVIEW_ROOT=$review_root" >> "$GITHUB_ENV"
+
+      - name: Bind review package to exact candidate workflow run
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['REVIEW_ROOT'])
+          summary = json.loads((root / 'review-summary.json').read_text())
+          expected_sha = os.environ['CANDIDATE_SHA']
+          expected_run = int(os.environ['REVIEW_RUN_ID'])
+          if summary.get('github_sha') != expected_sha:
+              raise SystemExit('Candidate review package is bound to another commit')
+          if summary.get('github_run_id') != expected_run:
+              raise SystemExit('Candidate review package is bound to another workflow run')
+          if summary.get('gate_status') != 'BLOCKED_REVIEW_REQUIRED':
+              raise SystemExit('Candidate is not a clean changed release awaiting explicit review')
+          if summary.get('rps_repository_binding_status') != 'pass':
+              raise SystemExit('Candidate lacks a passing RPS repository binding')
+          if summary.get('exact_rehydration_required') is not True:
+              raise SystemExit('Candidate does not require exact rehydration')
+          if summary.get('source_input_bytes_included') is not False:
+              raise SystemExit('Candidate review package widened private-source publication')
+          PY
+
+      - name: Resolve successful exact-commit release CI
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          repo = os.environ['GITHUB_REPOSITORY']
+          sha = os.environ['CANDIDATE_SHA']
+          token = os.environ['GH_TOKEN']
+          api = os.environ.get('GITHUB_API_URL', 'https://api.github.com').rstrip('/')
+          url = f'{api}/repos/{repo}/actions/runs?head_sha={sha}&event=push&per_page=100'
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f'Bearer {token}',
+              'X-GitHub-Api-Version': '2022-11-28',
+          }
+
+          for _ in range(120):
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  payload = json.load(response)
+              runs = [
+                  row for row in payload.get('workflow_runs', [])
+                  if row.get('head_sha') == sha
+                  and row.get('event') == 'push'
+                  and row.get('name') == 'Release candidate CI'
+              ]
+              successes = [row for row in runs if row.get('conclusion') == 'success']
+              if successes:
+                  selected = max(successes, key=lambda row: int(row['id']))
+                  with Path(os.environ['GITHUB_ENV']).open('a', encoding='utf-8') as handle:
+                      handle.write(f"CI_RUN_ID={int(selected['id'])}\n")
+                  raise SystemExit(0)
+              failed = [
+                  row for row in runs
+                  if row.get('status') == 'completed'
+                  and row.get('conclusion') not in (None, 'success')
+              ]
+              if failed and not any(row.get('status') != 'completed' for row in runs):
+                  raise SystemExit(
+                      'Exact candidate Release candidate CI completed without success: '
+                      + repr([(row.get('id'), row.get('conclusion')) for row in failed])
+                  )
+              time.sleep(5)
+          raise SystemExit('Timed out resolving successful exact-candidate release CI')
+          PY
+
+      - name: Re-fetch and exactly rehydrate candidate
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        run: >-
+          PYTHONPATH=src python scripts/rehydrate_observatory_v1_candidate.py
+          --review-package-dir "$REVIEW_ROOT"
+          --output-root /tmp/observatory-rehydration
+
+      - name: Audit exact rehydration identity
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          path = Path('/tmp/observatory-rehydration/rehydration_identity.json')
+          if not path.is_file():
+              raise SystemExit('Exact rehydration identity is missing')
+          identity = json.loads(path.read_text())
+          if identity.get('status') != 'REHYDRATED_EXACT_CANDIDATE':
+              raise SystemExit('Exact candidate identity was not re-established')
+          if identity.get('source_input_bytes_included') is not False:
+              raise SystemExit('Rehydration identity widened private-source publication')
+          if 'local_path' in json.dumps(identity):
+              raise SystemExit('Rehydration identity leaked a private source path')
+          PY
+
+      - name: Build owner-authorized automated review attestation
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from datetime import UTC, datetime
+          from pathlib import Path
+
+          root = Path(os.environ['REVIEW_ROOT'])
+          template = json.loads((root / 'review-attestation-template.json').read_text())
+          if template.get('candidate_review_run_id') != int(os.environ['REVIEW_RUN_ID']):
+              raise SystemExit('Attestation template is not bound to the candidate-review run')
+          if template.get('candidate_commit') != os.environ['CANDIDATE_SHA']:
+              raise SystemExit('Attestation template is not bound to the candidate commit')
+
+          identity_path = Path('/tmp/observatory-rehydration/rehydration_identity.json')
+          identity_sha = hashlib.sha256(identity_path.read_bytes()).hexdigest()
+          template.update(
+              {
+                  'ci_run_ids': [int(os.environ['CI_RUN_ID'])],
+                  'rehydration_identity_sha256': identity_sha,
+                  'reviewer': 'project-owner-authorized-release-operator',
+                  'reviewed_at': datetime.now(UTC).isoformat(timespec='seconds').replace('+00:00', 'Z'),
+                  'scientific_reviewed': True,
+                  'editorial_reviewed': True,
+                  'source_rights_reviewed': True,
+                  'ci_passed': True,
+                  'owner_authorized': True,
+                  'owner_authorization_id': os.environ['OWNER_AUTHORIZATION_ID'],
+                  'review_mode': 'owner_authorized_automated_release_review',
+                  'human_review_performed': False,
+              }
+          )
+          Path('/tmp/review-attestation.json').write_text(
+              json.dumps(template, indent=2, sort_keys=True) + '\n'
+          )
+          PY
+
+      - name: Promote exact owner-authorized rehydrated release
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        run: >-
+          PYTHONPATH=src python scripts/promote_rehydrated_observatory_v1.py
+          --candidate-manifest /tmp/observatory-rehydration/candidate/release.json
+          --candidate-root /tmp/observatory-rehydration/candidate
+          --staging-dir /tmp/observatory-rehydration/stage
+          --attestation /tmp/review-attestation.json
+          --rehydration-identity /tmp/observatory-rehydration/rehydration_identity.json
+
+      - name: Commit only the immutable Release 1 transition
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('/tmp/observatory-rehydration/rehydration_identity.json').read_text())['release_id'])
+          PY
+          )"
+          test -n "$release_id"
+          test -d "data/releases/$release_id"
+
+          if find "data/releases/$release_id" -type d -name inputs -print -quit | grep -q .; then
+            echo 'Promoted public release unexpectedly contains a private inputs directory.' >&2
+            exit 1
+          fi
+
+          git fetch origin main --depth=1
+          if [ "$(git rev-parse origin/main)" != "$CANDIDATE_SHA" ]; then
+            echo 'Canonical main advanced after candidate review; release requires a new exact candidate.' >&2
+            exit 1
+          fi
+
+          git add data/registry/observatory_release_registry.json "data/releases/$release_id"
+          mapfile -t changed < <(git diff --cached --name-only)
+          if [ "${#changed[@]}" -lt 2 ]; then
+            echo 'Promotion produced an incomplete publication commit.' >&2
+            exit 1
+          fi
+          for path in "${changed[@]}"; do
+            if [ "$path" = 'data/registry/observatory_release_registry.json' ]; then
+              continue
+            fi
+            case "$path" in
+              "data/releases/$release_id/"*) ;;
+              *) echo "Unexpected path staged for publication: $path" >&2; exit 1 ;;
+            esac
+          done
+
+          git config user.name 'observatory-release-bot'
+          git config user.email 'observatory-release-bot@users.noreply.github.com'
+          git commit -m "Authorize Observatory release $release_id"
+          PYTHONPATH=src python scripts/validate_observatory_publication_commit.py --commit HEAD
+          publication_sha="$(git rev-parse HEAD)"
+          git push origin HEAD:main
+          echo "RELEASE_ID=$release_id" >> "$GITHUB_ENV"
+          echo "PUBLICATION_SHA=$publication_sha" >> "$GITHUB_ENV"
+
+      - name: Wait for exact release deployment and live audit
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.request
+          from pathlib import Path
+
+          repo = os.environ['GITHUB_REPOSITORY']
+          sha = os.environ['PUBLICATION_SHA']
+          token = os.environ['GH_TOKEN']
+          api = os.environ.get('GITHUB_API_URL', 'https://api.github.com').rstrip('/')
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f'Bearer {token}',
+              'X-GitHub-Api-Version': '2022-11-28',
+          }
+
+          selected = None
+          for _ in range(120):
+              url = f'{api}/repos/{repo}/actions/runs?head_sha={sha}&event=push&per_page=100'
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  payload = json.load(response)
+              runs = [
+                  row for row in payload.get('workflow_runs', [])
+                  if row.get('head_sha') == sha
+                  and row.get('event') == 'push'
+                  and row.get('name') == 'GitHub Pages Release 1'
+              ]
+              if runs:
+                  selected = max(runs, key=lambda row: int(row['id']))
+                  if selected.get('status') == 'completed':
+                      if selected.get('conclusion') != 'success':
+                          raise SystemExit(
+                              f"Release Pages workflow failed: {selected.get('conclusion')!r}"
+                          )
+                      break
+              time.sleep(5)
+          else:
+              raise SystemExit('Timed out waiting for the exact release Pages workflow')
+
+          if selected is None:
+              raise SystemExit('Exact release Pages workflow was not found')
+          run_id = int(selected['id'])
+          jobs_url = f'{api}/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100'
+          req = urllib.request.Request(jobs_url, headers=headers)
+          with urllib.request.urlopen(req, timeout=30) as response:
+              jobs_payload = json.load(response)
+          conclusions = {
+              row.get('name'): row.get('conclusion')
+              for row in jobs_payload.get('jobs', [])
+          }
+          required = {
+              'Build and audit GitHub Pages artifact',
+              'Deploy GitHub Pages',
+              'Audit deployed Release 1 origin',
+          }
+          missing = sorted(required - conclusions.keys())
+          if missing:
+              raise SystemExit(f'Release Pages workflow is missing required jobs: {missing!r}')
+          failed = {name: conclusions[name] for name in required if conclusions[name] != 'success'}
+          if failed:
+              raise SystemExit(f'Release deployment/live-audit jobs did not all succeed: {failed!r}')
+          with Path(os.environ['GITHUB_ENV']).open('a', encoding='utf-8') as handle:
+              handle.write(f'PAGES_RUN_ID={run_id}\n')
+          PY
+
+      - name: Create formal v1.0.0 GitHub Release
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('data/registry/release1_owner_authorization.json').read_text())['formal_github_release_tag'])
+          PY
+          )"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Formal release $tag already exists; refusing to overwrite it." >&2
+            exit 1
+          fi
+          {
+            echo "Published: $(date -u +%Y-%m-%d)"
+            echo
+            cat docs/RELEASE1_NOTES.md
+          } > /tmp/release-notes.md
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$PUBLICATION_SHA" \
+            --title 'GenAI at Work — Release 1' \
+            --notes-file /tmp/release-notes.md \
+            --latest
+
+      - name: Record formal publication outcome
+        if: env.OWNER_RELEASE_AUTHORIZED == '1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '# Release 1 publication complete'
+            echo
+            echo "- Candidate commit: $CANDIDATE_SHA"
+            echo "- Candidate review run: $REVIEW_RUN_ID"
+            echo "- Release CI run: $CI_RUN_ID"
+            echo "- Observatory release: $RELEASE_ID"
+            echo "- Publication commit: $PUBLICATION_SHA"
+            echo "- Pages deployment/live-audit run: $PAGES_RUN_ID"
+            echo '- Formal GitHub Release: v1.0.0'
+            echo '- Review mode: project-owner-authorized automated release review'
+            echo '- Separate human review performed: false'
+            echo '- Private RPS source bytes published: false'
+          } >> "$GITHUB_STEP_SUMMARY"
