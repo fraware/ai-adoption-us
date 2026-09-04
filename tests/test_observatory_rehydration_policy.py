@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
+import json
+import subprocess
 from pathlib import Path
 from types import ModuleType
 
@@ -21,6 +24,25 @@ def load_script(relative: str, module_name: str) -> ModuleType:
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _write_json(path: Path, value: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
 def test_canonical_low_level_promotion_requires_rehydration_capability(tmp_path: Path):
@@ -109,17 +131,143 @@ def test_promotion_workflow_is_two_phase_and_commits_only_release_state():
     assert "data/audit/private" not in workflow
 
 
-def test_publication_commit_validator_prevents_unrelated_code_or_claim_changes():
+def test_publication_commit_validator_requires_append_only_new_release_transition():
     validator = read("scripts/validate_observatory_publication_commit.py")
 
     assert 'expected_subject = f"Authorize Observatory release {release_id}"' in validator
     assert "Publication commit parent is not the exact human-reviewed candidate commit" in validator
     assert 'review.get("rehydration_status") != "REHYDRATED_EXACT_CANDIDATE"' in validator
     assert "Review record does not bind the rehydration identity" in validator
+    assert "Publication commit must advance to a new immutable release ID" in validator
+    assert "attempts to rewrite a release directory that already existed in its parent" in validator
+    assert "exactly one append-only release row" in validator
+    assert "changed release-registry fields outside the governed release transition" in validator
     assert 'release_prefix = f"data/releases/{release_id}/"' in validator
     assert "Publication commit contains unrelated changed paths" in validator
     assert "Publication commit did not advance the release registry" in validator
     assert "Publication commit did not add the immutable release directory" in validator
+
+
+def test_publication_commit_validator_accepts_new_release_and_rejects_rewrite(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    validator = load_script(
+        "scripts/validate_observatory_publication_commit.py",
+        "observatory_publication_validator_dynamic_test",
+    )
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init")
+    _git(repo, "config", "user.name", "test")
+    _git(repo, "config", "user.email", "test@example.test")
+
+    registry_path = repo / "data/registry/observatory_release_registry.json"
+    releases_root = repo / "data/releases"
+    parent_registry = {
+        "schema_version": 1,
+        "current_release_id": None,
+        "current_release_manifest_sha256": None,
+        "releases": [],
+        "status": "NO_OBSERVATORY_RELEASE_PROMOTED_YET",
+    }
+    _write_json(registry_path, parent_registry)
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", "Candidate commit")
+    candidate_commit = _git(repo, "rev-parse", "HEAD").lower()
+
+    release_id = "release-1"
+    release_root = releases_root / release_id
+    artifact_path = release_root / "artifacts/result.json"
+    artifact_path.parent.mkdir(parents=True)
+    artifact_path.write_text('{"value": 1}\n')
+    identity_path = release_root / "rehydration_identity.json"
+    identity = {
+        "candidate_commit": candidate_commit,
+        "release_id": release_id,
+        "source_input_bytes_included": False,
+        "status": "REHYDRATED_EXACT_CANDIDATE",
+    }
+    _write_json(identity_path, identity)
+    identity_sha = _sha256(identity_path)
+    review = {
+        "candidate_commit": candidate_commit,
+        "rehydration_identity_sha256": identity_sha,
+        "rehydration_status": "REHYDRATED_EXACT_CANDIDATE",
+    }
+    _write_json(release_root / "review_record.json", review)
+    manifest = {
+        "release_id": release_id,
+        "release_status": "PROMOTED_AFTER_EXPLICIT_REVIEW",
+        "supersedes_release_id": None,
+        "promoted_at": "2026-09-04T09:00:00Z",
+        "data_mode": "derived_only",
+        "artifacts": [
+            {
+                "path": "artifacts/result.json",
+                "sha256": _sha256(artifact_path),
+            }
+        ],
+    }
+    manifest_path = release_root / "release_manifest.json"
+    _write_json(manifest_path, manifest)
+    manifest_sha = _sha256(manifest_path)
+    promoted_registry = {
+        "schema_version": 1,
+        "current_release_id": release_id,
+        "current_release_manifest_sha256": manifest_sha,
+        "status": "CURRENT_RELEASE_PROMOTED",
+        "releases": [
+            {
+                "release_id": release_id,
+                "manifest_sha256": manifest_sha,
+                "promoted_at": manifest["promoted_at"],
+                "supersedes_release_id": None,
+                "data_mode": "derived_only",
+                "candidate_commit": candidate_commit,
+                "rehydration_status": "REHYDRATED_EXACT_CANDIDATE",
+                "rehydration_identity_sha256": identity_sha,
+            }
+        ],
+    }
+    _write_json(registry_path, promoted_registry)
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", f"Authorize Observatory release {release_id}")
+
+    monkeypatch.setattr(validator, "ROOT", repo)
+    monkeypatch.setattr(validator, "REGISTRY", registry_path)
+    monkeypatch.setattr(validator, "RELEASES_ROOT", releases_root)
+    result = validator.validate("HEAD")
+    assert result["status"] == "PUBLICATION_COMMIT_VALID"
+    assert result["candidate_commit"] == candidate_commit
+
+    previous_publication_commit = _git(repo, "rev-parse", "HEAD").lower()
+    artifact_path.write_text('{"value": 2}\n')
+    manifest["artifacts"][0]["sha256"] = _sha256(artifact_path)
+    _write_json(manifest_path, manifest)
+    manifest_sha = _sha256(manifest_path)
+    identity["candidate_commit"] = previous_publication_commit
+    _write_json(identity_path, identity)
+    identity_sha = _sha256(identity_path)
+    review["candidate_commit"] = previous_publication_commit
+    review["rehydration_identity_sha256"] = identity_sha
+    _write_json(release_root / "review_record.json", review)
+    promoted_registry["current_release_manifest_sha256"] = manifest_sha
+    promoted_registry["releases"][0].update(
+        {
+            "manifest_sha256": manifest_sha,
+            "candidate_commit": previous_publication_commit,
+            "rehydration_identity_sha256": identity_sha,
+        }
+    )
+    _write_json(registry_path, promoted_registry)
+    _git(repo, "add", ".")
+    _git(repo, "commit", "-m", f"Authorize Observatory release {release_id}")
+
+    with pytest.raises(
+        validator.PublicationCommitError,
+        match="must advance to a new immutable release ID",
+    ):
+        validator.validate("HEAD")
 
 
 def test_pages_deploys_only_after_validated_release_authorization_commit():
