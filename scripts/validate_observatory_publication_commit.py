@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Validate the one-commit transition from reviewed candidate to public release.
 
-A publication commit is permitted to add only the immutable promoted release and
-advance the release registry. Its parent must be the exact candidate commit named
-in the human review record. This prevents unrelated code, claims, or source files
-from hitchhiking on the release authorization commit.
+A publication commit may introduce exactly one new immutable promoted release and
+advance the release registry by one append-only row. Its parent must be the exact
+candidate commit named in the human review record. This prevents unrelated code,
+claims, source files, or rewrites of an already promoted release from hitchhiking
+on the release authorization commit.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from genai_at_work.release_engine import load_json_object, sha256_file
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "data" / "registry" / "observatory_release_registry.json"
 RELEASES_ROOT = ROOT / "data" / "releases"
+REGISTRY_PATH = "data/registry/observatory_release_registry.json"
 RELEASE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 
 
@@ -41,6 +43,26 @@ def _git(*args: str) -> str:
         raise PublicationCommitError(f"Git command failed: {' '.join(args)}") from exc
 
 
+def _git_json(commit: str, path: str) -> dict[str, Any]:
+    try:
+        payload = _git("show", f"{commit}:{path}")
+        value = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise PublicationCommitError(
+            f"JSON file {path} is invalid at commit {commit}"
+        ) from exc
+    if not isinstance(value, dict):
+        raise PublicationCommitError(f"JSON file {path} must be an object at commit {commit}")
+    return {str(key): item for key, item in value.items()}
+
+
+def _release_rows(registry: dict[str, Any], *, context: str) -> list[dict[str, Any]]:
+    rows = registry.get("releases")
+    if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+        raise PublicationCommitError(f"{context} releases must be a list of objects")
+    return [{str(key): item for key, item in row.items()} for row in rows]
+
+
 def _artifact_hashes(manifest: dict[str, Any], release_root: Path) -> None:
     artifacts = manifest.get("artifacts")
     if not isinstance(artifacts, list) or not artifacts:
@@ -59,12 +81,85 @@ def _artifact_hashes(manifest: dict[str, Any], release_root: Path) -> None:
             raise PublicationCommitError(f"Promoted artifact checksum mismatch: {relative}")
 
 
+def _validate_append_only_registry_transition(
+    *,
+    parent: str,
+    parent_registry: dict[str, Any],
+    registry: dict[str, Any],
+    release_id: str,
+    manifest_sha: str,
+    manifest: dict[str, Any],
+    identity_sha: str,
+) -> None:
+    parent_current = parent_registry.get("current_release_id")
+    if parent_current is not None and (
+        not isinstance(parent_current, str) or RELEASE_ID_RE.fullmatch(parent_current) is None
+    ):
+        raise PublicationCommitError("Parent registry current_release_id is invalid")
+    if release_id == parent_current:
+        raise PublicationCommitError(
+            "Publication commit must advance to a new immutable release ID"
+        )
+    if manifest.get("supersedes_release_id") != parent_current:
+        raise PublicationCommitError(
+            "Promoted manifest does not explicitly supersede the parent registry release"
+        )
+
+    release_prefix = f"data/releases/{release_id}"
+    existing = _git("ls-tree", "-r", "--name-only", parent, "--", release_prefix)
+    if existing:
+        raise PublicationCommitError(
+            "Publication commit attempts to rewrite a release directory that already existed in its parent"
+        )
+
+    parent_rows = _release_rows(parent_registry, context="Parent registry")
+    current_rows = _release_rows(registry, context="Current registry")
+    if len(current_rows) != len(parent_rows) + 1 or current_rows[:-1] != parent_rows:
+        raise PublicationCommitError(
+            "Release registry history must advance by exactly one append-only release row"
+        )
+    added = current_rows[-1]
+    expected_added = {
+        "release_id": release_id,
+        "manifest_sha256": manifest_sha,
+        "promoted_at": manifest.get("promoted_at"),
+        "supersedes_release_id": parent_current,
+        "data_mode": manifest.get("data_mode"),
+        "candidate_commit": parent,
+        "rehydration_status": "REHYDRATED_EXACT_CANDIDATE",
+        "rehydration_identity_sha256": identity_sha,
+    }
+    for key, expected in expected_added.items():
+        if added.get(key) != expected:
+            raise PublicationCommitError(
+                f"Appended registry release row mismatch for {key}: {added.get(key)!r} != {expected!r}"
+            )
+
+    mutable_keys = {
+        "current_release_id",
+        "current_release_manifest_sha256",
+        "status",
+        "releases",
+    }
+    parent_static = {
+        key: value for key, value in parent_registry.items() if key not in mutable_keys
+    }
+    current_static = {
+        key: value for key, value in registry.items() if key not in mutable_keys
+    }
+    if current_static != parent_static:
+        raise PublicationCommitError(
+            "Publication commit changed release-registry fields outside the governed release transition"
+        )
+
+
 def validate(commit: str) -> dict[str, Any]:
     head = _git("rev-parse", commit).lower()
     parent = _git("rev-parse", f"{head}^").lower()
     subject = _git("show", "-s", "--format=%s", head)
 
     registry = load_json_object(REGISTRY)
+    parent_registry = _git_json(parent, REGISTRY_PATH)
     release_id = registry.get("current_release_id")
     manifest_sha = registry.get("current_release_manifest_sha256")
     if not isinstance(release_id, str) or RELEASE_ID_RE.fullmatch(release_id) is None:
@@ -82,7 +177,9 @@ def validate(commit: str) -> dict[str, Any]:
     review_path = release_root / "review_record.json"
     identity_path = release_root / "rehydration_identity.json"
     if not manifest_path.is_file() or not review_path.is_file() or not identity_path.is_file():
-        raise PublicationCommitError("Promoted release is missing manifest, review record, or rehydration identity")
+        raise PublicationCommitError(
+            "Promoted release is missing manifest, review record, or rehydration identity"
+        )
     if not isinstance(manifest_sha, str) or sha256_file(manifest_path) != manifest_sha:
         raise PublicationCommitError("Release registry manifest checksum mismatch")
 
@@ -111,14 +208,22 @@ def validate(commit: str) -> dict[str, Any]:
     if identity.get("source_input_bytes_included") is not False:
         raise PublicationCommitError("Rehydration identity widened private-source publication")
 
+    assert isinstance(manifest_sha, str)
+    _validate_append_only_registry_transition(
+        parent=parent,
+        parent_registry=parent_registry,
+        registry=registry,
+        release_id=release_id,
+        manifest_sha=manifest_sha,
+        manifest=manifest,
+        identity_sha=identity_sha,
+    )
     _artifact_hashes(manifest, release_root)
 
     changed = [
-        line
-        for line in _git("diff", "--name-only", parent, head).splitlines()
-        if line
+        line for line in _git("diff", "--name-only", parent, head).splitlines() if line
     ]
-    allowed_registry = "data/registry/observatory_release_registry.json"
+    allowed_registry = REGISTRY_PATH
     release_prefix = f"data/releases/{release_id}/"
     if not changed:
         raise PublicationCommitError("Publication commit contains no changes")
@@ -134,7 +239,9 @@ def validate(commit: str) -> dict[str, Any]:
     if allowed_registry not in changed:
         raise PublicationCommitError("Publication commit did not advance the release registry")
     if not any(path.startswith(release_prefix) for path in changed):
-        raise PublicationCommitError("Publication commit did not add the immutable release directory")
+        raise PublicationCommitError(
+            "Publication commit did not add the immutable release directory"
+        )
 
     return {
         "schema_version": 1,
