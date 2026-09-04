@@ -33,13 +33,13 @@ export default async function OccupationsPage() {
       <p className="eyebrow">{periods.length}-wave evidence</p>
       <h1>Occupation explorer</h1>
       <p className="lede">
-        Occupations provide the clearest cross-group link between adoption and depth of use. Across all
-        {` ${periods.length} `}audited waves, adoption and assisted working time align more tightly across
-        occupations than across industries.
+        Occupation is the strongest organizing layer in the current cross-group evidence. Across every
+        audited wave, adoption and assisted working time align more tightly across occupations than across
+        industries.
       </p>
 
       <section className="section" aria-labelledby="occupation-stability">
-        <h2 id="occupation-stability">Rank stability</h2>
+        <h2 id="occupation-stability">Adoption ranks persist more than assisted-hour ranks</h2>
         <StabilityBars
           title="Occupation rank persistence: median Spearman correlation across quarter pairs"
           bars={[
@@ -56,7 +56,7 @@ export default async function OccupationsPage() {
       </section>
 
       <section className="section" aria-labelledby="occupation-savings">
-        <h2 id="occupation-savings">Adoption consistently accounts for more cross-occupation variation in reported savings</h2>
+        <h2 id="occupation-savings">Adoption tracks reported savings more consistently across occupations</h2>
         <div className="table-wrap" tabIndex={0} aria-label="Scrollable occupation wave diagnostics table">
           <table>
             <caption>Unweighted cross-occupation descriptive diagnostics by quarter. A = adoption, H = assisted hours, S = reported savings.</caption>
@@ -105,7 +105,7 @@ export default async function OccupationsPage() {
       </section>
 
       <section className="section" aria-labelledby="occupation-boundary">
-        <h2 id="occupation-boundary">Interpretive boundary</h2>
+        <h2 id="occupation-boundary">What the occupation evidence supports</h2>
         <p className="note">
           Occupation-level patterns summarize major task bundles. Individual worker responses, employer
           policies, and causal productivity effects require microdata or separate identification.
