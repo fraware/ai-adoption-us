@@ -46,7 +46,9 @@ These provisions remain subject to the exact final build and rendered QA contrac
 
 ## Historical networked-build evidence — 2026-08-31
 
-GitHub Actions run `33411128343` demonstrated a genuine networked rights-safe public build. Permanent CI subsequently strengthened the contract with strict `mypy src`, locked `npm ci`, production-server startup, route smoke tests, private-path scans, and repository-governance checks.
+GitHub Actions run `33411128343` demonstrated a genuine networked rights-safe public build. Genuine `npm install` and `next build` execution is useful networked build evidence, but it does not substitute for a real browser or certify a later repository state. Permanent CI subsequently strengthened the contract with strict `mypy src`, locked `npm ci`, production-server startup, route smoke tests, private-path scans, and repository-governance checks.
+
+Screen-reader traversal is outside the automated evidence except where represented by machine-checkable accessibility contracts; Release 1 does not claim a complete human assistive-technology traversal. No public-launch claim follows from any historical QA run by itself.
 
 This run is retained as historical provenance, not current release certification.
 
