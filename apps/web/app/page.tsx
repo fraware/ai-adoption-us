@@ -6,7 +6,7 @@ import { latestNational, loadObservations } from "../lib/data";
 import { loadLongitudinalDiagnostics } from "../lib/longitudinal";
 
 export const metadata: Metadata = {
-  title: "AI adoption is only the beginning",
+  title: "From adoption to workflow",
 };
 
 const labels: Record<string, string> = {
@@ -63,17 +63,17 @@ export default async function HomePage() {
   return (
     <main>
       <p className="eyebrow">U.S. workplace generative AI</p>
-      <h1>Adoption is only the beginning.</h1>
+      <h1>Measure how AI moves from adoption into work.</h1>
       <p className="lede">
-        An auditable technical publication separating worker adoption, workflow penetration, and
-        reported time savings—and testing which patterns persist across survey waves.
+        GenAI at Work tracks the conversion of reported adoption into recurring use, assisted working
+        time, and reported time savings across U.S. workers, industries, and occupations.
       </p>
 
       <section className="section" aria-labelledby="evidence-heading">
         <h2 id="evidence-heading">What persists across {periods.length} survey waves</h2>
         <p className="kicker">
-          The durable evidence is about persistence and cross-level structure, not a latest-quarter
-          leaderboard.
+          Across the audited window, adoption rankings are more stable than assisted-hours rankings, and
+          occupation-level adoption–penetration alignment exceeds industry-level alignment in every wave.
         </p>
         <div className="metric-row" role="group" aria-label={`${periods.length}-wave evidence summary`}>
           <div className="metric">
@@ -82,9 +82,9 @@ export default async function HomePage() {
             <div>{firstPeriod} through {lastPeriod}</div>
           </div>
           <div className="metric">
-            <span>Cross-level result</span>
+            <span>Cross-level alignment</span>
             <strong>{crossLevelAlignedQuarters} / {periods.length}</strong>
-            <div>quarters where occupation adoption–assisted-hours alignment exceeds industry alignment</div>
+            <div>quarters with stronger occupation adoption–assisted-hours alignment</div>
           </div>
           <div className="metric">
             <span>Rank persistence</span>
@@ -93,7 +93,10 @@ export default async function HomePage() {
               {" / "}
               {industryDominance.quarter_pairs}
             </strong>
-            <div>industry quarter pairs; occupations show {occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} / {occupationDominance.quarter_pairs}</div>
+            <div>
+              industry quarter pairs; occupations show
+              {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} / ${occupationDominance.quarter_pairs}`}
+            </div>
           </div>
         </div>
 
@@ -107,35 +110,39 @@ export default async function HomePage() {
           ]}
         />
         <p className="note">
-          Adoption rankings are more similar across quarters than assisted-hours rankings in
+          Adoption rankings exceed assisted-hours rank stability in
           {` ${industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${industryDominance.quarter_pairs} `}
           industry quarter pairs and
           {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${occupationDominance.quarter_pairs} `}
-          occupation quarter pairs. This is descriptive aggregate evidence; it does not identify a causal mechanism.
+          occupation quarter pairs. These are descriptive aggregate diagnostics. Causal mechanisms require
+          separate identification.
         </p>
       </section>
 
       <section className="section" aria-labelledby="measurement-heading">
-        <h2 id="measurement-heading">One technology, several different measurements</h2>
+        <h2 id="measurement-heading">A measurement chain from adoption to outcomes</h2>
         <p className="lede">
-          Public discussion frequently collapses distinct stages into one “AI adoption” number. This
-          publication keeps them separate because their denominators and economic meanings differ.
+          Each stage answers a different question and uses a different denominator. Reading them together
+          reveals how diffusion converts into workflow depth and reported savings.
         </p>
-        <div className="measurement-ladder" role="group" aria-label="Measurement ladder from adoption to realization">
+        <div className="measurement-ladder" role="group" aria-label="Measurement chain from adoption to outcomes">
           <div className="measurement-step">
-            <span>01</span><strong>Adoption</strong><p>Who reports using GenAI for work.</p>
+            <span>01</span><strong>Adoption</strong><p>Share of employed adults reporting GenAI use for work.</p>
           </div>
           <div className="measurement-step">
-            <span>02</span><strong>Recent use</strong><p>Who used it for work in the prior week.</p>
+            <span>02</span><strong>Recent use</strong><p>Share reporting work use in the prior week.</p>
           </div>
           <div className="measurement-step">
-            <span>03</span><strong>Routine use</strong><p>Who reports using it every workday.</p>
+            <span>03</span><strong>Routine use</strong><p>Share reporting use on every workday.</p>
           </div>
           <div className="measurement-step">
-            <span>04</span><strong>Workflow penetration</strong><p>Share of work hours actively assisted by GenAI.</p>
+            <span>04</span><strong>Workflow penetration</strong><p>Share of total work hours actively assisted by GenAI.</p>
           </div>
           <div className="measurement-step">
-            <span>05</span><strong>Reported benefit</strong><p>Counterfactual time respondents report saving.</p>
+            <span>05</span><strong>Reported savings</strong><p>Counterfactual share of work hours respondents report saving.</p>
+          </div>
+          <div className="measurement-step">
+            <span>06</span><strong>Realized outcomes</strong><p>Changes in output, productivity, wages, employment, or firm performance require separate outcome data and identification.</p>
           </div>
         </div>
       </section>
@@ -144,11 +151,10 @@ export default async function HomePage() {
         <h2 id="national-heading">National snapshot</h2>
         {national.size === 0 ? (
           <div className="callout">
-            <p className="callout-label">Rights-safe Release 1 boundary</p>
+            <p className="callout-label">Public aggregate view</p>
             <p>
-              The bounded public observation view is unavailable in this build. The longitudinal
-              publication artifacts remain available, while private source-input bytes stay outside the
-              public bundle.
+              This build excludes the bounded national observation view. Longitudinal derived evidence
+              remains available through the promoted release.
             </p>
             <p><Link href="/sources">Read the source and redistribution boundary →</Link></p>
           </div>
@@ -172,16 +178,16 @@ export default async function HomePage() {
       </section>
 
       <section className="section" aria-labelledby="wedge-heading">
-        <h2 id="wedge-heading">The unresolved industry wedge</h2>
+        <h2 id="wedge-heading">Why occupations and industries diverge</h2>
         <p>
           Across every audited wave, adoption and assisted working time are more tightly coupled across
-          occupations than across industries. The aggregate adoption-to-penetration relationship is therefore more tightly aligned across
-          occupations than across broad industries. Broad industries contain an additional context wedge.
+          occupations than across industries. The difference points to an industry-context research
+          question beyond occupation mix alone.
         </p>
         <p>
-          The current aggregate data do not identify that wedge as an organizational effect. Firm
-          composition, detailed task mix, workflow design, policy, regulation, worker selection,
-          technology stacks, and sampling variation remain plausible contributors.
+          Industry aggregates combine occupation composition with firm context and sampling variation.
+          The current evidence reports the remaining variation descriptively; causal attribution requires
+          richer firm, task, and outcome data.
         </p>
         <p><Link href="/blog/after-adoption">Read the technical essay →</Link></p>
       </section>
