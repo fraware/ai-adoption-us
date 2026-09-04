@@ -20,7 +20,7 @@ The recorded pre-release work established:
 - private-data/build-tree exclusion checks;
 - GitHub Pages static-export auditing as a separate deployment artifact gate.
 
-Automated WebKit is not native iOS Safari. Automated accessibility checks are not full human assistive-technology review. Laboratory Lighthouse performance is not field Core Web Vitals.
+Code-level and static build validation does not substitute for a real browser. Automated WebKit is not native iOS Safari. Automated accessibility checks are not full human assistive-technology review. Laboratory Lighthouse performance is not field Core Web Vitals.
 
 The accepted Release 1 scope decision is recorded in:
 
@@ -97,7 +97,7 @@ The intended production site is:
 
 GitHub Pages uses a static Next.js export in `derived_only` mode. Repository-defined dynamic response-header policy is not equivalent to platform-served GitHub Pages headers; the live deployment audit must record the platform state actually served.
 
-Ordinary `main` pushes may build a Pages artifact for QA but cannot deploy the formal Observatory release. Deployment is restricted to a validated `Authorize Observatory release <release-id>` commit created after exact rehydration, human attestation, and immutable promotion.
+Ordinary `main` pushes may build a Pages artifact for QA but cannot deploy the formal Observatory release. Deployment is restricted to a validated `Authorize Observatory release <release-id>` commit created after exact rehydration, owner-authorized automated release review, and immutable promotion.
 
 ## Residual evidence not claimed
 
@@ -115,4 +115,4 @@ These are scope limitations, not hidden completed evidence.
 
 Historical QA supports statements about the exact runs and repository states recorded here. It does **not** authorize a statement that the final Release 1 has launched or that the final release identity has passed every gate.
 
-A formal public-release statement may be made only after the exact final candidate satisfies `docs/RELEASE_CHECKLIST.md`, is human-reviewed, exactly rehydrated, promoted into the immutable release registry/tree, deployed through the release-only authorization commit, live-audited, manually inspected for catastrophic errors, and tagged/released.
+A formal public-release statement may be made only after the exact final candidate satisfies `docs/RELEASE_CHECKLIST.md`, is covered by the recorded one-shot project-owner authorization, is exactly rehydrated, promoted into the immutable release registry/tree, deployed through the validated release-only authorization commit, live-audited, and tagged/released.
