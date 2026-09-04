@@ -19,10 +19,7 @@ export function ReleaseNotice() {
       <div className="release-strip" role="status">
         <div>
           <strong>Release 1 · reviewed public evidence</strong>
-          <span>
-            This release publishes authorized aggregate views and derived evidence. Private source-input
-            bytes and unrestricted historical subgroup data stay outside the public release.
-          </span>
+          <span>This release publishes authorized aggregate views and derived evidence. Private source-input bytes and unrestricted historical subgroup data stay outside the public release.</span>
           <Link href="/sources">Source scope</Link>
         </div>
       </div>
