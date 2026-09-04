@@ -78,24 +78,78 @@ jobs:
             exit 1
           fi
 
+      - name: Resolve and verify current promoted predecessor
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          registry = json.loads(
+              Path('data/registry/observatory_release_registry.json').read_text()
+          )
+          current = registry.get('current_release_id')
+          env_path = Path(os.environ['GITHUB_ENV'])
+          if current is None:
+              with env_path.open('a', encoding='utf-8') as handle:
+                  handle.write('PREVIOUS_RELEASE_MANIFEST=\n')
+              raise SystemExit(0)
+          if not isinstance(current, str) or re.fullmatch(r'[a-z0-9][a-z0-9._-]{0,127}', current) is None:
+              raise SystemExit('Current Observatory release ID is invalid')
+
+          manifest_path = Path('data/releases') / current / 'release_manifest.json'
+          if not manifest_path.is_file():
+              raise SystemExit(f'Current promoted release manifest is missing: {manifest_path}')
+          expected_sha = registry.get('current_release_manifest_sha256')
+          observed_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+          if not isinstance(expected_sha, str) or observed_sha != expected_sha:
+              raise SystemExit('Current promoted release manifest checksum mismatch')
+          manifest = json.loads(manifest_path.read_text())
+          if manifest.get('release_id') != current:
+              raise SystemExit('Current promoted release manifest ID disagrees with registry')
+          if manifest.get('release_status') != 'PROMOTED_AFTER_EXPLICIT_REVIEW':
+              raise SystemExit('Current predecessor is not an explicitly reviewed promoted release')
+
+          with env_path.open('a', encoding='utf-8') as handle:
+              handle.write(f'PREVIOUS_RELEASE_MANIFEST={manifest_path.as_posix()}\n')
+          PY
+
       - name: Retrieve and validate live RPS aggregate source
         run: >-
           PYTHONPATH=src python scripts/prepare_rps_refresh_candidate.py
           --output-dir /tmp/rps-refresh
 
       - name: Build private v4 RPS Observatory component
-        run: >-
-          PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py
-          --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
-          --output-dir /tmp/rps-observatory
-          --release-id rps-observatory-review-${GITHUB_RUN_ID}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --source-snapshot /tmp/rps-refresh/rps_source_snapshot.json
+            --output-dir /tmp/rps-observatory
+            --release-id "rps-observatory-review-${GITHUB_RUN_ID}"
+          )
+          if [ -n "${PREVIOUS_RELEASE_MANIFEST:-}" ]; then
+            args+=(--previous-release-manifest "$PREVIOUS_RELEASE_MANIFEST")
+          fi
+          PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py "${args[@]}"
 
       - name: Compose vintage-bound global Observatory candidate
-        run: >-
-          PYTHONPATH=src python scripts/prepare_observatory_v1_candidate.py
-          --rps-candidate-root /tmp/rps-observatory
-          --output-dir /tmp/observatory-v1-candidate
-          --release-id observatory-v1-review-${GITHUB_RUN_ID}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(
+            --rps-candidate-root /tmp/rps-observatory
+            --output-dir /tmp/observatory-v1-candidate
+            --release-id "observatory-v1-review-${GITHUB_RUN_ID}"
+          )
+          if [ -n "${PREVIOUS_RELEASE_MANIFEST:-}" ]; then
+            args+=(--previous-release-manifest "$PREVIOUS_RELEASE_MANIFEST")
+          fi
+          PYTHONPATH=src python scripts/prepare_observatory_v1_candidate.py "${args[@]}"
 
       - name: Stage immutable candidate for explicit review
         run: >-
