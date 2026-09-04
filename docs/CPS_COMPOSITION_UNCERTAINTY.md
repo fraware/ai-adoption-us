@@ -1,195 +1,236 @@
-# CPS composition uncertainty: design boundary and implementation contract
+# CPS composition analysis and uncertainty
 
-Status date: **2026-09-02**  
-Issue: **#14 — R1.1-G2b**  
-Status: **methodology/engineering framework implemented; formal design-based composition uncertainty remains open**
+This document describes how GenAI at Work uses the Current Population Survey (CPS) to construct occupation-composition benchmarks for industries, how those benchmarks are validated, and why Release 1 does not report full design-based confidence intervals for them.
 
-## Decision
+## 1. Purpose
 
-The observatory must not turn descriptive CPS reliability diagnostics into inferential uncertainty.
+Industry-level workplace AI use partly reflects the occupations employed within each industry. To separate this compositional component from the observed industry aggregate, the project uses CPS Basic Monthly public-use data to estimate the occupation mix of each industry.
 
-The existing person-month counts, Kish final-weight-dispersion diagnostic, monthly composition movement, leave-one-month-out perturbations, and Q2-2025/Q2-2026 stability checks remain useful quality-control evidence. They are **not** CPS design-based standard errors or confidence intervals.
+The resulting benchmark answers a descriptive question:
 
-The current public Basic Monthly CPS inputs used by the observatory are therefore not sufficient, by themselves, to support a covariance-aware design-based confidence interval for each custom 20-industry × 22-major-occupation composition vector.
+> What industry value would be implied by the observed occupation-level RPS values if they were combined using that industry's CPS occupation composition?
 
-The repository now has an explicit uncertainty interface that can consume a full covariance when one is available and can reproduce BLS generalized-variance-function arithmetic for **marginal approximation/benchmarking**. Crucially, the software labels a full matrix only as **covariance-aware**. It does not certify that the matrix is CPS design-based; that stronger claim requires independent provenance and methodological evidence at the release gate.
+The difference between the observed industry value and this benchmark is a descriptive standardization residual. It is not a causal estimate of an employer, organization, or industry effect.
 
-## Official-method review
+## 2. Periods included in Release 1
 
-### 1. Direct CPS variance estimation is replication-based
+Release 1 contains validated CPS composition packages for:
 
-Census Bureau *Current Population Survey: Design and Methodology, Technical Paper 77* describes the CPS direct variance system as successive-difference replication (SDR). The current system uses 160 replicates and is constructed to reflect CPS sample-design features. The 2010 redesign also incorporates rotation group in the replicate construction to support variances and covariances under the rotating-panel design.
+- Q2 2025;
+- Q2 2026.
 
-Primary source:
+Q4 2025 is intentionally unavailable because October 2025 CPS data were not collected. November and December are not used to construct a two-month substitute for a three-month quarter.
+
+## 3. Population and classification
+
+The CPS sample is aligned as closely as possible to the worker-side RPS population, including the 18–64 age range and an appropriate employed-worker universe.
+
+The analysis uses CPS main-job industry and major-occupation classifications together with versioned crosswalks under `data/registry/`. Each generated composition package records its source months, classification versions, coverage, and mapping information.
+
+## 4. Weighting
+
+For industry `j`, occupation `o`, and quarter `t`, define the occupation worker share as:
+
+```text
+w_worker(j,o,t) = weighted workers(j,o,t) / weighted workers(j,t)
+```
+
+and the occupation work-hour share as:
+
+```text
+w_hours(j,o,t) = weighted actual main-job hours(j,o,t)
+                 / weighted actual main-job hours(j,t)
+```
+
+The benchmark depends on the RPS measure being standardized.
+
+For workplace adoption:
+
+```text
+A_hat(j,t) = Σ_o w_worker(j,o,t) × A(o,t)
+```
+
+For AI-assisted working time and reported time savings:
+
+```text
+H_hat(j,t) = Σ_o w_hours(j,o,t) × H(o,t)
+S_hat(j,t) = Σ_o w_hours(j,o,t) × S(o,t)
+```
+
+Worker shares are not reused for the work-hour-based measures.
+
+Actual main-job hours are the primary hour measure because they align most closely with the RPS reference-week constructs. Usual main-job hours are retained only as a labeled sensitivity where coverage is sufficient.
+
+## 5. Occupation-adjusted industry residual
+
+For metric `m`:
+
+```text
+residual(j,t,m) = observed(j,t,m) - benchmark(j,t,m)
+```
+
+A positive residual means the observed industry value is above the value implied by its broad occupation composition under the specified weighting scheme; a negative residual means it is below.
+
+The residual can reflect many mechanisms, including finer task composition, worker selection, employer tools, firm characteristics, regulation, measurement error, and sampling variation. Without a separate identification strategy, it should not be called an organizational effect, efficiency measure, productivity effect, or causal firm effect.
+
+## 6. Coverage and suppression
+
+Each industry composition is checked for classification coverage and support. A material unmapped or unsupported share is not silently removed and renormalized into an apparently complete estimate.
+
+For sensitivity analyses, an explicit leave-one-occupation-out perturbation may intentionally remove one positive-weight occupation and renormalize the remaining weights. That operation is a robustness diagnostic, not missing-data treatment and not sampling inference.
+
+## 7. Release 1 robustness evidence
+
+The Q2 2025 and Q2 2026 composition analysis produced 120 primary industry residuals: 20 industries × 3 RPS measures × 2 quarters. All 120 primary rows were computationally supported under the primary weighting definitions.
+
+### Cross-quarter persistence
+
+Across all 20 industries, residual rank correlations between Q2 2025 and Q2 2026 were:
+
+| Measure | Spearman correlation | Same-sign industries | Median absolute change |
+| --- | ---: | ---: | ---: |
+| Work adoption | 0.665 | 17/20 | 4.10 percentage points |
+| AI-assisted work hours | 0.451 | 14/20 | 1.33 pp |
+| Reported time savings | 0.571 | 14/20 | 0.40 pp |
+
+These values indicate moderate, incomplete persistence. They do not support treating residuals as stable industry scores or a league table.
+
+### Leave-one-occupation-out sensitivity
+
+For each supported industry/measure/quarter row, the analysis removes each positive-weight occupation in turn, renormalizes the remaining composition, and records the largest residual shift.
+
+Across the 120 primary rows:
+
+- 21 maximum-influence perturbations reverse the residual sign;
+- the median maximum absolute shift is approximately 5.01 percentage points for adoption;
+- 1.22 percentage points for AI-assisted hours;
+- 0.31 percentage points for reported savings.
+
+This sensitivity reinforces the decision to present composition residuals with context rather than as precise industry performance measures.
+
+### Usual-hours sensitivity
+
+The usual-hours sensitivity uses the existing 98% valid-worker coverage requirement. It is poorly supported for most industries because some CPS usual-hours responses are not point-valued.
+
+Under that rule, none of the 20 Q2 2025 industries and only Public Administration in Q2 2026 meet the support threshold for the H/S usual-hours sensitivity. The broad absence of support is retained rather than weakening the coverage rule.
+
+## 8. Why the current reliability diagnostics are not confidence intervals
+
+The project reports several useful descriptive quality checks, including:
+
+- person counts;
+- weight-dispersion diagnostics;
+- month-to-month composition movement;
+- leave-one-month-out perturbations;
+- cross-period persistence;
+- leave-one-occupation-out influence;
+- cross-source comparison with OEWS.
+
+These diagnostics measure stability or sensitivity. They are not design-based CPS standard errors and should not be presented as substitutes for sampling uncertainty.
+
+## 9. CPS design-based variance
+
+The official CPS direct variance system uses successive-difference replication (SDR). *Current Population Survey: Design and Methodology, Technical Paper 77* describes a 160-replicate system designed to reflect CPS sample structure, including its rotating-panel design.
+
+Primary reference:
 
 - U.S. Census Bureau and U.S. Bureau of Labor Statistics, *Current Population Survey: Design and Methodology, Technical Paper 77*: https://www2.census.gov/programs-surveys/cps/methodology/CPS-Tech-Paper-77.pdf
 
-### 2. The public Basic Monthly distribution reviewed here does not expose that full replicate system
+The public Basic Monthly files used by this project provide the data and final weights needed for point estimation. In the official public Basic Monthly materials reviewed for Release 1, the project did not identify a general-purpose replicate-weight product sufficient to reconstruct the 160-replicate SDR covariance for arbitrary industry × occupation domains.
 
-The Census CPS datasets page publishes Basic Monthly public-use files and separately identifies replicate-weight products for supplements where available. In the public Basic Monthly distribution and documentation reviewed for this project on 2026-09-02, no documented general-purpose Basic Monthly replicate-weight file was identified that would allow the observatory to reconstruct the internal 160-replicate SDR covariance for arbitrary industry × occupation domains.
+This is a statement about the public materials reviewed. It does not imply that no restricted or future agency access path can exist.
 
-This is an evidence statement about the public materials reviewed, not a claim that no such access path can exist. Issue #14 remains open partly to resolve whether BLS/Census can provide a suitable public or research-access variance path.
+## 10. Generalized variance functions
 
-Primary source:
+BLS publishes generalized-variance-function (GVF) methods for approximate standard errors for many CPS estimates.
 
-- U.S. Census Bureau, CPS datasets: https://www.census.gov/programs-surveys/cps/data/datasets.html
-
-### 3. BLS provides an official approximate GVF path for many Basic CPS estimates
-
-The July 2026 BLS guide *Calculating Approximate Standard Errors and Confidence Intervals for Current Population Survey Estimates* documents generalized variance functions (GVFs) and parameter/factor tables PF-1 through PF-16. For a percentage `p` with denominator level `y`, the guide gives
+For a percentage `p` with base level `y`, the published form is:
 
 ```text
-se(p; y; f) = f * sqrt(((alpha + beta*y) / y) * p * (100 - p))
+se(p; y; f) = f × sqrt(((alpha + beta × y) / y) × p × (100 - p))
 ```
 
-where `p` and its standard error are expressed in percentage points. The guide explicitly permits borrowing alpha/beta parameters from a conceptually similar series when the target series is not tabulated, while stating the implicit assumption: the lending and borrowing series have approximately equal design effects. It advises same-type borrowing when possible and, among plausible lending series, generally favors the parameters producing the larger standard error.
+where the applicable `alpha`, `beta`, and factor `f` depend on the series and comparison.
 
-The same guide provides factors for quarterly averages and changes over time. These factors are tied to a lending series; they are not a generic license to assume independent CPS months.
-
-Primary source:
+Primary reference:
 
 - U.S. Bureau of Labor Statistics, *Calculating Approximate Standard Errors and Confidence Intervals for Current Population Survey Estimates*, July 2026: https://www.bls.gov/cps/methods/calculating-standard-errors-and-confidence-intervals.pdf
 
-### 4. Marginal GVF standard errors do not identify a 22-dimensional composition covariance
+BLS permits borrowing parameters from a conceptually similar series under an approximate equal-design-effect assumption. Release 1 does not select a single borrowing series for the custom industry × occupation domains because no prespecified, validated mapping from those domains to an official lending series was established.
 
-Each industry composition satisfies
+GVFs therefore remain useful for scalar validation and sensitivity work, not as the public uncertainty model for the composition vectors.
 
-```text
-sum_o w[j,o,t] = 1.
-```
+## 11. Why marginal standard errors are insufficient
 
-Consequently its covariance matrix is singular and obeys
+An industry composition has 22 occupation shares that sum to one. Its covariance matrix must therefore contain the cross-occupation dependence implied by that compositional constraint.
 
-```text
-Cov(w, 1' w) = 0,
-```
+A symmetric 22 × 22 covariance matrix has 253 unique entries. The sum-to-one constraint imposes 22 independent linear restrictions, leaving 231 free parameters. Even if 22 marginal variances were known, **209 covariance degrees of freedom would remain unidentified**.
 
-so rows/columns sum to zero (up to numerical tolerance). Treating independently calculated marginal standard errors as a diagonal covariance matrix violates this constraint and discards the covariance among occupation shares.
+Consequently, a diagonal matrix of marginal GVF variances is not a valid substitute for the required composition covariance.
 
-A marginal GVF approximation can therefore be used only as a sensitivity or calibration check unless a defensible covariance construction is supplied separately.
+The project explicitly does not:
 
-### 5. Quarter pooling also requires cross-month covariance
+- infer the missing off-diagonal covariance terms from marginal standard errors;
+- choose an arbitrary positive-semidefinite matrix and call it design-based;
+- assume a simple multinomial covariance multiplied by one design effect;
+- treat final person weights alone as sufficient survey-design information.
 
-CPS is a rotating-panel survey. BLS warns that estimates close in time can share sample and that covariance matters for changes/averages. The observatory pools April–June records with equal month factors; a formal covariance for the pooled occupation levels must therefore include the off-diagonal month-to-month covariance blocks. Setting these blocks to zero merely because they are unavailable would be an unsupported independence assumption.
+## 12. Quarter pooling and repeated-sample dependence
 
-## Implemented contract
+CPS uses a rotating-panel design, so adjacent months share sample. A design-based covariance for a pooled April–June composition must account for both:
 
-`src/genai_at_work/cps_uncertainty.py` now separates three computational support states:
+- covariance among occupations within a month;
+- covariance across occupations and months.
 
-1. `covariance_aware` — a full covariance matrix is available and passes structural checks;
-2. `gvf_marginal_approximation` — BLS-style marginal approximate standard errors only;
-3. `unsupported` — insufficient evidence for inferential uncertainty.
+The project does not assume April, May, and June are independent simply because the required cross-month covariance is unavailable.
 
-`covariance_aware` is intentionally weaker than `design_based`. A covariance can be synthetic, externally estimated, or generated by an unvalidated approximation and still be mathematically complete. The code therefore records its `source_method` but does not promote it to a CPS design-based claim. That promotion is permitted only when provenance demonstrates a defensible CPS variance method.
+A scalar quarterly GVF factor for one published series does not identify the multivariate covariance of a pooled 22-category composition.
 
-### GVF arithmetic
+## 13. Software support
 
-`approximate_percentage_standard_error` implements the published BLS percentage formula and requires the lending series and borrowing rationale to be recorded. Invalid parameter/estimate combinations fail closed rather than returning an imaginary/negative variance.
+`src/genai_at_work/cps_uncertainty.py` distinguishes three computational states:
 
-`approximate_composition_marginal_standard_errors` returns marginal share standard errors in 0–1 share units and marks covariance as unavailable.
+- `covariance_aware` — a full covariance matrix is supplied and passes mathematical checks;
+- `gvf_marginal_approximation` — only BLS-style marginal approximate standard errors are available;
+- `unsupported` — the available evidence is insufficient for inferential uncertainty.
 
-### Covariance validation
+A mathematically valid covariance is not automatically a CPS design-based covariance. Survey-design interpretation requires independent methodological provenance.
 
-`build_composition_covariance` requires:
-
-- unique occupation labels;
-- shares in `[0,1]` summing to one;
-- finite, square, symmetric covariance;
-- nonnegative marginal variances;
-- positive-semidefinite covariance (within tolerance);
-- the composition sum-to-one covariance constraint;
-- recorded covariance provenance in `source_method`.
-
-A diagonal matrix assembled from marginal GVF variances is intentionally rejected as a valid composition covariance.
-
-These checks establish mathematical consistency, **not** survey-design provenance.
-
-### Delta-method propagation
-
-If a full covariance `C_x` for weighted occupation levels `x` becomes available, the composition `w_i = x_i / sum(x)` is propagated with
+When a full level covariance `C_x` is available, the software can propagate it to normalized composition shares with the delta method:
 
 ```text
 J[i,k] = (1{i=k} - w_i) / sum(x)
 C_w = J C_x J'
 ```
 
-via `composition_covariance_from_level_covariance`.
-
-The result is only as design-valid as `C_x`.
-
-### Quarter pooling
-
-`pooled_composition_covariance_from_month_block` accepts a complete month-major covariance block for monthly occupation levels. It includes every cross-month block when deriving the covariance of equal-month pooled levels, then transforms those pooled levels into shares. An incomplete block fails closed.
-
-### Future RPS counterfactual propagation
-
-For a fixed vector of RPS occupation values `a`, `composition_counterfactual_standard_error` computes the composition-covariance contribution
+For fixed occupation-level RPS values `a`, the composition-only contribution to the variance of a benchmark is then:
 
 ```text
-Var(a' w) = a' C_w a.
+Var(a' w) = a' C_w a
 ```
 
-This is **not** a total standard error for the future RPS composition counterfactual or residual. It excludes RPS occupation-estimate uncertainty, covariance among RPS occupation estimates, observed-industry RPS uncertainty, and any cross-source dependence. It also does not independently establish that `C_w` is CPS design-based.
+That quantity would still exclude RPS sampling uncertainty and any dependence between RPS components.
 
-## What this checkpoint does not establish
+## 14. Release 1 uncertainty status
 
-This checkpoint does not produce design-based confidence intervals for the current Q2 2025 or Q2 2026 CPS composition artifacts.
+For the published Release 1 composition analysis:
 
-It does not:
+```text
+official scalar CPS benchmark: validated
+GVF scalar/marginal approximation: available for validation or sensitivity
+full design-based covariance for pooled 22-category compositions: unsupported
+design-based confidence interval for occupation-composition benchmark: unsupported
+inferential confidence interval for occupation-adjusted industry residual: unsupported
+```
 
-- infer a replicate design from Basic Monthly person records;
-- treat final CPS weights as sufficient design information;
-- label Kish weight-dispersion effective n as a survey-design effective sample size;
-- turn month-to-month or leave-one-month-out movement into a sampling variance;
-- assume CPS months are independent;
-- infer a 22 × 22 covariance matrix from 22 marginal GVF standard errors;
-- call a structurally valid covariance matrix design-based without provenance;
-- select a lending PF series solely because it produces convenient uncertainty;
-- propagate CPS-only uncertainty and call it uncertainty for an RPS residual.
+Accordingly, Release 1 reports the composition analysis as derived descriptive evidence and keeps stability, influence, and OEWS comparisons separate from formal sampling inference.
 
-## Remaining work before issue #14 can close
+## 15. What would support stronger inference
 
-### A. Resolve the variance-input path
+A future design-based uncertainty analysis would require authoritative evidence such as:
 
-Obtain an authoritative answer from BLS/Census on whether one of the following is available for Basic Monthly custom domains:
+1. Basic Monthly replicate weights or replicate estimates suitable for the relevant domains;
+2. an agency-supported method for direct variance and covariance estimation for arbitrary Basic Monthly industry × occupation domains; or
+3. official covariance/design-effect guidance covering both cross-occupation and cross-month dependence for the pooled estimator.
 
-1. public or research-access replicate weights / SDR replicate estimates;
-2. a supported method for obtaining direct variances and covariances for arbitrary weighted Basic CPS domains;
-3. official covariance/design-effect guidance sufficiently specific to industry × major occupation shares and pooled-quarter estimates.
-
-The response and exact applicable vintages must be recorded.
-
-### B. If GVF borrowing is retained as a benchmark, predefine the lending-series rule
-
-Before looking at desired confidence intervals, define a conceptually justified lending-series map for the target numerator/base, document the design-effect argument, and test plausible alternative lenders. Report the range. Do not select lenders post hoc to obtain a preferred conclusion.
-
-This exercise remains a marginal approximation unless a covariance method is separately justified.
-
-### C. Validate against official estimates
-
-For at least one CPS estimate that can be reconstructed from the same public-use inputs and has a published BLS standard error, compare:
-
-- the observatory point estimate;
-- the applicable approximate or direct standard error;
-- any lending-series approximation under consideration.
-
-Differences must be explained before applying a method to thin custom domains.
-
-### D. Validate the pooled-quarter covariance
-
-Any eventual quarter method must account for the CPS rotating-panel overlap across April, May, and June. A covariance construction that assumes independent months is not accepted without external methodological evidence.
-
-### E. Propagate source-specific uncertainty separately
-
-When authorized RPS occupation and industry observations become available, preserve separate uncertainty components for:
-
-- CPS composition;
-- RPS occupation values;
-- RPS observed industry values;
-- any covariance induced by common RPS sampling.
-
-Only after those components and their dependence structure are justified should the observatory report an inferential interval for an occupation-adjusted industry-context residual.
-
-## Publication state
-
-Until the remaining work is completed, current CPS composition reliability evidence remains **descriptive**. No current public composition result should display a design-based confidence interval generated by this module.
+Any new method should be validated against official CPS estimates before it is used for public intervals.

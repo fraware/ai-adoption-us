@@ -1,94 +1,95 @@
 # GenAI at Work — U.S. AI Adoption Observatory
 
-A rights-aware, auditable research and data product for studying how generative AI moves from **work adoption** into **routine use**, **AI-assisted working time**, and **self-reported time savings** in the United States.
+GenAI at Work is a public research and data project that tracks how generative AI is entering U.S. work: who uses it, how regularly it is used, how much working time is AI-assisted, and how much time workers report saving.
 
-This repository is the canonical public engineering and research surface for the project. It contains the rights-safe application source, analysis code, registries, derived public results, methodology, validation records, product specifications, and release controls.
+The project is built around a simple measurement principle: **AI adoption is not the same thing as intensive use, reported time savings, or measured productivity.** Those are different empirical objects and should be analyzed separately.
 
-> Core research question: **How is generative AI moving from availability and adoption into actual work?**
+**Public site:** https://fraware.github.io/ai-adoption-us/  
+**Current release:** `v1.0.0`, published 4 September 2026
 
-The project does **not** estimate a single aggregate “AI impact” number and does **not** treat reported time savings as measured labor productivity.
+## What the observatory measures
 
-## Current state
+The observatory distinguishes five stages of workplace AI diffusion:
 
-The canonical Observatory release state is recorded in `data/registry/observatory_release_registry.json` and, after formal publication, by the corresponding immutable GitHub tag/release. Release 1 uses a one-shot project-owner authorization recorded in `data/registry/release1_owner_authorization.json`: a separate human review step is not required, but no machine-verifiable scientific, editorial, source-rights, CI, source-identity, rehydration, promotion, deployment, or live-audit gate is waived.
+| Measure | Question | Interpretation |
+| --- | --- | --- |
+| Availability / capability | Can an AI system perform or assist a task? | Technical or theoretical capability, not realized use |
+| Work adoption | Who reports using generative AI for their job? | Extensive-margin workplace use |
+| Recent / routine use | How regularly is generative AI used for work? | Frequency of realized use |
+| AI-assisted working time | What share of working time involves AI assistance? | Depth of workflow use |
+| Reported time savings | How much additional time do users believe the same work would have taken without AI? | Self-reported counterfactual time savings, not measured productivity |
 
-The Release 1 architecture retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, cryptographically binds governed claim surfaces, and stages an immutable candidate for explicit review. The owner-authorized release operator then requires successful exact-commit CI, re-fetches the source on the exact candidate commit, requires the same scientific source identity, rebuilds and re-stages the candidate, and requires byte-identical candidate/stage identities before promotion. Public GitHub Pages deployment is restricted to the resulting validated release-only authorization commit, and the formal `v1.0.0` GitHub Release is created only after the exact Pages deployment and live-origin audit succeed.
+Future work may connect these measures to realized outcomes such as output, wages, employment, or firm performance, but Release 1 does not estimate those effects.
 
-Verified in the current scientific/release evidence:
+## Main findings in Release 1
 
-- canonical RPS metadata registry: **131 source series** = 5 national + 60 industry + 66 occupation;
-- latest authorized live source candidate: **962 observations** across the registered 131-series source history, spanning Q3 2024–Q2 2026 where observations are available;
-- complete common A/H/S subgroup window: **882 cells** = (20 industries + 22 occupations) × 3 constructs × 7 quarters, Q4 2024–Q2 2026;
-- bounded public RPS view: 35 national-history observations across seven quarters, plus 60 latest industry and 66 latest occupation A/H/S observations for Q2 2026;
-- deterministic longitudinal diagnostics, rank-stability analysis, and leave-one-group-out checks;
-- official Q2 2025 and Q2 2026 CPS Basic Monthly inputs executed through the composition pipeline, with versioned worker-share, actual-main-job-hour, coverage, sensitivity, and reliability artifacts;
-- occupation-adjusted RPS industry residuals produced as explicitly descriptive derived evidence, with no causal or productivity interpretation;
-- official May 2025 OEWS staffing data executed as an independent establishment-side composition robustness source;
-- preregistered BTOS–RPS industry triangulation produced under an explicit cross-construct interpretation boundary;
-- explicit web `DATA_MODE`; no implicit fallback into private source data;
-- permanent CI covering the public Python suite, compilation, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, server startup, and public-route HTTP smoke tests;
-- rendered-browser and native-Safari QA as separate launch-quality evidence, together with the exact release deployment audit.
+Release 1 covers seven common quarterly observations from Q4 2024 through Q2 2026 for 20 industries and 22 occupations.
 
-Private RPS source-input bytes are intentionally **not in this public repository** and are never copied into the public release bundle. See `docs/PRIVATE_RESEARCH_ASSETS.md`.
+Three findings are especially robust within that descriptive window:
 
-## Scientific result in one paragraph
+1. **Adoption and AI-assisted working time are more tightly aligned across occupations than across industries.** Pearson and Spearman correlations between the two measures are higher across occupations in all seven quarters.
+2. **Across occupations, adoption is a more consistent descriptor of reported time savings than AI-assisted hours.** `R²(S~A) > R²(S~H)` in all seven quarters and in all 154 leave-one-occupation-out checks.
+3. **Adoption rankings are more persistent than AI-assisted-hours rankings.** This holds in 20 of 21 quarter-pair comparisons for both industries and occupations.
 
-Across all seven common A/H/S quarters from Q4 2024 through Q2 2026, the relationship between work adoption and AI-assisted working time is more tightly aligned across **occupations** than across **industries** under both Pearson and Spearman measures. Adoption rankings are more persistent than assisted-hours rankings in **20 of 21** quarter-pair comparisons at both aggregation levels. Across occupations, adoption explains more cross-sectional variation in reported savings than assisted hours in all **7 of 7** quarters and all **154 of 154** leave-one-occupation checks. Across industries, the ordering changes by quarter: assisted hours has the higher univariate R² in **4 of 7** quarters and adoption in **3 of 7**. These findings are descriptive, aggregate, and non-causal.
+These are aggregate, descriptive relationships. They do not identify causal effects of AI use, organizational quality, or productivity.
 
-See `docs/RESULTS.md` for the full result table and interpretation limits.
+See [docs/RESULTS.md](docs/RESULTS.md) for the full tables and interpretation limits.
 
-## Repository map
+## Data sources
+
+The observatory combines four complementary U.S. data systems:
+
+- **RPS / Generative AI Adoption Tracker** — workplace generative-AI adoption, use frequency, AI-assisted work hours, and reported time savings.
+- **Current Population Survey (CPS)** — worker-level industry × occupation composition and working-time weights used to construct occupation-composition benchmarks for industries.
+- **Occupational Employment and Wage Statistics (OEWS)** — establishment-side occupation × industry staffing data used as an independent robustness check.
+- **Business Trends and Outlook Survey (BTOS)** — employer-reported recent AI use used for cross-source industry comparison.
+
+The sources measure different populations and constructs. The analysis preserves those differences instead of merging them into a single AI-adoption indicator.
+
+Detailed provenance and use constraints are documented in [docs/source-provenance.md](docs/source-provenance.md).
+
+## Industry composition analysis
+
+A central question is whether industry-level differences in workplace AI use are partly explained by differences in occupational composition.
+
+For industry `j`, occupation `o`, and quarter `t`, the project constructs occupation-composition benchmarks using CPS data:
 
 ```text
-apps/web/                         Next.js data publication
-  app/                            Routes: home, industries, occupations, methodology, sources, blog
-  components/                     Plot and release-mode components
-  lib/                            Data and promoted-release loaders
-  tests/browser/                  Rendered browser/accessibility QA
-content/                          Editorial source notes
-data/
-  contracts/                      Canonical observation schema
-  derived/longitudinal/           Rights-safe longitudinal results
-  derived/composition/            Rights-safe CPS/OEWS composition and robustness evidence
-  derived/btos_rps/               Rights-safe cross-source triangulation evidence
-  registry/                       Source registries, crosswalks, release contracts, claim inventory, owner authorization
-  releases/                       Immutable promoted public release directories
-  audit/private/                  NEVER public; absent from this repository
-src/genai_at_work/                Python research/analysis library
-scripts/                          Builders, validators, rehydration, and release tooling
-tests/                            Scientific, governance, composition, and release tests
-docs/                             Product, method, results, architecture, roadmap, handoff, QA
-.github/workflows/                CI, candidate review, owner-authorized release, promotion, and deployment workflows
+adoption benchmark       = Σ occupation worker share × occupation adoption
+assisted-hours benchmark = Σ occupation work-hour share × occupation assisted-hours share
+savings benchmark        = Σ occupation work-hour share × occupation reported-savings share
 ```
 
-## Data modes
+The difference between an observed industry value and its occupation-composition benchmark is reported as an **occupation-adjusted industry residual**.
 
-The web application requires an explicit `DATA_MODE`:
+This residual is descriptive. It is not interpreted as a firm effect, management effect, efficiency estimate, or causal effect.
 
-- `derived_only` — public rights-safe mode. Renders approved derived publication evidence and, when present in the promoted release bundle, the bounded attributed RPS observation view. It does not expose private source-input bytes, a historical subgroup database, or a generic source query API.
-- `audit_snapshot` — private research mode for explicitly supplied private audit material; it is not the public release path.
-- `fred_live_no_store` — reserved for a separately governed server-side source adapter and is not used as an implicit fallback by the public application.
+See [docs/methodology.md](docs/methodology.md) for the full methodology.
 
-There is no silent fallback between modes.
+## Repository structure
 
-## Composition evidence boundary
+```text
+apps/web/                 Next.js public data website
+content/                  Editorial and publication content
+data/
+  contracts/              Observation and artifact schemas
+  derived/                Versioned public analysis outputs
+  registry/               Source, taxonomy, rights, and release metadata
+  releases/               Published release artifacts
+src/genai_at_work/        Python analysis and data-processing library
+scripts/                  Reproduction, validation, and publication utilities
+tests/                    Scientific, data-integrity, and software tests
+docs/                     Methodology, results, provenance, and technical documentation
+.github/workflows/        Continuous integration and publication workflows
+```
 
-For industry `j`, occupation `o`, and period `t`:
+The public repository intentionally excludes source material that the project is not authorized to redistribute.
 
-- adoption composition uses CPS worker-share weights;
-- assisted-hours and reported-savings composition use CPS actual-main-job-hour shares;
-- usual hours are retained only as a labeled sensitivity;
-- May 2025 OEWS is an independent establishment-side robustness source, not a replacement for CPS.
+## Reproduce the public code
 
-The canonical residual is:
+### Python
 
-`occupation-adjusted industry-context residual = observed industry value - occupation-composition counterfactual`
-
-The residual is published only as a descriptive diagnostic. It must not be labeled an organizational effect, organizational quality, efficiency, productivity, or a causal effect without a separate identification strategy. Custom pooled CPS composition vectors also do not receive design-based confidence intervals unless an approved survey-covariance method is supplied.
-
-## Validation
-
-Python 3.12+:
+Requirements: Python 3.12+
 
 ```bash
 python -m pip install -e '.[dev]'
@@ -98,9 +99,7 @@ ruff check src tests scripts
 mypy src
 ```
 
-The authorized release pipeline builds source candidates only in private/external workspaces. Public-tree governance checks reject private RPS inputs from the repository and public client build.
-
-Web application:
+### Web application
 
 ```bash
 cd apps/web
@@ -110,59 +109,48 @@ DATA_MODE=derived_only npm run build
 DATA_MODE=derived_only npm run dev
 ```
 
-Permanent CI enforces the stronger locked-install contract: strict Python checks, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. Candidate promotion separately verifies CI runs against the exact repository, candidate commit, branch, workflow, event, and successful conclusion. The canonical Release 1 path also requires exact source rehydration and an explicit owner-authorized automated review attestation bound to the resulting rehydration identity.
+Some source-dependent analyses require reacquiring official upstream data because not every source file can be redistributed in this repository. Reproduction instructions and the distinction between public and source-dependent workflows are documented in [docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md).
 
-## Essential documents
+## Documentation
 
-Start here:
+The documentation is organized by reader need in [docs/README.md](docs/README.md).
 
-1. `docs/ENGINEERING_HANDOFF.md` — current technical handoff and acceptance contracts.
-2. `docs/RESULTS.md` — verified empirical results and interpretation limits.
-3. `docs/ROADMAP.md` — current release path and post-release research roadmap.
-4. `docs/ARCHITECTURE.md` — system/data architecture and trust boundaries.
-5. `docs/REPRODUCIBILITY.md` — build and regeneration contracts.
-6. `docs/RELEASE_CHECKLIST.md` — exact launch checklist.
-7. `docs/RELEASE1_NOTES.md` — canonical Release 1 notes; release status is determined by the registry/tag, not by this prose file alone.
-8. `docs/methodology.md` — scientific methodology.
-9. `docs/product-spec.md` — product specification.
-10. `docs/source-provenance.md` — source and rights provenance.
-11. `docs/source-rights/RPS_SOURCE_DECISION.md` — current source-rights decision record and evidence boundary.
-12. `CONTRIBUTING.md` — contribution, scientific-review, rights, validation, and release expectations.
+Recommended starting points:
 
-Dated root validation files and `RECONSTRUCTION_STATUS.md` / `RELEASE_PROVENANCE.json` are retained as historical provenance. They are explicitly historical and are not current release-status documents.
+- [Results](docs/RESULTS.md)
+- [Methodology](docs/methodology.md)
+- [Source provenance](docs/source-provenance.md)
+- [Data model](docs/data-model.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Reproducibility](docs/REPRODUCIBILITY.md)
+- [Release 1 notes](docs/RELEASE1_NOTES.md)
+- [Roadmap](docs/ROADMAP.md)
 
-## Product invariants
+## Scientific interpretation limits
 
-These must remain true in every release:
+Release 1 does **not** establish:
 
-- Adoption is not workflow penetration.
-- Assisted hours are not hours saved.
-- Reported hours saved are not measured labor productivity.
-- Industry residuals are not automatically organizational effects.
-- Cross-sectional correlations are descriptive absent a separate identification strategy.
-- Small/noisy subgroup cells must not become leaderboards without stability diagnostics.
-- Worker-share weights are used for adoption composition; work-hour-share weights are used for assisted-hours and reported-savings composition.
-- Suppressed or unsupported composition cells fail closed; they are never silently renormalized into apparently complete estimates.
-- Private RPS source-input observations never enter a public build artifact.
-- The bounded public observation contract does not authorize an unrestricted historical subgroup database, bulk export, or generic query API.
-- Public availability of a source does not by itself authorize storage, mirroring, API redistribution, or independent republication beyond the reviewed rights contract.
-- Governed public claims remain bound to the exact repository files reviewed for the release.
-- Canonical promotion requires exact post-review source rehydration; a changed scientific source identity forces a new candidate review.
-- Public deployment occurs only from a validated release-only authorization commit whose parent is the exact reviewed candidate commit.
-- The one-shot Release 1 owner authorization becomes inert once a release is promoted and cannot authorize later releases.
+- measured labor-productivity effects;
+- output, TFP, GDP, wage, or employment effects;
+- causal effects of generative-AI adoption or use intensity;
+- organizational or management effects from industry residuals;
+- equivalence between worker-reported RPS measures and employer-reported BTOS measures;
+- full design-based confidence intervals for custom pooled CPS composition vectors.
 
-## Release sequence
+The project reports unsupported quantities as unavailable instead of filling them through undocumented assumptions.
 
-- **Observatory v1 / Release 1:** bounded national history and latest industry/occupation A/H/S views; seven-quarter longitudinal diagnostics; CPS occupation-composition evidence and descriptive residuals; OEWS robustness; BTOS–RPS triangulation; methodology, provenance, and technical essay. Candidate construction, claim-surface binding, exact staging, owner-authorized automated review, trusted rehydration, rehydration-bound promotion controls, release-only deployment gating, live-origin audit, and formal `v1.0.0` publication are governed as one fail-closed sequence. The current release identity is read from the release registry and formal GitHub release rather than inferred from branch state.
-- **Post-Release 1:** stronger uncertainty treatment where supported, richer composition or task views only under explicit provenance and rights contracts, and mechanism-oriented analysis that maintains the distinction between descriptive decomposition and causal identification.
-- **Research v2:** worker × task × occupation × industry/context × time mechanism analysis with stronger identification, uncertainty, and outcome evidence.
+## Data access and reuse
 
-The detailed specifications and acceptance criteria are in `docs/ROADMAP.md` and `docs/ENGINEERING_HANDOFF.md`.
+Third-party data remain subject to their original terms and the source-specific decisions documented in this repository. Public availability of a dataset is not treated as automatic permission for unrestricted mirroring or redistribution.
+
+Private RPS source-input files and private audit material are excluded from the public repository. The published release contains only the observations and derived outputs covered by the documented public-use boundary.
+
+See [docs/PRIVATE_RESEARCH_ASSETS.md](docs/PRIVATE_RESEARCH_ASSETS.md) and [docs/source-rights/RPS_SOURCE_DECISION.md](docs/source-rights/RPS_SOURCE_DECISION.md).
 
 ## Contributing
 
-Contributions are welcome when they preserve the project's scientific, rights, and release contracts. Read `CONTRIBUTING.md` before opening a substantial pull request. The pull-request template requires explicit scientific/public-claim, source/rights, validation, and release-impact disclosure.
+Contributions are welcome when they preserve the project's measurement definitions, provenance, source-use constraints, and interpretation limits. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## License and reuse
+## License
 
-No repository-wide license is currently declared. Public availability of this repository must not be interpreted as a general grant of reuse or redistribution rights. Third-party source material remains governed by its own terms and the project source-rights records. A repository-wide code/documentation license, if adopted, must be chosen explicitly and must not silently broaden rights for source-derived data.
+No repository-wide license has been declared. Do not infer a general reuse or redistribution license from the repository's public availability. Third-party data retain their own terms.

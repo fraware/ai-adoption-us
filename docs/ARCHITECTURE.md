@@ -1,247 +1,210 @@
-# Architecture and trust boundaries
+# Architecture
 
-## 1. System objective
+GenAI at Work is composed of four layers: source acquisition, scientific analysis, versioned publication data, and a public web application. The architecture is designed so that a published chart or number can be traced back to a defined source vintage and reproducible transformation.
 
-GenAI at Work is simultaneously a research pipeline, a governed release system, and a public data publication. Its architecture preserves explicit boundaries among:
-
-1. source metadata and rights decisions;
-2. private source-input bytes used to build/reproduce candidates;
-3. rights-safe public observation projections;
-4. derived scientific evidence;
-5. governed public claim surfaces;
-6. immutable promoted releases;
-7. the deployed web publication.
-
-The central release invariant is identity continuity: the source vintage, scientific artifacts, public claims, promoted release, and deployed site must describe the same reviewed object.
-
-## 2. Current high-level architecture
+## 1. System overview
 
 ```text
-Authorized RPS published aggregates (FRED/ALFRED)
-                  │
-                  ▼
-       private refresh candidate
-   rps_source_snapshot.json + hashes
-                  │
-                  ▼
-       private RPS Observatory component
-   ┌──────────────┼────────────────────┐
-   │              │                    │
-   ▼              ▼                    ▼
-complete       seven-quarter       bounded public
-source input   longitudinal        observation view
-objects        diagnostics         (national history +
-(private)      (derived)           latest subgroup A/H/S)
-   │              │                    │
-   └──────────────┴─────────────┬──────┘
-                                │
-                                ▼
-                vintage-bound global candidate
-          ┌────────────┬────────────┬────────────┐
-          │            │            │            │
-          ▼            ▼            ▼            ▼
-        CPS          OEWS         BTOS      governed claim
-     composition   robustness  triangulation  surface hashes
-          │            │            │            │
-          └────────────┴────────────┴────────────┘
-                                │
-                                ▼
-                    immutable candidate stage
-                                │
-                 explicit release review gate
-                                │
-                owner-authorized Release 1 review
-                                │
-                                ▼
-                 exact post-review rehydration
-                                │
-                source identity + candidate + stage
-                     must reproduce exactly
-                                │
-                                ▼
-                   immutable promoted release
-                                │
-                                ▼
-                  release-only authorization commit
-                                │
-                                ▼
-             exact-SHA GitHub Pages dispatch/deployment
-                                │
-                                ▼
-                    live-origin audit + v1.0.0
+Official upstream sources
+        │
+        ▼
+Source acquisition and validation
+        │
+        ├── source identity and metadata
+        └── private source files where redistribution is restricted
+        │
+        ▼
+Scientific processing
+        │
+        ├── RPS longitudinal analysis
+        ├── CPS industry × occupation composition
+        ├── OEWS robustness analysis
+        └── BTOS industry comparison
+        │
+        ▼
+Versioned public artifacts
+        │
+        ├── observations permitted for publication
+        ├── derived tables and diagnostics
+        └── provenance and release metadata
+        │
+        ▼
+Next.js public website
 ```
 
-## 3. Source and private-data boundary
+The repository separates source material from derived public output because different upstream datasets have different storage and redistribution conditions.
 
-`data/audit/private/` is the repository-local private workspace boundary. External private/transient workspaces are also permitted by the candidate builders.
+## 2. Repository layers
 
-Rules:
+### `src/genai_at_work/`
 
-- private RPS source snapshots and complete historical source objects are never committed to the public repository;
-- candidate `inputs/` are never copied into the promoted public release;
-- public review packages contain no source `local_path`, private snapshot, or candidate `inputs/` directory;
-- public availability of a source is not treated as authorization for unrestricted mirroring, bulk redistribution, or a generic source API;
-- the current RPS permission basis and its limitations are recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`.
+Python modules for data validation, analysis, composition methods, provenance, and release preparation.
 
-The current public RPS contract permits a bounded attributed aggregate presentation view, not a complete historical subgroup database.
+### `data/contracts/`
 
-## 4. Public data mode
+Schemas and structural definitions for observations and generated artifacts.
+
+### `data/registry/`
+
+Machine-readable metadata for sources, taxonomies, crosswalks, source-use decisions, and published releases.
+
+### `data/derived/`
+
+Versioned derived outputs that can be included in the public repository. These include longitudinal RPS diagnostics, CPS/OEWS composition results, and BTOS–RPS comparison results.
+
+### `data/releases/`
+
+Immutable directories representing published versions of the observatory.
+
+### `apps/web/`
+
+The Next.js website. Public pages load versioned publication data and present national, industry, occupation, methodology, source, and research views.
+
+### `scripts/`
+
+Command-line utilities for acquiring sources, regenerating analysis, validating outputs, and publishing releases.
+
+### `tests/`
+
+Scientific and software tests covering source definitions, transformations, privacy boundaries, derived results, and the web build.
+
+## 3. Source acquisition
+
+The project uses official upstream interfaces whenever available.
+
+### RPS
+
+Published aggregate RPS series are retrieved through FRED/ALFRED. The acquisition code validates the registered series inventory, metadata, observation domain, and source identity before analysis.
+
+Some RPS source files used during reproduction are not committed to the public repository. Only observations and derived outputs covered by the documented public-use boundary are published.
+
+### CPS
+
+CPS Basic Monthly public-use files are used to estimate industry × occupation composition and working-time weights. Each analysis package records the months and classification definitions used.
+
+### OEWS
+
+May 2025 OEWS staffing data provide an establishment-side composition robustness source.
+
+### BTOS
+
+BTOS data provide an employer-side measure of recent AI use for sector-level comparison with worker-reported RPS adoption.
+
+Source details are documented in [source-provenance.md](source-provenance.md).
+
+## 4. Scientific processing
+
+### RPS longitudinal analysis
+
+The RPS analysis computes descriptive relationships among workplace adoption, AI-assisted working time, and reported time savings across industries and occupations.
+
+The main procedures include:
+
+- Pearson and Spearman association;
+- cross-sectional regression summaries;
+- leave-one-group-out sensitivity checks;
+- rank persistence across quarters.
+
+### CPS composition analysis
+
+CPS provides the occupation mix within each industry. Worker shares are used for adoption benchmarks, while actual main-job work-hour shares are used for assisted-hours and reported-savings benchmarks.
+
+Observed industry values are compared with these occupation-composition benchmarks. The resulting residual is descriptive and does not identify an organizational or causal effect.
+
+### OEWS robustness analysis
+
+OEWS provides a second view of industry staffing composition. It is kept analytically separate from CPS because the populations and survey designs differ.
+
+### BTOS comparison
+
+BTOS and RPS are linked through a documented industry crosswalk. Their sector-level association is reported as a cross-source descriptive comparison, not as a comparison of equivalent measures.
+
+The complete statistical methodology is described in [methodology.md](methodology.md).
+
+## 5. Public and private data boundaries
+
+The repository has two distinct data domains.
+
+### Public domain
+
+The public Git repository contains:
+
+- source metadata and provenance;
+- schemas and crosswalks;
+- public observations covered by the project's source-use decisions;
+- derived tables, diagnostics, and robustness results;
+- published release artifacts;
+- code and documentation.
+
+### Private or transient domain
+
+Source files that cannot be redistributed are acquired into a private or transient workspace during reproduction or publication. They are used to generate verified public outputs and are not copied into the public release.
+
+`data/audit/private/` represents the repository-local private workspace boundary and is excluded from Git.
+
+See [PRIVATE_RESEARCH_ASSETS.md](PRIVATE_RESEARCH_ASSETS.md) for details.
+
+## 6. Web data modes
+
+The application exposes an explicit `DATA_MODE` configuration.
 
 ### `derived_only`
 
-The Release 1 public mode. It can render:
-
-- rights-safe derived publication evidence;
-- the contracted bounded RPS observation view from the current promoted release.
-
-The web resolver verifies the release-registry pointer, promoted release-manifest checksum, artifact path, artifact size, artifact SHA-256, and RPS source-vintage consistency before returning promoted data. Longitudinal diagnostics and bounded observations resolve from the same promoted release.
-
-Before the first promoted release, the repository seven-quarter longitudinal artifact provides a research/QA fallback for derived diagnostics. The bounded observation view remains unavailable until a promoted release exists.
+The public mode used by the released website. It loads published observations and derived analysis artifacts only.
 
 ### `audit_snapshot`
 
-Controlled private research mode. It can load explicitly supplied private audit material. It is not the public release path and there is no silent fallback into it.
+A private research mode for explicitly supplied audit data. It is not used by the public website.
 
 ### `fred_live_no_store`
 
-Reserved server-side adapter mode. It remains separately governed and fail-closed. Release 1 does not depend on activating this runtime adapter because source acquisition occurs in the private release pipeline.
+A reserved server-side mode for direct source access without persistent storage. Release 1 does not require this mode for the public site.
 
-## 5. Scientific module boundaries
+The application does not automatically switch from a public mode into a private data source.
 
-### RPS registry and refresh
+## 7. Versioning and provenance
 
-`data/registry/rps_source_series_manifest.json` defines the 131-series work-focused scope:
+Generated results are associated with the source and repository state from which they were produced. Depending on the analysis, the recorded identity includes:
 
-- 5 national;
-- 60 industry;
-- 66 occupation.
+- source series or files;
+- source vintage or retrieval metadata;
+- crosswalk and taxonomy versions;
+- generated-artifact checksums;
+- repository commit;
+- published release identifier.
 
-`src/genai_at_work/rps_refresh.py` validates the official provider inventory, canonical metadata, excluded constructs, source definitions, observation domain, rights boundary, and stable scientific source identity.
+Historical releases are preserved instead of modifying published data in place. The current public version is recorded in `data/registry/observatory_release_registry.json` and the corresponding GitHub release.
 
-### Longitudinal analysis
+## 8. Publication process
 
-`src/genai_at_work/rps_release.py` and `rps_release_complete.py` own the deterministic descriptive RPS analysis:
+A new public version follows a conventional reproducible-release sequence:
 
-- cross-sectional regressions;
-- Pearson/Spearman A/H relationships;
-- leave-one-group-out diagnostics;
-- rank stability across all quarter pairs;
-- cross-level comparisons;
-- construct-specific source-history topology and the common complete A/H/S analytical window.
+1. acquire the required source vintages;
+2. validate source identities and definitions;
+3. regenerate all affected analysis artifacts;
+4. run scientific and software tests;
+5. review changed values, methodology, provenance, and public interpretation;
+6. create a versioned release directory;
+7. update the release registry;
+8. deploy the website from that release;
+9. preserve the previous release unchanged.
 
-Current Release 1 analysis uses seven common quarters, Q4 2024–Q2 2026.
+The implementation includes checksum and source-identity checks so that a source revision or changed analysis input cannot be published under an earlier reviewed version.
 
-### Public RPS projection
+Maintainer details are documented in [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 
-`src/genai_at_work/rps_public_view.py` constructs the bounded attributed RPS observation artifact under `rps-public-observation-delivery-v1`:
+## 9. Public website
 
-- five national work-family metrics across the complete seven-quarter history;
-- latest complete Q2 2026 A/H/S cross-sections for 20 industries;
-- latest complete Q2 2026 A/H/S cross-sections for 22 occupations.
+The website is intentionally a thin presentation layer over versioned data. It should not contain manually copied analytical values when those values can be loaded from published artifacts.
 
-It does not publish historical subgroup panels or a generic query database.
+This keeps the website, downloadable evidence, and documented methodology aligned across releases.
 
-### CPS composition and residuals
+## 10. Design principles
 
-CPS supplies occupation-composition weights:
+The architecture follows five principles:
 
-- adoption counterfactuals use worker shares;
-- assisted-hours and reported-savings counterfactuals use actual-main-job-hour shares;
-- usual-hours weights are sensitivity evidence.
-
-The occupation-adjusted industry-context residual is a descriptive standardization residual:
-
-`observed industry value - occupation-composition counterfactual`
-
-It is not an identified organizational, efficiency, productivity, or causal effect.
-
-### OEWS robustness
-
-May 2025 OEWS staffing evidence provides an independent establishment-side composition robustness basis. Its population differs from CPS and is kept separate instead of pooled into one synthetic weight system.
-
-### BTOS triangulation
-
-BTOS–RPS industry comparison is preregistered descriptive cross-construct triangulation. Employer-business AI use and worker GenAI adoption retain distinct units, denominators, technology scope, and reference periods.
-
-## 6. Claim-surface trust boundary
-
-Scientific artifact hashes alone do not prove that the public page presents the reviewed claim. `src/genai_at_work/claim_surfaces.py` binds each governed longitudinal/source claim to SHA-256 hashes of the exact repository files that present it.
-
-The RPS candidate converts each governed claim identity into a digest over:
-
-- its evidence-only claim digest; and
-- the exact registered surface-file hashes.
-
-Global composition revalidates these bindings. Any governed-file edit after candidate construction fails candidate composition/rehydration and requires a new review.
-
-## 7. Global candidate composition
-
-`src/genai_at_work/observatory_baseline.py` composes the complete v1 candidate from the private RPS component and repository-bound CPS/OEWS/BTOS evidence.
-
-`src/genai_at_work/observatory_rps_bindings.py` prevents repository artifacts derived from RPS from silently referring to another RPS vintage. It requires exact binding coverage for every RPS-dependent baseline artifact before global composition.
-
-The global candidate contains private `inputs/` for release reproducibility and rights-safe `artifacts/` eligible for promotion. The generic release engine validates both but copies only declared public artifacts into the immutable promoted release.
-
-## 8. Stage, review, and rehydration boundary
-
-`scripts/observatory_release.py stage` builds a portable stage identity from:
-
-- current release-registry predecessor identity;
-- candidate manifest file SHA-256;
-- candidate canonical digest;
-- release-diff digest;
-- review-package digest;
-- gate status.
-
-The candidate-review workflow uploads only rights-safe review evidence and leaves scientific/editorial/source-rights/CI attestation fields uncompleted. It cannot self-authorize publication or pre-attest a future rehydration identity.
-
-For Release 1, `data/registry/release1_owner_authorization.json` records a one-shot project-owner authorization for an automated release review. The release operator may complete the review attestation only after the exact candidate has zero release-contract failures, exact-commit CI succeeds, and exact source rehydration reproduces the reviewed scientific source, candidate, and stage identities. The release record states `human_review_performed=false` and binds the owner authorization ID.
-
-`scripts/rehydrate_observatory_v1_candidate.py` is the post-review trust boundary. It runs on the exact reviewed commit, verifies the predecessor release state, re-fetches RPS, requires the same scientific source identity, rebuilds the complete candidate, re-stages it, and requires exact equality with the reviewed candidate/stage records.
-
-A changed source value, source definition, repository evidence artifact, governed claim file, candidate manifest, stage identity, or release predecessor blocks promotion and forces renewed review.
-
-## 9. Promotion and deployment boundary
-
-Canonical promotion is available only through `scripts/promote_rehydrated_observatory_v1.py`. The low-level release engine rejects direct promotion against the canonical release registry/tree unless it receives the internal exact-rehydration capability.
-
-The owner-authorized Release 1 workflow requires:
-
-1. a successful exact candidate-review workflow run on canonical `main`;
-2. successful exact-commit Release candidate CI;
-3. an exact rehydration identity reproducing the reviewed source/candidate/stage state;
-4. an owner-authorized automated attestation bound to that identity;
-5. immutable release promotion;
-6. a release-only commit whose parent is the exact candidate commit;
-7. independent validation of that publication commit;
-8. explicit dispatch of the exact publication SHA to the Pages workflow;
-9. successful Pages artifact audit, deployment, and live-origin audit;
-10. formal `v1.0.0` creation only after those deployment gates pass.
-
-The owner authorization is first-release-only. Once the release registry contains a promoted release, the Release 1 operator becomes inert. Later releases require a separately authorized release decision.
-
-The resulting publication Git commit may change only:
-
-- `data/registry/observatory_release_registry.json`;
-- `data/releases/<release-id>/...`.
-
-`scripts/validate_observatory_publication_commit.py` validates this transition, requires the commit parent to be the exact reviewed candidate commit, and for the first release verifies the owner-authorization fields in the immutable review record.
-
-GitHub Pages may build on ordinary pushes and pull requests for QA. Deployment occurs only for a validated `Authorize Observatory release <release-id>` commit, either directly on an eligible push or through the exact-SHA `workflow_dispatch` path used when the release commit originates from the release operator. The dispatched path independently verifies that the supplied SHA is the current `main` tip and passes the publication-commit validator before deploying.
-
-## 10. Fail-closed principles
-
-The system prefers explicit unavailability or renewed review over convenience. Examples:
-
-- source scientific identity changes after review → new candidate review required;
-- governed public claim file changes after binding → candidate invalid;
-- release registry advances after review → rehydration invalid;
-- unsupported CPS period → unavailable;
-- composition support breach → unsupported/null evidence;
-- incomplete source family → candidate build failure;
-- unverified or broadened rights scope → publication blocked;
-- no promoted release → no bounded RPS public view;
-- direct canonical low-level promotion → blocked;
-- publication commit contains unrelated code/content → deployment blocked;
-- dispatched Pages SHA is not the canonical `main` tip → deployment blocked;
-- first-release review record lacks the owner authorization binding → publication commit invalid.
+1. **Traceability:** a published result should be traceable to its source and transformation.
+2. **Separation of concerns:** source acquisition, analysis, release data, and presentation remain distinct.
+3. **Explicit data permissions:** public storage and redistribution are decided source by source.
+4. **Versioned revisions:** changed source data produce a new analytical version instead of silently overwriting history.
+5. **Evidence-bounded publication:** unsupported estimates remain unavailable and descriptive analyses are not relabeled as causal findings.

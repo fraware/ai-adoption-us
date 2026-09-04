@@ -1,178 +1,202 @@
-# Canonical data model
+# Data model
 
-## Design requirement
+The data model makes the meaning and provenance of every published value explicit. A chart should never have to infer a measure, population, denominator, source, or transformation from a filename or column position.
 
-A chart must never infer the meaning of a value from its filename or column position. Construct, population, denominator, unit, source, and transformation status are explicit fields.
+This document describes the conceptual model. Machine-readable schemas and registries under `data/contracts/` and `data/registry/` are authoritative for field-level validation.
 
-## 1. `entities`
+## 1. Entities
 
-One row per entity shown by the site.
+An entity is the population grouping to which an observation refers.
 
-| field | type | meaning |
-|---|---|---|
-| `entity_id` | string | stable internal identifier |
-| `entity_type` | enum | `national`, `industry`, `occupation` |
-| `name` | string | display label |
-| `source_classification` | string/null | source classification label/code |
-| `sort_key` | integer | stable display order |
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `entity_id` | string | Stable identifier |
+| `entity_type` | enum | `national`, `industry`, or `occupation` |
+| `name` | string | Human-readable label |
+| `source_classification` | string / null | Source classification code or label |
+| `sort_key` | integer | Stable display order |
 
-## 2. `metrics`
+## 2. Metrics
 
-One row per construct.
+A metric describes the measurement construct independently of any particular entity or period.
 
-Required first-release metrics:
+Core metrics include:
 
-| metric_id | interpretation | denominator |
-|---|---|---|
-| `adoption_overall` | adults 18–64 using GenAI for any purpose | working-age adults |
-| `adoption_work` | employed adults 18–64 who use GenAI for work | employed adults |
-| `work_use_last_week` | employed adults who used GenAI for work in prior week | employed adults |
-| `work_use_daily` | employed adults who used GenAI every workday in prior week | employed adults |
-| `assisted_hours_share` | share of total work hours assisted by GenAI | total work hours |
-| `reported_time_savings_share` | self-reported additional hours otherwise needed, as share of total work hours | total work hours |
+| Metric | Interpretation | Denominator |
+| --- | --- | --- |
+| `adoption_work` | Employed adults aged 18–64 reporting generative-AI use for work | Employed adults |
+| `work_use_last_week` | Employed adults reporting work use in the previous week | Employed adults |
+| `work_use_daily` | Employed adults reporting use every workday in the previous week | Employed adults |
+| `assisted_hours_share` | Share of total working time assisted by generative AI | Total work hours |
+| `reported_time_savings_share` | Self-reported additional time otherwise required, expressed relative to total work hours | Total work hours |
 
-Fields:
+Some source registries also contain broader adoption measures that are outside the observatory's main workplace comparison.
 
-- `metric_id`
-- `label`
-- `unit`
-- `denominator`
-- `construct_type`: `direct_response`, `reconstructed`, `self_reported_counterfactual`, `derived`
-- `zero_for_nonusers`: boolean/null
-- `causal_interpretation_allowed`: always false for Release 1
-- `productivity_measure`: boolean
-- `definition`
-- `caution`
+Metric metadata should record:
 
-## 3. `series_registry`
+- stable metric identifier;
+- display label;
+- unit;
+- denominator;
+- construct type;
+- whether nonusers are assigned zero where relevant;
+- definition;
+- interpretation warning.
 
-One row per source series.
+Construct types distinguish direct responses, reconstructed measures, self-reported counterfactuals, and derived quantities.
 
-Fields:
+None of the Release 1 workplace measures is itself a causal productivity measure.
 
-- `source` (`fred_rps`)
-- `release_id` (`6` for the current RPS tracker release)
-- `series_id`
-- `title`
-- `metric_id`
-- `entity_id`
-- `frequency`
-- `unit`
-- `seasonal_adjustment`
-- `observation_start`
-- `observation_end`
-- `last_updated`
-- `source_url`
-- `citation_text`
-- `copyright_status`
-- `notes_hash`
+## 3. Source-series registry
 
-`notes_hash` makes source-definition changes detectable even when a series ID remains unchanged.
+The source-series registry maps an upstream series to the project's metric and entity definitions.
 
-## 4. `observations`
+Typical fields include:
 
-Canonical long-form table.
+- source;
+- source release or vintage;
+- series identifier;
+- source title;
+- metric identifier;
+- entity identifier;
+- frequency;
+- unit;
+- seasonal-adjustment status;
+- observation start and end;
+- source update metadata;
+- source URL;
+- citation text;
+- publication or copyright metadata;
+- a hash of source notes or definitions.
 
-Primary key:
+Definition hashes allow the software to detect a substantive metadata change even when the upstream series identifier remains unchanged.
 
-`(source, series_id, date, realtime_start, realtime_end)`
+## 4. Observations
 
-Publication key for latest-vintage views:
+Observations use a long-form representation: one row represents one source value for one entity, metric, and period.
 
-`(metric_id, entity_id, date)`
+Typical fields include:
 
-Fields:
+- source;
+- series identifier;
+- metric identifier;
+- entity identifier and type;
+- date and normalized period, such as `2026-Q2`;
+- value and unit;
+- source-vintage metadata;
+- ingestion timestamp;
+- source update timestamp.
 
-- `source`
-- `series_id`
-- `metric_id`
-- `entity_id`
-- `entity_type`
-- `date`
-- `period` (for example `2026-Q2`)
-- `value`
-- `unit`
-- `realtime_start`
-- `realtime_end`
-- `ingested_at_utc`
-- `source_last_updated`
-- `is_latest_vintage`
+Source precision is preserved in stored analytical values. Rounding is a presentation decision.
 
-Store raw precision; round only in presentation.
+Where the upstream system supplies revision or real-time metadata, the model retains enough information to distinguish a current observation from an earlier vintage.
 
-## 5. `composition_weights`
+## 5. Composition weights
 
-This table is not used until Release 1.1.
+CPS and OEWS composition analyses represent the share of an industry's workers or work hours attributable to each occupation.
 
-Fields:
+Typical fields include:
 
-- `source` (`cps`)
-- `period`
-- `industry_id`
-- `occupation_id`
-- `weight_basis`: `workers` or `work_hours`
-- `share`
-- `sample_population`
-- `weight_variable`
-- `hours_variable` (null for worker weights)
-- `crosswalk_version`
-- `n_unweighted`
+- source;
+- period;
+- industry identifier;
+- occupation identifier;
+- weighting basis: `workers` or `work_hours`;
+- share;
+- sample population;
+- survey weight variable;
+- hours variable where applicable;
+- crosswalk version;
+- unweighted sample count or coverage information.
 
-Important:
+The weighting basis is part of the scientific definition:
 
-- Adoption counterfactuals use `weight_basis=workers`.
-- Assisted-hours and time-savings counterfactuals use `weight_basis=work_hours`.
+- workplace adoption uses worker shares;
+- AI-assisted working time and reported time savings use work-hour shares.
 
-## 6. `derived_observations`
+Release 1 includes CPS composition analyses for Q2 2025 and Q2 2026, with OEWS May 2025 used as an independent robustness source.
 
-All derived values must declare their formula and inputs.
+## 6. Derived observations
 
-Fields:
+A derived observation is calculated from one or more source observations or composition weights. It should record enough metadata to reconstruct both the value and its interpretation.
 
-- `derived_metric_id`
-- `entity_id`
-- `date`
-- `value`
-- `formula_version`
-- `input_dataset_version`
-- `status`: `production`, `experimental`, `deprecated`
-- `interpretation`
-- `caution`
+Typical fields include:
 
-Candidate derived metrics:
+- derived metric identifier;
+- entity and period;
+- value;
+- formula or method version;
+- input dataset or source-vintage identity;
+- status;
+- interpretation;
+- caution or limitation.
 
-### `integration_residual`
+### Occupation-composition benchmark
 
-For a quarter-specific descriptive regression across industries:
+For industry `j`, occupation `o`, period `t`, and metric `m`, an industry benchmark is constructed from occupation-level RPS values and industry occupation weights.
 
-`H_jt - E_hat[H_jt | A_jt]`
+For adoption:
 
-Allowed UI label: **integration residual** or **assisted-hours residual**.
+```text
+A_hat(j,t) = Σ_o w_worker(j,o,t) × A(o,t)
+```
 
-Disallowed labels: efficiency, productivity, organizational quality.
+For AI-assisted working time and reported time savings:
 
-### `occupation_adjusted_adoption_gap`
+```text
+H_hat(j,t) = Σ_o w_hours(j,o,t) × H(o,t)
+S_hat(j,t) = Σ_o w_hours(j,o,t) × S(o,t)
+```
 
-`A_jt - sum_o w^workers_jot * A_ot`
+### Occupation-adjusted industry residual
 
-Interpretation: composition-standardization residual only.
+```text
+residual(j,t,m) = observed(j,t,m) - benchmark(j,t,m)
+```
 
-### `occupation_adjusted_assisted_hours_gap`
+This is a descriptive standardization residual. It does not identify organizational quality, efficiency, productivity, or a causal effect.
 
-`H_jt - sum_o w^hours_jot * H_ot`
+### Partial-identification intervals
 
-### partial-identification bounds
+When a source classification is materially coarser than the target classification, the method may report a feasible interval instead of imposing an arbitrary allocation within the broad category.
 
-When occupation categories do not align one-to-one, publish a feasible interval rather than inserting arbitrary midpoint allocations.
+## 7. Evidence status
 
-## 7. Denominator matrix
+Derived and published objects should be distinguishable by evidentiary status. A useful conceptual classification is:
 
-| source metric | worker weighted | hour weighted | zero for nonusers |
-|---|---:|---:|---:|
-| work adoption | yes | no | n/a |
-| last-week work use | yes | no | n/a |
-| daily work use | yes | no | n/a |
-| assisted-hours share | no | yes | yes |
-| reported-time-savings share | no | yes | yes |
+- **observed:** a published source value or deterministic aggregation of source values;
+- **derived descriptive:** a deterministic transformation, correlation, regression, composition benchmark, residual, or stability statistic;
+- **approximate uncertainty:** an explicitly labeled approximation with documented assumptions;
+- **design-based uncertainty:** an interval or covariance result supported by the relevant survey design information;
+- **causal outcome:** a separately identified effect using appropriate outcome data and research design.
 
-This matrix is a scientific invariant and should have automated tests.
+Release 1 contains observed and derived descriptive evidence. It does not promote reported time savings or industry residuals into causal outcome measures.
+
+## 8. Missing and suppressed values
+
+Missingness is represented explicitly. The software should distinguish among at least:
+
+- source value unavailable;
+- source value suppressed;
+- classification or coverage insufficient;
+- method unsupported for that period or cell.
+
+An unavailable component is not silently renormalized into an apparently complete estimate.
+
+## 9. Denominator and weighting matrix
+
+| Measure | Worker-based population | Work-hour-based population | Nonusers assigned zero in source construction |
+| --- | ---: | ---: | ---: |
+| Work adoption | yes | no | n/a |
+| Use last week | yes | no | n/a |
+| Daily work use | yes | no | n/a |
+| AI-assisted work-hours share | no | yes | yes |
+| Reported time-savings share | no | yes | yes |
+
+These distinctions are part of the measurement definition and are tested in the analysis code.
+
+## 10. Versioning
+
+Public results are versioned with the source and analytical state used to create them. Depending on the artifact, this includes source identifiers, source vintage, crosswalk version, method version, checksums, and release identifier.
+
+A revised source or method creates a new analytical version; published historical releases are not silently rewritten.

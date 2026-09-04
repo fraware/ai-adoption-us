@@ -32,13 +32,16 @@ def _load(path: Path) -> dict[str, object]:
     return value
 
 
-def test_permission_decision_clears_only_live_aggregate_gate() -> None:
+def test_permission_decision_clears_only_published_aggregate_project_use() -> None:
     text = RIGHTS.read_text()
-    assert "Status: **GRANTED — live aggregate observatory gate**" in text
+    lower = text.lower()
+    assert "published-aggregate project use recorded as permitted" in lower
     assert "project-owner attestation of source-owner permission" in text
     assert "respondent-level or other non-public microdata" in text
     assert "unrestricted bulk mirroring" in text
-    assert "legacy static exporter" in text
+    assert "generic public api" in lower
+    assert "does not publish the complete historical subgroup source panel" in lower
+    assert "not a general license for third parties" in lower
 
 
 def test_rps_q2_2026_snapshot_has_complete_exact_industry_contract() -> None:

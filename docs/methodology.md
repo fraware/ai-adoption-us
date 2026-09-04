@@ -1,160 +1,231 @@
-# Methodology and scientific guardrails
+# Methodology
 
-## Source hierarchy
+This document describes the measurement framework used by GenAI at Work and the methods behind Release 1 of the U.S. AI Adoption Observatory.
 
-Prefer primary sources and official APIs.
+The central methodological choice is to treat workplace generative-AI adoption, use intensity, reported time savings, and realized economic outcomes as distinct quantities. A high adoption rate does not imply intensive workflow use, and reported time savings are not equivalent to measured productivity.
 
-1. RPS series via the official FRED API, release 6.
-2. CPS public-use microdata / Census Data API for composition weights.
-3. BTOS downloadable data or official Census interfaces for firm-side triangulation.
+## 1. Measurement framework
 
-Do not scrape FRED. FRED's terms explicitly prohibit scraping/data-mining outside permitted API use. RPS series currently display `Copyrighted: Citation Required`; retain the authors' citation and identify FRED as the retrieval service when displaying the data.
-
-## RPS population
-
-The GenAI Adoption Tracker describes the RPS as a nationally representative online labor-market survey of U.S. working-age adults aged 18–64. It is designed and weighted to complement government surveys such as the CPS.
-
-## Metric semantics
+The observatory distinguishes the following stages:
 
 ### Work adoption
 
-Question-level construct: whether an employed adult reports using GenAI for their job.
+The share of employed adults who report using generative AI for their job.
 
-This is an extensive-margin measure. It does not say how recently or intensively GenAI was used.
+This is an extensive-margin measure: it indicates whether use occurs, not how frequently or intensively it occurs.
 
-### Use last week
+### Recent and routine use
 
-Among the employed population denominator, the share reporting at least one day of GenAI work use in the prior week. It is necessarily no higher than the work-adoption rate.
+Frequency measures indicate how recently and how regularly respondents used generative AI for work. Denominators matter: a measure among all employed adults differs from a measure conditional on being an adopter.
 
-### Daily work use
+### AI-assisted working time
 
-Among the employed population denominator, the share reporting GenAI use every workday in the prior week.
+The RPS estimates the share of total working time involving generative-AI assistance from reported days of use, active-use duration, and hours worked. Published values use the midpoint of implied lower and upper bounds, with nonusers assigned zero.
 
-### Work hours assisted
-
-The RPS combines bracketed days-of-use and active-use-duration responses with days/hours worked. The published series reports the midpoint of implied lower and upper bounds. Nonusers are assigned zero.
-
-This is a reconstructed share of total work hours. It is not the fraction of workers using AI.
+This is a time-allocation measure. It is not the share of workers who use AI.
 
 ### Reported time savings
 
-Respondents who used GenAI for work in the prior week report how many additional hours they believe the same work would have taken without GenAI. Nonusers are assigned zero.
+Respondents who used generative AI for work in the previous week report how much additional time they believe the same work would have required without AI. Nonusers are assigned zero.
 
-This is a **self-reported counterfactual**. It is not observed output, total-factor productivity, labor productivity, wage growth, or realized GDP.
+This is a self-reported counterfactual. It is not an observed measure of labor productivity, output, total-factor productivity, wages, or GDP.
 
-## Cross-survey composition methodology
+### Realized outcomes
 
-### Why CPS is primary
+Output, productivity, wages, employment, and firm performance require separate outcome data and an identification strategy. Release 1 does not estimate these effects.
 
-RPS and CPS are both worker/household survey systems. CPS provides joint industry, occupation, class-of-worker, survey-weight, and hours variables. This makes it a closer composition reference than establishment employment counts when the outcome itself is worker-based.
+## 2. Primary worker-side source: RPS
 
-Useful CPS variables include:
+Release 1 uses published aggregate series from the Generative AI Adoption Tracker's Real-Time Population Survey (RPS), retrieved through the official FRED/ALFRED interface within the project's documented source-use boundary.
 
-- `PRTAGE` — age
-- `PEMLR` / `PREMPNOT` — labor-force/employment status
-- `PWSSWGT` — final person-level survey weight
-- `PEIO1OCD` — detailed main-job occupation
-- `PRDTOCC1` — 22-category main-job occupation recode
-- `PRDTIND1` — detailed main-job industry recode
-- `PRCOW1` / `PRDTCOW1` — class of worker
-- `PEHRUSL1` — usual hours at main job
-- `PEHRACT1` — actual hours at main job in the reference week
+The GenAI Adoption Tracker describes the RPS as a nationally representative online labor-market survey of U.S. adults aged 18–64 designed to complement government surveys such as the Current Population Survey.
 
-Exact value labels and universes must be taken from the data dictionary for the relevant year/month; they must not be assumed from memory.
+The observatory uses national, industry, and occupation series for workplace adoption, AI-assisted working time, and reported time savings, together with national use-frequency measures.
 
-### Alignment rule
+The exact series inventory, source metadata, and retrieval information are documented in [source-provenance.md](source-provenance.md) and the machine-readable registries under `data/registry/`.
 
-For a quarter `t`, prefer CPS months contemporaneous with the RPS wave or an explicitly documented trailing window. Restrict the CPS sample to the same age range (18–64) and the closest defensible employment universe.
+## 3. Descriptive longitudinal analysis
 
-### Weighting rule
+Release 1's common industry/occupation analysis window contains seven quarters from Q4 2024 through Q2 2026.
 
-Worker-share outcomes:
+For each quarter, the project calculates descriptive relationships among:
 
-`w_workers(j,o,t) = weighted workers in (j,o,t) / weighted workers in (j,t)`
+- work adoption (`A`);
+- AI-assisted work-hours share (`H`);
+- reported time-savings share (`S`).
 
-Work-hour-share outcomes:
+The analysis includes:
 
-`w_hours(j,o,t) = weighted main-job hours in (j,o,t) / weighted main-job hours in (j,t)`
+- Pearson and Spearman association between adoption and assisted hours;
+- univariate and bivariate regressions describing cross-sectional variation in reported savings;
+- leave-one-group-out sensitivity checks;
+- rank persistence across quarter pairs;
+- comparisons between industry and occupation aggregation.
 
-Do not reuse worker weights for hour-share outcomes.
+These statistics describe aggregate cross-sectional structure. They are not causal estimates.
 
-### Hours choice
+See [RESULTS.md](RESULTS.md) for the reproduced values.
 
-Use a predeclared hierarchy:
+## 4. Industry composition analysis with CPS
 
-1. actual main-job hours (`PEHRACT1`) when valid and conceptually aligned with RPS reference-week work hours;
-2. usual main-job hours (`PEHRUSL1`) as a sensitivity analysis;
-3. never silently impute `HOURS VARY` values without documenting the imputation rule.
+Industry-level AI use may partly reflect the occupations employed within each industry. The project therefore constructs occupation-composition benchmarks using the Current Population Survey (CPS).
 
-## Classification alignment
+### Population alignment
 
-Industry and occupation codes can change across years. Crosswalk files are versioned inputs, not hard-coded assumptions.
+CPS samples are restricted to the closest defensible population match to the RPS workplace measures, including the 18–64 age range and an aligned employed-worker universe.
 
-Every derived composition table must record:
+The relevant CPS variables include person weights, main-job industry, main-job occupation, class of worker, usual hours, and actual hours in the survey reference week. Exact variable definitions and codes are taken from the documentation for the relevant CPS vintage.
 
-- CPS month(s)
-- CPS code system
-- RPS labels
-- crosswalk version/hash
-- unmatched employment share
-- aggregation rules
-- ownership/class-of-worker exclusions
+### Quarter construction
 
-If the unmatched weighted share exceeds a predefined threshold (suggested first gate: 2%), suppress the result rather than renormalizing silently.
+CPS months are selected to match the RPS quarter as closely as possible. The exact month set is recorded in each derived composition package.
 
-## Partial identification
+Q4 2025 is intentionally unavailable for CPS composition because October 2025 CPS data were not collected. November and December are not treated as a substitute three-month quarter.
 
-When source categories are coarser than RPS categories, prefer a feasible interval.
+### Worker-share weights
 
-For adoption, if broad category `g` contains RPS occupations `o in g`:
+For work adoption, industry occupation weights are based on the weighted number of workers:
 
-`lower_jt = sum_g w_jg * min_o(A_ot)`
+```text
+w_worker(j,o,t) = workers(j,o,t) / workers(j,t)
+```
 
-`upper_jt = sum_g w_jg * max_o(A_ot)`
+The occupation-composition benchmark for industry adoption is:
 
-Observed values outside this interval cannot be generated by any within-group allocation over those RPS major occupations, conditional on the broad composition shares used.
+```text
+A_hat(j,t) = Σ_o w_worker(j,o,t) × A(o,t)
+```
 
-The inference remains conditional on the crosswalk, population alignment, and source estimates; it does not identify a causal organizational effect.
+### Work-hour weights
 
-## Uncertainty
+For AI-assisted working time and reported time savings, occupation weights are based on weighted main-job work hours:
 
-RPS subgroup standard errors are not currently supplied with every FRED series. Therefore:
+```text
+w_hours(j,o,t) = work_hours(j,o,t) / work_hours(j,t)
+```
 
-- do not display conventional significance stars for subgroup residuals without valid uncertainty estimates;
-- use persistence/sensitivity diagnostics as descriptive robustness checks, not substitutes for inference;
-- label small or visibly volatile subgroup series;
-- preserve raw values and never smooth by default.
+The corresponding benchmarks are:
 
-## Revisions and vintages
+```text
+H_hat(j,t) = Σ_o w_hours(j,o,t) × H(o,t)
+S_hat(j,t) = Σ_o w_hours(j,o,t) × S(o,t)
+```
 
-FRED/ALFRED can revise historical observations. The pipeline stores real-time metadata and build timestamps.
+Actual main-job hours are preferred because they align most closely with the RPS reference-week measures. Usual hours are retained as a labeled sensitivity analysis.
 
-A production refresh must fail loudly if:
+### Occupation-adjusted industry residual
 
-- a source series disappears;
-- its title changes incompatibly;
-- unit/frequency changes;
-- notes/definition hashes change;
-- an expected metric/entity combination becomes missing.
+For any metric `m`, the project reports:
 
-A source-definition change should trigger human review before deployment.
+```text
+residual(j,t,m) = observed(j,t,m) - composition_benchmark(j,t,m)
+```
 
-## Publication language
+The residual indicates how far the observed industry value lies from the value predicted by its broad occupational composition under the specified weighting scheme.
 
-### Allowed
+It should not be interpreted as an organizational effect, management-quality effect, efficiency estimate, productivity effect, or causal firm effect. Many unmeasured mechanisms can contribute to the difference.
 
-- "reported time savings"
-- "share of work hours assisted"
-- "descriptive relationship"
-- "composition counterfactual"
-- "occupation-adjusted residual"
-- "consistent with"
+The detailed composition, robustness, and uncertainty treatment is documented in [CPS_COMPOSITION_UNCERTAINTY.md](CPS_COMPOSITION_UNCERTAINTY.md).
 
-### Avoid unless separately established
+## 5. Classification alignment and coverage
 
-- "AI productivity" for RPS savings
-- "efficiency"
-- "organizational effect"
-- "caused by"
-- "AI generated X% of GDP"
-- "workers are X% more productive"
+Industry and occupation classifications can differ across sources and vintages. Crosswalks are therefore treated as versioned inputs.
+
+Each composition analysis records, as applicable:
+
+- CPS months and vintage;
+- industry and occupation classification systems;
+- RPS labels;
+- crosswalk version and checksum;
+- aggregation rules;
+- class-of-worker restrictions;
+- unmatched weighted share;
+- coverage and suppression diagnostics.
+
+Results with inadequate mapping or support are reported as unavailable. The analysis does not silently renormalize away material unmatched employment.
+
+## 6. OEWS robustness analysis
+
+The Occupational Employment and Wage Statistics (OEWS) May 2025 data provide an independent establishment-side view of occupation × industry staffing.
+
+OEWS differs from CPS in population, data collection, and weighting. The project therefore uses OEWS as a robustness comparison rather than combining it with CPS into a synthetic composition estimate.
+
+Agreement across CPS and OEWS can increase confidence that a composition pattern is not an artifact of one staffing data system. Disagreement is treated as information about source sensitivity.
+
+See [OEWS_ROBUSTNESS.md](OEWS_ROBUSTNESS.md) for the source-universe differences, partial-identification treatment for unpublished cells, and released robustness results.
+
+## 7. BTOS industry comparison
+
+The Business Trends and Outlook Survey (BTOS) provides a separate employer-side measure of recent AI use.
+
+Release 1 compares BTOS sector-level current AI use with RPS worker-reported generative-AI work adoption under a prespecified industry crosswalk and suppression rule.
+
+The two measures are not equivalent:
+
+- BTOS measures responding employer businesses;
+- RPS measures employed adults;
+- the technology definitions differ;
+- the denominators differ;
+- the reference periods differ.
+
+Correlations between them are interpreted only as descriptive cross-source concordance.
+
+See [BTOS_RPS_COMPARISON.md](BTOS_RPS_COMPARISON.md) for the period-selection rule, source reproduction, crosswalk, eligible sector sets, and Release 1 results.
+
+## 8. Uncertainty and statistical interpretation
+
+### RPS descriptive statistics
+
+Release 1 reports aggregate descriptive correlations, regressions, rankings, and leave-one-group-out checks. These should not be interpreted as conventional hypothesis tests unless an appropriate sampling-uncertainty model is available for the exact statistic.
+
+### CPS composition uncertainty
+
+The public CPS Basic Monthly material used in Release 1 does not provide the full covariance information required for a design-based confidence interval for the custom pooled 22-category occupation-composition vectors.
+
+For that reason, Release 1 does not attach full design-based confidence intervals to these custom composition benchmarks or residuals. Available stability, sensitivity, and reliability diagnostics remain descriptive.
+
+Marginal generalized-variance-function approximations are not used to infer an otherwise unidentified multivariate covariance matrix.
+
+See [CPS_COMPOSITION_UNCERTAINTY.md](CPS_COMPOSITION_UNCERTAINTY.md) for the detailed treatment.
+
+## 9. Missing data and suppression
+
+Missing or unsupported values remain missing unless a documented method justifies estimation.
+
+In particular:
+
+- unavailable CPS quarters are shown as gaps;
+- suppressed BTOS sectors are not reconstructed from neighboring values;
+- unsupported composition cells are not silently renormalized into complete estimates;
+- source revisions are versioned rather than overwritten without record.
+
+This policy is intended to keep the public output faithful to the evidence actually available.
+
+## 10. Source revisions and vintages
+
+Several upstream sources can revise historical observations or definitions. Reproducible analyses therefore record source identity and vintage alongside generated artifacts.
+
+A source update is reviewed for changes in:
+
+- series identity;
+- units and frequency;
+- population or question wording;
+- classification systems;
+- historical values;
+- redistribution or publication constraints.
+
+A substantive definition change is treated as a measurement break and documented in the public output instead of being presented as continuous data.
+
+## 11. Interpretation rules
+
+The following distinctions apply throughout the project:
+
+- adoption is distinct from use intensity;
+- AI-assisted hours are distinct from hours saved;
+- reported time savings are distinct from measured productivity;
+- theoretical AI exposure or capability is distinct from realized adoption;
+- cross-sectional associations are descriptive without a separate identification strategy;
+- occupation-adjusted industry residuals are descriptive standardization residuals;
+- BTOS employer use and RPS worker use are different constructs.
+
+These distinctions are part of the measurement design, not editorial caveats added after analysis.

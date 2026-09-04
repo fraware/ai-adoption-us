@@ -1,101 +1,83 @@
-# RPS source-rights and production-feed decision
+# RPS source-use decision
 
-Status: **GRANTED — live aggregate observatory gate**
+**Decision date:** 2 September 2026  
+**Status:** published-aggregate project use recorded as permitted
 
-Decision date: 2026-09-02
+This document records the basis and scope under which GenAI at Work uses published aggregate observations from the Real-Time Population Survey (RPS) Generative AI Adoption Tracker.
 
-This record governs use of published aggregate observations from the Real-Time Population Survey (RPS) Generative AI Adoption Tracker in GenAI at Work.
+It is a project provenance record, not a general license for third parties.
 
-## Decision basis
+## Evidence basis
 
-On 2026-09-02, the project owner stated that permission has been obtained from the RPS data owners and explicitly authorized this project to proceed. The repository records that statement as a **project-owner attestation of source-owner permission**.
+On 2 September 2026, the project owner stated that permission had been obtained from the RPS data owners for the published aggregate use required by this project.
 
-The underlying permission correspondence or agreement has not been attached to this repository and has not been independently inspected as part of this code change. Accordingly, this record does not invent an authorized contact, correspondence date, contractual wording, or legal term that is not in the retained project evidence.
+The repository records that statement as a **project-owner attestation of source-owner permission**.
 
-The pre-permission fail-closed decision remains preserved in Git history at commit `a33926a234bffd9fb6fce9491377e71a7ed5ad22` and earlier.
+The underlying correspondence or agreement is not included in this public repository and was not independently inspected as part of the software review. This document therefore does not claim contractual wording, recipient identity, correspondence dates, or legal terms that are not present in the retained evidence.
 
-## Operational scope cleared by this decision
+## Use recorded as permitted
 
-For the published aggregate Tracker series used by this project, the live aggregate gate is treated as cleared for:
+For the published aggregate Tracker series used by GenAI at Work, the project treats the recorded permission as covering:
 
-- retrieving published aggregate observations from the official Tracker distribution;
-- storing versioned aggregate source checkpoints for reproducibility;
-- using those observations in the project’s analytical pipeline;
-- displaying selected attributed aggregate values in the observatory;
-- computing and publishing derived aggregate analyses, including the preregistered BTOS-RPS industry triangulation;
-- refreshing the aggregate source checkpoints as later published Tracker waves become available, subject to the normal revision gate.
+- retrieval of the relevant published aggregate observations from the official distribution;
+- private storage of versioned aggregate source files when needed for reproducibility;
+- use of those observations in the project's analysis;
+- display of selected attributed aggregate values in the public observatory;
+- publication of derived aggregate analyses;
+- refresh of the same aggregate source scope when later published Tracker waves become available.
 
-This decision removes the source-rights block from the aggregate analysis pipeline. It does **not** collapse the source’s measurement constructs or remove scientific review requirements.
+The public RPS presentation in Release 1 is intentionally narrower than the complete registered source history. It contains national history plus the latest complete industry and occupation A/H/S cross-sections and derived analyses.
 
-## Scope not inferred from the attestation
+## Use not inferred from the evidence
 
-The following remain separate decisions unless documentary evidence establishing their scope is later retained:
+The recorded permission should not be interpreted as establishing rights for:
 
 - respondent-level or other non-public microdata;
-- the historical replication package for *The Rapid Adoption of Generative AI*;
-- the separate occupation/task-adoption-index artifact reviewed under R1.3-G1;
-- unrestricted bulk mirroring of the entire source catalog through a public download service;
-- a public API that republishes the complete underlying Tracker database.
+- historical replication-package material not covered by the recorded aggregate scope;
+- the separate occupation/task-adoption-index files;
+- unrestricted bulk mirroring of the complete Tracker database;
+- a generic public API that republishes the complete underlying source;
+- downstream third-party redistribution beyond the source owners' own terms.
 
-Those items are not required for the current BTOS-RPS industry triangulation.
+Those uses require their own documentary basis.
 
-## Source and attribution contract
+## Source and attribution
 
-Primary measurement family:
+Primary source family:
 
-- Real-Time Population Survey: Generative Artificial Intelligence Adoption Tracker;
-- authors/source attribution: Alexander Bick, Adam Blandin, and David Deming;
-- public Tracker: https://www.genaiadoptiontracker.com/;
-- official series distribution used by the current reproducibility layer: FRED/ALFRED series identifiers already pinned in `data/registry/rps_source_series_manifest.json`.
+- Real-Time Population Survey / Generative AI Adoption Tracker;
+- authors associated with the Tracker series used here: Alexander Bick, Adam Blandin, and David Deming;
+- Tracker: https://www.genaiadoptiontracker.com/;
+- machine-readable distribution used by this project: FRED/ALFRED series registered in `data/registry/rps_source_series_manifest.json`.
 
-Current FRED/ALFRED series notes identify the values as quarterly, not seasonally adjusted percentages and request citation of the underlying RPS work. Source identifiers, retrieval dates, observed values, and source URLs must remain attached to every versioned checkpoint.
+The FRED/ALFRED service is treated as a distribution mechanism for the series, not as the party granting the underlying source-owner permission.
 
-FRED/ALFRED is treated as a distribution/transport layer, not as the party granting the underlying source-owner permission.
+Public outputs should preserve appropriate attribution to the RPS / Generative AI Adoption Tracker and source-series provenance.
 
-## Measurement guardrails unaffected by permission
+## Public data boundary
 
-Permission to use a source does not make unlike measures equivalent. In particular:
+Release 1 does not publish the complete historical subgroup source panel as a general public dataset.
 
-- RPS worker-reported GenAI adoption is not BTOS employer-business AI adoption;
-- adoption is not assisted-hours penetration;
-- adoption is not reported time savings or productivity;
-- sector-level concordance is not an organizational or causal effect;
-- source publication does not justify reconstructing suppressed values;
-- uncertainty claims require an approved design and available uncertainty inputs.
+The public product includes a bounded presentation of source observations and derived analyses. Source files used during release preparation remain outside the public Git repository when their redistribution is not covered by the documented use scope.
 
-## Engineering decision
+This approach preserves reproducibility while avoiding an unsupported interpretation of the recorded permission as blanket redistribution rights.
 
-The legacy static exporter that wrote raw FRED observations directly into the public web tree remains retired. That architectural safeguard is independent of the rights decision.
+## Scientific interpretation is separate from permission
 
-Authorized aggregate source values may instead enter through versioned source checkpoints with provenance and review. Analytical code consumes those checkpoints and produces derived artifacts. Direct full-database public redistribution can be added later only if its exact product scope is deliberately approved.
+Permission to use a source does not change what the source measures.
 
-The first authorized checkpoint under this decision is:
+In particular:
 
-`data/registry/rps_industry_adoption_q2_2026_v1.json`
+- RPS worker-reported generative-AI adoption is different from BTOS employer-reported AI use;
+- workplace adoption is different from AI-assisted working time;
+- AI-assisted working time is different from reported time savings;
+- reported time savings are not measured productivity;
+- sector-level cross-source concordance is not a causal organizational effect;
+- suppressed source values are not reconstructed;
+- uncertainty claims require an appropriate statistical method and inputs.
 
-The first analysis released from that checkpoint is governed by the canonical preregistration:
+## Change control
 
-`data/registry/btos_rps_comparison_protocol_v1.json`
+If the project's understanding of the source-use conditions changes, the source documentation and publication behavior should be reviewed before new source material is stored or released.
 
-## Decision fields
-
-- provider/data owner: Real-Time Population Survey / Generative AI Adoption Tracker data owners
-- permission status: `granted` for the published aggregate project use described above
-- evidence basis: project-owner attestation of source-owner permission
-- attestation date: 2026-09-02
-- documentary correspondence retained in repository: no
-- delivery format used now: published aggregate series through official FRED/ALFRED distribution
-- storage terms implemented: versioned aggregate checkpoints in the research repository
-- direct observation display/publication: treated as granted for selected attributed aggregate values used by the project
-- derived-result publication: treated as granted
-- unrestricted bulk mirror/public API: not inferred; separate product decision
-- historical replication package: unresolved/separate
-- microdata: unresolved/separate
-- task-index artifact: unresolved/separate
-- attribution: retain RPS/Tracker authorship and source-series provenance
-- engineering consequence: aggregate rights gate cleared; analysis may execute; legacy public-tree raw exporter remains retired
-- effective date: 2026-09-02
-
-## Current decision
-
-**Granted for the live published aggregate use required by the observatory and the preregistered BTOS-RPS analysis, on the project owner’s attestation that source-owner permission has been obtained.** Scientific, provenance, revision, and release-review gates remain in force.
+A future expansion to microdata, task-index data, unrestricted bulk download, or a public source API should not be inferred from this record; it requires a separate documented decision.

@@ -1,71 +1,93 @@
 # GenAI at Work — Release 1
 
-Release status is determined by the immutable Observatory release registry and the formal GitHub tag/release, not by this prose file alone. The Release 1 publication workflow stamps the actual publication date into the GitHub Release only after exact candidate validation, exact source rehydration, promotion, release-only deployment, and the live-origin audit succeed.
+**Version:** `v1.0.0`  
+**Published:** 4 September 2026  
+**Public site:** https://fraware.github.io/ai-adoption-us/
 
-## What Release 1 establishes
+Release 1 is the first published baseline of the U.S. AI Adoption Observatory. It measures how generative AI is moving from workplace adoption into routine use, AI-assisted working time, and reported time savings while keeping those quantities distinct from measured productivity or other realized economic outcomes.
 
-Release 1 is the first governed public baseline of the U.S. GenAI-at-work observatory. The product separates workplace GenAI adoption from routine use, AI-assisted working time, reported counterfactual time savings, composition-adjusted descriptive evidence, and firm-side triangulation instead of collapsing them into one adoption indicator.
+## What is included
 
-The public product is a static GitHub Pages deployment in `derived_only` mode. Private RPS source-input bytes and private audit material are excluded from the public Git tree and promoted release bundle.
+Release 1 combines four complementary data sources:
 
-## Evidence included
+- **RPS / Generative AI Adoption Tracker:** national workplace AI-use history and Q2 2026 industry and occupation measures;
+- **Current Population Survey:** Q2 2025 and Q2 2026 industry × occupation composition analysis;
+- **Occupational Employment and Wage Statistics:** May 2025 staffing-composition robustness analysis;
+- **Business Trends and Outlook Survey:** Q2 2026 employer-side industry comparison.
 
-Release 1 composes the rights-safe evidence validated in the repository:
+The common RPS industry/occupation analysis window covers seven quarters from Q4 2024 through Q2 2026.
 
-- national workplace GenAI adoption/use indicators and seven-quarter longitudinal conversion diagnostics;
-- bounded industry and occupation adoption, assisted-hours, and reported-savings views on the authorized public surface;
-- executed Q2 2025 and Q2 2026 CPS industry × occupation composition evidence;
-- occupation-adjusted industry-context residual diagnostics with descriptive-only interpretation;
-- May 2025 OEWS staffing robustness evidence;
-- preregistered BTOS–RPS descriptive triangulation with construct differences and suppression boundaries preserved;
-- methodology, source/provenance, and technical-essay surfaces cryptographically bound to the reviewed repository files.
+## Main descriptive findings
 
-The exact release is defined by its promoted immutable release directory, registry entry, release-only authorization commit, deployed Pages identity, and formal `v1.0.0` tag.
+Release 1 establishes three recurring patterns within that seven-quarter window:
 
-## Scientific boundaries
+1. Workplace adoption and AI-assisted working time are more tightly aligned across occupations than across industries in every quarter under both Pearson and Spearman measures.
+2. Across occupations, adoption explains more cross-sectional variation in reported time savings than AI-assisted hours in all seven quarters and all 154 leave-one-occupation-out checks.
+3. Adoption rankings are more persistent than AI-assisted-hours rankings in 20 of 21 quarter-pair comparisons at both the industry and occupation levels.
 
-Release 1 does not convert reported time savings into measured productivity, output, TFP, GDP, or wage growth. The occupation-adjusted industry-context residual is not an identified organizational, management-quality, efficiency, productivity, or causal effect. RPS worker-side constructs and BTOS firm-side current-use constructs are not treated as equivalent.
+Across industries, the relationship between reported savings and adoption versus assisted hours changes by quarter; neither is a uniformly stronger descriptor over the full period.
 
-Custom pooled CPS composition vectors do not have a supported full design-based covariance model in Release 1. Existing composition stability and reliability diagnostics remain descriptive. Marginal generalized-variance-function borrowing is not used to manufacture a missing 22-dimensional covariance structure.
+Full results and tables are in [RESULTS.md](RESULTS.md).
 
-The CPS Q4 2025 composition quarter remains explicitly unavailable because October 2025 CPS data were not collected; the project does not construct a replacement quarter from November–December observations.
+## Industry composition analysis
 
-## Rights and source boundaries
+The release uses CPS data to ask how much of an industry's observed AI-use pattern is associated with its broad occupational composition.
 
-Published-aggregate RPS project use is recorded as permitted under the project source-rights decision. That permission is not generalized to respondent-level microdata, the separate task-index artifact, unrestricted bulk mirroring, a historical subgroup database, or a generic public raw-source API.
+- workplace-adoption benchmarks use occupation worker shares;
+- AI-assisted-hours and reported-savings benchmarks use occupation work-hour shares.
 
-The release pipeline retrieves the authorized aggregate RPS source into a private candidate workspace. It records source identity, validates the registered inventory, detects release-relevant changes, derives the bounded public observation surface, and excludes source-input bytes from public candidate-review and release artifacts.
+The difference between the observed industry value and the occupation-composition benchmark is reported as an **occupation-adjusted industry residual**.
 
-## Release and QA contract
+This residual is descriptive. It should not be interpreted as an organizational, management, efficiency, productivity, or causal effect.
 
-Release 1 is not authorized by a successful build alone. The project owner explicitly authorized an automated release review in `data/registry/release1_owner_authorization.json`; no separate human review step is required. That authorization does not waive any machine-verifiable release gate. Publication requires:
+## Cross-source comparison
 
-- release CI on the exact candidate commit;
-- the applicable recorded rendered-browser/accessibility and native-Safari evidence;
-- GitHub Pages static artifact audit;
-- an exact candidate-review package with zero release-contract failures;
-- owner-authorized automated scientific, editorial, and source-rights review of that exact package;
-- exact source rehydration reproducing the reviewed scientific, candidate, and stage identities;
-- an automated review attestation bound to the deterministic rehydration identity and exact CI evidence;
-- explicit promotion into a new immutable `data/releases/<release-id>/` directory and release-registry transition;
-- validation of the single release-only authorization commit;
-- GitHub Pages deployment from that authorization commit and successful live-origin audit;
-- creation of the formal `v1.0.0` GitHub Release only after the deployment and live audit succeed.
+BTOS provides an employer-side measure of recent AI use, while RPS measures worker-reported generative-AI use. Their Q2 2026 sector relationship is reported as descriptive cross-source concordance only because the populations, denominators, technology scope, and reference periods differ.
 
-Historical CI, browser, or deployment results remain useful engineering evidence but do not substitute for exact final release execution where exact identity is required.
+OEWS provides a second view of industry staffing composition and is used as a robustness source rather than combined with CPS into a single weighting system.
 
-## Publication target
+## Statistical limitations
 
-The production site is:
+Release 1 does not provide full design-based confidence intervals for the custom pooled CPS occupation-composition vectors. The public CPS material used by the project does not supply the multivariate covariance information required for that calculation.
 
-`https://fraware.github.io/ai-adoption-us/`
+Available stability and sensitivity diagnostics remain descriptive. Marginal variance approximations are not used to construct an unsupported multivariate covariance model.
 
-Only a deployment tied to the promoted immutable release and successful release-only live audit constitutes the formal Release 1 site identity.
+Q4 2025 CPS composition is also intentionally unavailable because October 2025 CPS data were not collected; November and December are not used as a substitute quarter.
 
-## Update model after Release 1
+## What Release 1 does not claim
 
-The one-shot Release 1 owner authorization becomes inert after the first promoted release. Future source changes still flow through source identity, validation, rights-safe derivation, revision diagnostics, complete candidate composition, governed claim-surface binding, exact staging, review, exact rehydration, promotion, and release-only deployment under a separately authorized release decision.
+Release 1 does not estimate:
 
-## Post-Release-1 research
+- measured labor-productivity effects;
+- output or total-factor-productivity effects;
+- wage or employment effects;
+- causal effects of workplace AI adoption or use intensity;
+- organizational quality or management effects from industry residuals;
+- equivalence between RPS worker measures and BTOS employer measures.
 
-Current non-blocking research directions are tracked as GitHub issues and in `docs/ROADMAP.md`. They include design-based uncertainty for custom CPS composition vectors, the experimental composition explorer, task-exposure versus realized-adoption analysis under its separate provenance/rights gate, and richer worker/task/occupation/industry/time mechanism research.
+Reported time savings remain a self-reported counterfactual measure.
+
+## Public data and source-use boundary
+
+The public product includes the RPS observations and derived analyses covered by the project's documented publication scope. It does not provide the complete historical RPS subgroup source panel as a public database, unrestricted bulk mirror, or generic source query API.
+
+Private source-input material used during release preparation is excluded from the public Git repository and release bundle when redistribution is outside the documented source-use boundary.
+
+See [source-provenance.md](source-provenance.md) and [source-rights/RPS_SOURCE_DECISION.md](source-rights/RPS_SOURCE_DECISION.md).
+
+## Reproducibility
+
+The repository contains the analysis code, versioned derived artifacts, source metadata, crosswalks, tests, and release metadata needed to identify the published analytical version.
+
+Analyses that depend on source files not redistributed here can be reconstructed by reacquiring the registered official source and following [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
+
+## Published version identity
+
+The current published version is identified by:
+
+- GitHub tag `v1.0.0`;
+- the corresponding GitHub Release;
+- the release entry in `data/registry/observatory_release_registry.json`;
+- the versioned artifacts under `data/releases/`.
+
+These machine-readable records identify the exact published build. This document summarizes its scientific and product scope.
