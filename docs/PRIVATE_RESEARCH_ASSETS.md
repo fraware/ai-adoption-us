@@ -1,70 +1,74 @@
-# Private research assets and public-repository boundary
+# Data intentionally excluded from the public repository
 
-This repository is public. The private RPS audit observation fixture must therefore **not** be committed here.
+Some source material used for research validation and release preparation is intentionally absent from this public repository. This is a source-use and redistribution decision, not a missing-data accident.
 
-## Required private asset
+## RPS source material
 
-Path expected by the private research mode:
+The project has used two kinds of non-public RPS material during its development and validation:
 
-`data/audit/private/rps_subgroup_5q_audit.json`
+1. source files acquired during preparation of the current published-aggregate release; and
+2. an earlier five-quarter subgroup audit fixture used for private validation.
 
-Current frozen fixture properties are machine-registered in `data/registry/private_fixture_freeze.json`. The baseline freeze has:
+Neither is distributed as a public source-data package.
 
-- rows: **630**;
-- industries: 20;
-- occupations: 22;
-- metrics: 3 (`A`, `H`, `S`);
-- quarters: 5 (Q2 2025 through Q2 2026);
-- SHA-256: `bdeffa95911a94cb60f904c51efc48f7ce4d1bf1eaaec490f5c4bfacd20d4fba`.
+The public repository instead contains the source-series metadata, acquisition and analysis code, versioned derived results, and the bounded RPS observations covered by the project's documented publication scope.
 
-## Why it is absent
+## Historical five-quarter audit fixture
 
-The fixture was assembled for private research/audit use from third-party RPS series. The public release architecture deliberately does not redistribute the raw subgroup observations.
+The earlier private audit fixture is expected, when used, at:
 
-The omission is intentional and must not be “fixed” by copying the private fixture into the public Git repository.
+```text
+data/audit/private/rps_subgroup_5q_audit.json
+```
 
-## Recovery of the current freeze
+Its recorded identity is stored in `data/registry/private_fixture_freeze.json`:
 
-An authorized researcher recovering the existing frozen package should:
+- 630 observations;
+- 20 industries;
+- 22 occupations;
+- 3 measures (`A`, `H`, `S`);
+- 5 quarters, Q2 2025 through Q2 2026;
+- SHA-256 `bdeffa95911a94cb60f904c51efc48f7ce4d1bf1eaaec490f5c4bfacd20d4fba`.
 
-1. restore the fixture at the exact path above;
-2. verify its SHA-256 against `data/registry/private_fixture_freeze.json`;
-3. run the full private test suite;
-4. regenerate the four longitudinal derived artifacts with `scripts/build_longitudinal.py`;
-5. require byte-for-byte agreement with `data/derived/longitudinal/` before accepting the recovered freeze.
+This fixture is historical validation material. It is not the controlling empirical source for Release 1, which uses the authorized published-aggregate source history and a seven-quarter common analysis window.
 
-This recovery path is only for reproducing the **same** frozen fixture.
+## Reproducing the historical fixture analysis
 
-## Revision of the private fixture
+A researcher who is independently authorized to possess the exact historical fixture can verify it by:
 
-A candidate source revision must never overwrite the current fixture first.
+1. placing it at the path above;
+2. checking its SHA-256 against `data/registry/private_fixture_freeze.json`;
+3. running the tests that require the private fixture;
+4. regenerating the historical longitudinal artifacts with `scripts/build_longitudinal.py`;
+5. comparing the resulting artifacts with the corresponding recorded historical outputs.
 
-Any revised candidate must go through `scripts/private_fixture_revision_gate.py` and the mandatory procedure in `docs/PRIVATE_FIXTURE_REVISION_PROTOCOL.md`. The gate:
+This procedure verifies the previously recorded fixture. It does not authorize obtaining or redistributing the underlying source data.
 
-- verifies the current fixture against the registered checksum before any mutation;
-- preserves the current fixture and current derived freeze in a private archive;
-- validates the candidate under the existing scope/rights/definition contract;
-- runs the fixture-present longitudinal analytical suite against the separate candidate path and retains the result privately; only the same-freeze byte-for-byte canonical reproduction assertion is inapplicable during revision staging;
-- regenerates all four longitudinal artifacts into a separate staging directory;
-- produces a private cell-level diff and public-artifact hash diff;
-- marks all registered dependent claims for review when derived evidence changes;
-- blocks promotion until the applicable candidate private suite and publication diagnostics pass and an attestation is bound to the exact candidate checksum, stage fingerprint, staged artifact hashes, and every affected claim;
-- fails closed when rights or construct definitions change or when analytical/private-suite or publication diagnostics fail;
-- emits a public validation record without raw private observations only after explicit reviewed promotion.
+## Current source-dependent reproduction
 
-A new wave is not a fixture revision. New-wave ingestion belongs to the versioned update/release pipeline and must not use the revision gate to bypass the broader measurement and publication review.
+Release 1 reproduction does not depend on distributing the historical private fixture. Current RPS analyses are reconstructed by acquiring the registered published aggregate series through the official source interface in a private or temporary workspace.
 
-## Public substitutes
+The acquisition and release-preparation code records source identity and generates the public observations and derived outputs that are eligible for publication. Source-input files remain outside the public release when the documented use boundary does not permit redistribution.
 
-The public repository contains:
+See [REPRODUCIBILITY.md](REPRODUCIBILITY.md) for the current workflow.
 
-- the full source-series metadata manifest;
-- the machine-readable private-freeze identity and contract, without the fixture itself;
-- the complete longitudinal analysis implementation;
-- the private-fixture revision gate implementation and public tests;
-- the longitudinal public-claim inventory;
-- rights-safe aggregate derived diagnostics;
-- validation checks;
-- source provenance and methodology.
+## Public material available for inspection
 
-These permit inspection of the method, governance process, and published conclusions without redistributing the underlying private audit observations.
+The public repository includes:
+
+- the RPS series registry and source metadata;
+- source-use documentation;
+- acquisition and validation code;
+- longitudinal analysis code;
+- CPS, OEWS, and BTOS methodology and derived evidence;
+- public RPS observations included in the released product;
+- versioned derived diagnostics;
+- checksums and release metadata needed to identify the published analytical version.
+
+This provides transparency about the method and published results without turning the repository into an unauthorized mirror of third-party source data.
+
+## General rule
+
+Do not commit credentials, respondent-level records, private audit files, or third-party source files whose redistribution is outside the documented publication scope.
+
+If a new source is added, its storage and publication conditions should be documented explicitly before source material is placed in the public repository.
