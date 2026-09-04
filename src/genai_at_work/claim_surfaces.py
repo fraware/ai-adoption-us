@@ -10,7 +10,7 @@ are not accepted as substitutes for file identities.
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, MutableMapping, Sequence, Set
+from collections.abc import Mapping, MutableMapping, Set
 from pathlib import Path, PurePosixPath
 from typing import Any
 
