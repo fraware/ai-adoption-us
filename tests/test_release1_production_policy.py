@@ -10,7 +10,7 @@ def read(relative: str) -> str:
 def test_pages_static_export_and_non_pages_security_baseline_are_explicit():
     config = read("apps/web/next.config.mjs")
     layout = read("apps/web/app/layout.tsx")
-    policy = read("docs/RELEASE1_PRODUCTION_POLICY.md")
+    policy = read("docs/DEPLOYMENT.md")
 
     assert "GITHUB_PAGES === 'true'" in config
     assert "output: 'export'" in config
@@ -32,8 +32,8 @@ def test_pages_static_export_and_non_pages_security_baseline_are_explicit():
 
     assert 'httpEquiv="Content-Security-Policy"' in layout
     assert 'referrer: "strict-origin-when-cross-origin"' in layout
-    assert "does not support the framework `headers()` feature" in policy
-    assert "must **not** claim application-controlled HTTP security headers" in policy
+    assert "cannot control every HTTP response header" in policy
+    assert "should not claim that the application controls headers" in policy
 
 
 def test_public_indexing_surfaces_are_explicit_and_limited():
@@ -107,14 +107,14 @@ def test_github_pages_workflow_audits_the_live_deployment_after_deploy():
 
 def test_production_environment_and_policy_are_explicit():
     env = read("apps/web/.env.example")
-    policy = read("docs/RELEASE1_PRODUCTION_POLICY.md")
+    policy = read("docs/DEPLOYMENT.md")
     lower_policy = policy.lower()
     assert "DATA_MODE=derived_only" in env
     assert "NEXT_PUBLIC_SITE_URL=https://fraware.github.io/ai-adoption-us" in env
     assert "RELEASE_COMMIT_SHA=" in env
     assert "GITHUB_PAGES=true" in env
-    assert "no third-party analytics" in lower_policy
-    assert "no client-side monitoring" in lower_policy
-    assert "human/manual and physical-device spot checks remain outside release 1 scope" in lower_policy
+    assert "without third-party analytics" in lower_policy
+    assert "client-side error-reporting sdks" in lower_policy
+    assert "representative desktop and mobile rendering" in lower_policy
     assert "Source: GitHub Actions" in policy
-    assert "No alternate hosting service is selected or invoked" in policy
+    assert "static Next.js application hosted on GitHub Pages" in policy
