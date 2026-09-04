@@ -1,23 +1,25 @@
-# Reconstruction status — 2026-08-31
+# Historical reconstruction status — 2026-08-31
 
-This repository is a **new research reconstruction**, built from the last executable source tree plus persisted later specifications, recoverable registries, and independently audited five-wave subgroup evidence. It is not represented as the lost historical Phase-4 repository.
+> **Historical record.** This document preserves the state of the repository reconstruction on August 31, 2026. It is not the current project or release status. For current state, use `README.md`, `docs/ROADMAP.md`, `docs/RELEASE_CHECKLIST.md`, and the Observatory release registry under `data/registry/`.
 
-The public GitHub repository is the canonical **rights-safe engineering handoff**. The private RPS observation fixture remains outside it by design.
+This repository was reconstructed from the last executable source tree plus persisted later specifications, recoverable registries, and independently audited five-wave subgroup evidence. It is not represented as the lost historical Phase-4 repository.
 
-## What is executable
+The public GitHub repository became the canonical rights-safe engineering handoff. The private RPS observation fixture remained outside it by design.
+
+## What was executable at this checkpoint
 
 - Private five-wave RPS subgroup fixture: **630 reviewed cells** (20 industries + 22 occupations × adoption / assisted-hours / reported-savings × Q2 2025–Q2 2026).
 - Canonical RPS metadata registry: **131 source series** = 5 national + 60 industry + 66 occupation.
 - Deterministic longitudinal analysis, rank-stability, regression, and leave-one-out diagnostics.
-- Byte-for-byte regeneration of the committed longitudinal publication artifacts from the private fixture in the private research checkout.
+- Byte-for-byte regeneration of the then-committed longitudinal publication artifacts from the private fixture in the private research checkout.
 - Explicit rights-safe `derived_only` website mode alongside private `audit_snapshot` mode.
 - Fail-closed source architecture; no public static FRED observation bundle.
 - CPS worker/hour composition pipeline and occupation-adjusted residual engine with fail-closed suppression semantics.
-- Reproducible rights-safe export tooling that excludes private audit material.
+- Reproducible rights-safe export tooling that excluded private audit material.
 - Next.js application routes for home, industries, occupations, methodology, sources, and the technical essay.
 - Permanent GitHub Actions CI for Python, governance, strict typing, locked Node installation, production build, and route smoke tests.
 
-## Verified validation state
+## Verified validation state at this checkpoint
 
 Private reconstruction evidence from 2026-08-30:
 
@@ -55,33 +57,18 @@ Permanent pull-request validation run **33414088473** then closed the stronger m
 
 See `VALIDATION_2026-08-31.md` for the exact private/public/bootstrap/permanent-CI distinction.
 
-## Scientific boundary
+## Scientific boundary at this checkpoint
 
-The five-wave RPS findings remain descriptive aggregate results. They do not identify organizational effects, productivity effects, or causal mechanisms.
+The five-wave RPS findings were descriptive aggregate results. They did not identify organizational effects, productivity effects, or causal mechanisms.
 
-The CPS composition code is implemented, but **no real CPS composition values or occupation-adjusted residuals have been produced**. Zero empirical CPS residual values are claimed.
+At this August 31 checkpoint, the CPS composition code was implemented but no real CPS composition values or occupation-adjusted residuals had yet been produced. That statement is intentionally historical; later repository states subsequently executed and validated composition evidence.
 
-## Release 1 state
+## Release state at this checkpoint
 
-**R1-G1 — engineering/build and exact merge-candidate CI — is complete.**
+At this checkpoint, R1-G1 engineering/build and exact merge-candidate CI were complete, while browser/accessibility QA, deployment audit, and later release gates remained open. Those old gate descriptions are preserved only as historical provenance and must not be used as the current launch checklist.
 
-Release 1 is still **not a public launch**. Remaining launch gates are:
+## Work that was still open at this checkpoint
 
-1. browser and responsive rendering QA;
-2. keyboard-only and screen-reader validation;
-3. axe/Lighthouse/accessibility and performance review;
-4. visual-regression/browser-console review;
-5. production deployment audit and artifact identity check;
-6. final editorial/source-citation proofread and release tag after the rendered/deployment gates pass.
+The August 31 state still treated direct RPS production access, CPS composition execution, OEWS robustness, BTOS triangulation, and richer mechanism research as future work. Several of those items were subsequently completed or materially advanced. Current disposition is recorded in `docs/ROADMAP.md` and GitHub issues.
 
-Composition does not block Release 1.
-
-## External/research work still open
-
-- rights-cleared direct RPS production feed or explicit permission decision;
-- execution of the CPS composition pipeline on official April–June 2026 monthly microdata;
-- optional May-2025 OEWS robustness run from independently obtained official staffing data;
-- Release 1.2 BTOS triangulation only where construct alignment is defensible;
-- richer mechanism research moving toward worker × occupation × industry × time.
-
-The code/build QA record is in `docs/RELEASE1_PRODUCT_QA.md`; the operational sequence and acceptance criteria are in `docs/ROADMAP.md` and `docs/RELEASE_CHECKLIST.md`.
+The historical code/build QA record is in `docs/RELEASE1_PRODUCT_QA.md`. Current operational acceptance criteria are in `docs/RELEASE_CHECKLIST.md`.
