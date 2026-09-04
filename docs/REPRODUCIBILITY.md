@@ -2,19 +2,20 @@
 
 ## Scope
 
-The public repository is a **rights-safe reproduction package**. It contains source code, registries, versioned derived diagnostics, CPS/OEWS composition evidence, validation logic, product source, and locked web dependencies. It deliberately excludes the private copyrighted RPS subgroup fixture and does not mirror source datasets whose redistribution is outside the project boundary.
+The public repository is a rights-safe reproduction and release-control package. It contains source code, registries, versioned public/derived evidence, CPS/OEWS/BTOS inputs or source identities where redistribution permits them, validation logic, the web publication, and the release machinery. It deliberately excludes private RPS candidate input bytes and does not expose the complete historical RPS subgroup source panel as a public database.
 
-Reproducibility therefore has three distinct layers:
+Reproducibility has four distinct layers:
 
 1. public code/build reproducibility;
-2. official-source composition reproduction after reacquiring source bytes and verifying them against committed manifests;
-3. private RPS empirical reproduction with the authorized private fixture restored separately.
+2. official-source reproduction after reacquiring source bytes and validating their registered identity;
+3. exact Observatory candidate reproduction on a pinned Git commit;
+4. post-review exact rehydration before promotion.
 
-Do not collapse these into a single claim.
+These are separate claims and must remain separate.
 
-## Tier A — public code and artifact reproducibility
+## Tier A — public code and web-build reproducibility
 
-A clean public checkout must execute the public Python surface:
+A clean public checkout must execute:
 
 ```bash
 python -m pip install -e '.[dev]'
@@ -23,8 +24,6 @@ python -m compileall -q src scripts
 ruff check src tests scripts
 mypy src
 ```
-
-Private-fixture-dependent tests are expected to skip when the RPS fixture is absent. Governance, registry, CPS/OEWS, composition, rights, and public web-release tests must execute.
 
 The rights-safe web surface is lockfile-reproducible:
 
@@ -35,189 +34,146 @@ npm run lint
 DATA_MODE=derived_only NEXT_TELEMETRY_DISABLED=1 npm run build
 ```
 
-Permanent release CI also starts the optimized production server and smoke-tests:
+Permanent CI additionally starts the non-Pages production server and smoke-tests all public routes. Rendered browser/accessibility QA and native macOS Safari QA are separate executable gates. Browser evidence, exact workflow identities, and dated QA records remain distinct from scientific-source reproduction.
 
-- `/`;
-- `/blog/after-adoption`;
-- `/explore/industries`;
-- `/explore/occupations`;
-- `/methodology`;
-- `/sources`.
+## Tier B — official-source evidence reproduction
 
-Rendered browser/accessibility QA is a separate executable layer using the pinned browser toolchain in `apps/web/package-lock.json`. In the workflow environment it runs the production server and executes:
+### RPS published aggregate source
 
-```bash
-npm run qa:browser
-```
+The current RPS path uses the authorized published aggregate Generative AI Adoption Tracker distribution through FRED/ALFRED. `scripts/prepare_rps_refresh_candidate.py` retrieves the registered source inventory into a private or external candidate workspace. The refresh layer validates:
 
-The workflow records exact browser versions, screenshots/traces, axe results, runtime/console failures, Lighthouse output, and build-size evidence. WebKit evidence is an engine-level proxy and is not a substitute for real Safari/iOS or screen-reader validation.
+- the 137-series provider release inventory;
+- the 131-series Observatory registry scope;
+- the six intentionally excluded national constructs;
+- canonical series identities and definitions;
+- quarterly observations and percentage-domain validity;
+- the no-unrestricted-bulk-redistribution boundary;
+- a stable scientific `content_sha256` that excludes query-time retrieval-envelope fields.
 
-## Tier B — official CPS composition reproduction
+The current reviewed scientific state contains 962 observations in the registered 131-series history. The common A/H/S subgroup analytical window is Q4 2024–Q2 2026: seven quarters and 882 subgroup cells.
 
-Raw CPS public-use files are not committed. They must be reacquired from the official Census source path and verified against the committed `input_manifest.json` for the target evidence vintage.
+The source snapshot and complete historical subgroup input objects remain private release-candidate material. They are hash-bound to the candidate and are never copied into the promoted public release.
 
-### Q2 2026 primary composition execution
+### CPS composition
 
-The validated package is under:
+Official CPS Basic Monthly public-use files are reacquired from the Census source path and verified against their committed manifests. The validated Q2 2025 and Q2 2026 composition packages are under:
 
-`data/derived/composition/cps-q2-2026/`
+- `data/derived/composition/cps-q2-2025/`;
+- `data/derived/composition/cps-q2-2026/`.
 
-It contains at minimum:
+The current contract preserves:
 
-- `cps_composition.json`;
-- `input_manifest.json`;
-- `coverage.csv`;
-- `sensitivity.csv`;
-- `population_audit.json`;
-- `validation_checks.json`.
+- worker-share weights for adoption composition;
+- actual-main-job-hour shares for assisted-hours and reported-savings composition;
+- usual hours as a labeled sensitivity;
+- explicit support/coverage gates;
+- no design-based interval claim for custom pooled composition vectors without an approved covariance method.
 
-The audited executor is `scripts/execute_cps_composition.py`. A representative invocation is:
+Q4 2025 remains explicitly unavailable because October 2025 CPS was not collected; no two-month substitute is used.
 
-```bash
-PYTHONPATH=src python scripts/execute_cps_composition.py \
-  --year 2026 \
-  --quarter 2 \
-  --input-dir <official-cps-input-dir> \
-  --output-dir data/derived/composition/cps-q2-2026 \
-  --validation-report docs/validation/CPS_Q2_2026_COMPOSITION_EXECUTION.md \
-  --source-build-commit <git-sha>
-```
+### OEWS robustness
 
-`--download-missing` may be used only when the official source URLs remain valid and the resulting bytes are verified through the generated provenance/checksum record.
-
-The primary 2026 contract requires:
-
-- employed adults age 18–64 under the implemented CPS employment filter;
-- equal month factors within the quarter;
-- adoption composition from worker shares;
-- assisted-hours/reported-savings composition from actual-main-job-hour shares;
-- usual hours as sensitivity only;
-- employed-absent workers contribute zero actual main-job hours;
-- invalid active-worker actual hours are not imputed;
-- unsupported mapping/validity coverage fails closed at the configured gate.
-
-### Q2 2025 historical-layout composition execution
-
-The same-vintage household-side comparison for May 2025 OEWS is under:
-
-`data/derived/composition/cps-q2-2025/`
-
-It is intentionally produced through the audited historical-layout path, not by pretending the 2026 fixed-width layout is valid for 2025:
-
-```bash
-PYTHONPATH=src python scripts/execute_cps_2025_composition.py \
-  --quarter 2 \
-  --input-dir <official-cps-2025-input-dir> \
-  --output-dir data/derived/composition/cps-q2-2025 \
-  --validation-report docs/validation/CPS_2025_Q2_COMPOSITION_EXECUTION.md \
-  --source-build-commit <git-sha>
-```
-
-The executor uses the versioned 2025 fixed-width layout registry and records exact official source URLs, SHA-256 hashes, file sizes, row counts, retrieval timestamps, and crosswalk versions.
-
-### Reliability layer
-
-Cross-quarter CPS reliability evidence is retained under:
-
-`data/derived/composition/cps-q2-reliability/`
-
-and documented in:
-
-`docs/validation/CPS_Q2_COMPOSITION_RELIABILITY.md`.
-
-This evidence evaluates composition stability/reliability. It does not turn CPS composition weights into an RPS residual.
-
-## Tier C — OEWS robustness reproduction
-
-Official May 2025 OEWS staffing data are the independent establishment-side robustness basis. The public derived evidence is retained under:
+Official May 2025 OEWS staffing data provide an independent establishment-side occupation-composition robustness source. The public evidence is under:
 
 - `data/derived/composition/oews-may-2025/`;
-- `data/derived/composition/oews-may-2025-cross-vintage/`.
+- `data/derived/composition/oews-may-2025-cross-vintage/`;
+- the current OEWS/RPS adoption robustness package referenced by the Observatory baseline contract.
 
-The execution/robustness paths are implemented in:
+OEWS and CPS population differences remain explicit. They are not averaged into a synthetic composition measure.
 
-- `scripts/execute_oews_composition.py`;
-- `scripts/compare_oews_cps_vintages.py`.
+### BTOS triangulation
 
-Validation records are:
+The current Observatory baseline includes the preregistered Q2 2026 BTOS–RPS industry triangulation. Reproduction preserves the cross-construct boundary: BTOS employer-business AI use and RPS worker GenAI adoption have different units, denominators, technology scope, and reference periods. The result is descriptive sector concordance, not an identity-line gap or causal estimate.
 
-- `docs/validation/OEWS_MAY_2025_CPS_ROBUSTNESS.md`;
-- `docs/validation/OEWS_MAY_2025_CPS_VINTAGE_ROBUSTNESS.md`.
+## Tier C — exact Observatory candidate reproduction
 
-OEWS and CPS have different populations and coverage. Reproduction must preserve those differences and report disagreements; the two sources must not be averaged into a synthetic composition measure.
+The complete Release 1 candidate is composed from one RPS source vintage plus repository-bound CPS/OEWS/BTOS evidence.
 
-## Composition residual boundary
-
-The repository now reproduces **composition inputs and robustness evidence**. It does not yet reproduce a public occupation-adjusted RPS industry-context residual.
-
-The canonical residual requires a compatible rights-cleared RPS occupation vintage:
-
-`observed industry value - occupation-composition counterfactual`
-
-The join must remain fail-closed until the source-rights decision permits the required RPS observations and the residual robustness suite is rerun. No CPS/OEWS artifact alone identifies an organizational or productivity effect.
-
-## Tier D — private RPS empirical reproduction
-
-Restore the authorized private fixture exactly at:
-
-`data/audit/private/rps_subgroup_5q_audit.json`
-
-Verify its SHA-256 before use. The last frozen research fixture hash recorded by the project is:
-
-`bdeffa95911a94cb60f904c51efc48f7ce4d1bf1eaaec490f5c4bfacd20d4fba`
-
-Then run:
+The canonical sequence is:
 
 ```bash
-PYTHONPATH=src python scripts/build_longitudinal.py \
-  --fixture data/audit/private/rps_subgroup_5q_audit.json \
-  --output-dir data/derived/longitudinal
+PYTHONPATH=src python scripts/prepare_rps_refresh_candidate.py \
+  --output-dir <private-rps-refresh>
+
+PYTHONPATH=src python scripts/prepare_rps_observatory_candidate.py \
+  --source-snapshot <private-rps-refresh>/rps_source_snapshot.json \
+  --output-dir <private-rps-component> \
+  --release-id <rps-component-id>
+
+PYTHONPATH=src python scripts/prepare_observatory_v1_candidate.py \
+  --rps-candidate-root <private-rps-component> \
+  --output-dir <private-global-candidate> \
+  --release-id <global-release-id>
+
+PYTHONPATH=src python scripts/observatory_release.py stage \
+  --candidate-manifest <private-global-candidate>/release.json \
+  --candidate-root <private-global-candidate> \
+  --staging-dir <immutable-stage>
 ```
 
-The applicable frozen longitudinal publication artifacts must reproduce byte-for-byte under the private validation contract.
+Candidate construction is bound to a clean Git HEAD. The RPS component cryptographically binds the exact governed source files that present longitudinal/source claims. Global composition revalidates those claim-surface hashes and requires every repository artifact that depends on RPS to match the candidate RPS vintage through `data/registry/observatory_v1_rps_repository_bindings.json`.
 
-The private fixture must never be copied into the public repository or public build context merely to make private reproduction convenient.
+The release manifest binds every source object and public artifact by SHA-256. Staging additionally binds the candidate manifest bytes and canonical digest, release diff, review package, release-registry predecessor state, and publication gate into one portable `stage_id`.
 
-## Source identity
+A rights-safe review package contains the sanitized candidate manifest, candidate artifacts, stage records, and an uncompleted attestation template. It contains no private `inputs/`, source snapshot, or source `local_path` fields.
 
-Never identify a research result solely by a filename. A complete research freeze records:
+## Tier D — trusted post-review exact rehydration
+
+Human review is performed against the exact candidate-review package. Promotion cannot rely solely on that earlier build. Before canonical promotion, `scripts/rehydrate_observatory_v1_candidate.py`:
+
+1. requires a clean checkout of the exact reviewed candidate commit;
+2. requires the release registry to remain at the predecessor state recorded by the reviewed stage;
+3. re-fetches the authorized RPS source;
+4. requires the fresh scientific source content hash to equal the reviewed RPS source vintage;
+5. rebuilds the RPS component, claim-surface bindings, global candidate, and stage;
+6. requires byte-identical private candidate-manifest identity and identical sanitized manifest;
+7. requires the rehydrated stage manifest, release diff, review package, and publication gate to equal the reviewed records exactly;
+8. emits only a rights-safe `rehydration_identity.json` for review/promotion binding.
+
+Any scientific source revision, repository evidence change, claim-surface change, registry advance, artifact drift, or stage drift fails closed and requires a new candidate review.
+
+The promotion workflow is deliberately two-phase. A first `rehydrate` run produces the deterministic rehydration identity. A later `promote` run requires the human attestation to contain that identity file's SHA-256, repeats exact rehydration, verifies exact-commit CI evidence through the release engine, promotes the immutable release, and writes the rehydration trace into the release record.
+
+The low-level release engine cannot update the canonical release registry/release tree without the internal exact-rehydration capability supplied by `scripts/promote_rehydrated_observatory_v1.py`.
+
+## Public deployment identity
+
+Promotion produces one release-only authorization commit. `scripts/validate_observatory_publication_commit.py` requires:
+
+- commit subject `Authorize Observatory release <release-id>`;
+- the commit parent to be the exact human-reviewed candidate commit;
+- changed paths to be limited to `data/registry/observatory_release_registry.json` and `data/releases/<release-id>/...`;
+- valid release-manifest, review-record, rehydration-identity, and artifact checksums;
+- explicit exact-rehydration traceability.
+
+GitHub Pages builds may run on ordinary changes for QA, but deployment and the live deployment audit run only for this validated authorization commit. Thus engineering changes on `main` do not silently replace the public Observatory release.
+
+## Source identity and revision discipline
+
+A research/release freeze is identified by more than a filename. It records, as applicable:
 
 - Git commit SHA;
-- source-file checksums;
-- private-fixture checksum where applicable;
-- registry/crosswalk versions and checksums;
+- scientific source-vintage identities;
+- source-object checksums;
+- registry/crosswalk versions;
 - generated-artifact checksums;
-- Python/test environment;
-- Node/npm and browser-tool versions where applicable;
-- package-lock state;
-- source vintages and retrieval dates;
-- build/workflow identity;
-- public/private data mode.
+- governed claim-surface checksums;
+- candidate manifest SHA-256 and canonical digest;
+- stage ID and release diff;
+- exact CI run identities;
+- deterministic rehydration identity;
+- reviewer and reviewed timestamp;
+- promoted release-manifest identity;
+- authorization/deployment commit.
 
-`RELEASE_PROVENANCE.json` records a public-handoff provenance checkpoint. Dated validation files preserve execution evidence instead of silently rewriting history.
-
-## Determinism and revision discipline
-
-Longitudinal and composition builders must use deterministic ordering and stable serialization where the artifact contract requires it. Publication artifacts must not drift because of platform-specific formatting.
-
-A source revision, registry/crosswalk revision, private-fixture revision, or methodology change must trigger regeneration and a structured comparison against the previous frozen evidence before publication. The observatory must retain analytical history rather than silently overwriting it.
-
-Web dependency resolution is locked through `apps/web/package-lock.json`; release CI uses `npm ci`, not a fresh unconstrained install. Workflow dependencies are pinned to immutable commit SHAs.
+A source revision, registry/crosswalk revision, methodology change, governed public-file change, or repository evidence change triggers regeneration and explicit review. Analytical history is retained instead of silently overwritten.
 
 ## Rights boundary
 
-A clean public checkout must contain no tracked path under:
+A clean public checkout contains no tracked path under `data/audit/private/`. Private RPS source-input bytes remain outside the promoted release. The bounded public RPS artifact contains only the contracted national history and latest industry/occupation A/H/S presentation views. It does not create an unrestricted historical subgroup database, public source mirror, bulk download product, or generic source query API.
 
-`data/audit/private/`
+The current permission record is `docs/source-rights/RPS_SOURCE_DECISION.md`. Its evidence basis is a project-owner attestation that source-owner permission was obtained for the published aggregate project use described there. The underlying correspondence/agreement is not retained in the public repository and was not independently inspected as part of the code change; the project does not infer broader legal terms from that attestation.
 
-Permanent CI also rejects tracked bootstrap transfer material and generated TypeScript build metadata.
+## Historical private fixture
 
-Public availability of a source is not treated as permission to mirror, persist, expose through an API, or redistribute it independently.
-
-## What the public repository cannot reproduce by itself
-
-The public repository cannot reconstruct the 630 private RPS source observations because those bytes are deliberately excluded. This is a rights boundary, not a missing-code boundary.
-
-The public repository can inspect and validate the rights-safe longitudinal artifacts derived from the frozen private panel, and it contains the public CPS/OEWS composition artifacts and all code required to regenerate them after reacquiring and verifying the official source bytes.
-
-The public repository still cannot reproduce the RPS-dependent industry residual until a rights-cleared RPS observation path exists.
+The earlier five-quarter, 630-row private RPS fixture and its frozen hash remain part of repository history and historical validation records. They are no longer the controlling Release 1 empirical source path. Current Release 1 evidence is built from the authorized live published-aggregate source and the seven-quarter common A/H/S window described above.
