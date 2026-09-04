@@ -1,103 +1,169 @@
-# Release 1 publication contract
+# Release checklist
 
-This document defines the gates for the first public Observatory release. It is deliberately durable: current publication status must be read from `data/registry/observatory_release_registry.json`, the validated release-only commit, the Pages deployment audit, and the formal GitHub tag/release. Checkboxes in prose are not used as a substitute for those machine-verifiable identities.
+This checklist is for maintainers publishing a new version of GenAI at Work after Release 1. It describes the scientific and operational checks that should be completed before the public site is updated.
 
-The project owner authorized the one-shot Release 1 publication sequence in `data/registry/release1_owner_authorization.json`. A separate human review step is not required. The authorization does not waive any scientific, rights, provenance, CI, source-identity, rehydration, promotion, deployment, or live-audit gate.
+The current published version is identified by `data/registry/observatory_release_registry.json` and the corresponding GitHub release. Historical release records should not be edited in place.
 
-## A. Scientific integrity
+## 1. Define the release scope
 
-Release 1 must preserve all of the following:
+Before rebuilding the observatory, record:
 
-- work adoption, routine/recent use, assisted working time, and reported time savings remain distinct constructs;
-- reported time savings are not presented as measured labor productivity;
-- occupation-adjusted industry-context residuals remain descriptive standardization residuals, not identified organizational or causal effects;
-- longitudinal claims remain synchronized to the seven-quarter Q4 2024–Q2 2026 common A/H/S evidence;
-- governed longitudinal/source claims remain cryptographically bound to the exact public files that present them;
-- CPS composition, OEWS robustness, and BTOS–RPS triangulation retain their registered measurement and interpretation boundaries.
+- which upstream sources changed;
+- the source vintages or retrieval dates;
+- whether any source definition, wording, classification, or access condition changed;
+- which analysis artifacts and public pages are affected;
+- whether the release changes only software/documentation or also changes empirical evidence.
 
-The candidate builder, release diagnostics, claim-surface bindings, publication consistency tests, and owner-authorized release review collectively enforce this gate.
+If a source definition changed materially, treat it as a measurement revision, not as an ordinary data refresh.
 
-## B. Data rights and provenance
+## 2. Verify source provenance and publication conditions
 
-The public release must remain `DATA_MODE=derived_only`. Private RPS candidate inputs cannot enter the public Git tree, candidate-review package, promoted release, Pages artifact, or client build.
+For every source included in the release:
 
-The public RPS observation product is bounded to the contracted national history plus latest industry/occupation A/H/S views. Historical subgroup databases, unrestricted bulk mirrors/downloads, generic source query APIs, respondent microdata, historical replication packages, and the separate task-index artifact remain outside the Release 1 authorization unless separately approved.
+- use the documented authoritative acquisition path;
+- verify the registered series or file identity;
+- record the relevant period and vintage;
+- confirm that the intended public output remains within the documented source-use boundary;
+- preserve required attribution;
+- keep source files outside the public repository when redistribution is not covered.
 
-The source-rights basis and its evidentiary limitation remain recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`. Attribution and source-series provenance must remain intact.
+Do not broaden public source-data access simply because an upstream dataset is publicly accessible.
 
-## C. Exact source and analytical candidate
+## 3. Regenerate affected analyses
 
-A publishable Release 1 candidate must establish all of the following on canonical `main`:
+Rebuild all outputs that depend on changed sources or methods.
 
-- 131 registered work-focused RPS series: 5 national, 60 industry, 66 occupation;
-- 962 observations in the currently verified registered source history, subject to fail-closed revision detection;
-- 882 complete common A/H/S subgroup cells across seven quarters;
-- construct-specific source-history topology and complete A/H/S common-window coverage;
-- a bounded public observation artifact built from the same RPS source vintage as the longitudinal diagnostics;
-- exact vintage bindings for RPS-dependent CPS/OEWS/BTOS evidence;
-- all required RPS/CPS/OEWS/BTOS components and release diagnostics;
-- immutable staging with gate status `BLOCKED_REVIEW_REQUIRED` and zero contract failures.
+For the current measurement system, this can include:
 
-Any source revision, definition drift, coverage failure, diagnostic failure, rights change, claim-surface change, or release-registry advance must fail closed or force a new candidate.
+- RPS public observations and longitudinal diagnostics;
+- CPS industry × occupation composition weights and benchmarks;
+- occupation-adjusted industry residuals;
+- OEWS robustness analysis;
+- BTOS–RPS sector comparison;
+- source and release metadata;
+- charts or tables generated from those artifacts.
 
-## D. Code, product, and QA evidence
+Do not patch published analytical values manually when they can be regenerated from source-defined inputs.
 
-The exact final candidate commit must pass permanent Release candidate CI: public pytest, compileall, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, production-server startup, and route smoke tests.
+## 4. Review scientific definitions
 
-Rendered Chrome/Firefox/WebKit/mobile-proxy and native macOS Safari QA are retained as launch-quality evidence for the applicable final web state. A documentation/release-control-only final commit does not manufacture a claim of new browser testing when application code is unchanged. Any final application/UI change must rerun the applicable rendered/native QA before publication.
+Confirm that the release preserves the project's core measurement distinctions:
 
-The GitHub Pages static artifact must build and audit successfully for the release-only authorization commit before deployment.
+- work adoption is different from use intensity;
+- AI-assisted work hours are different from hours saved;
+- reported time savings are different from measured productivity;
+- theoretical capability or exposure is different from realized adoption;
+- occupation-adjusted industry residuals remain descriptive unless a separate identification strategy supports a stronger interpretation;
+- BTOS employer use and RPS worker use remain distinct constructs.
 
-Physical iOS/Android testing, full human screen-reader traversal, full human keyboard traversal beyond automated contracts, manual color-only-meaning review, and field Core Web Vitals are outside the Release 1 evidence scope and are not claimed as completed.
+Check populations, denominators, weighting rules, crosswalks, missing-data treatment, and suppression logic for every changed analysis.
 
-## E. Owner-authorized exact review identity
+## 5. Review uncertainty and missingness
 
-Candidate review must produce one rights-safe package bound to the exact candidate commit and workflow run. The package must contain the sanitized candidate manifest, exact artifact hashes, stage identity, release diff, review package, publication gate, and an initially uncompleted attestation template. It must contain no private source inputs or source `local_path` values.
+For any new or revised statistical interval or uncertainty estimate, verify that the method is supported by the relevant source design and inputs.
 
-The Release 1 owner-authorized operator may complete scientific, editorial, source-rights, and CI review fields only after:
+Do not infer missing covariance information from marginal standard errors or assume independence across repeated survey observations without methodological support.
 
-- the candidate gate has zero failures;
-- exact candidate Release candidate CI is successful;
-- the candidate review package is bound to the same commit/run;
-- exact post-review source rehydration reproduces the reviewed scientific source identity, candidate manifest, and stage records.
+Unavailable or suppressed values should remain explicit. In particular, historical source gaps should not be interpolated simply to create a visually continuous series.
 
-The completed attestation records `review_mode=owner_authorized_automated_release_review`, the one-shot owner authorization ID, and `human_review_performed=false`. It is bound to the deterministic rehydration-identity SHA-256.
+## 6. Run software and scientific validation
 
-## F. Trusted exact rehydration
+From the repository root:
 
-`scripts/rehydrate_observatory_v1_candidate.py` must re-fetch RPS on the exact reviewed candidate commit, verify the recorded predecessor release state, require the same scientific source identity, rebuild claim-surface hashes and the full global candidate, and reproduce the reviewed candidate/stage identities exactly.
+```bash
+python -m pip install -e '.[dev]'
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src pytest -q
+python -m compileall -q src scripts
+ruff check src tests scripts
+mypy src
+```
 
-A changed scientific source identity, repository evidence change, governed claim-file change, registry advance, candidate drift, or stage drift blocks promotion and requires a new candidate.
+From `apps/web`:
 
-The rehydration identity is rights-safe and contains no private source bytes.
+```bash
+npm ci --no-audit --no-fund
+npm run lint
+DATA_MODE=derived_only NEXT_TELEMETRY_DISABLED=1 npm run build
+```
 
-## G. Promotion integrity
+Run any additional source-specific reproduction or validation scripts required by the changed evidence.
 
-Canonical low-level promotion remains disabled without the exact-rehydration capability. Promotion independently verifies the exact-commit CI evidence against `data/registry/observatory_release_ci_policy.json`.
+If application behavior changed, also run the relevant browser, accessibility, and production-route checks used by continuous integration.
 
-A successful promotion may publish only declared public artifacts, must retain exact rehydration traceability, and must atomically advance the release registry. The resulting release-only Git commit may change only:
+## 7. Review public interpretation
 
-- `data/registry/observatory_release_registry.json`;
-- one new immutable `data/releases/<release-id>/` tree.
+Read every public page affected by the release as a publication, not only as a software build.
 
-`scripts/validate_observatory_publication_commit.py` must validate this append-only transition and require its parent to be the exact candidate commit.
+Check that:
 
-## H. Deployment and live-origin audit
+- headline claims are reproduced by the released artifacts;
+- periods and denominators are stated correctly;
+- descriptive statistics are not presented as causal effects;
+- reported savings are not described as measured productivity;
+- source differences and measurement breaks are visible where they affect interpretation;
+- missing or suppressed evidence is represented accurately;
+- methodology and provenance documentation match the released data.
 
-Ordinary `main` pushes may build Pages artifacts for QA but may not deploy the public Observatory release. Deployment is allowed only for a validated `Authorize Observatory release <release-id>` commit.
+Documentation changes that alter the interpretation of a result should receive the same scientific review as analytical changes.
 
-The release workflow must require all three Pages jobs to succeed for that exact commit:
+## 8. Verify the public/private data boundary
 
-- build and audit the GitHub Pages artifact;
-- deploy GitHub Pages;
-- audit the deployed Release 1 origin.
+Before publication, inspect the candidate public artifacts and web build for accidental inclusion of:
 
-The live audit must bind the deployed site to the exact publication commit/release identity and retain the repository's rights/privacy boundaries.
+- credentials;
+- private RPS source files;
+- respondent-level data;
+- private audit fixtures;
+- source paths or metadata that expose private storage locations;
+- third-party source material outside the documented redistribution scope.
 
-## I. Formal publication
+The public website should run in `derived_only` mode.
 
-The one-shot owner-authorized Release 1 workflow may create the formal `v1.0.0` GitHub Release only after the immutable Observatory release has been promoted and the exact Pages deployment/live-origin audit has succeeded.
+## 9. Create the versioned release
 
-The workflow refuses to overwrite an existing `v1.0.0` release. The GitHub Release targets the validated publication commit and uses `docs/RELEASE1_NOTES.md` as the canonical notes body with the actual publication date stamped at release time.
+The repository's release tooling should create a new immutable directory under `data/releases/` and advance the release registry to the new version.
 
-After the first Observatory release is promoted, `release1_owner_authorization.json` is inert by contract; later releases require a separately authorized release decision.
+The published release should record enough identity information to reproduce the analytical state, including the relevant source identities, generated artifacts, repository version, and checksums.
+
+Previous release directories and registry history should remain unchanged.
+
+## 10. Deploy and inspect the site
+
+Deploy the website from the versioned release and verify the production origin.
+
+At minimum, inspect:
+
+- home page;
+- industry explorer;
+- occupation explorer;
+- methodology;
+- sources;
+- technical essay;
+- responsive layouts;
+- chart/table consistency;
+- release/version information.
+
+A successful build is necessary but is not a substitute for checking the published analytical content.
+
+## 11. Publish release notes
+
+Create release notes that state:
+
+- release date and version;
+- new or revised source vintages;
+- material changes in empirical results;
+- methodology changes;
+- measurement breaks or newly unavailable periods;
+- source-use or provenance changes;
+- important product changes;
+- known limitations.
+
+Avoid internal issue labels, pull-request chronology, temporary project terminology, or implementation details unless they are necessary for technical reproducibility.
+
+## 12. After publication
+
+Preserve the previous release and record any upstream revision detected after publication as a new source event.
+
+If a post-release error affects public evidence or interpretation, correct it through a new version with explicit release notes rather than silently changing the historical release.
+
+For implementation details of the current release tooling, see [OBSERVATORY_RELEASE_PROTOCOL.md](OBSERVATORY_RELEASE_PROTOCOL.md). For source-dependent reconstruction, see [REPRODUCIBILITY.md](REPRODUCIBILITY.md).
