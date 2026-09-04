@@ -1,50 +1,49 @@
 # Documentation
 
-This directory documents the U.S. AI Adoption Observatory: what it measures, how the estimates are constructed, where the data come from, how to reproduce the analysis, and how the public site is maintained.
+This directory documents the U.S. AI Adoption Observatory: what it measures, what Release 1 finds, where the data come from, how the analysis works, how to reproduce it, and how the public site is maintained.
 
-The documentation is organized by reader need. You should not need knowledge of the project's development history to understand the current system.
+The documentation is organized for readers who have no knowledge of the project's development history.
 
 ## Start here
 
-- [Empirical results](RESULTS.md) — the main findings in Release 1, with interpretation limits.
-- [Methodology](methodology.md) — definitions, populations, weighting, composition analysis, uncertainty, and cross-source comparisons.
-- [Source provenance](source-provenance.md) — source-by-source provenance, vintages, and use constraints.
-- [Data model](data-model.md) — the structure and semantics of observations and derived outputs.
-- [Architecture](ARCHITECTURE.md) — how source acquisition, analysis, publication data, and the website fit together.
-- [Reproducibility](REPRODUCIBILITY.md) — how to run the public code and reconstruct source-dependent analyses.
+- [Empirical results](RESULTS.md) — the main Release 1 findings and their interpretation limits.
+- [Methodology](methodology.md) — measurement definitions, populations, weighting, cross-source analysis, missingness, and statistical interpretation.
+- [Data sources and provenance](source-provenance.md) — source-by-source scope, vintages, populations, and publication boundaries.
+- [Release 1 notes](RELEASE1_NOTES.md) — what shipped in `v1.0.0` and what the release does not claim.
 
-## Specialized methods
+## Research methods
 
-These documents explain analyses that require more detail than the general methodology page.
+- [CPS composition analysis and uncertainty](CPS_COMPOSITION_UNCERTAINTY.md) — industry occupation-composition benchmarks, residuals, robustness diagnostics, and the current design-based uncertainty boundary.
+- [OEWS robustness analysis](OEWS_ROBUSTNESS.md) — independent establishment-side staffing comparison and OEWS-weighted adoption robustness.
+- [BTOS–RPS industry comparison](BTOS_RPS_COMPARISON.md) — employer-versus-worker construct alignment, period selection, crosswalk, source reproduction, and Release 1 results.
 
-- [CPS composition uncertainty](CPS_COMPOSITION_UNCERTAINTY.md)
-- [RPS–CPS composition and residual methodology](RPS_CPS_COMPOSITION_RESIDUAL_PROTOCOL.md)
-- [BTOS–RPS industry comparison preregistration](BTOS_RPS_INDUSTRY_COMPARISON_PREREGISTRATION_2026-09-02.md)
-- [BTOS–RPS industry crosswalk](BTOS_RPS_INDUSTRY_CROSSWALK_2026-09-02.md)
-- [BTOS–RPS industry results](BTOS_RPS_INDUSTRY_TRIANGULATION_2026-09-02.md)
-- [OEWS provenance audit](OEWS_PROVENANCE_AUDIT.md)
+The machine-readable crosswalks, source definitions, and released analytical artifacts underlying these documents are versioned under `data/registry/`, `data/derived/`, and `data/releases/`.
 
-Dated files in this section record the data vintage or analysis decision they describe. They are evidence records, not project-status documents.
+## Data and software
 
-## Data access and source permissions
+- [Data model](data-model.md) — the semantics of observations, metrics, composition weights, derived results, missingness, and versioning.
+- [Architecture](ARCHITECTURE.md) — how source acquisition, scientific processing, versioned publication data, and the web application fit together.
+- [Reproducibility](REPRODUCIBILITY.md) — how to run the public code and reconstruct analyses that require reacquiring upstream source data.
 
-- [Private research assets](PRIVATE_RESEARCH_ASSETS.md) — what is intentionally excluded from the public repository and why.
-- [RPS source decision](source-rights/RPS_SOURCE_DECISION.md) — the project's recorded basis and limits for using published RPS aggregates.
+## Data access and source use
 
-The repository does not treat public accessibility as blanket permission to mirror or redistribute third-party source data. Public outputs are limited to source material and derived results within the documented use boundary.
+- [Private research assets](PRIVATE_RESEARCH_ASSETS.md) — which source material is intentionally absent from the public repository and why.
+- [RPS source-use decision](source-rights/RPS_SOURCE_DECISION.md) — the recorded basis and limits for using published RPS aggregates in this project.
 
-## Software and publication
+Public accessibility is not treated as blanket permission to mirror or redistribute third-party source data. Each source retains its own terms and publication boundary.
 
-- [Product specification](product-spec.md) — intended behavior of the public data product.
-- [Release checklist](RELEASE_CHECKLIST.md) — maintainer checklist for publishing a new version.
-- [Release protocol](OBSERVATORY_RELEASE_PROTOCOL.md) — implementation details for versioning and publication.
-- [Release 1 notes](RELEASE1_NOTES.md) — scope and limitations of `v1.0.0`.
-- [Roadmap](ROADMAP.md) — research and product work after Release 1.
+## Product and operations
 
-These files are maintainer references. The current public release is identified by the release registry in `data/registry/observatory_release_registry.json` and the corresponding GitHub release.
+- [Product specification](product-spec.md) — intended behavior and information architecture of the public observatory.
+- [RPS data updates](RPS_DATA_UPDATES.md) — how new or revised Tracker data are detected and incorporated; also records the current automation limitation.
+- [Deployment](DEPLOYMENT.md) — GitHub Pages build, public data mode, privacy, security, and deployment verification.
+- [Release checklist](RELEASE_CHECKLIST.md) — maintainer checklist for publishing a new observatory version.
+- [Roadmap](ROADMAP.md) — research and product priorities after Release 1.
 
-## Historical records
+The current published version is identified by `data/registry/observatory_release_registry.json`, the corresponding directory under `data/releases/`, and the matching GitHub release/tag.
 
-Some dated validation, reproduction, and methodological-decision files remain because they document how a particular result or source decision was established. They should be read as evidence for that specific vintage, not as instructions for current development.
+## Documentation policy
 
-Development handoffs, temporary execution plans, and reconstruction notes are not part of the public documentation model and should not be used as references for the current project.
+Durable documentation describes the current research product, its evidence, and its operation. Temporary execution plans, handoffs, issue-stage terminology, pre-release QA checkpoints, and duplicated reference copies are not part of the current documentation tree.
+
+When historical development detail is needed, use Git history, pull requests, workflow records, and immutable release artifacts. Those are better archival sources than keeping obsolete status documents beside the current methodology.
