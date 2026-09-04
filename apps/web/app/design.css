@@ -1,0 +1,356 @@
+/* Publication-focused visual layer. Keeps the existing palette and type stack, but removes dashboard density. */
+
+:root {
+  --max: 1180px;
+  --reading: 720px;
+}
+
+.site-header-inner {
+  padding: 18px 32px;
+}
+
+nav {
+  gap: 26px;
+  font-size: .9rem;
+}
+
+nav a {
+  color: var(--muted);
+}
+
+nav a:hover {
+  color: var(--ink);
+}
+
+main {
+  padding: 72px 32px 120px;
+}
+
+.hero {
+  max-width: 980px;
+}
+
+.hero-compact {
+  max-width: 820px;
+}
+
+h1 {
+  font-size: clamp(3rem, 6.2vw, 5rem);
+  line-height: .98;
+  max-width: 900px;
+  margin: 34px 0 24px;
+}
+
+h2 {
+  font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+}
+
+p.lede {
+  max-width: 760px;
+}
+
+.lede-small {
+  max-width: 650px;
+  font-family: ui-serif, Georgia, serif;
+  font-size: clamp(1.25rem, 2.3vw, 1.65rem);
+  line-height: 1.42;
+  color: #343230;
+}
+
+section.section {
+  margin-top: 108px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.section-intro {
+  max-width: 720px;
+}
+
+.text-link {
+  margin-top: 28px;
+  font-weight: 650;
+}
+
+.text-link a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.text-link a:hover {
+  text-decoration: underline;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 58px;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+
+.hero-metric {
+  padding: 24px 28px 28px 0;
+}
+
+.hero-metric + .hero-metric {
+  padding-left: 28px;
+  border-left: 1px solid var(--line);
+}
+
+.hero-metric > span {
+  display: block;
+  color: var(--muted);
+  font-size: .75rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.hero-metric strong {
+  display: block;
+  margin: 12px 0 8px;
+  font-size: clamp(2.5rem, 5vw, 3.7rem);
+  font-weight: 520;
+  line-height: 1;
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-metric p {
+  margin: 0;
+  max-width: 220px;
+  color: var(--muted);
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.hero-callout {
+  margin-top: 50px;
+}
+
+.section-chart {
+  max-width: 1040px;
+}
+
+.section-chart .chart-frame {
+  margin-top: 34px;
+}
+
+.section-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+  gap: 84px;
+  padding-top: 34px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.section-split h2 {
+  max-width: 680px;
+}
+
+.section-copy {
+  padding-top: 28px;
+}
+
+.section-copy p:first-child {
+  margin-top: 0;
+}
+
+.essay-promo {
+  max-width: 780px;
+  padding-top: 34px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.explore-index {
+  margin-top: 82px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.explore-index-row {
+  display: grid;
+  grid-template-columns: minmax(220px, .75fr) minmax(0, 1.25fr);
+  gap: 84px;
+  padding: 42px 0 46px;
+  border-bottom: 1px solid var(--line);
+}
+
+.explore-index-row h2 {
+  margin-bottom: 0;
+}
+
+.explore-index-row p:first-child {
+  margin-top: 0;
+}
+
+.compact-note {
+  max-width: 760px;
+  margin-top: 76px !important;
+}
+
+/* Flatten reusable dashboard primitives across the deeper routes. */
+.metric-row {
+  gap: 0;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+
+.metric {
+  min-height: 0;
+  padding: 22px 24px 24px 0;
+  background: transparent;
+}
+
+.metric + .metric {
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+
+.comparison-grid {
+  gap: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.comparison-card {
+  padding: 24px 28px 28px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.comparison-card + .comparison-card {
+  padding-left: 28px;
+}
+
+.status-grid {
+  gap: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.status-card {
+  padding: 24px 26px 28px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.status-card + .status-card {
+  padding-left: 26px;
+}
+
+.callout {
+  padding: 10px 0 10px 20px;
+  border: 0;
+  border-left: 3px solid var(--accent);
+  background: transparent;
+}
+
+.stability-figure {
+  padding: 24px 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+}
+
+.measurement-ladder {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+
+.measurement-step {
+  min-height: 150px;
+  padding: 20px 18px 22px 0;
+  background: transparent;
+}
+
+.measurement-step + .measurement-step {
+  padding-left: 18px;
+  border-left: 1px solid var(--line);
+}
+
+.site-footer > div {
+  padding: 34px 32px;
+}
+
+@media (max-width: 860px) {
+  .section-split,
+  .explore-index-row {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .section-copy {
+    padding-top: 0;
+  }
+
+  .status-card + .status-card,
+  .comparison-card + .comparison-card {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-header-inner {
+    padding: 15px 20px;
+  }
+
+  nav {
+    gap: 12px 18px;
+  }
+
+  main {
+    padding: 46px 20px 82px;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 12vw, 3.5rem);
+  }
+
+  section.section {
+    margin-top: 76px;
+  }
+
+  .hero-metrics {
+    grid-template-columns: 1fr;
+    margin-top: 44px;
+  }
+
+  .hero-metric,
+  .hero-metric + .hero-metric {
+    padding: 20px 0 22px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .hero-metric:first-child {
+    border-top: 0;
+  }
+
+  .section-split {
+    padding-top: 26px !important;
+  }
+
+  .explore-index {
+    margin-top: 58px;
+  }
+
+  .explore-index-row {
+    padding: 30px 0 34px;
+  }
+
+  .metric,
+  .metric + .metric {
+    padding: 18px 0 20px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .metric:first-child {
+    border-top: 0;
+  }
+}
