@@ -19,7 +19,7 @@ const staticContentSecurityPolicy = [
 ].join("; ");
 
 const siteDescription =
-  "A U.S. data observatory tracking how GenAI moves from adoption into recurring use, assisted working time, and reported savings.";
+  "A U.S. data observatory measuring how reported GenAI adoption turns into recurring use, assisted working time, and reported time savings.";
 
 export const metadata: Metadata = {
   ...(siteBaseUrl ? { metadataBase: new URL(`${siteBaseUrl}/`) } : {}),
@@ -63,7 +63,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div id="main-content" tabIndex={-1}>{children}</div>
         <footer className="site-footer">
           <div>
-            <p><strong>GenAI at Work</strong> tracks diffusion and conversion in U.S. workplace generative AI.</p>
+            <p><strong>GenAI at Work</strong> measures diffusion and depth of use in U.S. workplace generative AI.</p>
             <p>
               Reported time savings are survey-based counterfactual estimates. Labor productivity and other
               realized outcomes require separate outcome evidence.
