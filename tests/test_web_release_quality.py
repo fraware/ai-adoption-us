@@ -30,7 +30,7 @@ def test_labelled_generic_home_groups_have_explicit_roles_and_dynamic_evidence_l
     assert 'aria-label={`${periods.length}-wave evidence summary`}' in home
     assert (
         'className="measurement-ladder" role="group" '
-        'aria-label="Measurement ladder from adoption to realization"'
+        'aria-label="Measurement chain from adoption to outcomes"'
     ) in home
 
 
@@ -73,36 +73,44 @@ def test_browser_version_report_uses_pinned_playwright_version():
     assert "Unable to resolve pinned @playwright/test version" in reporter
 
 
-def test_public_sources_page_states_current_composition_and_rps_boundaries():
+def test_public_sources_page_states_current_composition_rps_and_qa_boundaries():
     page = read("apps/web/app/sources/page.tsx")
     lower = page.lower()
-    assert "Official Q2 2025 and Q2 2026 Basic Monthly" in page
-    assert "composition inputs, not RPS residuals" in page
-    assert "Robustness input validated" in page
-    assert "Authorized aggregate release path" in page
-    assert "bounded presentation view" in page
-    assert "historical" in lower and "subgroup panel" in lower
-    assert "bulk download product" in page
-    assert "generic source query API" in page
+    assert "Official Q2 2025 and Q2 2026 Basic Monthly public-use files" in page
+    assert "actual-main-job-hour occupation weights" in page
+    assert "Establishment robustness" in page
+    assert "OEWS · 2025-05" in page
+    assert "authorized aggregate release path" in lower
+    assert "bounded attributed public views" in lower
+    assert "owner permission for published aggregate project use" in lower
+    assert "derived aggregate analysis" in lower
+    assert "historical subgroup panels" in lower
+    assert "bulk download" in lower
+    assert "generic source-query access" in lower
     assert "private source-input bytes" in lower
-    assert "Still outside Release 1 claims" in page
+    assert "Outside current claims" in page
     assert "causal firm effects" in page
-    assert "Sources, provenance" in page
+    assert "Sources and release scope" in page
+    assert "human screen-reader traversal" in lower
+    assert "outside current validation evidence" in lower
 
 
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
     release_notice = read("apps/web/components/ReleaseNotice.tsx")
-    assert "Reported time savings are not an observed measure of labor productivity" in page
+    lower_page = page.lower()
+    assert "reported time savings are survey-based counterfactual estimates" in lower_page
+    assert "labor productivity, output, gdp, and employer value added require direct outcome evidence" in lower_page
     assert "occupation_" in page
     assert "adjusted_" in page
     assert "industry_" in page
     assert "context_" in page
     assert "residual" in page
-    assert "CPS composition foundation has been executed and validated" in page
-    assert "published-aggregate project use is recorded as permitted" in sources.lower()
-    assert "unrestricted RPS" in page
+    assert "the cps composition foundation uses official q2 2025 and q2 2026 inputs" in lower_page
+    assert "owner permission for published aggregate project use" in sources.lower()
+    assert "DATA_MODE=derived_only" in page
+    assert "private\n          source-input bytes" in page
     assert "private source-input bytes" in release_notice
 
 
