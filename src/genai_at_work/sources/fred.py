@@ -1,22 +1,24 @@
 """Official FRED API client for the RPS GenAI tracker.
 
 The client intentionally uses only documented FRED API endpoints. It does not scrape
-FRED HTML, consistent with FRED's published Terms of Use. Transient transport,
-rate-limit, and server failures are retried with bounded exponential backoff; semantic
-client errors and exhausted retries fail closed. Error text never includes the full
-credential-bearing request URL.
+FRED HTML, consistent with FRED's published Terms of Use. FRED documents a maximum
+API rate of two requests per second; production clients therefore pace request starts
+below that ceiling. Transient transport, rate-limit, and server failures are retried
+with bounded exponential backoff; semantic client errors and exhausted retries fail
+closed. Error text never includes the full credential-bearing request URL.
 """
 
 from __future__ import annotations
 
 import time
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import httpx
 
 TRANSIENT_HTTP_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
+DEFAULT_MIN_REQUEST_INTERVAL_SECONDS = 0.55
 
 
 class FredError(RuntimeError):
@@ -40,7 +42,7 @@ def _dict_rows(value: object, *, label: str) -> list[dict[str, Any]]:
     return rows
 
 
-@dataclass(frozen=True)
+@dataclass
 class FredClient:
     """Small, explicit FRED API v1 client.
 
@@ -56,13 +58,20 @@ class FredClient:
     backoff_seconds:
         Initial deterministic backoff before the second attempt. Subsequent retry
         delays double. Set to zero only in deterministic tests.
+    min_request_interval_seconds:
+        Minimum wall-clock interval between request starts for one client. The
+        production default is 0.55 seconds (~1.82 requests/second), deliberately
+        below FRED's documented two-requests/second API ceiling. Set to zero only
+        in tests that isolate retry behavior.
     """
 
     api_key: str
     timeout_seconds: float = 30.0
     max_attempts: int = 4
     backoff_seconds: float = 1.0
+    min_request_interval_seconds: float = DEFAULT_MIN_REQUEST_INTERVAL_SECONDS
     base_url: str = "https://api.stlouisfed.org/fred"
+    _last_request_started_at: float | None = field(init=False, default=None, repr=False)
 
     def __post_init__(self) -> None:
         if self.timeout_seconds <= 0:
@@ -71,11 +80,30 @@ class FredClient:
             raise ValueError("max_attempts must be positive")
         if self.backoff_seconds < 0:
             raise ValueError("backoff_seconds must be nonnegative")
+        if self.min_request_interval_seconds < 0:
+            raise ValueError("min_request_interval_seconds must be nonnegative")
 
     def _sleep_before_retry(self, attempt: int) -> None:
         delay = self.backoff_seconds * (2 ** (attempt - 1))
         if delay > 0:
             time.sleep(delay)
+
+    def _pace_request(self) -> None:
+        """Keep request starts below the configured provider-rate ceiling.
+
+        ``time.monotonic`` makes the interval immune to wall-clock adjustments.
+        The timestamp is updated immediately before transport begins, so retries
+        and ordinary calls share one pacing contract.
+        """
+
+        now = time.monotonic()
+        previous = self._last_request_started_at
+        if previous is not None and self.min_request_interval_seconds > 0:
+            remaining = self.min_request_interval_seconds - (now - previous)
+            if remaining > 0:
+                time.sleep(remaining)
+                now = time.monotonic()
+        self._last_request_started_at = now
 
     def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
         if not self.api_key:
@@ -85,6 +113,7 @@ class FredClient:
         url = f"{self.base_url}/{path}"
 
         for attempt in range(1, self.max_attempts + 1):
+            self._pace_request()
             try:
                 response = httpx.get(url, params=query, timeout=self.timeout_seconds)
             except httpx.RequestError as exc:
