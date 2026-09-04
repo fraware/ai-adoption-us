@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { loadLongitudinalDiagnostics } from "../../lib/longitudinal";
 
 export const metadata: Metadata = {
   title: "Explore",
 };
 
-export default function ExplorePage() {
+export default async function ExplorePage() {
+  const longitudinal = await loadLongitudinalDiagnostics();
+  const periods = longitudinal.input_scope.periods;
+  const crossLevelAlignedQuarters = Object.values(longitudinal.cross_level_comparison).filter(
+    (row) =>
+      row.occupation_minus_industry_pearson_A_H > 0 &&
+      row.occupation_minus_industry_spearman_A_H > 0,
+  ).length;
+
   return (
     <main>
       <section className="hero hero-compact" aria-labelledby="explore-title">
@@ -24,8 +33,8 @@ export default function ExplorePage() {
           </div>
           <div>
             <p>
-              Across every audited wave, adoption and assisted working time align more tightly across
-              occupations than across industries.
+              Across all {crossLevelAlignedQuarters} of {periods.length} audited waves, adoption and assisted
+              working time align more tightly across occupations than across industries.
             </p>
             <p className="text-link"><Link href="/explore/occupations">Explore occupations →</Link></p>
           </div>
