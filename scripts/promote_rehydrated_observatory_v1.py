@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import observatory_release
+
 from genai_at_work.release_engine import (
     canonical_digest,
     load_json_object,
