@@ -125,6 +125,8 @@ The residual indicates how far the observed industry value lies from the value p
 
 It should not be interpreted as an organizational effect, management-quality effect, efficiency estimate, productivity effect, or causal firm effect. Many unmeasured mechanisms can contribute to the difference.
 
+The detailed composition, robustness, and uncertainty treatment is documented in [CPS_COMPOSITION_UNCERTAINTY.md](CPS_COMPOSITION_UNCERTAINTY.md).
+
 ## 5. Classification alignment and coverage
 
 Industry and occupation classifications can differ across sources and vintages. Crosswalks are therefore treated as versioned inputs.
@@ -150,11 +152,13 @@ OEWS differs from CPS in population, data collection, and weighting. The project
 
 Agreement across CPS and OEWS can increase confidence that a composition pattern is not an artifact of one staffing data system. Disagreement is treated as information about source sensitivity.
 
+See [OEWS_ROBUSTNESS.md](OEWS_ROBUSTNESS.md) for the source-universe differences, partial-identification treatment for unpublished cells, and released robustness results.
+
 ## 7. BTOS industry comparison
 
 The Business Trends and Outlook Survey (BTOS) provides a separate employer-side measure of recent AI use.
 
-Release 1 compares BTOS sector-level current AI use with RPS worker-reported generative-AI work adoption under a preregistered industry crosswalk and suppression rule.
+Release 1 compares BTOS sector-level current AI use with RPS worker-reported generative-AI work adoption under a prespecified industry crosswalk and suppression rule.
 
 The two measures are not equivalent:
 
@@ -166,7 +170,7 @@ The two measures are not equivalent:
 
 Correlations between them are interpreted only as descriptive cross-source concordance.
 
-See the BTOS documents in this directory for the preregistration, crosswalk, and reproduced results.
+See [BTOS_RPS_COMPARISON.md](BTOS_RPS_COMPARISON.md) for the period-selection rule, source reproduction, crosswalk, eligible sector sets, and Release 1 results.
 
 ## 8. Uncertainty and statistical interpretation
 
