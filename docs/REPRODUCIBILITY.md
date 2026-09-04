@@ -106,17 +106,15 @@ The corresponding derived artifacts are under `data/derived/composition/` and re
 
 Because OEWS and CPS describe different populations and survey systems, their outputs should be compared as robustness evidence rather than combined into a single weighting scheme.
 
-## 7. Reproducing BTOS–RPS industry comparisons
+See [OEWS_ROBUSTNESS.md](OEWS_ROBUSTNESS.md) for the source-universe differences, point/partial-identification treatment, and released comparison statistics.
 
-The BTOS comparison uses a documented sector crosswalk and a preregistered definition of the employer-side AI-use measure.
+## 7. Reproducing the BTOS–RPS industry comparison
 
-To reproduce the comparison, use the source and period identified in the BTOS documentation together with the versioned RPS industry observations for the same analysis release.
+The BTOS comparison uses a versioned sector crosswalk and a prespecified definition of the employer-side AI-use measure.
 
-Relevant files include:
+To reproduce the comparison, use the source and period identified in [BTOS_RPS_COMPARISON.md](BTOS_RPS_COMPARISON.md) together with the versioned RPS industry observations for the same analysis release.
 
-- `BTOS_RPS_INDUSTRY_COMPARISON_PREREGISTRATION_2026-09-02.md`;
-- `BTOS_RPS_INDUSTRY_CROSSWALK_2026-09-02.md`;
-- `BTOS_RPS_INDUSTRY_TRIANGULATION_2026-09-02.md`.
+The human-readable document records the period-selection rule, BTOS source identity and suppression behavior, crosswalk treatment, eligible sector sets, and released correlations. The corresponding machine-readable source, crosswalk, and analysis definitions remain under `data/registry/`.
 
 The resulting correlation is a descriptive comparison across non-equivalent constructs.
 
