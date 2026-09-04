@@ -5,10 +5,15 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/observatory-candidate-review.yml'
+      - '.github/workflows/observatory-promotion.yml'
       - 'scripts/prepare_rps_refresh_candidate.py'
       - 'scripts/prepare_rps_observatory_candidate.py'
       - 'scripts/prepare_observatory_v1_candidate.py'
+      - 'scripts/rehydrate_observatory_v1_candidate.py'
+      - 'scripts/promote_rehydrated_observatory_v1.py'
+      - 'scripts/validate_observatory_publication_commit.py'
       - 'scripts/observatory_release.py'
+      - 'src/genai_at_work/claim_surfaces.py'
       - 'src/genai_at_work/release_engine.py'
       - 'src/genai_at_work/rps_release.py'
       - 'src/genai_at_work/rps_release_complete.py'
@@ -16,7 +21,6 @@ on:
       - 'src/genai_at_work/rps_public_view.py'
       - 'src/genai_at_work/observatory_baseline.py'
       - 'src/genai_at_work/observatory_rps_bindings.py'
-      - 'data/registry/observatory_release_registry.json'
       - 'data/registry/observatory_v1_baseline_contract.json'
       - 'data/registry/observatory_v1_rps_repository_bindings.json'
       - 'data/registry/rps_public_observation_delivery_v1.json'
@@ -166,6 +170,7 @@ jobs:
               'reviewed_artifact_ids': diff['changed_artifact_ids'],
               'reviewed_diagnostic_ids': diff['changed_diagnostic_ids'],
               'reviewed_claim_ids': diff['affected_claim_ids'],
+              'rehydration_identity_sha256': '',
               'reviewer': '',
               'reviewed_at': '',
               'scientific_reviewed': False,
@@ -199,6 +204,7 @@ jobs:
               'artifact_count': len(candidate['artifacts']),
               'diagnostic_count': len(candidate['diagnostics']),
               'claim_count': len(candidate['claims']),
+              'exact_rehydration_required': True,
               'explicit_review_completed': False,
               'promotion_performed': False,
               'source_input_bytes_included': False,
@@ -233,10 +239,14 @@ jobs:
           template = json.loads((root / 'review-attestation-template.json').read_text())
           if summary.get('source_input_bytes_included') is not False:
               raise SystemExit('Review summary widened private-source publication')
+          if summary.get('exact_rehydration_required') is not True:
+              raise SystemExit('Review summary must require exact rehydration')
           if summary.get('explicit_review_completed') is not False:
               raise SystemExit('Workflow may not self-attest explicit review')
           if template.get('ci_run_ids') != []:
               raise SystemExit('Workflow may not pre-attest external CI evidence')
+          if template.get('rehydration_identity_sha256') != '':
+              raise SystemExit('Workflow may not pre-attest a future rehydration identity')
           for field in (
               'scientific_reviewed',
               'editorial_reviewed',
