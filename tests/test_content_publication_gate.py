@@ -17,7 +17,7 @@ def load_validator():
     return module
 
 
-def test_content_publication_path_allowlist_is_presentation_only():
+def test_content_publication_path_contract_separates_presentation_and_deploy_sensitive():
     validator = load_validator()
 
     allowed = (
@@ -49,11 +49,22 @@ def test_content_publication_path_allowlist_is_presentation_only():
         ".github/workflows/pages.yml",
         ".github/workflows/ci.yml",
     )
+    non_deploy = (
+        "README.md",
+        "LICENSE",
+        "CONTRIBUTING.md",
+        "RELEASE_PROVENANCE.json",
+        "docs/ARCHITECTURE.md",
+        "docs/qa/2026-09-03-r1-g2-native-safari-desktop-qa.md",
+    )
 
     for path in allowed:
         assert validator._path_allowed(path), path
     for path in blocked:
         assert not validator._path_allowed(path), path
+        assert validator._path_deploy_sensitive(path), path
+    for path in non_deploy:
+        assert not validator._path_deploy_sensitive(path), path
 
 
 def test_content_workflow_requires_empty_authorization_for_push_deployment():
@@ -87,4 +98,6 @@ def test_content_validator_binds_current_release_and_hashes_artifacts():
     assert "Current immutable release directory changed" in text
     assert "sha256_file(manifest_path)" in text
     assert "sha256_file(path)" in text
-    assert "deploy-sensitive or non-presentation changes" in text
+    assert "DEPLOY_SENSITIVE_PREFIXES" in text
+    assert "deploy-sensitive changes outside the presentation boundary" in text
+    assert "ignored_non_deploy_paths" in text

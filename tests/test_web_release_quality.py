@@ -101,7 +101,6 @@ def test_public_sources_page_states_current_composition_rps_and_qa_boundaries():
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
-    release_notice = read("apps/web/components/ReleaseNotice.tsx")
     normalized_page = normalized_lower(page)
     assert "reported time savings are survey-based counterfactual estimates" in normalized_page
     assert "labor productivity, output, gdp, and employer value added require direct outcome evidence" in normalized_page
@@ -114,7 +113,6 @@ def test_methodology_keeps_savings_distinct_from_productivity():
     assert "owner permission for published aggregate project use" in normalized_lower(sources)
     assert "DATA_MODE=derived_only" in page
     assert "private source-input bytes" in normalized_page
-    assert "private source-input bytes" in normalized_lower(release_notice)
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():

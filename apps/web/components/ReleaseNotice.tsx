@@ -15,15 +15,7 @@ export function ReleaseNotice() {
   }
 
   if (mode === "derived_only") {
-    return (
-      <div className="release-strip" role="status">
-        <div>
-          <strong>Release 1 · reviewed public evidence</strong>
-          <span>This release publishes authorized aggregate views and derived evidence. Private source-input bytes and unrestricted historical subgroup data stay outside the public release.</span>
-          <Link href="/sources">Source scope</Link>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (mode === "fred_live_no_store") {

@@ -18,10 +18,11 @@ def test_public_release_surfaces_do_not_revert_to_candidate_language():
     sources = read("apps/web/app/sources/page.tsx")
     methodology = read("apps/web/app/methodology/page.tsx")
 
-    assert "Release 1 · reviewed public evidence" in release_notice
-    assert "private source-input bytes" in normalized_notice
-    assert "unrestricted historical subgroup data" in normalized_notice
+    assert 'if (mode === "derived_only")' in release_notice
+    assert "return null;" in release_notice
+    assert "Release 1 · reviewed public evidence" not in release_notice
     assert "Public candidate · derived diagnostics only" not in release_notice
+    assert "public candidate" not in normalized_notice
     assert "public candidate" not in normalized_lower(home)
     assert "public candidate" not in normalized_lower(sources)
     assert "public candidate" not in normalized_lower(methodology)
