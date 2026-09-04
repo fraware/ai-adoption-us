@@ -1,235 +1,166 @@
 # GenAI at Work — canonical observatory program plan
 
+Status date: **2026-09-04**
+
 ## Purpose
 
-This document is the top-level research and product program for the U.S. AI Adoption Observatory. It complements, but does not replace, `docs/ROADMAP.md`, `docs/ENGINEERING_HANDOFF.md`, `docs/RELEASE_CHECKLIST.md`, and the dated validation records.
+This document is the top-level research and product program for the U.S. AI Adoption Observatory. Current release execution is governed by `docs/RELEASE_CHECKLIST.md`; current engineering contracts by `docs/ENGINEERING_HANDOFF.md`; current sequencing by `docs/ROADMAP.md`.
 
 The observatory's core question is:
 
 > How is generative AI moving from availability and adoption into actual work, reported benefit, and eventually realized economic outcomes in the United States?
 
-The project is not a generic AI dashboard, a single "AI impact" score, or a publication that treats self-reported time savings as measured productivity.
+The project does not collapse those stages into a generic AI score and does not treat self-reported time savings as measured productivity.
 
-## North-star causal and measurement ladder
+## Measurement ladder
 
-The observatory keeps the following objects distinct:
+The observatory keeps these objects distinct:
 
 1. availability/access;
 2. work adoption;
-3. recent use;
-4. routine use;
-5. workflow penetration / AI-assisted working time;
-6. self-reported counterfactual benefit;
+3. recent and routine use;
+4. workflow penetration / AI-assisted working time;
+5. self-reported counterfactual benefit;
+6. composition-adjusted and cross-source descriptive evidence;
 7. realized economic outcomes such as output, quality, wages, employment, and measured productivity.
 
-Evidence about one layer does not automatically identify effects at a downstream layer.
+Evidence at one layer does not automatically identify effects at a downstream layer.
+
+## Current program state
+
+The initial observatory baseline has advanced beyond the earlier reconstruction plan. The current repository contains and governs:
+
+- authorized published-aggregate RPS retrieval through FRED;
+- a 131-series work-focused registry and revision-aware source candidate;
+- seven common A/H/S quarters, Q4 2024–Q2 2026, with 882 complete subgroup cells;
+- a bounded public RPS observation product;
+- deterministic longitudinal RPS diagnostics;
+- official Q2 2025 and Q2 2026 CPS composition evidence;
+- descriptive occupation-adjusted industry-context residuals;
+- May 2025 OEWS composition robustness;
+- preregistered Q2 2026 BTOS–RPS triangulation;
+- governed claim-surface binding;
+- exact candidate staging and rights-safe review packaging;
+- exact post-review source rehydration;
+- human-attestation-gated immutable promotion;
+- append-only release registry/history;
+- release-only GitHub Pages deployment authorization and live audit controls.
+
+No formal Observatory release has yet been promoted or tagged. Release 1 is now an execution/review problem, not an architecture-definition problem.
 
 ## Program phases
 
-| Phase | Objective | Completion standard |
-|---|---|---|
-| P0 | Canonical program and governance baseline | research questions, evidence classes, claims, vintages, and dependencies are explicit |
-| P1 | Rights-cleared Release 1 observatory | approved RPS source path, complete defensible history, full public product, QA and deployment audit |
-| P2 | Explain the industry wedge | official CPS composition executed, validated, sensitivity-tested, and interpreted conservatively |
-| P3 | Cross-source measurement triangulation | CPS/OEWS/BTOS comparisons preserve population, unit, denominator, and construct differences |
-| P4 | Mechanism research | worker × occupation × industry × time designs distinguish composition from context and selection |
-| P5 | Longitudinal observatory engine | new waves/revisions generate deterministic diffs, claim review, and immutable releases |
-| P6 | Economic realization research | stronger outcome claims require an explicit causal or quasi-causal identification strategy |
-| P7 | Durable public infrastructure | versioned data, API/research interfaces, external reproducibility, and institutional update cadence |
+| Phase | Objective | Current state |
+| --- | --- | --- |
+| P0 | Canonical measurement/governance baseline | **Complete** |
+| P1 | Governed public Release 1 | **Final review/execution pending** |
+| P2 | Occupation-composition explanation of industry variation | **Baseline evidence complete; uncertainty extensions remain** |
+| P3 | CPS/OEWS/BTOS cross-source triangulation | **Release 1 descriptive baseline complete** |
+| P4 | Task/exposure and worker/firm mechanism research | **Future; source/data/identification gated** |
+| P5 | Longitudinal revision/release engine | **Core release machinery complete; first promoted lifecycle pending** |
+| P6 | Realized economic outcomes | **Future; separate identification required** |
+| P7 | Durable public/research infrastructure | **Post-release** |
 
 ## Research-question registry
 
 | ID | Research question | Current evidence class | Status |
-|---|---|---|---|
-| Q1 | How fast is workplace GenAI adoption diffusing? | direct RPS measurement | active; production source rights unresolved |
-| Q2 | Is adoption translating into recent and routine use? | direct RPS measurement | active; production source rights unresolved |
-| Q3 | Is adoption translating into greater workflow penetration? | RPS direct measurement + descriptive subgroup analysis | supported descriptively |
-| Q4 | How persistent are occupation and industry differences over time? | derived longitudinal diagnostics | supported on frozen five-wave audit panel |
-| Q5 | Why is adoption-to-assisted-hours coupling tighter across occupations than industries? | descriptive structural finding | unresolved mechanism |
-| Q6 | How much industry variation is explained by occupational composition? | CPS cross-survey standardization | execution in progress |
-| Q7 | Does an occupation-adjusted industry-context residual persist across specifications and time? | cross-survey standardization / robustness | blocked on Q6 and compatible RPS observations |
-| Q8 | Do establishment- and business-side AI measures agree with worker-side measures? | OEWS/BTOS triangulation | future |
-| Q9 | Which task characteristics predict deeper AI integration? | O*NET/task mechanism analysis | future |
-| Q10 | Which worker, firm, and contextual factors predict conversion from adoption into workflow penetration and benefit? | microdata mechanism analysis | future |
-| Q11 | Under what conditions does AI use affect realized output, quality, wages, employment, or productivity? | causal/quasi-causal outcome research | future; no current identification |
+| --- | --- | --- | --- |
+| Q1 | How fast is workplace GenAI adoption diffusing? | direct RPS aggregate measurement | supported over available registered history |
+| Q2 | How does adoption relate to recent/routine use and workflow penetration? | direct RPS + longitudinal descriptive analysis | supported descriptively |
+| Q3 | How persistent are occupation and industry differences over time? | derived longitudinal diagnostics | supported over seven common A/H/S quarters |
+| Q4 | Why is adoption-to-assisted-hours coupling tighter across occupations than industries? | descriptive structural finding | mechanism unresolved |
+| Q5 | How much broad industry variation is associated with occupational composition? | CPS cross-survey standardization | Release 1 descriptive evidence produced |
+| Q6 | Does the occupation-adjusted industry-context residual persist across alternative composition evidence? | CPS/OEWS descriptive robustness | baseline robustness produced; no causal interpretation |
+| Q7 | Do employer/business-side and worker-side AI measures co-move across industries? | BTOS–RPS cross-construct triangulation | Release 1 descriptive evidence produced |
+| Q8 | How does theoretical/model-based task exposure compare with realized adoption? | task/occupation aggregate measurement | future; separate provenance/rights gate (#17) |
+| Q9 | Which worker, task, occupation, industry, or firm factors explain conversion from adoption into use and benefit? | mechanism research | future; richer authorized data/identification required (#10) |
+| Q10 | Under what conditions does AI use affect realized output, quality, wages, employment, or productivity? | causal/quasi-causal research | future; no current identification |
 
-## Evidence-class registry
+## Evidence classes
 
-Every public claim and visualization must be classifiable as one of:
+Every material public claim belongs to one of these classes:
 
-1. **Direct measurement** — a reported survey or administrative quantity with its original population and denominator.
-2. **Derived descriptive statistic** — deterministic transformation of direct measurements, including correlations, regressions, rank stability, and leave-one-out diagnostics.
-3. **Cross-survey standardization / composition counterfactual** — a result combining distinct source systems under an explicit mapping and weighting contract.
-4. **Model-based decomposition / mechanism evidence** — analysis intended to separate competing explanatory channels without automatically implying causality.
-5. **Causal or quasi-causal estimate** — permitted only when an explicit identification strategy, estimand, assumptions, inference procedure, and external-validity boundary are stated.
+1. **Direct measurement** — a source quantity with its original population, denominator, construct, period, and provenance.
+2. **Derived descriptive statistic** — deterministic transformations such as correlations, regressions, rank stability, or influence diagnostics.
+3. **Cross-survey standardization / triangulation** — results combining distinct source systems under explicit mapping, weighting, coverage, and interpretation contracts.
+4. **Mechanism evidence** — analyses intended to separate explanatory channels without automatically identifying causal effects.
+5. **Causal or quasi-causal estimate** — allowed only with an explicit estimand, identification strategy, assumptions, inference procedure, and external-validity boundary.
 
-The public product must not visually or linguistically collapse these evidence classes.
+The product must not visually or linguistically collapse these classes.
 
-## Source-vintage registry contract
+## Source-vintage and claim contracts
 
-Every source vintage used for publication must record, where applicable:
+Every release-relevant source vintage records, as applicable, provider/product identity, retrieval/release metadata, reference period, source/revision status, exact scientific/content identity, registered entity/series scope, taxonomy/crosswalk versions, rights/publication boundary, and build/release lineage.
 
-- provider and dataset/product name;
-- retrieval timestamp;
-- source URL or delivery identity;
-- file size and cryptographic checksum;
-- observation/reference period;
-- source revision status;
-- questionnaire/instrument version;
-- taxonomy/crosswalk versions;
-- rights/storage/cache/redistribution status;
-- build commit;
-- superseded vintage, if any.
+Material empirical claims are linked to machine-readable evidence and governed public surfaces. The release architecture binds reviewed claim identities to both evidence digests and the exact repository files presenting those claims. A new source vintage or governed-file edit must identify affected claims and force renewed candidate review where required.
 
-Previously frozen source vintages are retained; history is not silently overwritten.
+## Release 1 program
 
-## Claim-registry contract
+Release 1 is the governed public baseline. Its content is described in `docs/product-spec.md`, `docs/RESULTS.md`, and `docs/source-provenance.md`.
 
-Material empirical claims should be generated from, or explicitly linked to, versioned machine-readable evidence. For every claim that can change with new data, the observatory should eventually record:
+The remaining sequence is exact and fail-closed:
 
-- stable claim ID;
-- publication surface(s);
-- source artifact and field/query;
-- current value/truth condition;
-- evidence class;
-- interpretation boundary;
-- source vintage;
-- last reviewed release;
-- whether a new vintage changed the claim.
+1. finalize public repository/documentation state;
+2. rebuild the complete candidate on the resulting canonical `main` commit;
+3. require exact candidate CI/QA evidence specified by the release checklist;
+4. perform human scientific, editorial, and source-rights review against that exact rights-safe package;
+5. run exact source rehydration and verify reviewed identity reproduction;
+6. bind the human attestation to the deterministic rehydration identity and exact CI evidence;
+7. promote one new immutable release and append the release registry;
+8. validate the release-only authorization commit;
+9. deploy from that exact commit and pass the live-origin audit;
+10. perform final manual catastrophic-error/content inspection;
+11. create the formal tag and GitHub Release.
 
-A new wave or revision must be able to identify every affected chart, table, and textual claim before publication.
+No earlier successful deployment, candidate, or CI run substitutes for these final identities.
 
-## P1 — rights-cleared observatory completion
+## Composition program
 
-The direct RPS source-rights/feed gate is strategically product-critical even though Release 1 engineering can remain independent of it.
+For industry `j`, occupation `o`, period `t`, and metric `m`, the Release 1 composition program uses:
 
-Required source decision:
+- CPS worker shares for adoption counterfactuals;
+- CPS actual-main-job-hour shares for assisted-hours and reported-savings counterfactuals;
+- usual-hours shares as labeled sensitivity evidence;
+- OEWS May 2025 staffing as an independent establishment-side robustness basis.
 
-- machine-readable national, industry, and occupation series;
-- complete available history and historical revisions/vintages;
-- future update cadence;
-- storage/cache permission;
-- interactive publication and redistribution permission;
-- permission for transformed/derived subgroup outputs;
-- attribution/disclaimer requirements;
-- survey instrument and definition change log;
-- subgroup uncertainty/replicate-weight methodology where available;
-- microdata availability and permitted research use.
+The descriptive residual remains:
 
-After source resolution, audit all 131 canonical series for earliest/latest observation, missing quarters, revisions, definition changes, and maximal defensible common panels. The frozen five-wave reconstruction remains a historical validation panel and must not silently become a claim about a longer rights-cleared history.
+`G(j,t,m) = observed(j,t,m) - occupation-composition counterfactual(j,t,m)`
 
-Release 1 product completion then includes the national trend surface, full industry and occupation explorers, a `/data` publication surface, generated provenance links, the flagship technical essay, rendered accessibility/browser QA, deployment audit, release provenance, and immutable tag.
+`G` is not an identified organizational effect, quality measure, efficiency measure, productivity effect, or causal mechanism.
 
-## P2 — CPS occupation-composition program
+Design-based covariance-aware uncertainty for custom CPS composition vectors remains a separate research problem (#14). Existing stability/sensitivity diagnostics are not confidence intervals.
 
-Primary question:
+## Cross-source triangulation
 
-> How much of broad industry variation in adoption, AI-assisted working time, and reported savings can be accounted for by occupational composition?
+RPS worker measures, CPS worker composition, OEWS establishment employment, and BTOS business AI use are complementary systems with distinct units, populations, denominators, constructs, reference periods, and vintages.
 
-Primary weighting contracts:
+Cross-source disagreement is evidence to interpret, not noise to average into a synthetic score. Release 1 BTOS–RPS analysis is descriptive concordance only.
 
-`A_hat(j,t) = sum_o w_worker(j,o,t) * A(o,t)`
+## Future task and mechanism research
 
-`H_hat(j,t) = sum_o w_hours_actual(j,o,t) * H(o,t)`
+Task/exposure work (#17) requires its own canonical artifact, provenance, taxonomy, weighting, suppression, uncertainty, and publication-rights contract. The current aggregate RPS permission does not automatically cover a separate task-index artifact.
 
-`S_hat(j,t) = sum_o w_hours_actual(j,o,t) * S(o,t)`
+Worker × task × occupation × industry/context × time mechanism research (#10) requires richer authorized data and a pre-specified design capable of addressing worker selection, task mix, context, sampling uncertainty, and measurement error.
 
-with usual-hours weights used only as a separately labeled sensitivity.
+Reported time savings remain distinct from measured economic outcomes. Any future output, wage, employment, TFP, or productivity claim requires a separate causal or quasi-causal design appropriate to the estimand.
 
-For any metric `m`, the descriptive difference
+## Mature public architecture
 
-`G(j,t,m) = observed(j,t,m) - predicted_from_occupation_composition(j,t,m)`
+Post-release evolution may add dedicated trends, composition, measurement-reconciliation, task/research, data, or historical release surfaces. Such routes are product targets, not current shipped functionality until implemented, tested, rights-cleared, and included in a reviewed release.
 
-is labeled only **occupation-adjusted industry-context residual**.
-
-It is not an identified organizational effect, organizational quality measure, efficiency measure, or productivity effect.
-
-### P2 execution sequence
-
-1. Retrieve official April, May, and June 2026 Basic Monthly CPS public-use files.
-2. Freeze source URLs, retrieval metadata, file sizes, and SHA-256 checksums.
-3. Validate source schema and value semantics against official Census documentation.
-4. Apply the registered 18–64 employed population contract and equal month factors.
-5. Produce worker-share, actual-main-job-hour-share, and usual-hours sensitivity composition weights.
-6. Enforce mapping/validity coverage gates without silent renormalization.
-7. Record unsupported cells as null with explicit suppression reasons.
-8. Validate weight sums, non-negativity, industry symmetry, worker/hour-weight differences, and representative crosswalk mappings.
-9. Join only to an authorized, compatible RPS occupation vintage for occupation-composition counterfactuals.
-10. Run actual-versus-usual-hours, coverage-threshold, leave-one-occupation, crosswalk, and temporal robustness analyses.
-11. Use May 2025 OEWS as an independent establishment-side robustness source, not as the primary worker-survey composition basis.
-12. Publish an experimental composition explorer only after the scientific gates are green.
-
-## P3 — measurement matrix
-
-Every cross-source comparison should expose at minimum:
-
-`(unit, population, denominator, question, reference period, construct, taxonomy, vintage)`.
-
-RPS worker use, CPS worker composition, OEWS establishment employment, BTOS business use, and O*NET task characteristics are complementary evidence systems, not interchangeable measurements. Disagreement across them is an empirical result and must not be averaged away into a synthetic AI score.
-
-## P4 — mechanism program
-
-Preferred future data structure:
-
-`worker × occupation × industry/context × time`.
-
-Candidate mechanism layers include task structure, employer tool provision/policy, firm size, remote-work feasibility, education, earnings, software/digital intensity, management practices, regulatory context, capital intensity, class of worker, and worker selection.
-
-Descriptive fixed-effect/decomposition models remain non-causal until a separate identification strategy is justified.
-
-## P5 — longitudinal release engine
-
-For each new source wave or revision, the production process should:
-
-1. register the incoming source vintage and rights status;
-2. detect changes to previously frozen observations and definitions;
-3. regenerate derived artifacts deterministically;
-4. produce observation, diagnostic, ranking, and claim diffs;
-5. rerun stability, influence, suppression, and regression-contract checks;
-6. identify affected charts/tables/text;
-7. require explicit scientific/editorial review;
-8. publish only after CI and human review pass;
-9. retain the prior analytical history;
-10. create an immutable release identity.
-
-## P6 — realized economic outcomes
-
-Reported time savings are not measured labor productivity. Any future claim about output, quality, wages, employment, hours, TFP, or productivity requires a separate design with an explicit estimand and credible identification strategy, such as randomized deployment, a defensible natural experiment, staggered adoption with justified assumptions, matched administrative data, or another design appropriate to the question.
-
-## Product target architecture
-
-The mature publication should converge toward:
-
-- `/` — state of GenAI at work;
-- `/trends` — national diffusion and use intensity;
-- `/explore/occupations` — occupation structure and longitudinal change;
-- `/explore/industries` — industry structure and longitudinal change;
-- `/explore/composition` — experimental occupation-standardized industry analysis;
-- `/measurements` — cross-survey measurement reconciliation;
-- `/research` — technical findings and publications;
-- `/data` — versioned data/derived artifacts and eventually API access;
-- `/methodology` — constructs, populations, denominators, uncertainty, crosswalks;
-- `/sources` — source rights, provenance, and vintages;
-- `/releases` — immutable historical observatory releases.
-
-## Immediate critical path
-
-Two tracks proceed in parallel:
-
-**Research path:** execute the real April–June 2026 CPS composition pipeline and produce a dated validation package. Counterfactual residuals remain blocked until a compatible authorized RPS occupation vintage is available.
-
-**Product/data path:** resolve the direct RPS source-rights/feed decision, audit the complete available history, and then finish the full observational product.
-
-Browser/deployment QA remains required for public launch, but final launch certification should be performed against the actual release candidate after the principal data/product path stabilizes.
+The current shipped-surface contract is defined by `docs/product-spec.md` and the exact promoted release manifest.
 
 ## Non-negotiable invariants
 
 - Adoption is not workflow penetration.
 - Assisted hours are not hours saved.
 - Reported hours saved are not measured labor productivity.
-- Cross-sectional correlations are descriptive absent identification.
+- Cross-sectional and longitudinal associations remain descriptive absent identification.
 - Cross-survey counterfactuals expose mapping, weighting, coverage, and source differences.
 - Unsupported cells fail closed.
 - Worker shares are used for adoption composition; actual-main-job-hour shares are used for assisted-hours and reported-savings composition.
-- Private RPS audit observations never enter a public repository or deployment artifact.
-- A new source vintage cannot silently preserve an old claim when the underlying evidence changed.
+- Private RPS source-input bytes never enter the public repository or promoted release.
+- Bounded RPS publication rights do not imply unrestricted source mirroring or a generic public query API.
+- New source/repository evidence cannot silently preserve a stale claim or candidate identity.
+- Every promoted release is immutable, review-bound, exactly rehydrated, and deployed only through the validated release authorization boundary.

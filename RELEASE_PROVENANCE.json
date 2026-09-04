@@ -1,4 +1,9 @@
 {
+  "record_status": "historical_reconstruction_handoff",
+  "record_as_of": "2026-08-31",
+  "current_release_status_source": "data/registry/observatory_release_registry.json",
+  "current_release_checklist": "docs/RELEASE_CHECKLIST.md",
+  "historical_status_note": "This file preserves the August 31, 2026 rights-safe reconstruction handoff. It is not the current Observatory release manifest, release registry, or current validation state.",
   "archive_role": "rights_safe_release_candidate",
   "checkpoint_date": "2026-08-31",
   "data_mode_for_public_render": "derived_only",
@@ -70,5 +75,5 @@
   "rights_safe_import_commit": "04393d8b3f927cb723ebbd5c77a104dd2b514a07",
   "reconstruction_source_commit": "8fd110238459654849dd6378d3204295ba954fc8",
   "archive_sha256": "05580775c1f93067c1cc9fa6ad0c7c456f3c1941fa6850167dbbd5e8dee3ce16",
-  "record_scope_note": "This provenance record was written after the validated squash merge. Its own documentation-only commit is not identified by a self-referential field; permanent main CI must pass on that subsequent commit before the record is treated as the final repository state."
+  "record_scope_note": "This historical provenance record was written after the validated squash merge. Its own documentation-only commit was not identified by a self-referential field; permanent main CI was required on the subsequent state. Current release evidence is governed separately by the Observatory release registry and immutable release manifests."
 }

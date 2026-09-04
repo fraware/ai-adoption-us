@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Validate the one-commit transition from reviewed candidate to public release.
+"""Validate the one-commit transition from an exact candidate to public release.
 
 A publication commit may introduce exactly one new immutable promoted release and
 advance the release registry by one append-only row. Its parent must be the exact
-candidate commit named in the human review record. This prevents unrelated code,
-claims, source files, or rewrites of an already promoted release from hitchhiking
-on the release authorization commit.
+candidate commit named in the release review record. For the first Observatory
+release, the review record must also bind the repository's one-shot project-owner
+authorization and must state explicitly that no separate human review was performed.
+This prevents unrelated code, claims, source files, or rewrites of an already
+promoted release from hitchhiking on the release authorization commit.
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ from genai_at_work.release_engine import load_json_object, sha256_file
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY = ROOT / "data" / "registry" / "observatory_release_registry.json"
 RELEASES_ROOT = ROOT / "data" / "releases"
+OWNER_AUTHORIZATION = ROOT / "data" / "registry" / "release1_owner_authorization.json"
 REGISTRY_PATH = "data/registry/observatory_release_registry.json"
 RELEASE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 
@@ -79,6 +82,48 @@ def _artifact_hashes(manifest: dict[str, Any], release_root: Path) -> None:
         path = release_root / relative
         if not path.is_file() or not isinstance(expected, str) or sha256_file(path) != expected:
             raise PublicationCommitError(f"Promoted artifact checksum mismatch: {relative}")
+
+
+def _validate_first_release_owner_authorization(review: dict[str, Any]) -> None:
+    if not OWNER_AUTHORIZATION.is_file():
+        raise PublicationCommitError("Release 1 project-owner authorization record is missing")
+    authorization = load_json_object(OWNER_AUTHORIZATION)
+    required_authorization = {
+        "schema_version": 1,
+        "first_release_only": True,
+        "automated_release_review_authorized": True,
+        "human_review_required": False,
+        "formal_github_release_tag": "v1.0.0",
+        "active": True,
+    }
+    for key, expected in required_authorization.items():
+        if authorization.get(key) != expected:
+            raise PublicationCommitError(
+                f"Release 1 owner authorization field {key!r} is invalid"
+            )
+    authorization_id = authorization.get("authorization_id")
+    authorized_by = authorization.get("authorized_by")
+    authorized_at = authorization.get("authorized_at")
+    if not isinstance(authorization_id, str) or not authorization_id:
+        raise PublicationCommitError("Release 1 owner authorization ID is invalid")
+    if not isinstance(authorized_by, str) or not authorized_by:
+        raise PublicationCommitError("Release 1 authorized_by is invalid")
+    if not isinstance(authorized_at, str) or not authorized_at:
+        raise PublicationCommitError("Release 1 authorized_at is invalid")
+
+    expected_review = {
+        "review_mode": "owner_authorized_automated_release_review",
+        "owner_authorized": True,
+        "owner_authorization_id": authorization_id,
+        "authorized_by": authorized_by,
+        "authorized_at": authorized_at,
+        "human_review_performed": False,
+    }
+    for key, expected in expected_review.items():
+        if review.get(key) != expected:
+            raise PublicationCommitError(
+                f"Release 1 review record does not bind owner authorization field {key!r}"
+            )
 
 
 def _validate_append_only_registry_transition(
@@ -192,8 +237,10 @@ def validate(commit: str) -> dict[str, Any]:
         raise PublicationCommitError("Promoted manifest lacks explicit-review status")
     if review.get("candidate_commit") != parent:
         raise PublicationCommitError(
-            "Publication commit parent is not the exact human-reviewed candidate commit"
+            "Publication commit parent is not the exact release-reviewed candidate commit"
         )
+    if parent_registry.get("current_release_id") is None:
+        _validate_first_release_owner_authorization(review)
     if review.get("rehydration_status") != "REHYDRATED_EXACT_CANDIDATE":
         raise PublicationCommitError("Review record lacks exact-rehydration status")
     identity_sha = sha256_file(identity_path)

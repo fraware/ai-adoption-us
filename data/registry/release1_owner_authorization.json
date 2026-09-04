@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "authorization_id": "release-1-owner-authorization-2026-09-04",
+  "authorized_by": "Mateo Petel",
+  "authorized_at": "2026-09-04T11:53:00Z",
+  "scope": "first Observatory v1 release produced from canonical main after the public-readiness cleanup",
+  "first_release_only": true,
+  "automated_release_review_authorized": true,
+  "human_review_required": false,
+  "formal_github_release_tag": "v1.0.0",
+  "active": true,
+  "note": "The project owner explicitly authorized the release operator to complete the final scientific, editorial, source-rights, CI, exact-rehydration, promotion, deployment-audit, and formal publication sequence without a separate human review step. This authorization does not waive any machine-verifiable release, rights, provenance, identity, or deployment gate."
+}

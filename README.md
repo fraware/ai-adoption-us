@@ -10,7 +10,9 @@ The project does **not** estimate a single aggregate “AI impact” number and 
 
 ## Current state
 
-No Observatory release has been promoted yet. The Release 1 architecture retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, cryptographically binds governed claim surfaces, and stages an immutable candidate for explicit human review. The trusted promotion path then re-fetches the source on the exact reviewed repository commit, requires the same scientific source identity, rebuilds and re-stages the candidate, and requires byte-identical candidate/stage identities before promotion. Promotion additionally requires independently verified exact-commit CI and a human attestation bound to the deterministic rehydration identity. Public GitHub Pages deployment is restricted to the resulting validated release-only authorization commit.
+The canonical Observatory release state is recorded in `data/registry/observatory_release_registry.json` and, after formal publication, by the corresponding immutable GitHub tag/release. Release 1 uses a one-shot project-owner authorization recorded in `data/registry/release1_owner_authorization.json`: a separate human review step is not required, but no machine-verifiable scientific, editorial, source-rights, CI, source-identity, rehydration, promotion, deployment, or live-audit gate is waived.
+
+The Release 1 architecture retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, cryptographically binds governed claim surfaces, and stages an immutable candidate for explicit review. The owner-authorized release operator then requires successful exact-commit CI, re-fetches the source on the exact candidate commit, requires the same scientific source identity, rebuilds and re-stages the candidate, and requires byte-identical candidate/stage identities before promotion. Public GitHub Pages deployment is restricted to the resulting validated release-only authorization commit, and the formal `v1.0.0` GitHub Release is created only after the exact Pages deployment and live-origin audit succeed.
 
 Verified in the current scientific/release evidence:
 
@@ -25,7 +27,7 @@ Verified in the current scientific/release evidence:
 - preregistered BTOS–RPS industry triangulation produced under an explicit cross-construct interpretation boundary;
 - explicit web `DATA_MODE`; no implicit fallback into private source data;
 - permanent CI covering the public Python suite, compilation, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, server startup, and public-route HTTP smoke tests;
-- rendered-browser and native-Safari QA as separate launch-quality gates, together with the final deployment audit and explicit release review.
+- rendered-browser and native-Safari QA as separate launch-quality evidence, together with the exact release deployment audit.
 
 Private RPS source-input bytes are intentionally **not in this public repository** and are never copied into the public release bundle. See `docs/PRIVATE_RESEARCH_ASSETS.md`.
 
@@ -49,14 +51,14 @@ data/
   derived/longitudinal/           Rights-safe longitudinal results
   derived/composition/            Rights-safe CPS/OEWS composition and robustness evidence
   derived/btos_rps/               Rights-safe cross-source triangulation evidence
-  registry/                       Source registries, crosswalks, release contracts, and claim inventory
+  registry/                       Source registries, crosswalks, release contracts, claim inventory, owner authorization
   releases/                       Immutable promoted public release directories
   audit/private/                  NEVER public; absent from this repository
 src/genai_at_work/                Python research/analysis library
 scripts/                          Builders, validators, rehydration, and release tooling
 tests/                            Scientific, governance, composition, and release tests
 docs/                             Product, method, results, architecture, roadmap, handoff, QA
-.github/workflows/                CI, candidate-review, promotion, and deployment workflows
+.github/workflows/                CI, candidate review, owner-authorized release, promotion, and deployment workflows
 ```
 
 ## Data modes
@@ -108,24 +110,26 @@ DATA_MODE=derived_only npm run build
 DATA_MODE=derived_only npm run dev
 ```
 
-Permanent CI enforces the stronger locked-install contract: strict Python checks, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. Candidate promotion separately verifies CI runs against the exact repository, candidate commit, branch, workflow, event, and successful conclusion. The canonical release path also requires exact source rehydration and a human attestation bound to the resulting rehydration identity.
+Permanent CI enforces the stronger locked-install contract: strict Python checks, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. Candidate promotion separately verifies CI runs against the exact repository, candidate commit, branch, workflow, event, and successful conclusion. The canonical Release 1 path also requires exact source rehydration and an explicit owner-authorized automated review attestation bound to the resulting rehydration identity.
 
 ## Essential documents
 
 Start here:
 
-1. `docs/ENGINEERING_HANDOFF.md` — technical handoff and acceptance contracts.
+1. `docs/ENGINEERING_HANDOFF.md` — current technical handoff and acceptance contracts.
 2. `docs/RESULTS.md` — verified empirical results and interpretation limits.
-3. `docs/ROADMAP.md` — current roadmap, priorities, dependencies, and definitions of done.
+3. `docs/ROADMAP.md` — current release path and post-release research roadmap.
 4. `docs/ARCHITECTURE.md` — system/data architecture and trust boundaries.
 5. `docs/REPRODUCIBILITY.md` — build and regeneration contracts.
-6. `docs/RELEASE_CHECKLIST.md` — launch checklist.
-7. `docs/methodology.md` — scientific methodology.
-8. `docs/product-spec.md` — product specification.
-9. `docs/source-provenance.md` — source and rights provenance.
-10. `docs/source-rights/RPS_SOURCE_DECISION.md` — current source-rights decision record and evidence boundary.
-11. `docs/source-rights/RPS_PERMISSION_REQUEST.md` — historical permission request retained for provenance.
-12. `VALIDATION_2026-08-31.md` — historical public-handoff validation record.
+6. `docs/RELEASE_CHECKLIST.md` — exact launch checklist.
+7. `docs/RELEASE1_NOTES.md` — canonical Release 1 notes; release status is determined by the registry/tag, not by this prose file alone.
+8. `docs/methodology.md` — scientific methodology.
+9. `docs/product-spec.md` — product specification.
+10. `docs/source-provenance.md` — source and rights provenance.
+11. `docs/source-rights/RPS_SOURCE_DECISION.md` — current source-rights decision record and evidence boundary.
+12. `CONTRIBUTING.md` — contribution, scientific-review, rights, validation, and release expectations.
+
+Dated root validation files and `RECONSTRUCTION_STATUS.md` / `RELEASE_PROVENANCE.json` are retained as historical provenance. They are explicitly historical and are not current release-status documents.
 
 ## Product invariants
 
@@ -145,11 +149,20 @@ These must remain true in every release:
 - Governed public claims remain bound to the exact repository files reviewed for the release.
 - Canonical promotion requires exact post-review source rehydration; a changed scientific source identity forces a new candidate review.
 - Public deployment occurs only from a validated release-only authorization commit whose parent is the exact reviewed candidate commit.
+- The one-shot Release 1 owner authorization becomes inert once a release is promoted and cannot authorize later releases.
 
 ## Release sequence
 
-- **Observatory v1 / Release 1:** bounded national history and latest industry/occupation A/H/S views; seven-quarter longitudinal diagnostics; CPS occupation-composition evidence and descriptive residuals; OEWS robustness; BTOS–RPS triangulation; methodology, provenance, and technical essay. Candidate construction, claim-surface binding, exact staging, trusted rehydration, rehydration-bound promotion controls, and release-only deployment gating are implemented. Explicit human scientific/editorial/source-rights review, exact-commit CI evidence, execution of the promotion workflow, and the post-deployment live audit remain release-time gates.
+- **Observatory v1 / Release 1:** bounded national history and latest industry/occupation A/H/S views; seven-quarter longitudinal diagnostics; CPS occupation-composition evidence and descriptive residuals; OEWS robustness; BTOS–RPS triangulation; methodology, provenance, and technical essay. Candidate construction, claim-surface binding, exact staging, owner-authorized automated review, trusted rehydration, rehydration-bound promotion controls, release-only deployment gating, live-origin audit, and formal `v1.0.0` publication are governed as one fail-closed sequence. The current release identity is read from the release registry and formal GitHub release rather than inferred from branch state.
 - **Post-Release 1:** stronger uncertainty treatment where supported, richer composition or task views only under explicit provenance and rights contracts, and mechanism-oriented analysis that maintains the distinction between descriptive decomposition and causal identification.
 - **Research v2:** worker × task × occupation × industry/context × time mechanism analysis with stronger identification, uncertainty, and outcome evidence.
 
 The detailed specifications and acceptance criteria are in `docs/ROADMAP.md` and `docs/ENGINEERING_HANDOFF.md`.
+
+## Contributing
+
+Contributions are welcome when they preserve the project's scientific, rights, and release contracts. Read `CONTRIBUTING.md` before opening a substantial pull request. The pull-request template requires explicit scientific/public-claim, source/rights, validation, and release-impact disclosure.
+
+## License and reuse
+
+No repository-wide license is currently declared. Public availability of this repository must not be interpreted as a general grant of reuse or redistribution rights. Third-party source material remains governed by its own terms and the project source-rights records. A repository-wide code/documentation license, if adopted, must be chosen explicitly and must not silently broaden rights for source-derived data.

@@ -1,180 +1,137 @@
 # Product specification
 
+Status date: **2026-09-04**
+
 ## 1. Objective
 
-Build a technical data publication that answers a narrow but consequential question:
+GenAI at Work is a technical data publication built around one question:
 
 > How is generative AI moving from availability and adoption into actual work?
 
-The product is not intended to estimate a single aggregate "AI impact" number. It should make it easier to inspect where adoption, routine use, workflow penetration, and reported benefit move together—and where they do not.
+The product does not estimate a single aggregate “AI impact” number. It exposes distinct stages of workplace diffusion and use, the measurement objects behind them, composition-adjusted descriptive evidence, and the limits of what those data support.
 
 ## 2. Audience
 
-Primary:
+Primary audiences are AI researchers, economists and labor-market researchers, firm leaders designing AI deployment, policy researchers, and technically sophisticated journalists or investors. The public interface should remain legible to informed general readers without weakening the scientific distinctions.
 
-- AI researchers and lab strategists
-- economists and labor-market researchers
-- firm leaders designing AI deployment
-- policy researchers
-- technically sophisticated journalists and investors
+## 3. Editorial contract
 
-Secondary:
+The site should make fewer claims than a conventional dashboard and expose more of the measurement machinery.
 
-- informed general readers who need a faithful picture of workplace AI diffusion
+At the point of interpretation, a reader should be able to determine:
 
-## 3. Editorial position
+1. what is measured;
+2. the relevant population and denominator;
+3. whether the quantity is directly reported, reconstructed, self-reported counterfactual, composition-adjusted, or cross-source descriptive evidence;
+4. the source/vintage and relevant coverage boundary;
+5. what cannot be inferred from the result.
 
-The site should make fewer claims than a typical dashboard and expose more of the measurement machinery.
+The core editorial invariants are:
 
-Every chart should answer four questions without requiring a methodology appendix:
+- adoption is distinct from workflow penetration;
+- assisted hours are distinct from reported hours saved;
+- reported savings are distinct from measured labor productivity;
+- composition-adjusted residuals are descriptive standardization residuals, not identified organizational effects;
+- BTOS employer AI use and RPS worker GenAI adoption are distinct cross-source constructs;
+- unsupported or suppressed evidence is shown as unavailable, not silently completed.
 
-1. What exactly is measured?
-2. What is the denominator?
-3. Is this directly observed, reconstructed, or self-reported counterfactual?
-4. What cannot be inferred from it?
-
-## 4. Information architecture
+## 4. Release 1 public surface
 
 ### `/` — AI at Work
 
-Narrative landing page, not a grid of KPI cards.
-
-Sequence:
-
-1. Current national snapshot.
-2. Time-series chart showing work adoption, last-week work use, daily work use, assisted-hours share, and reported-time-savings share.
-3. Explanation of why those lines are not interchangeable.
-4. Industry conversion scatterplot (`adoption -> assisted hours`).
-5. Occupation conversion scatterplot.
-6. Two short case studies selected from data, not hard-coded rankings.
-7. Link into methodology and downloadable data.
+The landing page is a narrative research publication rather than a KPI grid. It presents the national adoption/use sequence, longitudinal evidence, selected industry/occupation relationships, and direct paths to methodology and provenance.
 
 ### `/explore/industries`
 
-Primary exploratory workspace.
-
-Controls:
-
-- quarter
-- metric
-- compare industries
-- absolute level / change since previous year
-- optional residual overlay
-
-Views:
-
-- ranked dot plot
-- time-series small multiples or comparison lines
-- adoption vs assisted-hours scatter
-- assisted-hours vs reported-savings scatter
-- data table with source-series links
-
-Never label a residual "efficiency," "productivity," or "organizational quality."
+The industry evidence surface presents the supported RPS A/H/S cross-section and derived industry analysis, including the occupation-composition counterfactual/residual evidence where the release contract supports it. Any residual is labeled as descriptive and accompanied by the relevant weighting, coverage, and interpretation boundary.
 
 ### `/explore/occupations`
 
-Same basic grammar as industries, enabling direct comparison between occupation and industry structures.
-
-### `/explore/composition`
-
-Experimental view. It should be visually and linguistically separated from directly reported RPS estimates.
-
-Displays:
-
-- observed industry adoption
-- occupation-composition counterfactual
-- residual / feasible interval where partial identification is used
-- decomposition metadata: CPS period, sample definition, weighting basis, crosswalk version
-
-For work-hours-assisted and reported-savings counterfactuals, use work-hour shares rather than worker shares.
+The occupation evidence surface exposes the corresponding supported RPS A/H/S evidence and longitudinal context, enabling comparison between occupation and industry structures without treating the two aggregation levels as interchangeable.
 
 ### `/methodology`
 
-A first-class product page, not legal fine print.
+A first-class scientific-method page covering source populations, construct definitions, denominator semantics, composition weighting, uncertainty limitations, cross-survey alignment, classification/crosswalk rules, revisions, rights boundaries, and reproducibility.
 
-Sections:
+### `/sources`
 
-- survey populations
-- exact metric definitions
-- denominator matrix
-- assisted-hours construction
-- reported-time-savings interpretation
-- survey-question changes / revisions
-- RPS-CPS population alignment
-- industry/occupation crosswalks
-- uncertainty limitations
-- source copyright and attribution
-- reproducibility/versioning
+A first-class provenance surface identifying the RPS/FRED, CPS, OEWS, and BTOS evidence families; public/private source boundaries; attribution; and the distinction between bounded public observation products and private source-input material.
 
 ### `/blog/after-adoption`
 
-Technical essay using the website as evidence. All numeric callouts should be loaded from generated data rather than manually duplicated in prose where practical.
+A technical essay interpreting the release evidence under the same claim and measurement contracts as the data surfaces. Governed numerical/source claims are bound to the reviewed repository files through the release claim-surface mechanism.
 
-### `/data`
+### Public data boundary
 
-Download page containing:
+Release 1 does **not** provide an unrestricted historical subgroup database, generic raw-source query API, or bulk mirror of the private RPS source candidate.
 
-- canonical observations (CSV / Parquet where permitted)
-- series registry
-- derived metrics
-- data dictionary
-- build timestamp / source vintages
-- citations and copyright notices
+The promoted release may expose only the reviewed rights-safe artifacts declared in its immutable release manifest. For RPS observations, the Release 1 contract is bounded to the attributed national-history presentation plus the latest complete industry and occupation A/H/S views. Derived CPS/OEWS/BTOS and longitudinal artifacts are published only when declared by the reviewed release.
 
-## 5. Visual design
+## 5. Evidence included in Release 1
 
-Use an editorial research aesthetic rather than a SaaS dashboard aesthetic.
+The governed Release 1 baseline includes:
 
-- readable serif or neutral editorial display type for headings
-- compact sans-serif for controls/tables
-- generous whitespace
-- one strong chart per section
-- direct labels where possible
-- no decorative gradients, gauges, speedometers, or "AI score" dials
-- color only when it encodes a variable or highlights a selected entity
-- chart annotations should state measurement caveats in plain language
+- seven-quarter common RPS A/H/S longitudinal diagnostics, Q4 2024–Q2 2026;
+- bounded national-history and latest Q2 2026 industry/occupation RPS presentation views;
+- Q2 2025 and Q2 2026 CPS industry × occupation composition evidence;
+- occupation-adjusted industry-context residual diagnostics with descriptive-only interpretation;
+- May 2025 OEWS establishment-side composition robustness;
+- preregistered Q2 2026 BTOS–RPS descriptive triangulation;
+- methodology, provenance, and technical-essay surfaces bound to the same reviewed release architecture.
 
-Accessibility:
+This is the first-release scope. CPS composition and BTOS triangulation are no longer deferred to hypothetical Release 1.1/1.2 stages.
 
-- WCAG AA contrast
-- keyboard-operable controls
-- text alternatives for every chart
-- tabular fallback for core figures
-- no meaning encoded only by color
+## 6. Interaction and visual design
 
-## 6. Product invariants
+The visual system should read as an editorial research publication rather than a SaaS dashboard.
 
-The following statements should remain true across all versions of the site:
+- charts are used only where they improve interpretation;
+- labels and annotations state measurement meaning and caveats directly;
+- color encodes variables or selection, not decorative status;
+- tables provide accessible equivalents for core visual evidence;
+- layouts remain usable at supported responsive widths;
+- keyboard focus, semantic structure, reduced motion, and contrast remain part of the release QA contract;
+- no ranking or leaderboard treatment is applied to unsupported/unstable cells.
 
-- Adoption is not workflow penetration.
-- Assisted hours are not the same as hours saved.
-- Reported hours saved are not measured labor productivity.
-- Industry residuals are not automatically organizational effects.
-- Cross-sectional correlations are descriptive unless a separate identification strategy is supplied.
-- Small/noisy subgroup cells should never be turned into leaderboards without stability diagnostics.
+The actual release UI is authoritative over speculative controls described in earlier design notes. New routes or controls require implementation, tests, accessibility review, and release-contract inclusion before being represented as shipped product functionality.
 
-## 7. First release scope
+## 7. Data modes
 
-Ship the RPS data publication first.
+The public web application uses explicit `DATA_MODE` selection.
 
-Release 1:
+- `derived_only` is the public rights-safe mode. It renders approved derived evidence and, when available in the promoted release, the bounded RPS observation view.
+- `audit_snapshot` is private research mode for explicitly supplied private audit material and is never the public release path.
+- `fred_live_no_store` remains a separately governed server-side adapter mode and is not an implicit public fallback.
 
-- national overview
-- full industry explorer
-- full occupation explorer
-- conversion views
-- methodology
-- technical blog
-- reproducible RPS pipeline
+There is no silent fallback among modes.
 
-Release 1.1:
+## 8. Release and trust model
 
-- CPS composition counterfactuals
-- explicit worker-weight and hour-weight methodologies
-- sensitivity / partial-identification bounds
+A product build is not a publication authorization.
 
-Release 1.2:
+The public Release 1 object is defined by:
 
-- BTOS triangulation when exact construct alignment is defensible
+1. an exact canonical repository commit;
+2. a validated scientific source vintage;
+3. a complete global Observatory candidate;
+4. governed claim-surface hashes;
+5. an immutable stage and zero-failure review gate;
+6. explicit human scientific/editorial/source-rights review;
+7. exact post-review source rehydration reproducing the reviewed candidate/stage identities;
+8. human attestation bound to the deterministic rehydration identity and exact CI evidence;
+9. immutable promotion into the release registry/tree;
+10. a validated release-only authorization commit;
+11. GitHub Pages deployment and live-origin audit from that authorization commit.
 
-This sequencing keeps the first public release useful while preventing unfinished cross-survey inference from contaminating directly reported data.
+Only after those gates pass is the formal tag/GitHub Release created.
+
+## 9. Post-Release-1 product work
+
+The first release deliberately leaves several extensions outside the launch gate:
+
+- a dedicated experimental composition explorer (#8);
+- design-based uncertainty for custom CPS composition vectors (#14);
+- task/exposure versus realized-adoption evidence under its separate provenance/rights gate (#17);
+- richer worker × task × occupation × industry/time mechanism research (#10).
+
+These extensions must preserve the same construct, rights, provenance, uncertainty, and release disciplines. Their open issue status does not imply that Release 1 is incomplete.

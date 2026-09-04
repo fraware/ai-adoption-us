@@ -80,7 +80,11 @@ def test_github_pages_workflow_builds_every_change_but_deploys_only_authorized_r
     assert "data/audit/private" in workflow
     assert "sourceBytesPublished" in workflow
     assert "startsWith(github.event.head_commit.message, 'Authorize Observatory release ')" in workflow
-    assert "scripts/validate_observatory_publication_commit.py --commit \"$GITHUB_SHA\"" in workflow
+    assert "publication_sha:" in workflow
+    assert "RELEASE_COMMIT_SHA: ${{ inputs.publication_sha || github.sha }}" in workflow
+    assert 'scripts/validate_observatory_publication_commit.py --commit "$RELEASE_COMMIT_SHA"' in workflow
+    assert "Dispatched publication SHA is not the current canonical main commit." in workflow
+    assert "Manual Pages release dispatch requires publication_sha." in workflow
     assert "github.event_name != 'pull_request'" not in workflow
     assert "vercel" not in workflow.lower()
 
@@ -91,7 +95,7 @@ def test_github_pages_workflow_audits_the_live_deployment_after_deploy():
     assert "name: Audit deployed Release 1 origin" in workflow
     assert "needs: deploy" in workflow
     assert "DEPLOYED_PAGE_URL: ${{ needs.deploy.outputs.page_url }}" in workflow
-    assert "EXPECTED_COMMIT_SHA: ${{ github.sha }}" in workflow
+    assert "EXPECTED_COMMIT_SHA: ${{ inputs.publication_sha || github.sha }}" in workflow
     assert "https://fraware.github.io/ai-adoption-us" in workflow
     assert "/release-manifest.json" in workflow
     assert "/data/audit/private/rps_subgroup_5q_audit.json" in workflow

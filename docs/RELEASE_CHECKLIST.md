@@ -1,97 +1,103 @@
-# Release checklist
+# Release 1 publication contract
 
-Release 1 is launch-ready only when every release-time item below is resolved on the exact candidate/release identities. Historical QA and deployment records remain evidence about earlier repository states; they do not substitute for exact-head review, rehydration, promotion, or deployment evidence for the final release.
+This document defines the gates for the first public Observatory release. It is deliberately durable: current publication status must be read from `data/registry/observatory_release_registry.json`, the validated release-only commit, the Pages deployment audit, and the formal GitHub tag/release. Checkboxes in prose are not used as a substitute for those machine-verifiable identities.
+
+The project owner authorized the one-shot Release 1 publication sequence in `data/registry/release1_owner_authorization.json`. A separate human review step is not required. The authorization does not waive any scientific, rights, provenance, CI, source-identity, rehydration, promotion, deployment, or live-audit gate.
 
 ## A. Scientific integrity
 
-- [x] Work adoption, routine/recent use, assisted working time, and reported time savings remain distinct constructs.
-- [x] Reported time savings are not presented as measured labor productivity.
-- [x] Occupation-adjusted industry-context residuals are presented as descriptive standardization residuals, not identified organizational or causal effects.
-- [x] Current longitudinal public claims are synchronized to the seven-quarter Q4 2024–Q2 2026 common A/H/S evidence.
-- [x] Current headline counts and relationships are derived from or reconciled against release artifacts rather than protected by five-wave prose literals.
-- [x] Governed longitudinal/source claims are cryptographically bound to the exact public files that present them.
-- [x] CPS composition, OEWS robustness, and BTOS–RPS triangulation retain their registered measurement/interpretation boundaries.
-- [ ] Human scientific review completed against the exact final candidate-review package.
+Release 1 must preserve all of the following:
+
+- work adoption, routine/recent use, assisted working time, and reported time savings remain distinct constructs;
+- reported time savings are not presented as measured labor productivity;
+- occupation-adjusted industry-context residuals remain descriptive standardization residuals, not identified organizational or causal effects;
+- longitudinal claims remain synchronized to the seven-quarter Q4 2024–Q2 2026 common A/H/S evidence;
+- governed longitudinal/source claims remain cryptographically bound to the exact public files that present them;
+- CPS composition, OEWS robustness, and BTOS–RPS triangulation retain their registered measurement and interpretation boundaries.
+
+The candidate builder, release diagnostics, claim-surface bindings, publication consistency tests, and owner-authorized release review collectively enforce this gate.
 
 ## B. Data rights and provenance
 
-- [x] Public web mode is `DATA_MODE=derived_only`.
-- [x] Private RPS candidate inputs are excluded from the public Git tree and promoted release artifacts.
-- [x] The public RPS observation product is bounded to the contracted national history plus latest industry/occupation A/H/S views.
-- [x] Historical subgroup database, unrestricted bulk mirror/download, generic source query API, respondent microdata, historical replication package, and separate task-index artifact remain outside the Release 1 authorization unless separately approved.
-- [x] Current source-rights status and the evidence limitation are recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`: published aggregate project use is treated as granted on the project owner's attestation; the underlying correspondence/agreement is not retained in the public repository or independently inspected in this code change.
-- [x] Source attribution and source-series provenance are preserved.
-- [ ] Human source-rights review completed against the exact final candidate-review package.
+The public release must remain `DATA_MODE=derived_only`. Private RPS candidate inputs cannot enter the public Git tree, candidate-review package, promoted release, Pages artifact, or client build.
 
-## C. Source and analytical candidate
+The public RPS observation product is bounded to the contracted national history plus latest industry/occupation A/H/S views. Historical subgroup databases, unrestricted bulk mirrors/downloads, generic source query APIs, respondent microdata, historical replication packages, and the separate task-index artifact remain outside the Release 1 authorization unless separately approved.
 
-- [x] Canonical RPS registry cardinality is 131 work-focused series: 5 national, 60 industry, 66 occupation.
-- [x] Current live candidate evidence contains 962 registered source observations.
-- [x] Common A/H/S subgroup panel contains 882 cells across seven quarters.
-- [x] RPS component validates construct-specific source-history topology and requires complete A/H/S common-window coverage.
-- [x] Bounded public observation artifact is built from the same RPS source vintage as the longitudinal diagnostics.
-- [x] Repository RPS-dependent CPS/OEWS/BTOS evidence is explicitly bound to the candidate RPS vintage before global composition.
-- [x] Global candidate contains the required RPS/CPS/OEWS/BTOS components and release diagnostics.
-- [ ] Final global candidate rebuilt on canonical `main` after merge and staged with gate status `BLOCKED_REVIEW_REQUIRED` and zero contract failures.
+The source-rights basis and its evidentiary limitation remain recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`. Attribution and source-series provenance must remain intact.
 
-## D. Public code and application validation
+## C. Exact source and analytical candidate
 
-These gates must be evaluated on the exact final candidate commit; historical pass counts are not release evidence for a later head.
+A publishable Release 1 candidate must establish all of the following on canonical `main`:
 
-- [ ] Release candidate CI succeeds on the exact final candidate commit: public pytest suite, compileall, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, production-server startup, and route smoke tests.
-- [ ] Rendered browser/accessibility QA succeeds on the exact final candidate commit.
-- [ ] Native macOS Safari QA succeeds on the exact final candidate commit.
-- [ ] GitHub Pages static build/audit succeeds on the exact final candidate commit. The PR/main engineering build does not itself authorize deployment.
+- 131 registered work-focused RPS series: 5 national, 60 industry, 66 occupation;
+- 962 observations in the currently verified registered source history, subject to fail-closed revision detection;
+- 882 complete common A/H/S subgroup cells across seven quarters;
+- construct-specific source-history topology and complete A/H/S common-window coverage;
+- a bounded public observation artifact built from the same RPS source vintage as the longitudinal diagnostics;
+- exact vintage bindings for RPS-dependent CPS/OEWS/BTOS evidence;
+- all required RPS/CPS/OEWS/BTOS components and release diagnostics;
+- immutable staging with gate status `BLOCKED_REVIEW_REQUIRED` and zero contract failures.
 
-## E. Accessibility and product-quality scope
+Any source revision, definition drift, coverage failure, diagnostic failure, rights change, claim-surface change, or release-registry advance must fail closed or force a new candidate.
 
-- [x] Skip-link/focus, reduced-motion, semantic landmarks, chart/table fallback, responsive containment, runtime resize, 404 behavior, and automated accessibility contracts are implemented.
-- [x] Automated rendered QA covers the configured stable Chrome, Firefox, WebKit/mobile-proxy matrix and native macOS Safari workflow.
-- **Out of Release 1 scope — not claimed as completed evidence:** physical iOS/Android device testing, full human screen-reader traversal, full human keyboard traversal beyond automated contracts, manual color-only-meaning review, and field Core Web Vitals.
+## D. Code, product, and QA evidence
 
-## F. Exact staging and review identity
+The exact final candidate commit must pass permanent Release candidate CI: public pytest, compileall, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, production-server startup, and route smoke tests.
 
-- [x] Staging binds the candidate manifest file SHA-256 and canonical digest, predecessor release-registry identity, release diff, review package, and gate status into one portable `stage_id`.
-- [x] Candidate review package excludes private source inputs and contains an uncompleted human attestation template.
-- [x] Review workflow cannot self-attest scientific/editorial/source-rights/CI completion or a future rehydration identity.
-- [ ] Exact candidate-review workflow run selected and retained for the final candidate commit.
-- [ ] Human editorial review completed against that exact candidate-review package.
-- [ ] Human attestation lists the exact source/artifact/diagnostic/claim changes and exact final CI run IDs.
+Rendered Chrome/Firefox/WebKit/mobile-proxy and native macOS Safari QA are retained as launch-quality evidence for the applicable final web state. A documentation/release-control-only final commit does not manufacture a claim of new browser testing when application code is unchanged. Any final application/UI change must rerun the applicable rendered/native QA before publication.
 
-## G. Trusted exact rehydration
+The GitHub Pages static artifact must build and audit successfully for the release-only authorization commit before deployment.
 
-- [x] `scripts/rehydrate_observatory_v1_candidate.py` re-fetches RPS on the exact reviewed commit, checks the reviewed predecessor release state, and requires the same scientific source identity.
-- [x] Rehydration rebuilds the RPS component, governed claim-surface hashes, vintage-bound global candidate, and immutable stage.
-- [x] Rehydration requires byte-identical candidate-manifest identity and exact equality of the reviewed stage/diff/review/gate records.
-- [x] A changed scientific source identity or any candidate/stage drift fails closed and requires renewed review.
-- [x] Rehydration emits a rights-safe deterministic identity and no private source bytes.
-- [ ] Phase-1 exact rehydration executed for the final reviewed candidate.
-- [ ] Human attestation updated to bind the SHA-256 of that exact rehydration identity.
-- [ ] Phase-2 promotion run repeats exact rehydration successfully before promotion.
+Physical iOS/Android testing, full human screen-reader traversal, full human keyboard traversal beyond automated contracts, manual color-only-meaning review, and field Core Web Vitals are outside the Release 1 evidence scope and are not claimed as completed.
 
-## H. Promotion integrity
+## E. Owner-authorized exact review identity
 
-- [x] Canonical low-level promotion is fail-closed without the internal exact-rehydration capability.
-- [x] Promotion independently verifies exact-commit CI evidence against the release CI policy.
-- [x] Promoted release copies declared public artifacts only and retains no private candidate `inputs/`.
-- [x] Promoted review record and registry entry retain exact rehydration traceability.
-- [x] Post-promotion finalization is rollback-protected if rehydration sidecar/registry finalization fails.
-- [ ] Explicit reviewed Release 1 promotion executed successfully.
+Candidate review must produce one rights-safe package bound to the exact candidate commit and workflow run. The package must contain the sanitized candidate manifest, exact artifact hashes, stage identity, release diff, review package, publication gate, and an initially uncompleted attestation template. It must contain no private source inputs or source `local_path` values.
 
-## I. Publication-commit and deployment integrity
+The Release 1 owner-authorized operator may complete scientific, editorial, source-rights, and CI review fields only after:
 
-- [x] Public deployment is no longer a side effect of every `main` push.
-- [x] The release authorization commit is constrained to the release registry plus one immutable `data/releases/<release-id>/` directory.
-- [x] `scripts/validate_observatory_publication_commit.py` requires the authorization commit parent to be the exact reviewed candidate commit and verifies release/review/rehydration/artifact identities.
-- [x] GitHub Pages deploy and live-audit jobs run only for a validated `Authorize Observatory release <release-id>` commit.
-- [ ] Release-only authorization commit created and pushed after successful promotion.
-- [ ] GitHub Pages deployment succeeds from that exact authorization commit.
-- [ ] Live deployment audit succeeds and records the exact deployed commit/release identity.
+- the candidate gate has zero failures;
+- exact candidate Release candidate CI is successful;
+- the candidate review package is bound to the same commit/run;
+- exact post-review source rehydration reproduces the reviewed scientific source identity, candidate manifest, and stage records.
 
-## J. Final publication
+The completed attestation records `review_mode=owner_authorized_automated_release_review`, the one-shot owner authorization ID, and `human_review_performed=false`. It is bound to the deterministic rehydration-identity SHA-256.
 
-- [x] Release notes document evidence, measurement boundaries, source-rights limits, hosting limits, and scientific limitations.
-- [ ] Final public site manually inspected after the exact release deployment for catastrophic rendering/content errors.
-- [ ] Formal GitHub Release/tag created only after the immutable Observatory release and live deployment audit are complete.
+## F. Trusted exact rehydration
 
-A checked implementation control means the control exists in code/tests. It does not mean its release-time execution has already occurred. Unchecked execution items must not be represented as completed in release notes, the public site, or external submission materials.
+`scripts/rehydrate_observatory_v1_candidate.py` must re-fetch RPS on the exact reviewed candidate commit, verify the recorded predecessor release state, require the same scientific source identity, rebuild claim-surface hashes and the full global candidate, and reproduce the reviewed candidate/stage identities exactly.
+
+A changed scientific source identity, repository evidence change, governed claim-file change, registry advance, candidate drift, or stage drift blocks promotion and requires a new candidate.
+
+The rehydration identity is rights-safe and contains no private source bytes.
+
+## G. Promotion integrity
+
+Canonical low-level promotion remains disabled without the exact-rehydration capability. Promotion independently verifies the exact-commit CI evidence against `data/registry/observatory_release_ci_policy.json`.
+
+A successful promotion may publish only declared public artifacts, must retain exact rehydration traceability, and must atomically advance the release registry. The resulting release-only Git commit may change only:
+
+- `data/registry/observatory_release_registry.json`;
+- one new immutable `data/releases/<release-id>/` tree.
+
+`scripts/validate_observatory_publication_commit.py` must validate this append-only transition and require its parent to be the exact candidate commit.
+
+## H. Deployment and live-origin audit
+
+Ordinary `main` pushes may build Pages artifacts for QA but may not deploy the public Observatory release. Deployment is allowed only for a validated `Authorize Observatory release <release-id>` commit.
+
+The release workflow must require all three Pages jobs to succeed for that exact commit:
+
+- build and audit the GitHub Pages artifact;
+- deploy GitHub Pages;
+- audit the deployed Release 1 origin.
+
+The live audit must bind the deployed site to the exact publication commit/release identity and retain the repository's rights/privacy boundaries.
+
+## I. Formal publication
+
+The one-shot owner-authorized Release 1 workflow may create the formal `v1.0.0` GitHub Release only after the immutable Observatory release has been promoted and the exact Pages deployment/live-origin audit has succeeded.
+
+The workflow refuses to overwrite an existing `v1.0.0` release. The GitHub Release targets the validated publication commit and uses `docs/RELEASE1_NOTES.md` as the canonical notes body with the actual publication date stamped at release time.
+
+After the first Observatory release is promoted, `release1_owner_authorization.json` is inert by contract; later releases require a separately authorized release decision.
