@@ -1,81 +1,125 @@
-# GenAI at Work roadmap
+# Roadmap
 
-Status date: **2026-09-04**
+Status: **4 September 2026**
 
-This roadmap records the current public-release path and the research work intentionally left open after Release 1. The exact launch gate is `docs/RELEASE_CHECKLIST.md`; this document describes sequencing and scope.
+Release 1 (`v1.0.0`) established the first public baseline of the U.S. AI Adoption Observatory. The next phase is about extending the measurement system without weakening the distinctions that make the current results interpretable.
 
-## Release 1: current state
+## Current baseline
 
-The scientific and release architecture is implemented. The current candidate baseline includes the seven-quarter Q4 2024–Q2 2026 RPS A/H/S longitudinal panel, bounded public RPS observation view, Q2 2025 and Q2 2026 CPS composition evidence, descriptive occupation-adjusted industry residuals, May 2025 OEWS robustness, BTOS–RPS triangulation, governed claim-surface bindings, immutable staging, exact source rehydration, explicit promotion, and release-only deployment controls.
+Release 1 provides:
 
-No Observatory release has been promoted yet. A successful merge or historical deployment is not Release 1 publication evidence.
+- seven-quarter national and subgroup workplace GenAI evidence through Q2 2026;
+- industry and occupation views of adoption, AI-assisted working time, and reported time savings;
+- CPS-based occupation-composition benchmarks for industries;
+- descriptive occupation-adjusted industry residuals;
+- OEWS staffing robustness analysis;
+- BTOS–RPS sector comparison;
+- a versioned public website and reproducible release structure.
 
-### Immediate release sequence
+The current release remains descriptive. It does not estimate causal productivity, wage, employment, or firm-performance effects.
 
-| Gate | State | Definition of done |
-| --- | --- | --- |
-| Source retrieval reliability | **Implementation repaired; canonical execution required** | Authorized RPS/FRED retrieval completes under provider-rate pacing and the shared non-cancelling release queue. |
-| Exact Observatory candidate | **Pending execution** | Candidate is rebuilt on canonical `main`, staged as `BLOCKED_REVIEW_REQUIRED`, and has zero contract failures. |
-| Exact candidate CI/QA | **Pending final identity** | Required CI, Pages artifact audit, rendered-browser/accessibility QA, and native Safari evidence are bound to the exact final candidate as required by the checklist. |
-| Human review | **Pending** | Scientific, editorial, and source-rights review is completed against the exact rights-safe candidate-review package. |
-| Exact rehydration | **Pending** | Trusted re-fetch reproduces the reviewed scientific source identity, candidate manifest, stage, diff, review package, and gate records exactly. |
-| Promotion | **Pending** | Human attestation is bound to the deterministic rehydration identity and exact CI evidence; one immutable Observatory release is promoted. |
-| Release-only deployment | **Pending** | The validated authorization commit deploys through GitHub Pages and the live-origin audit succeeds. |
-| Formal publication | **Pending** | Final manual catastrophic-error/content inspection passes, then the release tag and GitHub Release are created. |
+## Near-term product work
 
-The release remains blocked at the first incomplete gate. Later gates never substitute for an earlier failure.
+### Improve the public explorer
 
-## Source and rights track
+Extend the industry and occupation pages so readers can move more easily between levels, trends, composition benchmarks, source definitions, and uncertainty information.
 
-### Published-aggregate RPS source
+Priorities include:
 
-The project records published-aggregate RPS use as permitted under the project-owner attestation in `docs/source-rights/RPS_SOURCE_DECISION.md`. The public release remains bounded: source-input bytes stay private; public output is restricted to the reviewed observation/derived surfaces; respondent microdata, the separate task-index artifact, unrestricted bulk mirroring, a historical subgroup database, and a generic raw-source API remain outside the current authorization.
+- clearer comparison views across quarters;
+- easier access to source and denominator definitions;
+- explicit display of missing periods and source breaks;
+- better presentation of composition benchmarks and residuals;
+- downloadable derived tables where source-use conditions permit them.
 
-Issue #4 tracks completion of the production-feed lifecycle. The implemented feed now has registered series identity, source retrieval, provenance, revision-aware candidate generation, private-vintage handling, and reviewed release controls. The issue remains open until the canonical live path and Release 1 transition establish the full end-to-end definition of done.
+### Release history and revisions
 
-## Release 1 scientific boundary
+Make source and analytical revisions easier to inspect from the website. A reader should be able to distinguish:
 
-Release 1 is a descriptive measurement product. Its central distinctions remain contractual:
+- when an upstream source changed;
+- when the observatory published a new version;
+- which values changed;
+- whether a change reflects new data, a revised source value, or a methodological revision.
 
-- adoption is distinct from routine use and AI-assisted working time;
-- AI-assisted hours are distinct from counterfactual hours saved;
-- reported time savings are distinct from measured labor productivity;
-- occupation-adjusted industry residuals are descriptive standardization residuals, not identified organizational or causal effects;
-- RPS worker-side constructs and BTOS firm-side constructs remain separate measurement objects;
-- CPS composition diagnostics do not become design-based confidence intervals without a defensible covariance method;
-- unsupported or suppressed cells fail closed instead of being silently renormalized into apparently complete estimates.
+### Documentation consolidation
 
-## Post-Release-1 work
+Continue reducing duplication across methodology, provenance, source-specific notes, and maintainer procedures. Durable documentation should describe the current system; dated evidence records should remain clearly identified as historical or source-vintage-specific records.
 
-The remaining open issues are intentional roadmap items, not unfinished claims required for the first public baseline.
+## Research priorities
 
-### #14 — design-based uncertainty for CPS composition vectors
+### 1. Design-based uncertainty for CPS composition estimates
 
-Develop a defensible covariance-aware uncertainty treatment for custom CPS industry × occupation composition vectors. Current Kish dispersion, monthly movement, leave-one-month-out sensitivity, and cross-vintage stability measures remain descriptive quality diagnostics until this work is complete.
+Release 1 does not provide a full design-based covariance estimate for the custom pooled CPS occupation-composition vectors.
 
-### #8 — experimental composition explorer
+A future method should add design-based intervals only if the required replicate or covariance information can be obtained from an authoritative source and implemented with defensible survey methodology.
 
-A future `/explore/composition` surface may expose observed industry values, occupation-composition counterfactuals, residuals, weighting/coverage information, suppression reasons, and stability context. It must consume only validated versioned outputs and retain the descriptive interpretation boundary.
+Until then, sensitivity and stability diagnostics remain descriptive.
 
-### #17 — realized task adoption versus AI exposure
+### 2. Richer composition analysis
 
-A separate measurement layer may compare theoretical/model-based exposure with realized worker-reported adoption by task and occupation. It remains gated on exact source provenance and reuse/publication terms for the task/occupation indices. Exposure, realized adoption, assisted use, and reported savings remain separate constructs.
+The current industry analysis uses broad occupation composition to construct descriptive benchmarks. Future work can examine whether finer occupation, task, worker, or firm structure explains additional variation.
 
-### #10 — worker × occupation × industry × time mechanism research
+Any extension should preserve the distinction between statistical decomposition and causal identification.
 
-Longer-term mechanism work requires richer authorized data and a pre-specified design capable of separating task suitability, worker selection, occupation composition, and industry/firm context. Aggregate residuals do not establish organizational complementarity or causal mechanisms.
+### 3. Task exposure versus realized adoption
 
-## Repository/release maintenance after launch
+The project can add a task-level layer comparing theoretical or model-based AI exposure with realized worker-reported use.
 
-After Release 1:
+This requires:
 
-1. every source revision or new wave receives a versioned source identity and revision assessment;
-2. release-relevant changes rebuild a complete candidate instead of patching public output in place;
-3. governed public claims remain bound to the exact repository files reviewed for the release;
-4. exact rehydration and explicit human attestation remain prerequisites for promotion;
-5. promoted release directories and registry history remain append-only;
-6. dated historical validation/reconstruction records remain provenance, while current status lives in the README, this roadmap, and the release checklist.
+- a well-defined task/occupation mapping;
+- source and publication permissions for the task data;
+- explicit separation of capability, exposure, adoption, assisted use, and reported savings.
 
-## What does not block Release 1
+Exposure should not be used as a substitute for observed adoption.
 
-Release 1 does not require respondent-level mechanism identification, the experimental composition explorer, task-level exposure/adoption analysis, or a new design-based CPS covariance method. Those are separately gated research/product extensions and must not be used to overstate the first baseline.
+### 4. Realized economic outcomes
+
+A major future objective is to connect workplace AI use to outcomes such as:
+
+- measured output or productivity;
+- wages;
+- employment;
+- hours;
+- firm performance.
+
+These questions require new outcome data and research designs capable of supporting causal or otherwise identified claims. Reported time savings alone are insufficient.
+
+### 5. Mechanism-oriented analysis
+
+Longer-term work should investigate why adoption and use intensity differ across occupations and industries.
+
+Potential mechanisms include task suitability, worker selection, employer tooling, organizational practices, regulation, and market structure. These mechanisms should be studied with data that can distinguish among them instead of assigning causal meaning to aggregate residuals.
+
+## Data and source development
+
+Future releases should continue to:
+
+- update RPS observations as new waves become available;
+- refresh CPS composition inputs on a documented schedule;
+- update BTOS and OEWS comparisons when new comparable vintages are available;
+- preserve source-definition and classification changes explicitly;
+- keep third-party redistribution decisions source-specific.
+
+A new source should be added only when its measurement role is clear and it materially improves the observatory.
+
+## Release principles
+
+Future versions should maintain the following properties:
+
+1. every published result is tied to defined source vintages;
+2. changed sources regenerate affected analyses;
+3. historical releases remain available;
+4. public interpretation is reviewed when results or definitions change;
+5. the website reads from versioned release artifacts rather than hand-maintained analytical values;
+6. unsupported quantities remain unavailable until a defensible method exists.
+
+## What is deliberately outside the current scope
+
+The following are research extensions, not missing pieces of Release 1:
+
+- respondent-level causal mechanism analysis;
+- a universal AI-impact or productivity number;
+- task-level exposure/adoption analysis without resolved provenance and permissions;
+- full design-based CPS composition uncertainty without authoritative covariance information;
+- unrestricted redistribution of third-party source data.
