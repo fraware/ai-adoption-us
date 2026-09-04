@@ -33,9 +33,9 @@ export default async function OccupationsPage() {
       <p className="eyebrow">{periods.length}-wave evidence</p>
       <h1>Occupation explorer</h1>
       <p className="lede">
-        Occupations are bundles of tasks, not proxies for firms. Across all {periods.length} audited waves,
-        the aggregate relationship between occupation adoption and assisted working time is tighter than
-        the corresponding relationship across industries.
+        Occupations provide the clearest cross-group link between adoption and depth of use. Across all
+        {` ${periods.length} `}audited waves, adoption and assisted working time align more tightly across
+        occupations than across industries.
       </p>
 
       <section className="section" aria-labelledby="occupation-stability">
@@ -49,14 +49,14 @@ export default async function OccupationsPage() {
           ]}
         />
         <p className="note">
-          Adoption ranks are more stable than assisted-hours ranks in
+          Adoption rankings exceed assisted-hours rank stability in
           {` ${dominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${dominance.quarter_pairs} `}
-          possible quarter-pair comparisons.
+          quarter-pair comparisons.
         </p>
       </section>
 
       <section className="section" aria-labelledby="occupation-savings">
-        <h2 id="occupation-savings">Adoption remains highly informative about reported savings</h2>
+        <h2 id="occupation-savings">Adoption consistently accounts for more cross-occupation variation in reported savings</h2>
         <div className="table-wrap" tabIndex={0} aria-label="Scrollable occupation wave diagnostics table">
           <table>
             <caption>Unweighted cross-occupation descriptive diagnostics by quarter. A = adoption, H = assisted hours, S = reported savings.</caption>
@@ -81,9 +81,8 @@ export default async function OccupationsPage() {
           </table>
         </div>
         <p className="note">
-          Adoption has the higher univariate R² for reported savings in {occupationABeatsHWaves} of {periods.length} occupation waves and
-          in all {occupationLooABeatsH} leave-one-occupation checks. This is descriptive aggregate
-          evidence, not an individual-level behavioral model.
+          Adoption has the higher univariate R² for reported savings in {occupationABeatsHWaves} of {periods.length} waves and
+          in all {occupationLooABeatsH} leave-one-occupation checks. The result is aggregate and descriptive.
         </p>
       </section>
 
@@ -96,10 +95,10 @@ export default async function OccupationsPage() {
           </>
         ) : (
           <div className="callout">
-            <p className="callout-label">Derived-only mode</p>
+            <p className="callout-label">Public aggregate view</p>
             <p>
-              The bounded public occupation view is unavailable in this build. The longitudinal derived
-              diagnostics remain available without exposing the historical subgroup source panel.
+              This build excludes the bounded public occupation cross-section. Longitudinal derived
+              diagnostics remain available through the promoted release.
             </p>
           </div>
         )}
@@ -108,8 +107,8 @@ export default async function OccupationsPage() {
       <section className="section" aria-labelledby="occupation-boundary">
         <h2 id="occupation-boundary">Interpretive boundary</h2>
         <p className="note">
-          Occupation-level patterns describe major task bundles. They do not identify individual worker
-          responses, employer policies, or causal productivity effects.
+          Occupation-level patterns summarize major task bundles. Individual worker responses, employer
+          policies, and causal productivity effects require microdata or separate identification.
         </p>
       </section>
     </main>
