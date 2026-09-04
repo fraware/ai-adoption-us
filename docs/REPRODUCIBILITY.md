@@ -119,7 +119,9 @@ A rights-safe review package contains the sanitized candidate manifest, candidat
 
 ## Tier D — trusted post-review exact rehydration
 
-Human review is performed against the exact candidate-review package. Promotion cannot rely solely on that earlier build. Before canonical promotion, `scripts/rehydrate_observatory_v1_candidate.py`:
+For Release 1, the project owner explicitly authorized an automated release review in `data/registry/release1_owner_authorization.json`; no separate human review is required. The candidate-review workflow itself cannot self-attest publication readiness. The owner-authorized release operator may complete the review only after the exact candidate package is clean and exact-commit CI succeeds.
+
+Before canonical promotion, `scripts/rehydrate_observatory_v1_candidate.py`:
 
 1. requires a clean checkout of the exact reviewed candidate commit;
 2. requires the release registry to remain at the predecessor state recorded by the reviewed stage;
@@ -128,25 +130,28 @@ Human review is performed against the exact candidate-review package. Promotion 
 5. rebuilds the RPS component, claim-surface bindings, global candidate, and stage;
 6. requires byte-identical private candidate-manifest identity and identical sanitized manifest;
 7. requires the rehydrated stage manifest, release diff, review package, and publication gate to equal the reviewed records exactly;
-8. emits only a rights-safe `rehydration_identity.json` for review/promotion binding.
+8. emits only a rights-safe `rehydration_identity.json` for release-review and promotion binding.
 
 Any scientific source revision, repository evidence change, claim-surface change, registry advance, artifact drift, or stage drift fails closed and requires a new candidate review.
 
-The promotion workflow is deliberately two-phase. A first `rehydrate` run produces the deterministic rehydration identity. A later `promote` run requires the human attestation to contain that identity file's SHA-256, repeats exact rehydration, verifies exact-commit CI evidence through the release engine, promotes the immutable release, and writes the rehydration trace into the release record.
+For Release 1 the automated review attestation is created only after exact rehydration succeeds. It binds the exact CI run, rehydration-identity SHA-256, source/artifact/diagnostic/claim review sets, and the one-shot owner authorization ID. The immutable release record states `review_mode=owner_authorized_automated_release_review` and `human_review_performed=false`.
 
-The low-level release engine cannot update the canonical release registry/release tree without the internal exact-rehydration capability supplied by `scripts/promote_rehydrated_observatory_v1.py`.
+The generic manually dispatched promotion workflow remains available for separately authorized future release decisions. It preserves the same exact-rehydration capability boundary and cannot use the low-level release engine to mutate the canonical registry directly.
 
 ## Public deployment identity
 
 Promotion produces one release-only authorization commit. `scripts/validate_observatory_publication_commit.py` requires:
 
 - commit subject `Authorize Observatory release <release-id>`;
-- the commit parent to be the exact human-reviewed candidate commit;
-- changed paths to be limited to `data/registry/observatory_release_registry.json` and `data/releases/<release-id>/...`;
+- the commit parent to be the exact release-reviewed candidate commit;
+- for the first release, an immutable review record bound to `release1_owner_authorization.json` and explicitly recording that no separate human review was performed;
+- changed paths limited to `data/registry/observatory_release_registry.json` and `data/releases/<release-id>/...`;
 - valid release-manifest, review-record, rehydration-identity, and artifact checksums;
 - explicit exact-rehydration traceability.
 
-GitHub Pages builds may run on ordinary changes for QA, but deployment and the live deployment audit run only for this validated authorization commit. Thus engineering changes on `main` do not silently replace the public Observatory release.
+GitHub Pages builds may run on ordinary changes for QA, but release deployment and the live deployment audit require this validated authorization commit. The owner-authorized workflow explicitly dispatches `pages.yml` with the exact publication SHA after the release commit reaches `main`; the Pages workflow independently verifies that the supplied SHA is the current canonical `main` commit and passes the publication validator before deployment. This avoids relying on a secondary push-triggered workflow after a repository-token-authenticated release commit.
+
+The formal `v1.0.0` GitHub Release is created only after the exact Pages build, deployment, and live-origin audit all succeed.
 
 ## Source identity and revision discipline
 
@@ -162,9 +167,11 @@ A research/release freeze is identified by more than a filename. It records, as 
 - stage ID and release diff;
 - exact CI run identities;
 - deterministic rehydration identity;
-- reviewer and reviewed timestamp;
+- release-review mode, authorization identity, reviewer/operator, and reviewed timestamp;
 - promoted release-manifest identity;
-- authorization/deployment commit.
+- authorization/deployment commit;
+- Pages deployment/live-audit run;
+- formal GitHub release/tag.
 
 A source revision, registry/crosswalk revision, methodology change, governed public-file change, or repository evidence change triggers regeneration and explicit review. Analytical history is retained instead of silently overwritten.
 
