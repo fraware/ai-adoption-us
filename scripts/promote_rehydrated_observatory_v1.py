@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 from pathlib import Path
 from typing import Any
@@ -107,6 +108,16 @@ def _rollback(
     registry.write_bytes(registry_before)
 
 
+def _ensure_github_token_alias() -> None:
+    """Expose the Actions token under the name required by CI verification."""
+
+    if os.environ.get("GITHUB_TOKEN", "").strip():
+        return
+    gh_token = os.environ.get("GH_TOKEN", "").strip()
+    if gh_token:
+        os.environ["GITHUB_TOKEN"] = gh_token
+
+
 def promote(args: argparse.Namespace) -> int:
     candidate = load_json_object(args.candidate_manifest)
     staged_manifest = load_json_object(args.staging_dir / "stage_manifest.json")
@@ -140,6 +151,7 @@ def promote(args: argparse.Namespace) -> int:
         attestation=args.attestation,
         _rehydration_verified=True,
     )
+    _ensure_github_token_alias()
     observatory_release.promote(delegated)
 
     try:
