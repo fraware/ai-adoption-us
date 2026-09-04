@@ -15,6 +15,8 @@ on:
       - 'scripts/observatory_release.py'
       - 'src/genai_at_work/claim_surfaces.py'
       - 'src/genai_at_work/release_engine.py'
+      - 'src/genai_at_work/rps_refresh.py'
+      - 'src/genai_at_work/sources/fred.py'
       - 'src/genai_at_work/rps_release.py'
       - 'src/genai_at_work/rps_release_complete.py'
       - 'src/genai_at_work/rps_release_public.py'
@@ -46,7 +48,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: observatory-candidate-review-${{ github.ref }}
+  group: authorized-rps-fred-source
   cancel-in-progress: false
 
 jobs:

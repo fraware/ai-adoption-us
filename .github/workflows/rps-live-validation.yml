@@ -34,7 +34,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: rps-live-validation-${{ github.ref }}
+  group: authorized-rps-fred-source
   cancel-in-progress: false
 
 jobs:
