@@ -135,9 +135,10 @@ def test_publication_commit_validator_requires_append_only_new_release_transitio
     validator = read("scripts/validate_observatory_publication_commit.py")
 
     assert 'expected_subject = f"Authorize Observatory release {release_id}"' in validator
-    assert "Publication commit parent is not the exact human-reviewed candidate commit" in validator
+    assert "Publication commit parent is not the exact release-reviewed candidate commit" in validator
     assert 'review.get("rehydration_status") != "REHYDRATED_EXACT_CANDIDATE"' in validator
     assert "Review record does not bind the rehydration identity" in validator
+    assert "Release 1 review record does not bind owner authorization field" in validator
     assert "Publication commit must advance to a new immutable release ID" in validator
     assert "attempts to rewrite a release directory that already existed in its parent" in validator
     assert "exactly one append-only release row" in validator
@@ -163,6 +164,20 @@ def test_publication_commit_validator_accepts_new_release_and_rejects_rewrite(
 
     registry_path = repo / "data/registry/observatory_release_registry.json"
     releases_root = repo / "data/releases"
+    authorization_path = repo / "data/registry/release1_owner_authorization.json"
+    authorization = {
+        "schema_version": 1,
+        "authorization_id": "release-1-owner-auth-test",
+        "authorized_by": "test-owner",
+        "authorized_at": "2026-09-04T11:53:00Z",
+        "scope": "test first release",
+        "first_release_only": True,
+        "automated_release_review_authorized": True,
+        "human_review_required": False,
+        "formal_github_release_tag": "v1.0.0",
+        "active": True,
+    }
+    _write_json(authorization_path, authorization)
     parent_registry = {
         "schema_version": 1,
         "current_release_id": None,
@@ -193,6 +208,12 @@ def test_publication_commit_validator_accepts_new_release_and_rejects_rewrite(
         "candidate_commit": candidate_commit,
         "rehydration_identity_sha256": identity_sha,
         "rehydration_status": "REHYDRATED_EXACT_CANDIDATE",
+        "review_mode": "owner_authorized_automated_release_review",
+        "owner_authorized": True,
+        "owner_authorization_id": authorization["authorization_id"],
+        "authorized_by": authorization["authorized_by"],
+        "authorized_at": authorization["authorized_at"],
+        "human_review_performed": False,
     }
     _write_json(release_root / "review_record.json", review)
     manifest = {
@@ -236,6 +257,7 @@ def test_publication_commit_validator_accepts_new_release_and_rejects_rewrite(
     monkeypatch.setattr(validator, "ROOT", repo)
     monkeypatch.setattr(validator, "REGISTRY", registry_path)
     monkeypatch.setattr(validator, "RELEASES_ROOT", releases_root)
+    monkeypatch.setattr(validator, "OWNER_AUTHORIZATION", authorization_path)
     result = validator.validate("HEAD")
     assert result["status"] == "PUBLICATION_COMMIT_VALID"
     assert result["candidate_commit"] == candidate_commit
@@ -278,5 +300,5 @@ def test_pages_deploys_only_after_validated_release_authorization_commit():
     )
 
     assert workflow.count(condition) >= 2
-    assert "scripts/validate_observatory_publication_commit.py --commit \"$GITHUB_SHA\"" in workflow
+    assert "scripts/validate_observatory_publication_commit.py --commit \"$RELEASE_COMMIT_SHA\"" in workflow
     assert "github.event_name != 'pull_request'" not in workflow
