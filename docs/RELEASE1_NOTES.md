@@ -1,18 +1,16 @@
-# GenAI at Work — Release 1 candidate notes
+# GenAI at Work — Release 1
 
-**Status:** pre-release. No formal Observatory Release 1 has been promoted, deployed through the release-only authorization path, tagged, or published as a GitHub Release yet.
-
-The formal release date will be the date of the GitHub Release created only after exact-candidate review, exact source rehydration, explicit promotion, release-only deployment, and live deployment audit all succeed.
+Release status is determined by the immutable Observatory release registry and the formal GitHub tag/release, not by this prose file alone. The Release 1 publication workflow stamps the actual publication date into the GitHub Release only after exact candidate validation, exact source rehydration, promotion, release-only deployment, and the live-origin audit succeed.
 
 ## What Release 1 establishes
 
 Release 1 is the first governed public baseline of the U.S. GenAI-at-work observatory. The product separates workplace GenAI adoption from routine use, AI-assisted working time, reported counterfactual time savings, composition-adjusted descriptive evidence, and firm-side triangulation instead of collapsing them into one adoption indicator.
 
-The public product is designed for static GitHub Pages deployment in `derived_only` mode. Private RPS source-input bytes and private audit material are excluded from the public Git tree and promoted release bundle.
+The public product is a static GitHub Pages deployment in `derived_only` mode. Private RPS source-input bytes and private audit material are excluded from the public Git tree and promoted release bundle.
 
-## Evidence intended for the release
+## Evidence included
 
-The current Release 1 candidate architecture composes the rights-safe evidence already validated in the repository:
+Release 1 composes the rights-safe evidence validated in the repository:
 
 - national workplace GenAI adoption/use indicators and seven-quarter longitudinal conversion diagnostics;
 - bounded industry and occupation adoption, assisted-hours, and reported-savings views on the authorized public surface;
@@ -22,7 +20,7 @@ The current Release 1 candidate architecture composes the rights-safe evidence a
 - preregistered BTOS–RPS descriptive triangulation with construct differences and suppression boundaries preserved;
 - methodology, source/provenance, and technical-essay surfaces cryptographically bound to the reviewed repository files.
 
-The final release is defined by its promoted immutable release directory and registry entry, not by these notes alone.
+The exact release is defined by its promoted immutable release directory, registry entry, release-only authorization commit, deployed Pages identity, and formal `v1.0.0` tag.
 
 ## Scientific boundaries
 
@@ -40,33 +38,33 @@ The release pipeline retrieves the authorized aggregate RPS source into a privat
 
 ## Release and QA contract
 
-Release 1 is not authorized by a successful build alone. The exact final candidate must satisfy the release checklist in `docs/RELEASE_CHECKLIST.md`, including:
+Release 1 is not authorized by a successful build alone. The project owner explicitly authorized an automated release review in `data/registry/release1_owner_authorization.json`; no separate human review step is required. That authorization does not waive any machine-verifiable release gate. Publication requires:
 
 - release CI on the exact candidate commit;
-- rendered browser/accessibility QA and native Safari QA on the applicable final web state;
+- the applicable recorded rendered-browser/accessibility and native-Safari evidence;
 - GitHub Pages static artifact audit;
-- exact candidate-review package with zero release-contract failures;
-- human scientific, editorial, and source-rights review of that exact package;
-- exact source rehydration that reproduces the reviewed scientific/candidate/stage identities;
-- human attestation bound to the deterministic rehydration identity and exact CI evidence;
+- an exact candidate-review package with zero release-contract failures;
+- owner-authorized automated scientific, editorial, and source-rights review of that exact package;
+- exact source rehydration reproducing the reviewed scientific, candidate, and stage identities;
+- an automated review attestation bound to the deterministic rehydration identity and exact CI evidence;
 - explicit promotion into a new immutable `data/releases/<release-id>/` directory and release-registry transition;
 - validation of the single release-only authorization commit;
 - GitHub Pages deployment from that authorization commit and successful live-origin audit;
-- final catastrophic-error/manual content inspection before the formal tag and GitHub Release are created.
+- creation of the formal `v1.0.0` GitHub Release only after the deployment and live audit succeed.
 
-Historical CI, browser, or deployment results remain useful engineering evidence but do not substitute for exact final release execution.
+Historical CI, browser, or deployment results remain useful engineering evidence but do not substitute for exact final release execution where exact identity is required.
 
 ## Publication target
 
-The intended production site is:
+The production site is:
 
 `https://fraware.github.io/ai-adoption-us/`
 
-A previously deployed site state must not be interpreted as the formal Release 1 artifact unless it is tied to the final promoted release and passes the release-only live deployment audit.
+Only a deployment tied to the promoted immutable release and successful release-only live audit constitutes the formal Release 1 site identity.
 
 ## Update model after Release 1
 
-Release 1 establishes a reviewed baseline, not unattended publication. Future source changes flow through source identity, validation, rights-safe derivation, revision diagnostics, complete candidate composition, governed claim-surface binding, exact staging, review, exact rehydration, promotion, and release-only deployment.
+The one-shot Release 1 owner authorization becomes inert after the first promoted release. Future source changes still flow through source identity, validation, rights-safe derivation, revision diagnostics, complete candidate composition, governed claim-surface binding, exact staging, review, exact rehydration, promotion, and release-only deployment under a separately authorized release decision.
 
 ## Post-Release-1 research
 
