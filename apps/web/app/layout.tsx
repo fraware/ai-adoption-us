@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ReleaseNotice } from "../components/ReleaseNotice";
 import { absoluteSiteUrl, configuredSiteBaseUrl } from "../lib/site";
 import "./globals.css";
+import "./design.css";
 
 const siteBaseUrl = configuredSiteBaseUrl();
 const homeUrl = absoluteSiteUrl("/");
