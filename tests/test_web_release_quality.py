@@ -131,21 +131,20 @@ def test_explorers_use_registry_entity_names_instead_of_slug_labels():
 def test_source_provenance_matches_rights_safe_architecture():
     text = read("docs/source-provenance.md")
     lower = text.lower()
-    assert "authorized release pipeline" in lower
-    assert "private candidate workspace" in lower
-    assert "contracted attributed aggregate presentation view" in lower
     assert "complete historical subgroup source panel" in lower
-    assert "bulk download" in lower
-    assert "generic query api" in lower
-    assert "private source-input" in lower
+    assert "unrestricted bulk mirror" in lower
+    assert "generic source api" in lower
+    assert "rps source files used during release preparation are acquired outside the public git history" in lower
     assert "project-owner attestation" in lower
     assert "not independently inspected" in lower
-    assert "does not infer unrecorded contractual terms" in lower
-    assert "Official Q2 2025 and Q2 2026 Basic Monthly CPS inputs have been executed" in text
-    assert "Official May 2025 staffing data have been executed" in text
-    assert "occupation-adjusted RPS industry-context residual artifacts" in text
-    assert "derived descriptive diagnostics" in text
-    assert "no class-4 causal claim" in lower
+    assert "does not infer broader rights" in lower
+    assert "release 1 includes validated composition analyses" in lower
+    assert "q2 2025" in lower
+    assert "q2 2026" in lower
+    assert "release 1 uses **may 2025** oews staffing data" in lower
+    assert "occupation-adjusted industry residuals" in lower
+    assert "descriptive standardization results" in lower
+    assert "do not identify management quality" in lower
 
 
 def test_navigation_routes_exist():
@@ -159,9 +158,11 @@ def test_navigation_routes_exist():
     assert all((ROOT / rel).exists() for rel in expected)
 
 
-def test_release_qa_does_not_overclaim_browser_validation():
-    text = read("docs/RELEASE1_PRODUCT_QA.md")
-    assert "does not substitute for a real browser" in text
-    assert "Genuine `npm install` and `next build`" in text
-    assert "Screen-reader traversal" in text
-    assert "No public-launch claim" in text
+def test_current_validation_surfaces_do_not_overclaim_browser_validation():
+    sources = normalized_lower(read("apps/web/app/sources/page.tsx"))
+    deployment = normalized_lower(read("docs/DEPLOYMENT.md"))
+    assert "human screen-reader traversal" in sources
+    assert "outside current validation evidence" in sources
+    assert "representative desktop and mobile rendering" in deployment
+    assert "a successful github actions job is necessary operational evidence" in deployment
+    assert "the live origin should also be inspected" in deployment
