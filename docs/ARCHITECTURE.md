@@ -2,170 +2,231 @@
 
 ## 1. System objective
 
-The system is both a research pipeline and a public data publication. The architecture must preserve a hard distinction between:
+GenAI at Work is simultaneously a research pipeline, a governed release system, and a public data publication. Its architecture preserves explicit boundaries among:
 
-1. source metadata;
-2. private research observations;
-3. generated derived diagnostics;
-4. public website artifacts;
-5. future cross-survey composition outputs.
+1. source metadata and rights decisions;
+2. private source-input bytes used to build/reproduce candidates;
+3. rights-safe public observation projections;
+4. derived scientific evidence;
+5. governed public claim surfaces;
+6. immutable promoted releases;
+7. the deployed web publication.
 
-## 2. High-level architecture
+The central release invariant is identity continuity: the source vintage, scientific artifacts, public claims, promoted release, and deployed site must describe the same reviewed object.
 
-```text
-                        ┌──────────────────────┐
-                        │ RPS / FRED metadata  │
-                        └──────────┬───────────┘
-                                   │ registry only in public repo
-                                   ▼
-                       data/registry/*.json|yaml
-                                   │
-                ┌──────────────────┴─────────────────┐
-                │                                    │
-                ▼                                    ▼
-     PRIVATE RESEARCH ONLY                    PUBLIC RIGHTS-SAFE
- data/audit/private/...                     data/derived/longitudinal/
-                │                                    │
-                ▼                                    │
- scripts/build_longitudinal.py                       │
-                │                                    │
-                └──────────────► deterministic derived diagnostics
-                                                     │
-                                                     ▼
-                                              apps/web/lib/
-                                                     │
-                                                     ▼
-                                               Next.js routes
-```
-
-Future Release 1.1 adds:
+## 2. Current high-level architecture
 
 ```text
-Official CPS monthly public-use files
-             │
-             ▼
-  src/genai_at_work/cps.py
-             │
-             ▼
- industry × occupation worker/hour shares
-             │
-             ▼
- src/genai_at_work/composition.py
-             │
-             ▼
- occupation-composition counterfactuals
-             │
-             ▼
- occupation-adjusted industry-context residuals
+Authorized RPS published aggregates (FRED/ALFRED)
+                  │
+                  ▼
+       private refresh candidate
+   rps_source_snapshot.json + hashes
+                  │
+                  ▼
+       private RPS Observatory component
+   ┌──────────────┼────────────────────┐
+   │              │                    │
+   ▼              ▼                    ▼
+complete       seven-quarter       bounded public
+source input   longitudinal        observation view
+objects        diagnostics         (national history +
+(private)      (derived)           latest subgroup A/H/S)
+   │              │                    │
+   └──────────────┴─────────────┬──────┘
+                                │
+                                ▼
+                vintage-bound global candidate
+          ┌────────────┬────────────┬────────────┐
+          │            │            │            │
+          ▼            ▼            ▼            ▼
+        CPS          OEWS         BTOS      governed claim
+     composition   robustness  triangulation  surface hashes
+          │            │            │            │
+          └────────────┴────────────┴────────────┘
+                                │
+                                ▼
+                    immutable candidate stage
+                                │
+                     explicit human review
+                                │
+                                ▼
+                 exact post-review rehydration
+                                │
+                source identity + candidate + stage
+                     must reproduce exactly
+                                │
+                                ▼
+                   immutable promoted release
+                                │
+                                ▼
+                  release-only authorization commit
+                                │
+                                ▼
+                       GitHub Pages deployment
 ```
 
-## 3. Trust boundary: private RPS observations
+## 3. Source and private-data boundary
 
-`data/audit/private/` is the private research boundary.
+`data/audit/private/` is the repository-local private workspace boundary. External private/transient workspaces are also permitted by the candidate builders.
 
 Rules:
 
-- never commit it to this public repository;
-- never copy it under `apps/web/public/`;
-- never include it in a static deployment artifact;
-- `audit_snapshot` mode is for controlled research environments only;
-- public releases are constructed by `scripts/export_rights_safe.py`;
-- derived public statistics must be regenerated from private inputs and then reviewed for publication suitability.
+- private RPS source snapshots and complete historical source objects are never committed to the public repository;
+- candidate `inputs/` are never copied into the promoted public release;
+- public review packages contain no source `local_path`, private snapshot, or candidate `inputs/` directory;
+- public availability of a source is not treated as authorization for unrestricted mirroring, bulk redistribution, or a generic source API;
+- the current RPS permission basis and its limitations are recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`.
 
-## 4. Public release modes
+The current public RPS contract permits a bounded attributed aggregate presentation view, not a complete historical subgroup database.
+
+## 4. Public data mode
 
 ### `derived_only`
 
-The intended public Release 1 mode.
+The Release 1 public mode. It can render:
 
-Loads only generated, rights-safe diagnostics. It cannot render raw subgroup observation tables because those inputs are absent.
+- rights-safe derived publication evidence;
+- the contracted bounded RPS observation view from the current promoted release.
+
+The web resolver verifies the release-registry pointer, promoted release-manifest checksum, artifact path, artifact size, artifact SHA-256, and RPS source-vintage consistency before returning promoted data. Longitudinal diagnostics and bounded observations resolve from the same promoted release.
+
+Before the first promoted release, the repository seven-quarter longitudinal artifact provides a research/QA fallback for derived diagnostics. The bounded observation view remains unavailable until a promoted release exists.
 
 ### `audit_snapshot`
 
-Private research mode.
-
-Requires the private fixture. A public build without the fixture cannot silently fall back into this mode.
+Controlled private research mode. It can load explicitly supplied private audit material. It is not the public release path and there is no silent fallback into it.
 
 ### `fred_live_no_store`
 
-Reserved mode. It is intentionally fail-closed until source rights and production behavior are reviewed.
-
-No code should turn this mode into a persistent cache without explicit rights approval.
+Reserved server-side adapter mode. It remains separately governed and fail-closed. Release 1 does not depend on activating this runtime adapter because source acquisition occurs in the private release pipeline.
 
 ## 5. Scientific module boundaries
 
-### `rps_registry.py`
+### RPS registry and refresh
 
-Canonical source-series identity and metadata. The registry cardinality contract is 131 work-focused series:
+`data/registry/rps_source_series_manifest.json` defines the 131-series work-focused scope:
 
 - 5 national;
 - 60 industry;
 - 66 occupation.
 
-### `longitudinal.py`
+`src/genai_at_work/rps_refresh.py` validates the official provider inventory, canonical metadata, excluded constructs, source definitions, observation domain, rights boundary, and stable scientific source identity.
 
-Pure descriptive analysis over audited subgroup panels. It owns:
+### Longitudinal analysis
+
+`src/genai_at_work/rps_release.py` and `rps_release_complete.py` own the deterministic descriptive RPS analysis:
 
 - cross-sectional regressions;
-- Pearson/Spearman coupling;
-- leave-one-out diagnostics;
-- rank stability;
-- cross-level comparisons.
+- Pearson/Spearman A/H relationships;
+- leave-one-group-out diagnostics;
+- rank stability across all quarter pairs;
+- cross-level comparisons;
+- construct-specific source-history topology and the common complete A/H/S analytical window.
 
-### `cps.py`
+Current Release 1 analysis uses seven common quarters, Q4 2024–Q2 2026.
 
-CPS public-use parsing, crosswalk application, weighting, coverage, and quarter pooling.
+### Public RPS projection
 
-Critical denominator contract:
+`src/genai_at_work/rps_public_view.py` constructs the bounded attributed RPS observation artifact under `rps-public-observation-delivery-v1`:
 
-- adoption counterfactual → worker shares;
-- assisted-hours / reported-savings counterfactuals → actual-main-job-hour shares.
+- five national work-family metrics across the complete seven-quarter history;
+- latest complete Q2 2026 A/H/S cross-sections for 20 industries;
+- latest complete Q2 2026 A/H/S cross-sections for 22 occupations.
 
-### `composition.py`
+It does not publish historical subgroup panels or a generic query database.
 
-Consumes RPS occupation outcomes plus CPS industry×occupation composition weights and emits counterfactuals/residuals.
+### CPS composition and residuals
 
-The residual is a mechanical standardization residual, never a causal organizational estimate.
+CPS supplies occupation-composition weights:
 
-## 6. Web architecture
+- adoption counterfactuals use worker shares;
+- assisted-hours and reported-savings counterfactuals use actual-main-job-hour shares;
+- usual-hours weights are sensitivity evidence.
 
-The Next.js app consumes either:
+The occupation-adjusted industry-context residual is a descriptive standardization residual:
 
-- rights-safe derived longitudinal artifacts; or
-- private audited observations in controlled research mode.
+`observed industry value - occupation-composition counterfactual`
 
-Routes:
+It is not an identified organizational, efficiency, productivity, or causal effect.
 
-- `/` — narrative overview;
-- `/explore/industries`;
-- `/explore/occupations`;
-- `/methodology`;
-- `/sources`;
-- `/blog/after-adoption`.
+### OEWS robustness
 
-Future route:
+May 2025 OEWS staffing evidence provides an independent establishment-side composition robustness basis. Its population differs from CPS and is kept separate rather than pooled into one synthetic weight system.
 
-- `/explore/composition` after Release 1.1 empirical gates pass.
+### BTOS triangulation
 
-## 7. Generated-artifact contract
+BTOS–RPS industry comparison is preregistered descriptive cross-construct triangulation. Employer-business AI use and worker GenAI adoption retain distinct units, denominators, technology scope, and reference periods.
 
-The following files are generated publication artifacts and must reproduce byte-for-byte from the private fixture:
+## 6. Claim-surface trust boundary
 
-- `data/derived/longitudinal/longitudinal_diagnostics.json`;
-- `data/derived/longitudinal/quarter_diagnostics.csv`;
-- `data/derived/longitudinal/rank_stability.csv`;
-- `data/derived/longitudinal/validation_checks.json`.
+Scientific artifact hashes alone do not prove that the public page presents the reviewed claim. `src/genai_at_work/claim_surfaces.py` binds each governed longitudinal/source claim to SHA-256 hashes of the exact repository files that present it.
 
-Source-series manifests are metadata registries, not observation stores.
+The RPS candidate converts each governed claim identity into a digest over:
 
-## 8. Fail-closed principles
+- its evidence-only claim digest; and
+- the exact registered surface-file hashes.
 
-The system must prefer an explicit missing state over a convenient fabricated value.
+Global composition revalidates these bindings. Any governed-file edit after candidate construction fails candidate composition/rehydration and requires a new review.
 
-Examples:
+## 7. Global candidate composition
 
-- unsupported CPS quarter → unavailable;
-- composition coverage breach → `null`;
-- missing private fixture → audit tests skip/fail as designed, never fabricate;
-- unavailable production source → `fred_live_no_store` remains disabled;
-- raw-data rights uncertainty → no public raw-data export.
+`src/genai_at_work/observatory_baseline.py` composes the complete v1 candidate from the private RPS component and repository-bound CPS/OEWS/BTOS evidence.
+
+`src/genai_at_work/observatory_rps_bindings.py` prevents repository artifacts derived from RPS from silently referring to another RPS vintage. It requires exact binding coverage for every RPS-dependent baseline artifact before global composition.
+
+The global candidate contains private `inputs/` for release reproducibility and rights-safe `artifacts/` eligible for promotion. The generic release engine validates both but copies only declared public artifacts into the immutable promoted release.
+
+## 8. Stage, review, and rehydration boundary
+
+`scripts/observatory_release.py stage` builds a portable stage identity from:
+
+- current release-registry predecessor identity;
+- candidate manifest file SHA-256;
+- candidate canonical digest;
+- release-diff digest;
+- review-package digest;
+- gate status.
+
+The candidate-review workflow uploads only rights-safe review evidence and leaves scientific/editorial/source-rights/CI attestation fields uncompleted.
+
+`scripts/rehydrate_observatory_v1_candidate.py` is the post-review trust boundary. It runs on the exact reviewed commit, verifies the predecessor release state, re-fetches RPS, requires the same scientific source identity, rebuilds the complete candidate, re-stages it, and requires exact equality with the reviewed candidate/stage records.
+
+A changed source value, source definition, repository evidence artifact, governed claim file, candidate manifest, stage identity, or release predecessor blocks promotion and forces renewed review.
+
+## 9. Promotion and deployment boundary
+
+Canonical promotion is available only through `scripts/promote_rehydrated_observatory_v1.py`. The low-level release engine rejects direct promotion against the canonical release registry/tree unless it receives the internal exact-rehydration capability.
+
+The two-phase promotion workflow requires:
+
+1. an exact candidate-review workflow run on `main`;
+2. a deterministic rehydration identity;
+3. a later human attestation bound to that identity SHA-256;
+4. a second exact rehydration;
+5. exact-commit CI verification;
+6. immutable release promotion.
+
+The resulting Git commit may change only:
+
+- `data/registry/observatory_release_registry.json`;
+- `data/releases/<release-id>/...`.
+
+`scripts/validate_observatory_publication_commit.py` validates this transition and requires the commit parent to be the exact reviewed candidate commit.
+
+GitHub Pages may build on ordinary pushes for QA, but deployment occurs only from a validated `Authorize Observatory release <release-id>` commit. This prevents an ordinary code merge from silently replacing the public release.
+
+## 10. Fail-closed principles
+
+The system prefers explicit unavailability or renewed review over convenience. Examples:
+
+- source scientific identity changes after review → new candidate review required;
+- governed public claim file changes after binding → candidate invalid;
+- release registry advances after review → rehydration invalid;
+- unsupported CPS period → unavailable;
+- composition support breach → unsupported/null evidence;
+- incomplete source family → candidate build failure;
+- unverified or broadened rights scope → publication blocked;
+- no promoted release → no bounded RPS public view;
+- direct canonical low-level promotion → blocked;
+- publication commit contains unrelated code/content → deployment blocked.
