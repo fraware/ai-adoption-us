@@ -247,7 +247,9 @@ test.describe("Release 1 rendered browser QA", () => {
     const section = page.locator('section[aria-labelledby="cross-source-triangulation"]');
     await expect(section).toBeVisible();
     await expect(
-      section.getByRole("heading", { name: "Two different measures, one sector pattern" }),
+      section.getByRole("heading", {
+        name: "Worker adoption and firm AI use show substantial sector concordance",
+      }),
     ).toBeVisible();
     await expect(
       section.locator(".metric").filter({ hasText: "Primary sectors" }).locator("strong"),
@@ -262,9 +264,9 @@ test.describe("Release 1 rendered browser QA", () => {
     const boundary = section.locator("#btos-rps-measurement-boundary");
     await expect(boundary).toContainText("responding employer businesses");
     await expect(boundary).toContainText("employed adults");
-    await expect(boundary).toContainText("not percentage-point gaps");
-    await expect(boundary).toContainText("not");
-    await expect(boundary).toContainText("causal effects");
+    await expect(boundary).toContainText("distinct constructs");
+    await expect(boundary).toContainText("Percentage-point gaps");
+    await expect(boundary).toContainText("causal interpretation");
 
     await expect(
       section.locator('figure[aria-label="RPS worker GenAI adoption (%) versus BTOS business AI use (%)"]'),
@@ -280,6 +282,6 @@ test.describe("Release 1 rendered browser QA", () => {
     await expect(sensitivity).toContainText("17");
     await expect(sensitivity).toContainText("0.815");
     await expect(sensitivity).toContainText("0.850");
-    await expect(sensitivity).toContainText("limited-comparability sectors");
+    await expect(sensitivity).toContainText("preregistered limited-comparability tier");
   });
 });
