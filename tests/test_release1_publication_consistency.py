@@ -7,89 +7,90 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
+def normalized_lower(text: str) -> str:
+    return " ".join(text.lower().split())
+
+
 def test_public_release_surfaces_do_not_revert_to_candidate_language():
     release_notice = read("apps/web/components/ReleaseNotice.tsx")
-    lower_release_notice = release_notice.lower()
+    normalized_notice = normalized_lower(release_notice)
     home = read("apps/web/app/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
     methodology = read("apps/web/app/methodology/page.tsx")
 
     assert "Release 1 · reviewed public evidence" in release_notice
-    assert "private source-input bytes" in lower_release_notice
-    assert "unrestricted historical subgroup data" in lower_release_notice
+    assert "private source-input bytes" in normalized_notice
+    assert "unrestricted historical subgroup data" in normalized_notice
     assert "Public candidate · derived diagnostics only" not in release_notice
-    assert "public candidate" not in home.lower()
-    assert "public candidate" not in sources.lower()
-    assert "public candidate" not in methodology.lower()
+    assert "public candidate" not in normalized_lower(home)
+    assert "public candidate" not in normalized_lower(sources)
+    assert "public candidate" not in normalized_lower(methodology)
 
 
 def test_sources_page_matches_current_r1_source_rights_and_qa_state():
-    sources = read("apps/web/app/sources/page.tsx")
-    lower = sources.lower()
+    sources = normalized_lower(read("apps/web/app/sources/page.tsx"))
 
-    assert "firm-side triangulation" in lower
-    assert "cross-construct descriptive triangulation" in lower
-    assert "owner permission for published aggregate project use" in lower
-    assert "derived aggregate analysis" in lower
-    assert "authorized aggregate release path" in lower
-    assert "bounded attributed public views" in lower
-    assert "historical subgroup panels" in lower
-    assert "bulk download" in lower
-    assert "generic source-query access" in lower
-    assert "private source-input bytes" in lower
-    assert "human screen-reader traversal" in lower
-    assert "outside current validation evidence" in lower
-    assert "exact promoted release commit" in lower
+    assert "firm-side triangulation" in sources
+    assert "cross-construct descriptive triangulation" in sources
+    assert "owner permission for published aggregate project use" in sources
+    assert "derived aggregate analysis" in sources
+    assert "authorized aggregate release path" in sources
+    assert "bounded attributed public views" in sources
+    assert "historical subgroup panels" in sources
+    assert "bulk download" in sources
+    assert "generic source-query access" in sources
+    assert "private source-input bytes" in sources
+    assert "human screen-reader traversal" in sources
+    assert "outside current validation evidence" in sources
+    assert "exact promoted release commit" in sources
 
 
 def test_methodology_matches_executed_composition_boundary():
-    methodology = read("apps/web/app/methodology/page.tsx")
-    lower = methodology.lower()
+    methodology = normalized_lower(read("apps/web/app/methodology/page.tsx"))
 
-    assert "the cps composition foundation uses official q2 2025 and q2 2026 inputs" in lower
-    assert "occupation-adjusted industry-context residuals" in lower
-    assert "derived descriptive diagnostics" in lower
-    assert "design-based confidence intervals" in lower
-    assert "custom pooled cps composition vectors remain unsupported" in lower
-    assert "rps join gated" not in lower
-    assert "until source permissions are resolved" not in lower
+    assert "the cps composition foundation uses official q2 2025 and q2 2026 inputs" in methodology
+    assert "occupation-adjusted industry-context residuals" in methodology
+    assert "derived descriptive diagnostics" in methodology
+    assert "design-based confidence intervals" in methodology
+    assert "custom pooled cps composition vectors remain unsupported" in methodology
+    assert "rps join gated" not in methodology
+    assert "until source permissions are resolved" not in methodology
 
 
 def test_essay_matches_executed_composition_and_dynamic_longitudinal_evidence():
     essay = read("apps/web/app/blog/after-adoption/page.tsx")
-    lower = essay.lower()
+    normalized_essay = normalized_lower(essay)
 
-    assert "cps occupation weights generate an industry counterfactual" in lower
-    assert "occupation-adjusted industry-context residual" in lower
-    assert "full design-based uncertainty" in lower
+    assert "cps occupation weights generate an industry counterfactual" in normalized_essay
+    assert "occupation-adjusted industry-context residual" in normalized_essay
+    assert "full design-based uncertainty" in normalized_essay
     assert "periods.length" in essay
     assert "adoption_rank_corr_gt_assisted_hours_rank_corr" in essay
     assert "occupationABeatsHWaves" in essay
     assert "occupationLooABeatsH" in essay
-    assert "five audited waves" not in lower
-    assert "full five-wave window" not in lower
-    assert "until the required cps microdata are executed" not in lower
+    assert "five audited waves" not in normalized_essay
+    assert "full five-wave window" not in normalized_essay
+    assert "until the required cps microdata are executed" not in normalized_essay
     assert '<Link href="/methodology">' in essay
     assert '<Link href="/sources">' in essay
 
 
 def test_release1_bounded_view_and_live_adapter_boundaries_are_distinct():
-    release_notice = read("apps/web/components/ReleaseNotice.tsx")
-    home = read("apps/web/app/page.tsx")
-    sources = read("apps/web/app/sources/page.tsx")
-    lower_sources = sources.lower()
+    release_notice = normalized_lower(read("apps/web/components/ReleaseNotice.tsx"))
+    home = normalized_lower(read("apps/web/app/page.tsx"))
+    sources = normalized_lower(read("apps/web/app/sources/page.tsx"))
 
     # The application-controlled live adapter remains separately gated.
     assert "live adapter stays fail-closed until its operational activation gates pass" in release_notice
 
     # Release 1 exposes the contracted rights-bounded observation artifact.
-    assert "bounded national observation view" in home.lower()
-    assert "bounded attributed public views" in lower_sources
-    assert "seven complete national-history quarters through q2 2026" in lower_sources
-    assert "latest complete industry and occupation a/h/s cross-sections" in lower_sources
-    assert "historical subgroup panels" in lower_sources
-    assert "bulk download" in lower_sources
-    assert "generic source-query access" in lower_sources
+    assert "bounded national observation view" in home
+    assert "bounded attributed public views" in sources
+    assert "seven complete national-history quarters through q2 2026" in sources
+    assert "latest complete industry and occupation a/h/s cross-sections" in sources
+    assert "historical subgroup panels" in sources
+    assert "bulk download" in sources
+    assert "generic source-query access" in sources
 
 
 def test_derived_only_resolves_observations_and_diagnostics_from_one_promoted_release():
