@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Stage Observatory candidates and execute the internal reviewed promotion kernel.
 
-The public CLI may stage candidates. Direct CLI promotion is deliberately
-fail-closed: a promotion must be invoked by the exact-rehydration wrapper after
-it has independently verified the reviewed candidate, source vintage, artifacts,
-and rehydration identity.
+The CLI may stage candidates and may exercise promotion against isolated test or
+scratch registries. Promotion of the canonical repository registry/release tree
+is fail-closed unless invoked by the exact-rehydration wrapper after it has
+verified the reviewed candidate, source vintage, artifacts, and rehydration
+identity.
 """
 
 from __future__ import annotations
@@ -38,6 +39,8 @@ from genai_at_work.release_engine import (
 
 ROOT = Path(__file__).parents[1]
 CI_POLICY = ROOT / "data/registry/observatory_release_ci_policy.json"
+CANONICAL_REGISTRY = ROOT / "data/registry/observatory_release_registry.json"
+CANONICAL_RELEASES_ROOT = ROOT / "data/releases"
 RELEASE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 
 
@@ -256,14 +259,22 @@ def _copy_artifacts(
     return public
 
 
-def promote(args: argparse.Namespace) -> int:
-    """Internal promotion kernel; callable only after exact rehydration verification."""
-
-    if getattr(args, "_rehydration_verified", False) is not True:
+def _require_rehydrated_canonical_promotion(args: argparse.Namespace) -> None:
+    targets_canonical_state = (
+        args.registry.resolve() == CANONICAL_REGISTRY.resolve()
+        or args.releases_root.resolve() == CANONICAL_RELEASES_ROOT.resolve()
+    )
+    if targets_canonical_state and getattr(args, "_rehydration_verified", False) is not True:
         raise SystemExit(
-            "Direct Observatory promotion is disabled. Use "
+            "Direct canonical Observatory promotion is disabled. Use "
             "scripts/promote_rehydrated_observatory_v1.py after exact rehydration."
         )
+
+
+def promote(args: argparse.Namespace) -> int:
+    """Promotion kernel; canonical state requires the exact-rehydration capability."""
+
+    _require_rehydrated_canonical_promotion(args)
 
     registry = load_json_object(args.registry)
     candidate = load_json_object(args.candidate_manifest)
@@ -430,7 +441,7 @@ def promote(args: argparse.Namespace) -> int:
 
 def parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Stage immutable Observatory candidates; direct promotion is disabled"
+        description="Stage immutable Observatory candidates and exercise isolated release-engine promotion"
     )
     sub = parser.add_subparsers(dest="command", required=True)
     common = argparse.ArgumentParser(add_help=False)
@@ -439,17 +450,17 @@ def parser() -> argparse.ArgumentParser:
     common.add_argument(
         "--registry",
         type=Path,
-        default=ROOT / "data/registry/observatory_release_registry.json",
+        default=CANONICAL_REGISTRY,
     )
     common.add_argument(
-        "--releases-root", type=Path, default=ROOT / "data/releases"
+        "--releases-root", type=Path, default=CANONICAL_RELEASES_ROOT
     )
     common.add_argument("--staging-dir", type=Path, required=True)
     sub.add_parser("stage", parents=[common])
     promote_parser = sub.add_parser(
         "promote",
         parents=[common],
-        help="Fail-closed legacy entry point; use the exact-rehydration wrapper",
+        help="Canonical state is fail-closed; isolated test/scratch registries remain supported",
     )
     promote_parser.add_argument("--attestation", type=Path, required=True)
     return parser
