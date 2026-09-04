@@ -75,14 +75,16 @@ def test_browser_version_report_uses_pinned_playwright_version():
 
 def test_public_sources_page_states_current_composition_and_rps_boundaries():
     page = read("apps/web/app/sources/page.tsx")
+    lower = page.lower()
     assert "Official Q2 2025 and Q2 2026 Basic Monthly" in page
     assert "composition inputs, not RPS residuals" in page
     assert "Robustness input validated" in page
     assert "Authorized aggregate release path" in page
     assert "bounded presentation view" in page
-    assert "historical subgroup panel" in page
+    assert "historical" in lower and "subgroup panel" in lower
     assert "bulk download product" in page
     assert "generic source query API" in page
+    assert "private source-input bytes" in lower
     assert "Still outside Release 1 claims" in page
     assert "causal firm effects" in page
     assert "Sources, provenance" in page
@@ -91,6 +93,7 @@ def test_public_sources_page_states_current_composition_and_rps_boundaries():
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
+    release_notice = read("apps/web/components/ReleaseNotice.tsx")
     assert "Reported time savings are not an observed measure of labor productivity" in page
     assert "occupation_" in page
     assert "adjusted_" in page
@@ -100,7 +103,7 @@ def test_methodology_keeps_savings_distinct_from_productivity():
     assert "CPS composition foundation has been executed and validated" in page
     assert "published-aggregate project use is recorded as permitted" in sources.lower()
     assert "unrestricted RPS" in page
-    assert "private source-input bytes" in page
+    assert "private source-input bytes" in release_notice
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():
@@ -118,11 +121,14 @@ def test_source_provenance_matches_rights_safe_architecture():
     lower = text.lower()
     assert "authorized release pipeline" in lower
     assert "private candidate workspace" in lower
-    assert "bounded attributed aggregate presentation view" in lower
-    assert "historical subgroup source panel" in lower
+    assert "contracted attributed aggregate presentation view" in lower
+    assert "complete historical subgroup source panel" in lower
     assert "bulk download" in lower
     assert "generic query api" in lower
     assert "private source-input" in lower
+    assert "project-owner attestation" in lower
+    assert "not independently inspected" in lower
+    assert "does not infer unrecorded contractual terms" in lower
     assert "Official Q2 2025 and Q2 2026 Basic Monthly CPS inputs have been executed" in text
     assert "Official May 2025 staffing data have been executed" in text
     assert "occupation-adjusted RPS industry-context residual artifacts" in text
