@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { TimeSeriesPlot } from "../components/TimeSeriesPlot";
 import { latestNational, loadObservations } from "../lib/data";
+import { loadLongitudinalDiagnostics } from "../lib/longitudinal";
 
 export const metadata: Metadata = {
   title: "Workplace AI, measured",
@@ -22,7 +23,10 @@ const chartLabels: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const rows = await loadObservations();
+  const [rows, longitudinal] = await Promise.all([
+    loadObservations(),
+    loadLongitudinalDiagnostics(),
+  ]);
   const national = latestNational(rows);
   const chartMetricOrder = [
     "adoption_work",
@@ -44,6 +48,12 @@ export default async function HomePage() {
       metric: row.metric_id,
       label: chartLabels[row.metric_id],
     }));
+  const periods = longitudinal.input_scope.periods;
+  const crossLevelAlignedQuarters = Object.values(longitudinal.cross_level_comparison).filter(
+    (row) =>
+      row.occupation_minus_industry_pearson_A_H > 0 &&
+      row.occupation_minus_industry_spearman_A_H > 0,
+  ).length;
 
   return (
     <main>
@@ -101,8 +111,9 @@ export default async function HomePage() {
         </div>
         <div className="section-copy">
           <p>
-            Across every audited wave, adoption and assisted working time align more tightly across
-            occupations than across industries. Industry aggregates retain variation beyond occupation mix.
+            Across all {crossLevelAlignedQuarters} of {periods.length} audited waves, adoption and assisted
+            working time align more tightly across occupations than across industries. Industry aggregates
+            retain variation beyond occupation mix.
           </p>
           <p className="text-link"><Link href="/explore">Explore the data →</Link></p>
         </div>
