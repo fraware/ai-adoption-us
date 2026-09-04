@@ -48,7 +48,9 @@ objects        diagnostics         (national history +
                                 ▼
                     immutable candidate stage
                                 │
-                     explicit human review
+                 explicit release review gate
+                                │
+                owner-authorized Release 1 review
                                 │
                                 ▼
                  exact post-review rehydration
@@ -63,7 +65,10 @@ objects        diagnostics         (national history +
                   release-only authorization commit
                                 │
                                 ▼
-                       GitHub Pages deployment
+             exact-SHA GitHub Pages dispatch/deployment
+                                │
+                                ▼
+                    live-origin audit + v1.0.0
 ```
 
 ## 3. Source and private-data boundary
@@ -152,7 +157,7 @@ It is not an identified organizational, efficiency, productivity, or causal effe
 
 ### OEWS robustness
 
-May 2025 OEWS staffing evidence provides an independent establishment-side composition robustness basis. Its population differs from CPS and is kept separate rather than pooled into one synthetic weight system.
+May 2025 OEWS staffing evidence provides an independent establishment-side composition robustness basis. Its population differs from CPS and is kept separate instead of pooled into one synthetic weight system.
 
 ### BTOS triangulation
 
@@ -188,7 +193,9 @@ The global candidate contains private `inputs/` for release reproducibility and 
 - review-package digest;
 - gate status.
 
-The candidate-review workflow uploads only rights-safe review evidence and leaves scientific/editorial/source-rights/CI attestation fields uncompleted.
+The candidate-review workflow uploads only rights-safe review evidence and leaves scientific/editorial/source-rights/CI attestation fields uncompleted. It cannot self-authorize publication or pre-attest a future rehydration identity.
+
+For Release 1, `data/registry/release1_owner_authorization.json` records a one-shot project-owner authorization for an automated release review. The release operator may complete the review attestation only after the exact candidate has zero release-contract failures, exact-commit CI succeeds, and exact source rehydration reproduces the reviewed scientific source, candidate, and stage identities. The release record states `human_review_performed=false` and binds the owner authorization ID.
 
 `scripts/rehydrate_observatory_v1_candidate.py` is the post-review trust boundary. It runs on the exact reviewed commit, verifies the predecessor release state, re-fetches RPS, requires the same scientific source identity, rebuilds the complete candidate, re-stages it, and requires exact equality with the reviewed candidate/stage records.
 
@@ -198,23 +205,29 @@ A changed source value, source definition, repository evidence artifact, governe
 
 Canonical promotion is available only through `scripts/promote_rehydrated_observatory_v1.py`. The low-level release engine rejects direct promotion against the canonical release registry/tree unless it receives the internal exact-rehydration capability.
 
-The two-phase promotion workflow requires:
+The owner-authorized Release 1 workflow requires:
 
-1. an exact candidate-review workflow run on `main`;
-2. a deterministic rehydration identity;
-3. a later human attestation bound to that identity SHA-256;
-4. a second exact rehydration;
-5. exact-commit CI verification;
-6. immutable release promotion.
+1. a successful exact candidate-review workflow run on canonical `main`;
+2. successful exact-commit Release candidate CI;
+3. an exact rehydration identity reproducing the reviewed source/candidate/stage state;
+4. an owner-authorized automated attestation bound to that identity;
+5. immutable release promotion;
+6. a release-only commit whose parent is the exact candidate commit;
+7. independent validation of that publication commit;
+8. explicit dispatch of the exact publication SHA to the Pages workflow;
+9. successful Pages artifact audit, deployment, and live-origin audit;
+10. formal `v1.0.0` creation only after those deployment gates pass.
 
-The resulting Git commit may change only:
+The owner authorization is first-release-only. Once the release registry contains a promoted release, the Release 1 operator becomes inert. Later releases require a separately authorized release decision.
+
+The resulting publication Git commit may change only:
 
 - `data/registry/observatory_release_registry.json`;
 - `data/releases/<release-id>/...`.
 
-`scripts/validate_observatory_publication_commit.py` validates this transition and requires the commit parent to be the exact reviewed candidate commit.
+`scripts/validate_observatory_publication_commit.py` validates this transition, requires the commit parent to be the exact reviewed candidate commit, and for the first release verifies the owner-authorization fields in the immutable review record.
 
-GitHub Pages may build on ordinary pushes for QA, but deployment occurs only from a validated `Authorize Observatory release <release-id>` commit. This prevents an ordinary code merge from silently replacing the public release.
+GitHub Pages may build on ordinary pushes and pull requests for QA. Deployment occurs only for a validated `Authorize Observatory release <release-id>` commit, either directly on an eligible push or through the exact-SHA `workflow_dispatch` path used when the release commit originates from the release operator. The dispatched path independently verifies that the supplied SHA is the current `main` tip and passes the publication-commit validator before deploying.
 
 ## 10. Fail-closed principles
 
@@ -229,4 +242,6 @@ The system prefers explicit unavailability or renewed review over convenience. E
 - unverified or broadened rights scope → publication blocked;
 - no promoted release → no bounded RPS public view;
 - direct canonical low-level promotion → blocked;
-- publication commit contains unrelated code/content → deployment blocked.
+- publication commit contains unrelated code/content → deployment blocked;
+- dispatched Pages SHA is not the canonical `main` tip → deployment blocked;
+- first-release review record lacks the owner authorization binding → publication commit invalid.
