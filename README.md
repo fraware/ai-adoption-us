@@ -153,4 +153,6 @@ Contributions are welcome when they preserve the project's measurement definitio
 
 ## License
 
-No repository-wide license has been declared. Do not infer a general reuse or redistribution license from the repository's public availability. Third-party data retain their own terms.
+The repository's original code and documentation are licensed under the [MIT License](LICENSE).
+
+Third-party data and source materials remain subject to their original terms and the source-specific rights decisions documented in this repository. The MIT License does not override those third-party terms.
