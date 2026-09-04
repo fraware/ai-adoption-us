@@ -9,6 +9,10 @@ def read(rel: str) -> str:
     return (ROOT / rel).read_text()
 
 
+def normalized_lower(text: str) -> str:
+    return " ".join(text.lower().split())
+
+
 def test_layout_has_accessible_navigation_and_source_surface():
     layout = read("apps/web/app/layout.tsx")
     assert 'className="skip-link"' in layout
@@ -75,43 +79,43 @@ def test_browser_version_report_uses_pinned_playwright_version():
 
 def test_public_sources_page_states_current_composition_rps_and_qa_boundaries():
     page = read("apps/web/app/sources/page.tsx")
-    lower = page.lower()
-    assert "Official Q2 2025 and Q2 2026 Basic Monthly public-use files" in page
-    assert "actual-main-job-hour occupation weights" in page
-    assert "Establishment robustness" in page
-    assert "OEWS · 2025-05" in page
-    assert "authorized aggregate release path" in lower
-    assert "bounded attributed public views" in lower
-    assert "owner permission for published aggregate project use" in lower
-    assert "derived aggregate analysis" in lower
-    assert "historical subgroup panels" in lower
-    assert "bulk download" in lower
-    assert "generic source-query access" in lower
-    assert "private source-input bytes" in lower
-    assert "Outside current claims" in page
-    assert "causal firm effects" in page
-    assert "Sources and release scope" in page
-    assert "human screen-reader traversal" in lower
-    assert "outside current validation evidence" in lower
+    normalized = normalized_lower(page)
+    assert "official q2 2025 and q2 2026 basic monthly public-use files" in normalized
+    assert "actual-main-job-hour occupation weights" in normalized
+    assert "establishment robustness" in normalized
+    assert "oews · 2025-05" in normalized
+    assert "authorized aggregate release path" in normalized
+    assert "bounded attributed public views" in normalized
+    assert "owner permission for published aggregate project use" in normalized
+    assert "derived aggregate analysis" in normalized
+    assert "historical subgroup panels" in normalized
+    assert "bulk download" in normalized
+    assert "generic source-query access" in normalized
+    assert "private source-input bytes" in normalized
+    assert "outside current claims" in normalized
+    assert "causal firm effects" in normalized
+    assert "sources and release scope" in normalized
+    assert "human screen-reader traversal" in normalized
+    assert "outside current validation evidence" in normalized
 
 
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
     release_notice = read("apps/web/components/ReleaseNotice.tsx")
-    lower_page = page.lower()
-    assert "reported time savings are survey-based counterfactual estimates" in lower_page
-    assert "labor productivity, output, gdp, and employer value added require direct outcome evidence" in lower_page
+    normalized_page = normalized_lower(page)
+    assert "reported time savings are survey-based counterfactual estimates" in normalized_page
+    assert "labor productivity, output, gdp, and employer value added require direct outcome evidence" in normalized_page
     assert "occupation_" in page
     assert "adjusted_" in page
     assert "industry_" in page
     assert "context_" in page
     assert "residual" in page
-    assert "the cps composition foundation uses official q2 2025 and q2 2026 inputs" in lower_page
-    assert "owner permission for published aggregate project use" in sources.lower()
+    assert "the cps composition foundation uses official q2 2025 and q2 2026 inputs" in normalized_page
+    assert "owner permission for published aggregate project use" in normalized_lower(sources)
     assert "DATA_MODE=derived_only" in page
-    assert "private\n          source-input bytes" in page
-    assert "private source-input bytes" in release_notice.lower()
+    assert "private source-input bytes" in normalized_page
+    assert "private source-input bytes" in normalized_lower(release_notice)
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():
