@@ -10,9 +10,9 @@ The project does **not** estimate a single aggregate “AI impact” number and 
 
 ## Current state
 
-The Observatory v1 release pipeline is operational through exact-candidate staging. No Observatory release has been promoted yet. The current release process retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, and stops at an explicit human-review gate. Promotion additionally requires exact candidate identity, independently verified CI evidence, and the remaining trusted rehydration proof.
+No Observatory release has been promoted yet. The Release 1 architecture retrieves the authorized published-aggregate RPS source into a private candidate workspace, validates the registered source inventory, builds the bounded public observation view and derived diagnostics, composes the complete RPS/CPS/OEWS/BTOS baseline, cryptographically binds governed claim surfaces, and stages an immutable candidate for explicit human review. The trusted promotion path then re-fetches the source on the exact reviewed repository commit, requires the same scientific source identity, rebuilds and re-stages the candidate, and requires byte-identical candidate/stage identities before promotion. Promotion additionally requires independently verified exact-commit CI and a human attestation bound to the deterministic rehydration identity. Public GitHub Pages deployment is restricted to the resulting validated release-only authorization commit.
 
-Verified in the current release architecture:
+Verified in the current scientific/release evidence:
 
 - canonical RPS metadata registry: **131 source series** = 5 national + 60 industry + 66 occupation;
 - latest authorized live source candidate: **962 observations** across the registered 131-series source history, spanning Q3 2024–Q2 2026 where observations are available;
@@ -25,7 +25,7 @@ Verified in the current release architecture:
 - preregistered BTOS–RPS industry triangulation produced under an explicit cross-construct interpretation boundary;
 - explicit web `DATA_MODE`; no implicit fallback into private source data;
 - permanent CI covering the public Python suite, compilation, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, server startup, and public-route HTTP smoke tests;
-- rendered-browser QA remains a separate launch-quality gate, together with the final deployment audit and explicit release review.
+- rendered-browser and native-Safari QA as separate launch-quality gates, together with the final deployment audit and explicit release review.
 
 Private RPS source-input bytes are intentionally **not in this public repository** and are never copied into the public release bundle. See `docs/PRIVATE_RESEARCH_ASSETS.md`.
 
@@ -41,7 +41,7 @@ See `docs/RESULTS.md` for the full result table and interpretation limits.
 apps/web/                         Next.js data publication
   app/                            Routes: home, industries, occupations, methodology, sources, blog
   components/                     Plot and release-mode components
-  lib/                            Data and derived-results loaders
+  lib/                            Data and promoted-release loaders
   tests/browser/                  Rendered browser/accessibility QA
 content/                          Editorial source notes
 data/
@@ -50,12 +50,13 @@ data/
   derived/composition/            Rights-safe CPS/OEWS composition and robustness evidence
   derived/btos_rps/               Rights-safe cross-source triangulation evidence
   registry/                       Source registries, crosswalks, release contracts, and claim inventory
+  releases/                       Immutable promoted public release directories
   audit/private/                  NEVER public; absent from this repository
 src/genai_at_work/                Python research/analysis library
-scripts/                          Builders, validators, release tooling
+scripts/                          Builders, validators, rehydration, and release tooling
 tests/                            Scientific, governance, composition, and release tests
 docs/                             Product, method, results, architecture, roadmap, handoff, QA
-.github/workflows/                Release CI and candidate-review workflows
+.github/workflows/                CI, candidate-review, promotion, and deployment workflows
 ```
 
 ## Data modes
@@ -107,7 +108,7 @@ DATA_MODE=derived_only npm run build
 DATA_MODE=derived_only npm run dev
 ```
 
-Permanent CI enforces the stronger locked-install contract: strict Python checks, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. Candidate promotion separately verifies CI runs against the exact repository, candidate commit, branch, workflow, event, and successful conclusion.
+Permanent CI enforces the stronger locked-install contract: strict Python checks, `npm ci`, TypeScript, the rights-safe optimized build, private-build scan, production-server startup, and all public-route HTTP smoke tests. Candidate promotion separately verifies CI runs against the exact repository, candidate commit, branch, workflow, event, and successful conclusion. The canonical release path also requires exact source rehydration and a human attestation bound to the resulting rehydration identity.
 
 ## Essential documents
 
@@ -122,8 +123,9 @@ Start here:
 7. `docs/methodology.md` — scientific methodology.
 8. `docs/product-spec.md` — product specification.
 9. `docs/source-provenance.md` — source and rights provenance.
-10. `docs/source-rights/RPS_PERMISSION_REQUEST.md` — historical source-rights decision record.
-11. `VALIDATION_2026-08-31.md` — historical public-handoff validation record.
+10. `docs/source-rights/RPS_SOURCE_DECISION.md` — current source-rights decision record and evidence boundary.
+11. `docs/source-rights/RPS_PERMISSION_REQUEST.md` — historical permission request retained for provenance.
+12. `VALIDATION_2026-08-31.md` — historical public-handoff validation record.
 
 ## Product invariants
 
@@ -140,10 +142,13 @@ These must remain true in every release:
 - Private RPS source-input observations never enter a public build artifact.
 - The bounded public observation contract does not authorize an unrestricted historical subgroup database, bulk export, or generic query API.
 - Public availability of a source does not by itself authorize storage, mirroring, API redistribution, or independent republication beyond the reviewed rights contract.
+- Governed public claims remain bound to the exact repository files reviewed for the release.
+- Canonical promotion requires exact post-review source rehydration; a changed scientific source identity forces a new candidate review.
+- Public deployment occurs only from a validated release-only authorization commit whose parent is the exact reviewed candidate commit.
 
 ## Release sequence
 
-- **Observatory v1 / Release 1:** bounded national history and latest industry/occupation A/H/S views; seven-quarter longitudinal diagnostics; CPS occupation-composition evidence and descriptive residuals; OEWS robustness; BTOS–RPS triangulation; methodology, provenance, and technical essay. Exact-candidate staging is operational; explicit human review, exact rehydration, promotion, rendered/manual QA, and deployment audit remain gates.
+- **Observatory v1 / Release 1:** bounded national history and latest industry/occupation A/H/S views; seven-quarter longitudinal diagnostics; CPS occupation-composition evidence and descriptive residuals; OEWS robustness; BTOS–RPS triangulation; methodology, provenance, and technical essay. Candidate construction, claim-surface binding, exact staging, trusted rehydration, rehydration-bound promotion controls, and release-only deployment gating are implemented. Explicit human scientific/editorial/source-rights review, exact-commit CI evidence, execution of the promotion workflow, and the post-deployment live audit remain release-time gates.
 - **Post-Release 1:** stronger uncertainty treatment where supported, richer composition or task views only under explicit provenance and rights contracts, and mechanism-oriented analysis that maintains the distinction between descriptive decomposition and causal identification.
 - **Research v2:** worker × task × occupation × industry/context × time mechanism analysis with stronger identification, uncertainty, and outcome evidence.
 
