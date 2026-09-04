@@ -46,7 +46,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: observatory-candidate-review-${{ github.ref }}
+  group: authorized-rps-fred-source
   cancel-in-progress: false
 
 jobs:
