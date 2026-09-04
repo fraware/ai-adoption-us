@@ -63,17 +63,17 @@ export default async function HomePage() {
   return (
     <main>
       <p className="eyebrow">U.S. workplace generative AI</p>
-      <h1>Measure how AI moves from adoption into work.</h1>
+      <h1>AI adoption measures reach. The workday reveals depth.</h1>
       <p className="lede">
-        GenAI at Work tracks the conversion of reported adoption into recurring use, assisted working
-        time, and reported time savings across U.S. workers, industries, and occupations.
+        GenAI at Work measures how reported adoption turns into recurring use, assisted working time, and
+        reported time savings across U.S. workers, industries, and occupations.
       </p>
 
       <section className="section" aria-labelledby="evidence-heading">
-        <h2 id="evidence-heading">What persists across {periods.length} survey waves</h2>
+        <h2 id="evidence-heading">The {periods.length}-wave record shows a stable distinction</h2>
         <p className="kicker">
-          Across the audited window, adoption rankings are more stable than assisted-hours rankings, and
-          occupation-level adoption–penetration alignment exceeds industry-level alignment in every wave.
+          Adoption rankings are more stable than assisted-hours rankings. In every audited wave, adoption
+          and assisted time also align more tightly across occupations than across industries.
         </p>
         <div className="metric-row" role="group" aria-label={`${periods.length}-wave evidence summary`}>
           <div className="metric">
@@ -82,12 +82,12 @@ export default async function HomePage() {
             <div>{firstPeriod} through {lastPeriod}</div>
           </div>
           <div className="metric">
-            <span>Cross-level alignment</span>
+            <span>Occupation–industry gap</span>
             <strong>{crossLevelAlignedQuarters} / {periods.length}</strong>
-            <div>quarters with stronger occupation adoption–assisted-hours alignment</div>
+            <div>quarters with tighter adoption–assisted-hours alignment by occupation</div>
           </div>
           <div className="metric">
-            <span>Rank persistence</span>
+            <span>Adoption rank stability</span>
             <strong>
               {industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr}
               {" / "}
@@ -120,10 +120,10 @@ export default async function HomePage() {
       </section>
 
       <section className="section" aria-labelledby="measurement-heading">
-        <h2 id="measurement-heading">A measurement chain from adoption to outcomes</h2>
+        <h2 id="measurement-heading">Follow the path from diffusion to outcomes</h2>
         <p className="lede">
-          Each stage answers a different question and uses a different denominator. Reading them together
-          reveals how diffusion converts into workflow depth and reported savings.
+          Each stage answers a different question and uses a different denominator. Together they show how
+          far GenAI has spread and how deeply it enters working time.
         </p>
         <div className="measurement-ladder" role="group" aria-label="Measurement chain from adoption to outcomes">
           <div className="measurement-step">
@@ -142,7 +142,7 @@ export default async function HomePage() {
             <span>05</span><strong>Reported savings</strong><p>Counterfactual share of work hours respondents report saving.</p>
           </div>
           <div className="measurement-step">
-            <span>06</span><strong>Realized outcomes</strong><p>Changes in output, productivity, wages, employment, or firm performance require separate outcome data and identification.</p>
+            <span>06</span><strong>Realized outcomes</strong><p>Output, productivity, wages, employment, and firm performance require separate outcome data and identification.</p>
           </div>
         </div>
       </section>
@@ -178,16 +178,16 @@ export default async function HomePage() {
       </section>
 
       <section className="section" aria-labelledby="wedge-heading">
-        <h2 id="wedge-heading">Why occupations and industries diverge</h2>
+        <h2 id="wedge-heading">Industry structure adds an unresolved layer</h2>
         <p>
-          Across every audited wave, adoption and assisted working time are more tightly coupled across
-          occupations than across industries. The difference points to an industry-context research
-          question beyond occupation mix alone.
+          Across every audited wave, adoption and assisted working time align more tightly across
+          occupations than across industries. That repeated difference points to industry variation that
+          is less visible at the occupation level.
         </p>
         <p>
-          Industry aggregates combine occupation composition with firm context and sampling variation.
-          The current evidence reports the remaining variation descriptively; causal attribution requires
-          richer firm, task, and outcome data.
+          Industry aggregates combine occupation mix with firm context and sampling variation. The current
+          evidence describes the remaining structure; causal attribution requires richer firm, task, and
+          outcome data.
         </p>
         <p><Link href="/blog/after-adoption">Read the technical essay →</Link></p>
       </section>
