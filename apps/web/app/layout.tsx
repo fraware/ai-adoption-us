@@ -18,22 +18,23 @@ const staticContentSecurityPolicy = [
   "connect-src 'self'",
 ].join("; ");
 
+const siteDescription =
+  "A U.S. data observatory tracking how GenAI moves from adoption into recurring use, assisted working time, and reported savings.";
+
 export const metadata: Metadata = {
   ...(siteBaseUrl ? { metadataBase: new URL(`${siteBaseUrl}/`) } : {}),
   title: {
     default: "GenAI at Work",
     template: "%s · GenAI at Work",
   },
-  description:
-    "An auditable technical data publication separating workplace GenAI adoption, workflow penetration, and reported time savings.",
+  description: siteDescription,
   referrer: "strict-origin-when-cross-origin",
   ...(homeUrl ? { alternates: { canonical: homeUrl } } : {}),
   openGraph: {
     type: "website",
     siteName: "GenAI at Work",
     title: "GenAI at Work",
-    description:
-      "An auditable technical data publication separating workplace GenAI adoption, workflow penetration, and reported time savings.",
+    description: siteDescription,
     ...(homeUrl ? { url: homeUrl } : {}),
   },
 };
@@ -62,10 +63,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div id="main-content" tabIndex={-1}>{children}</div>
         <footer className="site-footer">
           <div>
-            <p><strong>GenAI at Work</strong> is a measurement-first technical publication.</p>
+            <p><strong>GenAI at Work</strong> tracks diffusion and conversion in U.S. workplace generative AI.</p>
             <p>
-              Reported time savings are self-reported counterfactual estimates, not observed labor
-              productivity. Longitudinal subgroup results are descriptive and aggregate.
+              Reported time savings are survey-based counterfactual estimates. Labor productivity and other
+              realized outcomes require separate outcome evidence.
             </p>
             <p className="footer-links">
               <Link href="/methodology">Methodology</Link>
