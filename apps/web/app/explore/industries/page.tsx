@@ -40,16 +40,16 @@ export default async function IndustriesPage() {
       <p className="eyebrow">Industry evidence</p>
       <h1>Industry explorer</h1>
       <p className="lede">
-        Industries reveal a second layer of workplace AI: worker adoption and assisted time move together
-        less tightly than they do across occupations, and firm-side BTOS data provide an independent sector
-        lens.
+        Industry data expose an extra layer of variation in workplace AI. Worker adoption and assisted time
+        align less tightly here than across occupations, and BTOS adds a separate firm-side view of current
+        AI use.
       </p>
 
       <section className="section" aria-labelledby="cross-source-triangulation">
-        <h2 id="cross-source-triangulation">Worker adoption and firm AI use move together across sectors</h2>
+        <h2 id="cross-source-triangulation">Worker adoption and firm AI use show substantial sector concordance</h2>
         <p>
-          The preregistered primary comparison pairs Q2 2026 RPS industry adoption with BTOS sectors that
-          meet the primary crosswalk and suppression rules.
+          The primary comparison pairs Q2 2026 RPS worker adoption with BTOS sectors that satisfy the
+          preregistered crosswalk and suppression rules.
         </p>
         <div className="metric-row" aria-label="Primary BTOS and RPS triangulation summary">
           <div className="metric">
@@ -117,7 +117,7 @@ export default async function IndustriesPage() {
       </section>
 
       <section className="section" aria-labelledby="industry-stability">
-        <h2 id="industry-stability">Worker-side rank stability</h2>
+        <h2 id="industry-stability">Adoption ranks persist more than assisted-hour ranks</h2>
         <StabilityBars
           title="Industry rank persistence: median Spearman correlation across quarter pairs"
           bars={[
@@ -134,7 +134,7 @@ export default async function IndustriesPage() {
       </section>
 
       <section className="section" aria-labelledby="industry-savings">
-        <h2 id="industry-savings">Industry savings relationships shift across waves</h2>
+        <h2 id="industry-savings">The industry link to reported savings changes across waves</h2>
         <div className="table-wrap" tabIndex={0} aria-label="Scrollable industry wave diagnostics table">
           <table>
             <caption>Unweighted cross-industry descriptive regressions by quarter. A = adoption, H = assisted hours, S = reported savings.</caption>
@@ -183,10 +183,10 @@ export default async function IndustriesPage() {
       </section>
 
       <section className="section" aria-labelledby="industry-boundary">
-        <h2 id="industry-boundary">Interpretive boundary</h2>
+        <h2 id="industry-boundary">What the industry evidence supports</h2>
         <p className="note">
-          These are aggregate cross-sectional diagnostics. Efficiency, productivity, organizational
-          quality, and causal effects require separate identification.
+          These aggregate cross-sectional diagnostics describe association and persistence. Efficiency,
+          productivity, organizational quality, and causal effects require separate identification.
         </p>
       </section>
     </main>
