@@ -1,0 +1,27 @@
+{
+  "composition_evidence_tiers_bound": true,
+  "interpretation_boundary": "Residuals are descriptive standardization gaps. Leave-one-occupation-out diagnostics are explicit renormalized sensitivities, not sampling inference. Rank/sign persistence is descriptive and does not identify organizational or productivity effects.",
+  "leave_one_occupation_out_row_count": 120,
+  "periods": [
+    "2025-Q2",
+    "2026-Q2"
+  ],
+  "primary_row_count": 120,
+  "primary_supported_row_count": 120,
+  "primary_suppressed_row_count": 0,
+  "residual_identity_failure_count": 0,
+  "rps_panel_periods": [
+    "2024-Q4",
+    "2025-Q1",
+    "2025-Q2",
+    "2025-Q3",
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2"
+  ],
+  "source_observation_count": 962,
+  "source_series_count": 131,
+  "status": "pass",
+  "unsupported_nonnull_failure_count": 0,
+  "usual_hours_sensitivity_row_count": 80
+}

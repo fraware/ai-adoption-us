@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "analysis_id": "btos-rps-industry-triangulation-q2-2026-v1",
+  "executed_date": "2026-09-02",
+  "protocol_id": "btos-rps-industry-triangulation-v1",
+  "protocol_canonical_commit": "854db8d637e5f7896ef2f779692d9451d8971e55",
+  "inputs": {
+    "btos_checkpoint": "data/derived/btos/btos_core_ai_202611.json",
+    "rps_checkpoint": "data/registry/rps_industry_adoption_q2_2026_v1.json",
+    "crosswalk": "data/registry/btos_rps_industry_crosswalk_v1.json"
+  },
+  "constructs": {
+    "btos": "percent of responding employer businesses reporting AI use in any business function in the last two weeks",
+    "rps": "percent of employed adults aged 18-64 in the industry reporting use of Generative AI for their job",
+    "interpretation": "Cross-source sector concordance only. The percentages have different units, denominators, technology scope, and reference periods and are not interchangeable."
+  },
+  "primary": {
+    "n": 14,
+    "weighting": "unweighted across eligible sectors",
+    "spearman_rho": 0.704070833089,
+    "pearson_r": 0.797472661352,
+    "inference": "descriptive only; no p-value or confidence interval",
+    "tier": "primary-comparability only",
+    "entity_indices": [2, 3, 4, 5, 6, 8, 9, 11, 12, 14, 15, 16, 17, 18]
+  },
+  "expanded_sensitivity": {
+    "n": 17,
+    "weighting": "unweighted across eligible sectors",
+    "spearman_rho": 0.815450797048,
+    "pearson_r": 0.850095624804,
+    "inference": "descriptive only; no p-value or confidence interval",
+    "tier": "primary plus eligible limited-comparability sectors",
+    "added_entity_indices": [7, 10, 19]
+  },
+  "exclusions": [
+    {"entity_index": 1, "reason": "BTOS sector 11 suppressed in cycle 202611; no reconstruction or imputation."},
+    {"entity_index": 13, "reason": "BTOS sector 55 suppressed in cycle 202611; excluded from the primary statistic without reconstruction or cycle switching."},
+    {"entity_index": 20, "reason": "Public Administration has no BTOS counterpart."},
+    {"source_key": "XX", "reason": "BTOS unclassified multi-sector businesses are not mapped or redistributed."}
+  ],
+  "pairs": [
+    {"entity_index": 2, "entity_name": "Mining, Quarrying, and Oil and Gas Extraction", "comparability": "primary", "btos_estimate_pct": 8.9, "rps_adoption_work_pct": 26.09946, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 3, "entity_name": "Construction", "comparability": "primary", "btos_estimate_pct": 12.0, "rps_adoption_work_pct": 43.54248, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 4, "entity_name": "Manufacturing", "comparability": "primary", "btos_estimate_pct": 16.1, "rps_adoption_work_pct": 47.65867, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 5, "entity_name": "Wholesale Trade", "comparability": "primary", "btos_estimate_pct": 18.1, "rps_adoption_work_pct": 62.11655, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 6, "entity_name": "Retail Trade", "comparability": "primary", "btos_estimate_pct": 15.9, "rps_adoption_work_pct": 39.45123, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 7, "entity_name": "Transportation and Warehousing", "comparability": "limited", "btos_estimate_pct": 10.6, "rps_adoption_work_pct": 25.10418, "included_primary": false, "included_expanded_sensitivity": true},
+    {"entity_index": 8, "entity_name": "Utilities", "comparability": "primary", "btos_estimate_pct": 19.8, "rps_adoption_work_pct": 56.42715, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 9, "entity_name": "Information", "comparability": "primary", "btos_estimate_pct": 38.8, "rps_adoption_work_pct": 82.19260, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 10, "entity_name": "Finance and Insurance", "comparability": "limited", "btos_estimate_pct": 35.7, "rps_adoption_work_pct": 67.33240, "included_primary": false, "included_expanded_sensitivity": true},
+    {"entity_index": 11, "entity_name": "Real Estate and Rental and Leasing", "comparability": "primary", "btos_estimate_pct": 27.9, "rps_adoption_work_pct": 56.49284, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 12, "entity_name": "Professional, Scientific, and Technical Services", "comparability": "primary", "btos_estimate_pct": 36.7, "rps_adoption_work_pct": 69.54294, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 14, "entity_name": "Administrative and Support and Waste Management Services", "comparability": "primary", "btos_estimate_pct": 19.2, "rps_adoption_work_pct": 40.46012, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 15, "entity_name": "Educational Services", "comparability": "primary", "btos_estimate_pct": 32.1, "rps_adoption_work_pct": 52.58519, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 16, "entity_name": "Health Care and Social Assistance", "comparability": "primary", "btos_estimate_pct": 23.7, "rps_adoption_work_pct": 37.16530, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 17, "entity_name": "Arts, Entertainment, and Recreation", "comparability": "primary", "btos_estimate_pct": 19.5, "rps_adoption_work_pct": 31.99921, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 18, "entity_name": "Accommodation and Food Services", "comparability": "primary", "btos_estimate_pct": 8.9, "rps_adoption_work_pct": 30.52520, "included_primary": true, "included_expanded_sensitivity": true},
+    {"entity_index": 19, "entity_name": "Other Services, Except Public Administration", "comparability": "limited", "btos_estimate_pct": 9.4, "rps_adoption_work_pct": 24.67841, "included_primary": false, "included_expanded_sensitivity": true}
+  ],
+  "preanalysis_exposure_disclosure": "The canonical protocol records that two RPS industry observations (Information and Management of Companies and Enterprises) were inadvertently exposed during metadata verification before preregistration. The full industry vector and selected-cycle BTOS outcomes were not assembled together and no cross-source statistic was computed before the protocol was canonical.",
+  "prohibited_interpretations": [
+    "Do not interpret correlation as a causal effect.",
+    "Do not call BTOS business AI use equivalent to RPS worker GenAI adoption.",
+    "Do not calculate percentage-point gaps or calibration to an identity line from these non-commensurate measures.",
+    "Do not interpret either measure as productivity.",
+    "Do not report p-values or correlation confidence intervals without an approved survey-covariance design."
+  ],
+  "public_product_status": "published",
+  "public_product_route": "/explore/industries",
+  "publication_validated_commit": "75b94550be97c2e500db6c7b796330d0d8e90c40"
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "industry_id": "agriculture-forestry-fishing-and-hunting",
+    "industry_index": 1,
+    "l1_q2_2025_to_q2_2026": 0.05879336993775047,
+    "maximum_leave_one_month_out_l1": 0.051617101771200206,
+    "minimum_kish_weight_dispersion_effective_n": 1198.9203926002735,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.1908725417559737,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.30802424171055726
+  },
+  {
+    "industry_id": "mining-quarrying-and-oil-and-gas-extraction",
+    "industry_index": 2,
+    "l1_q2_2025_to_q2_2026": 0.34073230429699825,
+    "maximum_leave_one_month_out_l1": 0.09624552461216886,
+    "minimum_kish_weight_dispersion_effective_n": 374.18687580091887,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.3138446214276028,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.0856719568654385
+  },
+  {
+    "industry_id": "construction",
+    "industry_index": 3,
+    "l1_q2_2025_to_q2_2026": 0.06406050651984178,
+    "maximum_leave_one_month_out_l1": 0.015127871474756645,
+    "minimum_kish_weight_dispersion_effective_n": 6445.8655197280905,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.05114082921539645,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.2526294059494
+  },
+  {
+    "industry_id": "manufacturing",
+    "industry_index": 4,
+    "l1_q2_2025_to_q2_2026": 0.049691531479320414,
+    "maximum_leave_one_month_out_l1": 0.022493611945825564,
+    "minimum_kish_weight_dispersion_effective_n": 8172.542703798986,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.07816933731451074,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.6356908371806814
+  },
+  {
+    "industry_id": "wholesale-trade",
+    "industry_index": 5,
+    "l1_q2_2025_to_q2_2026": 0.13478198002963565,
+    "maximum_leave_one_month_out_l1": 0.045126124955857876,
+    "minimum_kish_weight_dispersion_effective_n": 1610.3945968363273,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.15843795886359427,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.8506924792288885
+  },
+  {
+    "industry_id": "retail-trade",
+    "industry_index": 6,
+    "l1_q2_2025_to_q2_2026": 0.05933515652692245,
+    "maximum_leave_one_month_out_l1": 0.01480325263386973,
+    "minimum_kish_weight_dispersion_effective_n": 8294.194086227115,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.05422197447703861,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.0943009194925044
+  },
+  {
+    "industry_id": "transportation-and-warehousing",
+    "industry_index": 7,
+    "l1_q2_2025_to_q2_2026": 0.08995171326043987,
+    "maximum_leave_one_month_out_l1": 0.019717324644963126,
+    "minimum_kish_weight_dispersion_effective_n": 4336.674078999504,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.06759023496666207,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.3308388897420949
+  },
+  {
+    "industry_id": "utilities",
+    "industry_index": 8,
+    "l1_q2_2025_to_q2_2026": 0.15420900167475454,
+    "maximum_leave_one_month_out_l1": 0.07349444291533794,
+    "minimum_kish_weight_dispersion_effective_n": 907.6522804912561,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.2268440449724102,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.6798018510625224
+  },
+  {
+    "industry_id": "information",
+    "industry_index": 9,
+    "l1_q2_2025_to_q2_2026": 0.12394952803410196,
+    "maximum_leave_one_month_out_l1": 0.04557251077659504,
+    "minimum_kish_weight_dispersion_effective_n": 1481.2452058158556,
+    "tops_match_across_quarters": false,
+    "within_quarter_l1_envelope": 0.14910787798219455,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.83127417351418
+  },
+  {
+    "industry_id": "finance-and-insurance",
+    "industry_index": 10,
+    "l1_q2_2025_to_q2_2026": 0.08960026006702666,
+    "maximum_leave_one_month_out_l1": 0.025960041129277755,
+    "minimum_kish_weight_dispersion_effective_n": 4241.852454502261,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.09164452602174879,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.9776935290795548
+  },
+  {
+    "industry_id": "real-estate-and-rental-and-leasing",
+    "industry_index": 11,
+    "l1_q2_2025_to_q2_2026": 0.11375372425865278,
+    "maximum_leave_one_month_out_l1": 0.0356470136491595,
+    "minimum_kish_weight_dispersion_effective_n": 1653.2000172793462,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.12030030536240312,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.9455813425907038
+  },
+  {
+    "industry_id": "professional-scientific-and-technical-services",
+    "industry_index": 12,
+    "l1_q2_2025_to_q2_2026": 0.06934457533088315,
+    "maximum_leave_one_month_out_l1": 0.019651802981286107,
+    "minimum_kish_weight_dispersion_effective_n": 7743.05745494127,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.06491549486053776,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.068228401860922
+  },
+  {
+    "industry_id": "management-of-companies-and-enterprises",
+    "industry_index": 13,
+    "l1_q2_2025_to_q2_2026": 0.6077589403442754,
+    "maximum_leave_one_month_out_l1": 0.14218063065667338,
+    "minimum_kish_weight_dispersion_effective_n": 60.39158432205465,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.4690574043432125,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.2957026895146804
+  },
+  {
+    "industry_id": "administrative-and-support-and-waste-management-services",
+    "industry_index": 14,
+    "l1_q2_2025_to_q2_2026": 0.06816396622852862,
+    "maximum_leave_one_month_out_l1": 0.029770097739432337,
+    "minimum_kish_weight_dispersion_effective_n": 3768.1362519591135,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.09115865124595454,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.7477509298005725
+  },
+  {
+    "industry_id": "educational-services",
+    "industry_index": 15,
+    "l1_q2_2025_to_q2_2026": 0.04225940297696889,
+    "maximum_leave_one_month_out_l1": 0.017091424965664362,
+    "minimum_kish_weight_dispersion_effective_n": 7697.186252822272,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.058732635255309903,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.71952165594593
+  },
+  {
+    "industry_id": "health-care-and-social-assistance",
+    "industry_index": 16,
+    "l1_q2_2025_to_q2_2026": 0.03795513173676655,
+    "maximum_leave_one_month_out_l1": 0.017662850260485294,
+    "minimum_kish_weight_dispersion_effective_n": 12106.131661471998,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.0630912918948107,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.6015906569173991
+  },
+  {
+    "industry_id": "arts-entertainment-and-recreation",
+    "industry_index": 17,
+    "l1_q2_2025_to_q2_2026": 0.17381408231326254,
+    "maximum_leave_one_month_out_l1": 0.042538162570763385,
+    "minimum_kish_weight_dispersion_effective_n": 1594.4581009893805,
+    "tops_match_across_quarters": false,
+    "within_quarter_l1_envelope": 0.15019920015013863,
+    "year_over_year_exceeds_within_quarter_envelope": true,
+    "year_over_year_to_within_quarter_ratio": 1.1572237544508797
+  },
+  {
+    "industry_id": "accommodation-and-food-services",
+    "industry_index": 18,
+    "l1_q2_2025_to_q2_2026": 0.029473692637022625,
+    "maximum_leave_one_month_out_l1": 0.02291969843872312,
+    "minimum_kish_weight_dispersion_effective_n": 5033.126059806951,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.07618771999738068,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.3868562103976327
+  },
+  {
+    "industry_id": "other-services-except-public-administration",
+    "industry_index": 19,
+    "l1_q2_2025_to_q2_2026": 0.07787989047683821,
+    "maximum_leave_one_month_out_l1": 0.02783262205431299,
+    "minimum_kish_weight_dispersion_effective_n": 3846.644334927734,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.09709371045686993,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.8021105601009377
+  },
+  {
+    "industry_id": "public-administration",
+    "industry_index": 20,
+    "l1_q2_2025_to_q2_2026": 0.09468465124607767,
+    "maximum_leave_one_month_out_l1": 0.03608590902847846,
+    "minimum_kish_weight_dispersion_effective_n": 4205.187372215435,
+    "tops_match_across_quarters": true,
+    "within_quarter_l1_envelope": 0.13603591666671863,
+    "year_over_year_exceeds_within_quarter_envelope": false,
+    "year_over_year_to_within_quarter_ratio": 0.6960268550110222
+  }
+]

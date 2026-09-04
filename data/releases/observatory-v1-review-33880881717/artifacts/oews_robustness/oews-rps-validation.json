@@ -1,0 +1,15 @@
+{
+  "comparison_row_count": 40,
+  "counterfactual_row_count": 40,
+  "interpretation": "independent-source descriptive robustness; not causal inference",
+  "partially_identified_row_count": 8,
+  "periods": [
+    "2025-Q2",
+    "2026-Q2"
+  ],
+  "point_identified_row_count": 32,
+  "raw_rps_snapshot_published": false,
+  "status": "pass",
+  "unsupported_comparison_row_count": 0,
+  "unsupported_counterfactual_row_count": 0
+}

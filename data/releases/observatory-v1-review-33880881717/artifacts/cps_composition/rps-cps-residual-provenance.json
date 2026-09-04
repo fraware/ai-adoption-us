@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "artifact_type": "rps_cps_occupation_adjusted_industry_context_residual_evidence",
+  "evidence_date": "2026-09-02",
+  "source_id": "rps-genai-tracker-fred-release-6",
+  "source_content_sha256": "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+  "source_snapshot_file_sha256": "6aebc5a9c317e0ae376b04eb7ae9a7c32342503679f740a3e4085e706177139e",
+  "source_observation_count": 962,
+  "source_series_count": 131,
+  "source_reference_periods": [
+    "2024-Q3",
+    "2024-Q4",
+    "2025-Q1",
+    "2025-Q2",
+    "2025-Q3",
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2"
+  ],
+  "joint_rps_analysis_periods": [
+    "2024-Q4",
+    "2025-Q1",
+    "2025-Q2",
+    "2025-Q3",
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2"
+  ],
+  "composition_residual_periods": ["2025-Q2", "2026-Q2"],
+  "construct_periods": {
+    "adoption_work": [
+      "2024-Q3",
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ],
+    "assisted_hours_share": [
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ],
+    "reported_time_savings_share": [
+      "2024-Q4",
+      "2025-Q1",
+      "2025-Q2",
+      "2025-Q3",
+      "2025-Q4",
+      "2026-Q1",
+      "2026-Q2"
+    ]
+  },
+  "source_definition_id": "sha256:b99faacfe2ddca647cce687a5d2ee675ef441c2115fe193519facf7a7ccc495f",
+  "source_taxonomy_version": "sha256:3313cb24fe888c5875e8e4c6264743c5ff862f07edbe2fecd0127eb2e1da397f",
+  "canonical_manifest_sha256": "130b0bdf7be71ca49bd9be957047423ddef76f20a97b3047fa5e0d0e1970c924",
+  "provider_scope_sha256": "41f2b0a8b6499dd2a38c64b4b7fc99bfb00179bb442bb0c1e09c3a992080fa6f",
+  "composition_inputs": {
+    "2025-Q2": "abcad221c005ba27adfcc71c669e9e58f27300e0f48e22db24f3254aa42a3de5",
+    "2026-Q2": "63c93fa075e63157dfc14b675bc64054d3b6f1743172bb44f101c66a5ffe1d08"
+  },
+  "evidence_tiers_sha256": "6febdcb4db133825e306d2b5b170694290d003fc692759dd40b5f9fc1f240aa4",
+  "github_validation_run_id": "33683408001",
+  "github_validation_commit": "3fd0abd9c5573c3c2bca7bb53205bc52fa2cd453",
+  "github_validation_result": "success",
+  "workflow_artifact_id": 9867278483,
+  "workflow_artifact_sha256": "15abd9a1ba2a285bfbbe686fc65059286e1261563b17dd325204c72d5905fb3c",
+  "workflow_artifact_retention_note": "The GitHub Actions artifact is temporary. This directory retains the reviewed rights-safe derived evidence required for durable research reproducibility.",
+  "rights": {
+    "decision_ref": "docs/source-rights/RPS_SOURCE_DECISION.md",
+    "published_aggregate_project_use": "approved",
+    "public_raw_source_snapshot_included": false,
+    "complete_source_catalog_mirror_included": false,
+    "derived_analysis_publication": "approved"
+  },
+  "interpretation": "Occupation-adjusted industry-context residuals are descriptive standardization gaps. They are not identified organizational, efficiency, productivity, or causal effects.",
+  "promotion_performed": false
+}

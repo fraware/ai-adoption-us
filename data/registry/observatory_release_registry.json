@@ -1,8 +1,24 @@
 {
+  "current_release_id": "observatory-v1-review-33880881717",
+  "current_release_manifest_sha256": "da79c75b890f6f4cace936536a71adb3198a699fb6dc87dc848bfec2afea7018",
+  "note": "This registry governs future immutable observatory releases. It does not retroactively label the current rights-safe engineering/research repository state as a public observatory release.",
+  "releases": [
+    {
+      "candidate_commit": "b9ec865167815b9328e391d798dca098feeddf52",
+      "ci_evidence_digest": "ccdb9999b557e057194cc76e9594d6589e47c6cd49940655c8964aa89beab920",
+      "ci_evidence_policy_id": "observatory-release-ci-v1",
+      "ci_run_ids": [
+        33880881691
+      ],
+      "data_mode": "derived_only",
+      "manifest_sha256": "da79c75b890f6f4cace936536a71adb3198a699fb6dc87dc848bfec2afea7018",
+      "promoted_at": "2026-09-04T14:11:52Z",
+      "rehydration_identity_sha256": "e70c5cd8f3bc54b261b039d73360afec97b4ad6fbb05c8419cbdf39462440c5f",
+      "rehydration_status": "REHYDRATED_EXACT_CANDIDATE",
+      "release_id": "observatory-v1-review-33880881717",
+      "supersedes_release_id": null
+    }
+  ],
   "schema_version": 1,
-  "current_release_id": null,
-  "current_release_manifest_sha256": null,
-  "releases": [],
-  "status": "NO_OBSERVATORY_RELEASE_PROMOTED_YET",
-  "note": "This registry governs future immutable observatory releases. It does not retroactively label the current rights-safe engineering/research repository state as a public observatory release."
+  "status": "CURRENT_RELEASE_PROMOTED"
 }

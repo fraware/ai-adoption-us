@@ -1,0 +1,48 @@
+{
+  "generated_at_utc": "2026-09-01T08:39:52.908129+00:00",
+  "highest_cross_vintage_l1_industry": {
+    "industry_id": "management-of-companies-and-enterprises",
+    "industry_name": "Management of Companies and Enterprises",
+    "l1_q2_2025_to_q2_2026": 0.6077589403442754,
+    "within_quarter_l1_envelope": 0.4690574043432125,
+    "year_over_year_to_within_quarter_ratio": 1.2957026895146804
+  },
+  "highest_leave_one_month_out_industry_period": {
+    "industry_id": "management-of-companies-and-enterprises",
+    "industry_name": "Management of Companies and Enterprises",
+    "maximum_leave_one_month_out_l1": 0.14218063065667338,
+    "period": "2026-Q2"
+  },
+  "industry_count": 20,
+  "interpretation_boundary": "Kish effective n measures weight dispersion only and is not a CPS design-based effective sample size. Monthly and leave-one-month-out L1 measures are empirical stability diagnostics, not significance tests. BLS/Census GVF or replicate-based inference is not claimed for these custom 22-dimensional composition vectors.",
+  "lowest_effective_n_industry_period": {
+    "industry_id": "management-of-companies-and-enterprises",
+    "industry_name": "Management of Companies and Enterprises",
+    "kish_weight_dispersion_effective_n": 60.39158432205465,
+    "period": "2026-Q2",
+    "person_month_count": 81
+  },
+  "months": [
+    "apr",
+    "may",
+    "jun"
+  ],
+  "official_methodology_basis": [
+    "BLS July 2026 Calculating Approximate Standard Errors and Confidence Intervals for CPS Estimates",
+    "CPS Technical Paper 77, Chapter 2-4: Variance Estimation"
+  ],
+  "periods": [
+    "2025-Q2",
+    "2026-Q2"
+  ],
+  "primary_comparable_industry_count": 17,
+  "primary_cross_vintage_changes_exceeding_within_quarter_envelope": 7,
+  "primary_median_kish_weight_dispersion_effective_n": 4289.263266750882,
+  "primary_median_person_month_count": 5788.0,
+  "primary_minimum_kish_weight_dispersion_effective_n": 60.39158432205465,
+  "primary_minimum_person_month_count": 81,
+  "raw_cps_files_retained_in_repository": false,
+  "reference_vectors_reproduced": true,
+  "source_build_commit": "26e7c68d886c48035b750f5d1a99cd0b3df79ee2",
+  "status": "CPS Q2 2025/Q2 2026 empirical composition reliability executed"
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "cps_residual_inside_oews_interval_count": 0,
+    "direction_agreement_count": 16,
+    "direction_disagreement_count": 1,
+    "direction_indeterminate_count": 0,
+    "direction_resolved_count": 17,
+    "exact_residual_rank_spearman": 0.832967032967033,
+    "interpretation": "OEWS is an independent establishment-side composition robustness source. Partially identified rows remain intervals; CPS and OEWS are not averaged.",
+    "maximum_partial_residual_interval_width": 0.06223176256413865,
+    "median_absolute_exact_residual_difference": 1.9523895126091748,
+    "partially_identified_primary_count": 3,
+    "period": "2025-Q2",
+    "point_identified_primary_count": 14,
+    "primary_industry_count": 17,
+    "supported_primary_count": 17
+  },
+  {
+    "cps_residual_inside_oews_interval_count": 0,
+    "direction_agreement_count": 16,
+    "direction_disagreement_count": 1,
+    "direction_indeterminate_count": 0,
+    "direction_resolved_count": 17,
+    "exact_residual_rank_spearman": 0.9692307692307692,
+    "interpretation": "OEWS is an independent establishment-side composition robustness source. Partially identified rows remain intervals; CPS and OEWS are not averaged.",
+    "maximum_partial_residual_interval_width": 0.027044085730338452,
+    "median_absolute_exact_residual_difference": 2.859216046048683,
+    "partially_identified_primary_count": 3,
+    "period": "2026-Q2",
+    "point_identified_primary_count": 14,
+    "primary_industry_count": 17,
+    "supported_primary_count": 17
+  }
+]

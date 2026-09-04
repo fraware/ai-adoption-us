@@ -1,0 +1,523 @@
+{
+  "affected_claim_ids": [
+    "after-adoption-essay",
+    "global-btos-rps-cross-construct-concordance",
+    "global-cps-composition-design-interval-unsupported",
+    "global-cps-q4-2025-unavailable",
+    "global-industry-context-residual-descriptive-only",
+    "global-oews-composition-robustness",
+    "home-longitudinal-summary",
+    "industry-explorer-longitudinal",
+    "methodology-longitudinal-scope",
+    "occupation-explorer-longitudinal",
+    "readme-longitudinal-status",
+    "results-longitudinal-summary",
+    "source-provenance-longitudinal-status",
+    "sources-longitudinal-status"
+  ],
+  "artifact_changes": [
+    {
+      "artifact_id": "btos-core-ai-202611",
+      "change": "added",
+      "new_sha256": "54ec6cb866556cd53a092d9db5a226b9fb9a9f3996c115fa4f198de194e09a11",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "btos-rps-execution-state",
+      "change": "added",
+      "new_sha256": "dd79e78ec5880f505c140cbf5146e872ab33a18ca620b58b1fb284e43ef42454",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "btos-rps-industry-triangulation",
+      "change": "added",
+      "new_sha256": "305cd586f25d6586a18c36ee60aefe40e22e5233d7b3abb25d15c044712c354e",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-composition-q2-2025",
+      "change": "added",
+      "new_sha256": "abcad221c005ba27adfcc71c669e9e58f27300e0f48e22db24f3254aa42a3de5",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-composition-q2-2025-validation",
+      "change": "added",
+      "new_sha256": "6974265882c7f3880c4a482e005dcf3ea005e3b38af32dabfb99adcf0317575c",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-composition-q2-2026",
+      "change": "added",
+      "new_sha256": "63c93fa075e63157dfc14b675bc64054d3b6f1743172bb44f101c66a5ffe1d08",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-composition-q2-2026-validation",
+      "change": "added",
+      "new_sha256": "14f86adab0b96bf5ef5ec2fce8b31830cbd18d90ef1e243c1a5f3f63c77887b8",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-cross-vintage-reliability",
+      "change": "added",
+      "new_sha256": "4f250d2512034eec3e3b299c3206871a78dc12288033ddd36f2aae11ad9d0835",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-design-variance-decision",
+      "change": "added",
+      "new_sha256": "d889d48e8992acb2d915e4902637f65d537d81ab6afa23f344feb45800c5ecd7",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-direct-se-validation-family",
+      "change": "added",
+      "new_sha256": "2eaef618d0413f4eef8cdf35f28dda71bbc77d105f46c45f2e6f5e9bb8cfb9d0",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-quarter-availability",
+      "change": "added",
+      "new_sha256": "344ad681d1795fa4854d8d3e6ca56b16218c5f86cdbd3a7a8269b9efa3ab58c9",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "cps-reliability-validation",
+      "change": "added",
+      "new_sha256": "5d966bcd68e822be153bf17304c960c065dd7875d15255402036d073a5232025",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "oews-rps-cps-comparison",
+      "change": "added",
+      "new_sha256": "3e239eecf2f3b3c7a1e474628c55dfeb12bd5158d2cb0b84d6989f430d083f38",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "oews-rps-primary-counterfactuals",
+      "change": "added",
+      "new_sha256": "d684e8dbd1490b3ca201147629b9638b48939fe0d196ebaf1a455430acab9bc6",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "oews-rps-provenance",
+      "change": "added",
+      "new_sha256": "c75f2368f2b3db549cc186370deb75bc36fdb529a55e8faae27ee8c187799e3f",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "oews-rps-summary",
+      "change": "added",
+      "new_sha256": "623b52f69dbf8b1dd0204009c65465ec0fd51f15146b507a4d1235f9a53d73de",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "oews-rps-validation",
+      "change": "added",
+      "new_sha256": "594571b2c4b21ba31afcadda18b8e23809486023b71a7948a18901eb94f27ab9",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-cps-primary-residuals",
+      "change": "added",
+      "new_sha256": "75d07d7a018e38bac5c0d8d85bbd3bff0ccf0fc05fec7f2ffabc3a3427370d8e",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-cps-residual-persistence",
+      "change": "added",
+      "new_sha256": "b201d452725c0c216884b8ee094dca3572a2890729715d1e886d33478ea7ccb4",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-cps-residual-provenance",
+      "change": "added",
+      "new_sha256": "b5295574fed62dc1e40e95ddaab409c9c8f30feddf315244e09b04c7300deb93",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-cps-residual-robustness",
+      "change": "added",
+      "new_sha256": "184d78a43139625ce6722cc88bc670c92cd479115835d373269598c12a8ae88e",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-cps-residual-validation",
+      "change": "added",
+      "new_sha256": "8c3ed66668dfda5b71e3fcf78bd9fd56b851b76ea981e013160bedc65a2106cb",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-longitudinal-diagnostics",
+      "change": "added",
+      "new_sha256": "1e9a7049eea50b691989a754a97e9e0f6e7993ba9befbc82a7fe4f9521559500",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-longitudinal-validation",
+      "change": "added",
+      "new_sha256": "96d3d804fc224f1a46cd0ae1e44cb16a244b80d49077150b99b0c89957bee933",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-public-observation-view",
+      "change": "added",
+      "new_sha256": "b69a297d7c0d9d0afa7741305d79ecf52b9c464a31209d8eb0c92e60871d202b",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-quarter-diagnostics",
+      "change": "added",
+      "new_sha256": "8b60418c63bf8b1410766bbc300c37212b1ee6b447ab942ddefbb05959718163",
+      "old_sha256": null
+    },
+    {
+      "artifact_id": "rps-rank-stability",
+      "change": "added",
+      "new_sha256": "da153ea8bbde516f8c850c33edd08f7245ff5fbdf070480e863c79ece70e8642",
+      "old_sha256": null
+    }
+  ],
+  "changed_artifact_ids": [
+    "btos-core-ai-202611",
+    "btos-rps-execution-state",
+    "btos-rps-industry-triangulation",
+    "cps-composition-q2-2025",
+    "cps-composition-q2-2025-validation",
+    "cps-composition-q2-2026",
+    "cps-composition-q2-2026-validation",
+    "cps-cross-vintage-reliability",
+    "cps-design-variance-decision",
+    "cps-direct-se-validation-family",
+    "cps-quarter-availability",
+    "cps-reliability-validation",
+    "oews-rps-cps-comparison",
+    "oews-rps-primary-counterfactuals",
+    "oews-rps-provenance",
+    "oews-rps-summary",
+    "oews-rps-validation",
+    "rps-cps-primary-residuals",
+    "rps-cps-residual-persistence",
+    "rps-cps-residual-provenance",
+    "rps-cps-residual-robustness",
+    "rps-cps-residual-validation",
+    "rps-longitudinal-diagnostics",
+    "rps-longitudinal-validation",
+    "rps-public-observation-view",
+    "rps-quarter-diagnostics",
+    "rps-rank-stability"
+  ],
+  "changed_diagnostic_ids": [
+    "global-btos-cross-construct-governance",
+    "global-cps-q2-2025-composition",
+    "global-cps-q2-2026-composition",
+    "global-cps-q4-2025-explicit-unavailability",
+    "global-cps-residual-contract",
+    "global-oews-robustness-contract",
+    "global-rps-repository-source-binding",
+    "rps-longitudinal-influence",
+    "rps-longitudinal-regression-contract",
+    "rps-longitudinal-stability",
+    "rps-longitudinal-suppression-coverage"
+  ],
+  "changed_source_ids": [
+    "btos-core-ai-202611-q7-a1-v1",
+    "cps-basic-monthly-composition-v1",
+    "oews-may-2025-composition-v1",
+    "rps-genai-tracker-fred-release-6"
+  ],
+  "claim_changes": [
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "after-adoption-essay",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Technical essay claims derived from the complete common-window RPS subgroup diagnostics. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "apps/web/app/blog/after-adoption/page.tsx"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "global-btos-rps-cross-construct-concordance",
+      "new_truth_state": "supported",
+      "new_value_summary": "BTOS business AI use and RPS worker GenAI adoption show descriptive sector-level concordance under a preregistered crosswalk and period-selection rule.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "/explore/industries",
+        "/methodology"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "global-cps-composition-design-interval-unsupported",
+      "new_truth_state": "unsupported",
+      "new_value_summary": "Design-based confidence intervals for the custom pooled CPS industry-by-occupation composition vectors remain unsupported in Observatory v1.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "/explore/industries",
+        "/methodology"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "global-cps-q4-2025-unavailable",
+      "new_truth_state": "supported",
+      "new_value_summary": "Q4 2025 CPS composition is unavailable because October 2025 CPS interviewing was not conducted; no two-month substitution is permitted.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "/",
+        "/explore/industries",
+        "/methodology"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "global-industry-context-residual-descriptive-only",
+      "new_truth_state": "supported",
+      "new_value_summary": "Occupation-adjusted industry-context residuals are descriptive standardization gaps after accounting for occupation composition.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "/explore/industries",
+        "/methodology"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "global-oews-composition-robustness",
+      "new_truth_state": "supported",
+      "new_value_summary": "OEWS provides an independent occupation-composition robustness lens for the industry adoption counterfactual.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "/explore/industries",
+        "/methodology"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "home-longitudinal-summary",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Homepage longitudinal evidence summary and interpretive framing, with wave counts read from the release artifact. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "apps/web/app/page.tsx"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "industry-explorer-longitudinal",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Industry longitudinal diagnostics and stability interpretation. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "apps/web/app/explore/industries/page.tsx"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "methodology-longitudinal-scope",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Public methodology language governing the longitudinal window, estimands, and interpretation boundary. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "apps/web/app/methodology/page.tsx"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "occupation-explorer-longitudinal",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Occupation longitudinal diagnostics and stability interpretation. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "apps/web/app/explore/occupations/page.tsx"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "readme-longitudinal-status",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Repository-level summary of longitudinal findings and validation state. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "README.md"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "results-longitudinal-summary",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Canonical public result tables and interpretation limits for the current longitudinal evidence. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "docs/RESULTS.md"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "source-provenance-longitudinal-status",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Repository provenance record for the RPS longitudinal source scope, rights boundary, and published evidence. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "docs/source-provenance.md"
+      ]
+    },
+    {
+      "artifact_dependency_changed": true,
+      "change": "added",
+      "claim_id": "sources-longitudinal-status",
+      "new_truth_state": "supported-descriptive-with-guardrails",
+      "new_value_summary": "Public source and provenance page statements about the bounded RPS release scope and longitudinal evidence. Source-backed longitudinal evidence currently covers 7 complete quarterly waves through 2026-Q2; any changed candidate requires explicit review.",
+      "old_truth_state": null,
+      "old_value_summary": null,
+      "surfaces": [
+        "apps/web/app/sources/page.tsx"
+      ]
+    }
+  ],
+  "contract_failures": [],
+  "diagnostic_changes": [
+    {
+      "change": "added",
+      "diagnostic_id": "global-btos-cross-construct-governance",
+      "new_status": "pass",
+      "new_value_digest": "f94f063e9da490ace5155403b4612ebd04e26e30027ab3a878d81ea6d34013dc",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "global-cps-q2-2025-composition",
+      "new_status": "pass",
+      "new_value_digest": "1b5c60d5a2ea7c719f584da90730b2ef137e34e96da9d61be0faec103dbcf820",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "global-cps-q2-2026-composition",
+      "new_status": "pass",
+      "new_value_digest": "ec93be9ef74da7cf67990fe52a2e1548faddaaf7e1acc811a76b59f902d4b704",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "global-cps-q4-2025-explicit-unavailability",
+      "new_status": "pass",
+      "new_value_digest": "a834021f31239c2043286b0ad78282f1858d4856e7a2f2b073657bad25603978",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "global-cps-residual-contract",
+      "new_status": "pass",
+      "new_value_digest": "04a4145ad7f09950ef37889a77efb56a356b01f0cdc7b54c931c2db0dc3beb5a",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "global-oews-robustness-contract",
+      "new_status": "pass",
+      "new_value_digest": "a63ad24a28bc35767e00b62c9d17a4f6dd1656e0b96853fd579c3184efb4a6ec",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "global-rps-repository-source-binding",
+      "new_status": "pass",
+      "new_value_digest": "9105b62856bc027901c90e2356f7739f1e1b263b3671cd108e7edb60027ed452",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "rps-longitudinal-influence",
+      "new_status": "pass",
+      "new_value_digest": "2ca956c85edc514018f7cdc8752ceb34faf0d66fc4c1fddc6590d9a972ce71ef",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "rps-longitudinal-regression-contract",
+      "new_status": "pass",
+      "new_value_digest": "b150f821b0b3342ec74d3fe32037330c95e6ad4e369d75913fffec63bda85b0d",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "rps-longitudinal-stability",
+      "new_status": "pass",
+      "new_value_digest": "29032714f6fe95b605f5668b1565d77c0820a88c0b419b185484104c0b870293",
+      "old_status": null,
+      "old_value_digest": null
+    },
+    {
+      "change": "added",
+      "diagnostic_id": "rps-longitudinal-suppression-coverage",
+      "new_status": "pass",
+      "new_value_digest": "119514f4dbe3c2eb94e0737f0c9ddaea3826523cfffada9eeb437536e1b3ef5f",
+      "old_status": null,
+      "old_value_digest": null
+    }
+  ],
+  "source_changes": [
+    {
+      "change": "added",
+      "new_source_vintage_id": "sha256:aabfa89cef7f2d8fcb6b3470e61eb48bad287f885d6e1d86d99bc099f22b1949",
+      "old_source_vintage_id": null,
+      "source_id": "btos-core-ai-202611-q7-a1-v1"
+    },
+    {
+      "change": "added",
+      "new_source_vintage_id": "sha256:e453972632b19eebdd98b597525f40ccb48d1ad1450cbef9efc9761a565d3862",
+      "old_source_vintage_id": null,
+      "source_id": "cps-basic-monthly-composition-v1"
+    },
+    {
+      "change": "added",
+      "new_source_vintage_id": "sha256:e7a982699e2c798d42697819ad7132d15a04d0b152213ec56fa45a6141c08992",
+      "old_source_vintage_id": null,
+      "source_id": "oews-may-2025-composition-v1"
+    },
+    {
+      "change": "added",
+      "new_source_vintage_id": "sha256:fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73",
+      "old_source_vintage_id": null,
+      "source_id": "rps-genai-tracker-fred-release-6"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+cohort,earlier_period,industry_count,later_period,median_absolute_residual_change,metric_id,residual_rank_spearman,sign_agreement_count,sign_agreement_share
+all_supported,2025-Q2,20,2026-Q2,4.095358779468526,adoption_work,0.6646616541353384,17,0.85
+all_supported,2025-Q2,20,2026-Q2,1.3316708929987127,assisted_hours_share,0.45112781954887216,14,0.7
+all_supported,2025-Q2,20,2026-Q2,0.3952816468123096,reported_time_savings_share,0.5714285714285714,14,0.7
+primary_stable,2025-Q2,16,2026-Q2,4.4141886642124994,adoption_work,0.5264705882352941,13,0.8125
+primary_stable,2025-Q2,16,2026-Q2,1.2093707989421139,assisted_hours_share,0.42058823529411765,12,0.75
+primary_stable,2025-Q2,16,2026-Q2,0.511484577799819,reported_time_savings_share,0.5529411764705883,11,0.6875
