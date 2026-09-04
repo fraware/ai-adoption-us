@@ -40,16 +40,16 @@ export default async function IndustriesPage() {
       <p className="eyebrow">Industry evidence</p>
       <h1>Industry explorer</h1>
       <p className="lede">
-        Employer-reported AI use and worker-reported GenAI adoption show a substantial cross-sector
-        association, while the worker-side longitudinal evidence shows that adoption ranks are more
-        persistent than workflow penetration.
+        Industry data expose an extra layer of variation in workplace AI. Worker adoption and assisted time
+        align less tightly here than across occupations, and BTOS adds a separate firm-side view of current
+        AI use.
       </p>
 
       <section className="section" aria-labelledby="cross-source-triangulation">
-        <h2 id="cross-source-triangulation">Two different measures, one sector pattern</h2>
+        <h2 id="cross-source-triangulation">Worker adoption and firm AI use show substantial sector concordance</h2>
         <p>
-          The preregistered primary comparison uses every published, non-suppressed BTOS sector with
-          primary crosswalk comparability and the corresponding Q2 2026 RPS industry observation.
+          The primary comparison pairs Q2 2026 RPS worker adoption with BTOS sectors that satisfy the
+          preregistered crosswalk and suppression rules.
         </p>
         <div className="metric-row" aria-label="Primary BTOS and RPS triangulation summary">
           <div className="metric">
@@ -72,11 +72,11 @@ export default async function IndustriesPage() {
         <div className="callout" id="btos-rps-measurement-boundary">
           <p className="callout-label">Measurement boundary</p>
           <p>
-            BTOS measures the share of responding employer businesses reporting AI use in any business
-            function during the last two weeks. RPS measures the share of employed adults in an industry
-            reporting use of Generative AI for their job. Their units, denominators, technology scope,
-            and reference periods differ. The correlations describe sector-level concordance only; they
-            are not percentage-point gaps, construct equivalence, productivity estimates, or causal effects.
+            BTOS reports the share of responding employer businesses using AI in any business function over
+            the prior two weeks. RPS reports the share of employed adults in an industry using generative AI
+            for work. The correlation is sector-level descriptive concordance across distinct constructs.
+            Percentage-point gaps, productivity interpretation, and causal interpretation require evidence
+            beyond this comparison.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default async function IndustriesPage() {
               <div><dt>Spearman ρ</dt><dd>{triangulation.primary.spearman_rho.toFixed(3)}</dd></div>
               <div><dt>Pearson r</dt><dd>{triangulation.primary.pearson_r.toFixed(3)}</dd></div>
             </dl>
-            <p>Primary-comparability sectors only; no imputation of suppressed BTOS values.</p>
+            <p>Primary-comparability sectors; suppressed BTOS values remain excluded.</p>
           </div>
           <div className="comparison-card">
             <h3>Expanded sensitivity</h3>
@@ -104,20 +104,20 @@ export default async function IndustriesPage() {
               <div><dt>Pearson r</dt><dd>{triangulation.expanded_sensitivity.pearson_r.toFixed(3)}</dd></div>
             </dl>
             <p>
-              Adds Transportation and Warehousing, Finance and Insurance, and Other Services as
-              limited-comparability sectors. This sensitivity does not replace the primary result.
+              Adds Transportation and Warehousing, Finance and Insurance, and Other Services under the
+              preregistered limited-comparability tier.
             </p>
           </div>
         </div>
         <p className="note">
-          Management of Companies and Enterprises is excluded because its BTOS estimate is suppressed.
-          Agriculture remains suppressed in the limited-comparability tier. Public Administration has no
-          BTOS counterpart, and BTOS unclassified multi-sector businesses are not redistributed.
+          Suppression rules leave Management of Companies and Enterprises outside the primary analysis and
+          Agriculture outside the limited-comparability sensitivity. Public Administration lacks a BTOS
+          counterpart; unclassified multi-sector businesses stay unallocated.
         </p>
       </section>
 
       <section className="section" aria-labelledby="industry-stability">
-        <h2 id="industry-stability">Worker-side rank stability</h2>
+        <h2 id="industry-stability">Adoption ranks persist more than assisted-hour ranks</h2>
         <StabilityBars
           title="Industry rank persistence: median Spearman correlation across quarter pairs"
           bars={[
@@ -127,15 +127,14 @@ export default async function IndustriesPage() {
           ]}
         />
         <p className="note">
-          Adoption ranks are more stable than assisted-hours ranks in
+          Across RPS waves, adoption rankings exceed assisted-hours rank stability in
           {` ${dominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${dominance.quarter_pairs} `}
-          possible quarter-pair comparisons. These diagnostics use RPS only and are separate from the
-          BTOS-RPS comparison above.
+          quarter-pair comparisons. These diagnostics use the worker-side RPS series.
         </p>
       </section>
 
       <section className="section" aria-labelledby="industry-savings">
-        <h2 id="industry-savings">The savings relationship changes by wave</h2>
+        <h2 id="industry-savings">The industry link to reported savings changes across waves</h2>
         <div className="table-wrap" tabIndex={0} aria-label="Scrollable industry wave diagnostics table">
           <table>
             <caption>Unweighted cross-industry descriptive regressions by quarter. A = adoption, H = assisted hours, S = reported savings.</caption>
@@ -161,7 +160,7 @@ export default async function IndustriesPage() {
         </div>
         <p className="note">
           Assisted hours has the higher univariate R² in {industryHBeatsAWaves} of {longitudinal.input_scope.periods.length} waves.
-          The Q2 2026 ordering is therefore a reproduced cross-section, not a stable structural law.
+          Q2 2026 fits that recurrent pattern, with the ordering changing across the full audited window.
         </p>
       </section>
 
@@ -174,20 +173,20 @@ export default async function IndustriesPage() {
           </>
         ) : (
           <div className="callout">
-            <p className="callout-label">Derived-only mode</p>
+            <p className="callout-label">Public aggregate view</p>
             <p>
-              The bounded public industry view is unavailable in this build. The longitudinal derived
-              diagnostics remain available without exposing the historical subgroup source panel.
+              This build excludes the bounded public industry cross-section. Longitudinal derived
+              diagnostics remain available through the promoted release.
             </p>
           </div>
         )}
       </section>
 
       <section className="section" aria-labelledby="industry-boundary">
-        <h2 id="industry-boundary">Interpretive boundary</h2>
+        <h2 id="industry-boundary">What the industry evidence supports</h2>
         <p className="note">
-          These are aggregate cross-sectional diagnostics. No residual, regression, or cross-source
-          correlation is interpreted as efficiency, productivity, organizational quality, or a causal effect.
+          These aggregate cross-sectional diagnostics describe association and persistence. Efficiency,
+          productivity, organizational quality, and causal effects require separate identification.
         </p>
       </section>
     </main>

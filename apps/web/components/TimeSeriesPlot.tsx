@@ -60,7 +60,8 @@ export function TimeSeriesPlot({ data }: { data: Point[] }) {
       <figure className="chart-frame" aria-label="National generative AI work-use time series">
         <div className="chart-canvas" ref={container} aria-hidden="true" />
         <figcaption>
-          National work-use constructs are plotted separately because their denominators and meanings differ.
+          The national series remain separate so adoption, recurrence, assisted hours, and reported savings
+          retain their own definitions.
         </figcaption>
       </figure>
       <details className="data-details">

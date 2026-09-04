@@ -9,6 +9,10 @@ def read(rel: str) -> str:
     return (ROOT / rel).read_text()
 
 
+def normalized_lower(text: str) -> str:
+    return " ".join(text.lower().split())
+
+
 def test_layout_has_accessible_navigation_and_source_surface():
     layout = read("apps/web/app/layout.tsx")
     assert 'className="skip-link"' in layout
@@ -30,7 +34,7 @@ def test_labelled_generic_home_groups_have_explicit_roles_and_dynamic_evidence_l
     assert 'aria-label={`${periods.length}-wave evidence summary`}' in home
     assert (
         'className="measurement-ladder" role="group" '
-        'aria-label="Measurement ladder from adoption to realization"'
+        'aria-label="Measurement chain from adoption to outcomes"'
     ) in home
 
 
@@ -73,37 +77,45 @@ def test_browser_version_report_uses_pinned_playwright_version():
     assert "Unable to resolve pinned @playwright/test version" in reporter
 
 
-def test_public_sources_page_states_current_composition_and_rps_boundaries():
+def test_public_sources_page_states_current_composition_rps_and_qa_boundaries():
     page = read("apps/web/app/sources/page.tsx")
-    lower = page.lower()
-    assert "Official Q2 2025 and Q2 2026 Basic Monthly" in page
-    assert "composition inputs, not RPS residuals" in page
-    assert "Robustness input validated" in page
-    assert "Authorized aggregate release path" in page
-    assert "bounded presentation view" in page
-    assert "historical" in lower and "subgroup panel" in lower
-    assert "bulk download product" in page
-    assert "generic source query API" in page
-    assert "private source-input bytes" in lower
-    assert "Still outside Release 1 claims" in page
-    assert "causal firm effects" in page
-    assert "Sources, provenance" in page
+    normalized = normalized_lower(page)
+    assert "official q2 2025 and q2 2026 basic monthly public-use files" in normalized
+    assert "actual-main-job-hour occupation weights" in normalized
+    assert "establishment robustness" in normalized
+    assert "oews · 2025-05" in normalized
+    assert "authorized aggregate release path" in normalized
+    assert "bounded attributed public views" in normalized
+    assert "owner permission for published aggregate project use" in normalized
+    assert "derived aggregate analysis" in normalized
+    assert "historical subgroup panels" in normalized
+    assert "bulk download" in normalized
+    assert "generic source-query access" in normalized
+    assert "private source-input bytes" in normalized
+    assert "outside current claims" in normalized
+    assert "causal firm effects" in normalized
+    assert "sources and release scope" in normalized
+    assert "human screen-reader traversal" in normalized
+    assert "outside current validation evidence" in normalized
 
 
 def test_methodology_keeps_savings_distinct_from_productivity():
     page = read("apps/web/app/methodology/page.tsx")
     sources = read("apps/web/app/sources/page.tsx")
     release_notice = read("apps/web/components/ReleaseNotice.tsx")
-    assert "Reported time savings are not an observed measure of labor productivity" in page
+    normalized_page = normalized_lower(page)
+    assert "reported time savings are survey-based counterfactual estimates" in normalized_page
+    assert "labor productivity, output, gdp, and employer value added require direct outcome evidence" in normalized_page
     assert "occupation_" in page
     assert "adjusted_" in page
     assert "industry_" in page
     assert "context_" in page
     assert "residual" in page
-    assert "CPS composition foundation has been executed and validated" in page
-    assert "published-aggregate project use is recorded as permitted" in sources.lower()
-    assert "unrestricted RPS" in page
-    assert "private source-input bytes" in release_notice
+    assert "the cps composition foundation uses official q2 2025 and q2 2026 inputs" in normalized_page
+    assert "owner permission for published aggregate project use" in normalized_lower(sources)
+    assert "DATA_MODE=derived_only" in page
+    assert "private source-input bytes" in normalized_page
+    assert "private source-input bytes" in normalized_lower(release_notice)
 
 
 def test_explorers_use_registry_entity_names_instead_of_slug_labels():

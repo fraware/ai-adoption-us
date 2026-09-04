@@ -642,5 +642,19 @@ def test_stage_promote_baseline_then_stage_new_wave_without_source_redistributio
 def test_public_registry_has_no_synthetic_release_promoted():
     root = Path(__file__).parents[1]
     registry = json.loads((root / "data/registry/observatory_release_registry.json").read_text())
-    assert registry["current_release_id"] is None
-    assert registry["releases"] == []
+    current_release_id = registry["current_release_id"]
+    releases = registry["releases"]
+    synthetic_fixture_ids = {"release-1", "release-2"}
+
+    assert current_release_id not in synthetic_fixture_ids
+    assert all(release["release_id"] not in synthetic_fixture_ids for release in releases)
+
+    if current_release_id is None:
+        assert releases == []
+        return
+
+    assert registry["status"] == "CURRENT_RELEASE_PROMOTED"
+    current = next((release for release in releases if release["release_id"] == current_release_id), None)
+    assert current is not None
+    assert current["manifest_sha256"] == registry["current_release_manifest_sha256"]
+    assert current["rehydration_status"] == "REHYDRATED_EXACT_CANDIDATE"
