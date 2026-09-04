@@ -28,7 +28,7 @@ RELEASE_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]{0,127}$")
 # Runtime data loaders, build/dependency configuration, source registries, release
 # artifacts, and analytical code are intentionally absent.
 ALLOWED_EXACT_PATHS = {
-    ".github/workflows/pages.yml",
+    ".github/workflows/content-pages.yml",
     "apps/web/app/design.css",
     "apps/web/app/layout.tsx",
     "apps/web/app/page.tsx",
