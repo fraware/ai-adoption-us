@@ -47,8 +47,18 @@ export default async function HomePage() {
       label: chartLabels[row.metric_id],
     }));
 
+  const periods = longitudinal.input_scope.periods;
+  const firstPeriod = periods[0];
+  const lastPeriod = periods[periods.length - 1];
+  const crossLevelAlignedQuarters = Object.values(longitudinal.cross_level_comparison).filter(
+    (row) =>
+      row.occupation_minus_industry_pearson_A_H > 0 &&
+      row.occupation_minus_industry_spearman_A_H > 0,
+  ).length;
   const industryRank = longitudinal.rank_stability.industry;
   const occupationRank = longitudinal.rank_stability.occupation;
+  const industryDominance = longitudinal.rank_stability_dominance.industry;
+  const occupationDominance = longitudinal.rank_stability_dominance.occupation;
 
   return (
     <main>
@@ -60,35 +70,35 @@ export default async function HomePage() {
       </p>
 
       <section className="section" aria-labelledby="evidence-heading">
-        <h2 id="evidence-heading">What survives five survey waves</h2>
+        <h2 id="evidence-heading">What persists across {periods.length} survey waves</h2>
         <p className="kicker">
           The durable evidence is about persistence and cross-level structure, not a latest-quarter
           leaderboard.
         </p>
-        <div className="metric-row" role="group" aria-label="Five-wave evidence summary">
+        <div className="metric-row" role="group" aria-label={`${periods.length}-wave evidence summary`}>
           <div className="metric">
             <span>Audited window</span>
-            <strong>{longitudinal.input_scope.periods.length} waves</strong>
-            <div>Q2 2025 through Q2 2026</div>
+            <strong>{periods.length} waves</strong>
+            <div>{firstPeriod} through {lastPeriod}</div>
           </div>
           <div className="metric">
             <span>Cross-level result</span>
-            <strong>5 / 5</strong>
-            <div>occupation adoption–assisted-hours coupling exceeds industry coupling</div>
+            <strong>{crossLevelAlignedQuarters} / {periods.length}</strong>
+            <div>quarters where occupation adoption–assisted-hours alignment exceeds industry alignment</div>
           </div>
           <div className="metric">
             <span>Rank persistence</span>
             <strong>
-              {longitudinal.rank_stability_dominance.industry.adoption_rank_corr_gt_assisted_hours_rank_corr}
+              {industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr}
               {" / "}
-              {longitudinal.rank_stability_dominance.industry.quarter_pairs}
+              {industryDominance.quarter_pairs}
             </strong>
-            <div>industry quarter pairs where adoption ranks are more stable than assisted-hours ranks</div>
+            <div>industry quarter pairs; occupations show {occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} / {occupationDominance.quarter_pairs}</div>
           </div>
         </div>
 
         <StabilityBars
-          title="Median pairwise rank correlation across the five-wave window"
+          title={`Median pairwise rank correlation across the ${periods.length}-wave window`}
           bars={[
             { label: "Industry adoption", value: industryRank.A.median_pairwise },
             { label: "Industry assisted hours", value: industryRank.H.median_pairwise },
@@ -97,9 +107,11 @@ export default async function HomePage() {
           ]}
         />
         <p className="note">
-          Adoption rankings are more persistent than assisted-hours rankings in every one of the ten
-          possible quarter-pair comparisons at both aggregation levels. This is descriptive aggregate
-          evidence; it does not identify a causal mechanism.
+          Adoption rankings are more similar across quarters than assisted-hours rankings in
+          {` ${industryDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${industryDominance.quarter_pairs} `}
+          industry quarter pairs and
+          {` ${occupationDominance.adoption_rank_corr_gt_assisted_hours_rank_corr} of ${occupationDominance.quarter_pairs} `}
+          occupation quarter pairs. This is descriptive aggregate evidence; it does not identify a causal mechanism.
         </p>
       </section>
 
@@ -134,9 +146,9 @@ export default async function HomePage() {
           <div className="callout">
             <p className="callout-label">Rights-safe Release 1 boundary</p>
             <p>
-              The direct national observation feed is not activated in Release 1. The five-wave
-              statistics elsewhere on the site are derived publication artifacts generated from a
-              reviewed private fixture; raw subgroup observations are excluded from the public bundle.
+              The bounded public observation view is unavailable in this build. The longitudinal
+              publication artifacts remain available, while private source-input bytes stay outside the
+              public bundle.
             </p>
             <p><Link href="/sources">Read the source and redistribution boundary →</Link></p>
           </div>

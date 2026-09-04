@@ -70,7 +70,7 @@ def test_release_manifest_is_rights_safe_and_identity_bound():
         assert forbidden not in text
 
 
-def test_github_pages_workflow_is_pinned_and_fail_closed():
+def test_github_pages_workflow_builds_every_change_but_deploys_only_authorized_release():
     workflow = read(".github/workflows/pages.yml")
     assert "DATA_MODE: derived_only" in workflow
     assert "GITHUB_PAGES: 'true'" in workflow
@@ -79,7 +79,9 @@ def test_github_pages_workflow_is_pinned_and_fail_closed():
     assert "actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e" in workflow
     assert "data/audit/private" in workflow
     assert "sourceBytesPublished" in workflow
-    assert "github.event_name != 'pull_request'" in workflow
+    assert "startsWith(github.event.head_commit.message, 'Authorize Observatory release ')" in workflow
+    assert "scripts/validate_observatory_publication_commit.py --commit \"$GITHUB_SHA\"" in workflow
+    assert "github.event_name != 'pull_request'" not in workflow
     assert "vercel" not in workflow.lower()
 
 

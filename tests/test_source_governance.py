@@ -32,12 +32,16 @@ def test_rps_observatory_candidate_stays_private_and_cannot_promote():
     public_module = (
         ROOT / "src" / "genai_at_work" / "rps_release_public.py"
     ).read_text()
+    surface_module = (ROOT / "src" / "genai_at_work" / "claim_surfaces.py").read_text()
 
     assert 'PRIVATE_ROOT = ROOT / "data" / "audit" / "private"' in script
     assert "Repository-local RPS release candidates may only be written under" in script
     assert '"promotion_performed": False' in script
     assert "global_baseline_warning" in script
     assert "build_rps_observatory_release_candidate" in script
+    assert "bind_claim_surfaces" in script
+    assert "validate_claim_surface_bindings" in script
+    assert "Governed publication surface changed after claim binding" in surface_module
     assert "build_rps_release_candidate_complete_history" in public_module
     assert '"source_input_bytes_publication": False' in complete_module
     assert "complete 131-series source history" in complete_module
@@ -129,10 +133,17 @@ def test_private_audit_not_under_public_web_tree():
     assert not any("rps_subgroup_5q_audit" in p.name for p in public.rglob("*"))
 
 
-def test_derived_only_mode_is_explicit_and_rights_safe():
-    text = (ROOT / "apps" / "web" / "lib" / "data.ts").read_text()
-    assert 'mode === "derived_only"' in text
-    assert 'return []' in text
+def test_derived_only_mode_is_explicit_rights_bounded_and_release_resolved():
+    data = (ROOT / "apps" / "web" / "lib" / "data.ts").read_text()
+    release = (ROOT / "apps" / "web" / "lib" / "release.ts").read_text()
+    assert 'mode === "derived_only"' in data
+    assert "loadPromotedPublicView" in data
+    assert "rps-public-observation-view" in data
+    assert "historical_subgroup_panel_included !== false" in data
+    assert "generic_query_api_included !== false" in data
+    assert "observatory_release_registry.json" in release
+    assert "current_release_manifest_sha256" in release
+    assert "PROMOTED_AFTER_EXPLICIT_REVIEW" in release
     derived = ROOT / "data" / "derived" / "longitudinal" / "longitudinal_diagnostics.json"
     assert derived.exists()
 
@@ -147,7 +158,7 @@ def test_public_pages_use_derived_longitudinal_loader():
         assert "loadLongitudinalDiagnostics" in (ROOT / rel).read_text()
 
 
-def test_longitudinal_web_contract_matches_derived_artifact():
+def test_longitudinal_web_contract_matches_current_seven_quarter_artifact():
     import json
 
     derived = json.loads(
@@ -156,10 +167,22 @@ def test_longitudinal_web_contract_matches_derived_artifact():
     assert set(derived["quarter_diagnostics"]) == {"industry", "occupation"}
     assert set(derived["rank_stability"]) == {"industry", "occupation"}
     assert set(derived["rank_stability_dominance"]) == {"industry", "occupation"}
-    assert len(derived["input_scope"]["periods"]) == 5
+    assert derived["input_scope"]["periods"] == [
+        "2024-Q4",
+        "2025-Q1",
+        "2025-Q2",
+        "2025-Q3",
+        "2025-Q4",
+        "2026-Q1",
+        "2026-Q2",
+    ]
+    assert derived["source_content_sha256"] == (
+        "fe8bffa7cacd029cc23e2ba7e310d925e8c05322f6d53bd89e8234f02e825b73"
+    )
     for entity_type in ("industry", "occupation"):
         assert set(derived["rank_stability"][entity_type]) == {"A", "H", "S"}
-        assert len(derived["quarter_diagnostics"][entity_type]) == 5
+        assert len(derived["quarter_diagnostics"][entity_type]) == 7
+        assert derived["rank_stability_dominance"][entity_type]["quarter_pairs"] == 21
 
 
 def test_no_python_runtime_cache_is_tracked_or_packaged():

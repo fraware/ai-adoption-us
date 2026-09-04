@@ -1,0 +1,261 @@
+name: Observatory exact rehydration and promotion
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Rehydrate for review, or promote after the rehydration identity has been human-attested
+        required: true
+        type: choice
+        options:
+          - rehydrate
+          - promote
+      review_run_id:
+        description: Observatory candidate-review workflow run ID for this exact main commit
+        required: true
+        type: string
+      attestation_json:
+        description: Completed review attestation JSON; required only for promote
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: observatory-promotion
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Exact rehydration and governed release transition
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Require canonical main ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_REF" != 'refs/heads/main' ]; then
+            echo 'Observatory rehydration/promotion must be dispatched on main.' >&2
+            exit 1
+          fi
+
+      - name: Check out exact candidate commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install release-engine dependencies
+        run: python -m pip install -e .
+
+      - name: Require authorized RPS credential
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${FRED_API_KEY:-}" ]; then
+            echo 'FRED_API_KEY is required for trusted source rehydration.' >&2
+            exit 1
+          fi
+
+      - name: Download exact candidate review package
+        env:
+          REVIEW_RUN_ID: ${{ inputs.review_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! [[ "$REVIEW_RUN_ID" =~ ^[0-9]+$ ]]; then
+            echo 'review_run_id must be a positive integer.' >&2
+            exit 1
+          fi
+          mkdir -p /tmp/review-download
+          gh run download "$REVIEW_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern 'observatory-candidate-review-*' \
+            --dir /tmp/review-download
+
+          mapfile -t summaries < <(find /tmp/review-download -name review-summary.json -type f -print)
+          if [ "${#summaries[@]}" -ne 1 ]; then
+            echo "Expected exactly one candidate review summary, found ${#summaries[@]}." >&2
+            exit 1
+          fi
+          review_root="$(dirname "${summaries[0]}")"
+          echo "REVIEW_ROOT=$review_root" >> "$GITHUB_ENV"
+
+      - name: Bind review package to this workflow commit
+        env:
+          REVIEW_RUN_ID: ${{ inputs.review_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['REVIEW_ROOT'])
+          summary = json.loads((root / 'review-summary.json').read_text())
+          expected_sha = os.environ['GITHUB_SHA']
+          expected_run = int(os.environ['REVIEW_RUN_ID'])
+          if summary.get('github_sha') != expected_sha:
+              raise SystemExit(
+                  f"Review package commit {summary.get('github_sha')!r} != workflow commit {expected_sha!r}"
+              )
+          if summary.get('github_run_id') != expected_run:
+              raise SystemExit('Review package run ID does not match requested review_run_id')
+          if summary.get('gate_status') != 'BLOCKED_REVIEW_REQUIRED':
+              raise SystemExit('Review package is not an exact candidate awaiting explicit review')
+          if summary.get('exact_rehydration_required') is not True:
+              raise SystemExit('Review package does not require exact rehydration')
+          if summary.get('source_input_bytes_included') is not False:
+              raise SystemExit('Review package widened the private-source boundary')
+          PY
+
+      - name: Re-fetch and exactly rehydrate reviewed candidate
+        run: >-
+          PYTHONPATH=src python scripts/rehydrate_observatory_v1_candidate.py
+          --review-package-dir "$REVIEW_ROOT"
+          --output-root /tmp/observatory-rehydration
+
+      - name: Audit rights-safe rehydration identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          identity=/tmp/observatory-rehydration/rehydration_identity.json
+          test -f "$identity"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          identity = json.loads(
+              Path('/tmp/observatory-rehydration/rehydration_identity.json').read_text()
+          )
+          if identity.get('status') != 'REHYDRATED_EXACT_CANDIDATE':
+              raise SystemExit('Rehydration did not establish exact candidate identity')
+          if identity.get('source_input_bytes_included') is not False:
+              raise SystemExit('Rehydration identity widened private-source publication')
+          if 'local_path' in json.dumps(identity):
+              raise SystemExit('Rehydration identity leaked a private source path')
+          PY
+
+      - name: Upload deterministic rehydration identity for human attestation
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: observatory-rehydration-identity-${{ github.run_id }}-${{ github.sha }}
+          path: /tmp/observatory-rehydration/rehydration_identity.json
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Require completed human attestation for promotion
+        if: inputs.operation == 'promote'
+        env:
+          ATTESTATION_JSON: ${{ inputs.attestation_json }}
+          REVIEW_RUN_ID: ${{ inputs.review_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${ATTESTATION_JSON:-}" ]; then
+            echo 'attestation_json is required for operation=promote.' >&2
+            exit 1
+          fi
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          try:
+              attestation = json.loads(os.environ['ATTESTATION_JSON'])
+          except json.JSONDecodeError as exc:
+              raise SystemExit(f'Invalid attestation_json: {exc}') from exc
+          if not isinstance(attestation, dict):
+              raise SystemExit('attestation_json must encode one JSON object')
+          if attestation.get('candidate_review_run_id') != int(os.environ['REVIEW_RUN_ID']):
+              raise SystemExit('Attestation is not bound to the requested candidate-review run')
+          identity_path = Path('/tmp/observatory-rehydration/rehydration_identity.json')
+          digest = hashlib.sha256(identity_path.read_bytes()).hexdigest()
+          if attestation.get('rehydration_identity_sha256') != digest:
+              raise SystemExit(
+                  'Attestation must bind the SHA-256 of the exact rehydration identity from a prior review step'
+              )
+          Path('/tmp/review-attestation.json').write_text(
+              json.dumps(attestation, indent=2, sort_keys=True) + '\n'
+          )
+          PY
+
+      - name: Promote exact rehydrated release
+        if: inputs.operation == 'promote'
+        run: >-
+          PYTHONPATH=src python scripts/promote_rehydrated_observatory_v1.py
+          --candidate-manifest /tmp/observatory-rehydration/candidate/release.json
+          --candidate-root /tmp/observatory-rehydration/candidate
+          --staging-dir /tmp/observatory-rehydration/stage
+          --attestation /tmp/review-attestation.json
+          --rehydration-identity /tmp/observatory-rehydration/rehydration_identity.json
+
+      - name: Commit only the immutable release transition
+        if: inputs.operation == 'promote'
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('/tmp/observatory-rehydration/rehydration_identity.json').read_text())['release_id'])
+          PY
+          )"
+          test -n "$release_id"
+          test -d "data/releases/$release_id"
+
+          if find "data/releases/$release_id" -type d -name inputs -print -quit | grep -q .; then
+            echo 'Promoted public release unexpectedly contains a private inputs directory.' >&2
+            exit 1
+          fi
+
+          git add data/registry/observatory_release_registry.json "data/releases/$release_id"
+          mapfile -t changed < <(git diff --cached --name-only)
+          if [ "${#changed[@]}" -lt 2 ]; then
+            echo 'Promotion produced an incomplete publication commit.' >&2
+            exit 1
+          fi
+          for path in "${changed[@]}"; do
+            if [ "$path" = 'data/registry/observatory_release_registry.json' ]; then
+              continue
+            fi
+            case "$path" in
+              "data/releases/$release_id/"*) ;;
+              *) echo "Unexpected path staged for publication: $path" >&2; exit 1 ;;
+            esac
+          done
+
+          git config user.name 'observatory-release-bot'
+          git config user.email 'observatory-release-bot@users.noreply.github.com'
+          git commit -m "Authorize Observatory release $release_id"
+          PYTHONPATH=src python scripts/validate_observatory_publication_commit.py --commit HEAD
+          git push origin HEAD:main
+
+      - name: Record promotion outcome
+        if: inputs.operation == 'promote'
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '# Observatory promotion'
+            echo
+            echo "- Candidate commit: $GITHUB_SHA"
+            echo "- Candidate review run: ${{ inputs.review_run_id }}"
+            echo "- Promotion commit: $(git rev-parse HEAD)"
+            echo '- Rehydration: exact and human-attested'
+            echo '- Private source bytes published: false'
+            echo '- Public deployment: delegated to the authorization-commit Pages workflow'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -18,8 +18,11 @@ export function ReleaseNotice() {
     return (
       <div className="release-strip" role="status">
         <div>
-          <strong>Release 1 · rights-safe derived evidence</strong>
-          <span>Raw RPS observations are excluded from the public bundle.</span>
+          <strong>Release 1 · rights-bounded public evidence</strong>
+          <span>
+            The public bundle is limited to contracted aggregate presentation views and derived artifacts;
+            private source-input bytes and unrestricted historical subgroup data remain excluded.
+          </span>
           <Link href="/sources">Source and rights boundary</Link>
         </div>
       </div>

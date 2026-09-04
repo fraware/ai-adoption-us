@@ -1,122 +1,97 @@
 # Release checklist
 
-A release is not launch-ready until every applicable item below is explicitly resolved. Checked items are backed by an execution record or committed code inspection; unchecked items remain open. Items explicitly designated **out of Release 1 scope** are not claimed as completed and are not launch blockers under the 2026-09-03 R1-G2 scope decision. See `VALIDATION_2026-08-30.md`, `VALIDATION_2026-08-31.md`, `docs/RELEASE1_PRODUCT_QA.md`, `docs/qa/R1_G3_DEPLOYMENT_AUDIT_2026-09-03.md`, and the other dated records under `docs/qa/` for the private/public/build/rendered/deployment distinction.
+Release 1 is launch-ready only when every release-time item below is resolved on the exact candidate/release identities. Historical QA and deployment records remain evidence about earlier repository states; they do not substitute for exact-head review, rehydration, promotion, or deployment evidence for the final release.
 
 ## A. Scientific integrity
 
-- [x] Product language preserves the core metric distinctions in `docs/product-spec.md` under the current code-level QA/tests.
+- [x] Work adoption, routine/recent use, assisted working time, and reported time savings remain distinct constructs.
 - [x] Reported time savings are not presented as measured labor productivity.
-- [x] The occupation-adjusted industry-context residual is not presented as an identified organizational effect.
-- [x] Latest-quarter subgroup presentation is accompanied by multi-wave stability context in the Release 1 design.
-- [x] Current displayed longitudinal statistics come from generated rights-safe artifacts or directly defined transformations.
-- [x] Private fixture revisions are governed by `scripts/private_fixture_revision_gate.py` and `docs/PRIVATE_FIXTURE_REVISION_PROTOCOL.md`: a changed candidate is staged separately, the current freeze is checksum-verified and privately archived, the applicable fixture-present analytical suite runs against the candidate, longitudinal artifacts are regenerated/diffed, affected public claims require explicit hash-bound review attestation, and promotion fails closed on private-suite, rights, definition, or publication-diagnostic failure. This records the implemented/tested control; no real private source revision is claimed to have occurred.
-- [x] Official CPS composition inputs are executed and validated as composition evidence; unsupported inferential claims remain fail-closed under the current composition-uncertainty contract.
+- [x] Occupation-adjusted industry-context residuals are presented as descriptive standardization residuals, not identified organizational or causal effects.
+- [x] Current longitudinal public claims are synchronized to the seven-quarter Q4 2024–Q2 2026 common A/H/S evidence.
+- [x] Current headline counts and relationships are derived from or reconciled against release artifacts rather than protected by five-wave prose literals.
+- [x] Governed longitudinal/source claims are cryptographically bound to the exact public files that present them.
+- [x] CPS composition, OEWS robustness, and BTOS–RPS triangulation retain their registered measurement/interpretation boundaries.
+- [ ] Human scientific review completed against the exact final candidate-review package.
 
 ## B. Data rights and provenance
 
-- [x] Public web build mode is `DATA_MODE=derived_only`.
-- [x] `data/audit/private/` is absent from the public Git tree.
-- [x] `.gitignore` explicitly excludes `data/audit/private/` as defense in depth.
-- [x] Permanent CI verifies the private audit path is absent from the public source tree and optimized build tree.
-- [x] `data/audit/private/` is absent from the audited GitHub Pages artifact and the live deployment fails the guarded private/raw paths closed; see `docs/qa/R1_G3_DEPLOYMENT_AUDIT_2026-09-03.md`.
-- [x] Rights-safe export/governance tests pass on the validated public source surface.
-- [x] Rights-safe ZIP export contains exactly one generated provenance record and fails on duplicate archive member names.
-- [x] Sources/Provenance page describes the current RPS/CPS/OEWS/BTOS evidence roles and fail-closed boundaries.
-- [x] The persistent static FRED-to-public-JSON design is retired.
-- [x] Direct published-aggregate RPS permission/feed status is recorded in `docs/source-rights/RPS_SOURCE_DECISION.md` with status **GRANTED — live aggregate observatory gate** dated 2026-09-02; the retained record does not infer permission for microdata, the separate task-index artifact, unrestricted bulk mirroring, or a full-source public API.
-- **Not active in Release 1:** the live RPS source-check schedule remains disabled until its separate durable-private-backend activation gates pass. Release 1 public web execution remains `derived_only`.
+- [x] Public web mode is `DATA_MODE=derived_only`.
+- [x] Private RPS candidate inputs are excluded from the public Git tree and promoted release artifacts.
+- [x] The public RPS observation product is bounded to the contracted national history plus latest industry/occupation A/H/S views.
+- [x] Historical subgroup database, unrestricted bulk mirror/download, generic source query API, respondent microdata, historical replication package, and separate task-index artifact remain outside the Release 1 authorization unless separately approved.
+- [x] Current source-rights status and the evidence limitation are recorded in `docs/source-rights/RPS_SOURCE_DECISION.md`: published aggregate project use is treated as granted on the project owner's attestation; the underlying correspondence/agreement is not retained in the public repository or independently inspected in this code change.
+- [x] Source attribution and source-series provenance are preserved.
+- [ ] Human source-rights review completed against the exact final candidate-review package.
 
-## C. Python/research validation
+## C. Source and analytical candidate
 
-- [x] Private fixture-present checkout: **58 passed** on the frozen 2026-08-30 reconstruction validation.
-- [x] Public checkout validation is enforced by permanent CI; exact counts evolve as regression coverage is added and must be taken from the exact release-head run rather than the historical 52-pass import baseline.
-- [x] `python -m compileall -q src scripts` passes in permanent CI.
-- [x] Ruff passes in permanent CI.
-- [x] Strict `mypy src` passes without relaxing the configured strictness.
-- [x] Longitudinal derived artifacts regenerate byte-for-byte from the frozen private fixture under the private validation contract.
-- [x] Canonical RPS registry cardinality = **131** and identities are regression-tested.
-- [x] Git whitespace/hygiene checks pass.
-- [x] Exact final R1-G2 evidence is committed under `docs/qa/` and issue #2 is closed.
+- [x] Canonical RPS registry cardinality is 131 work-focused series: 5 national, 60 industry, 66 occupation.
+- [x] Current live candidate evidence contains 962 registered source observations.
+- [x] Common A/H/S subgroup panel contains 882 cells across seven quarters.
+- [x] RPS component validates construct-specific source-history topology and requires complete A/H/S common-window coverage.
+- [x] Bounded public observation artifact is built from the same RPS source vintage as the longitudinal diagnostics.
+- [x] Repository RPS-dependent CPS/OEWS/BTOS evidence is explicitly bound to the candidate RPS vintage before global composition.
+- [x] Global candidate contains the required RPS/CPS/OEWS/BTOS components and release diagnostics.
+- [ ] Final global candidate rebuilt on canonical `main` after merge and staged with gate status `BLOCKED_REVIEW_REQUIRED` and zero contract failures.
 
-## D. Web production build
+## D. Public code and application validation
 
-- [x] `apps/web/package-lock.json` is committed.
-- [x] A genuine networked dependency install succeeded.
-- [x] TypeScript validation succeeded.
-- [x] `DATA_MODE=derived_only` optimized Next.js **16.3.3** production build succeeded.
-- [x] All intended public routes were generated by the production build.
-- [x] Generated `tsconfig.tsbuildinfo` is excluded from version control.
-- [x] Permanent CI succeeds with **`npm ci`** from the committed lockfile.
-- [x] Permanent CI starts the non-Pages production server successfully for server-profile validation.
-- [x] Permanent CI HTTP-smoke-tests every public route successfully in the non-Pages profile.
-- [x] The optimized build-tree private-path scan passes.
-- [x] Automated rendered QA on the tested Chrome/Firefox/WebKit matrix reports no uncaught page errors or unexpected browser-console errors on any primary success-path route.
-- [x] GitHub Pages static-export workflow passes on the exact deployed R1-G3 evidence head and is preserved as a permanent deployment gate.
+These gates must be evaluated on the exact final candidate commit; historical pass counts are not release evidence for a later head.
 
-## E. Browser and responsive QA
+- [ ] Release candidate CI succeeds on the exact final candidate commit: public pytest suite, compileall, Ruff, strict mypy, governance/privacy scans, locked `npm ci`, TypeScript, optimized production build, private-build scan, production-server startup, and route smoke tests.
+- [ ] Rendered browser/accessibility QA succeeds on the exact final candidate commit.
+- [ ] Native macOS Safari QA succeeds on the exact final candidate commit.
+- [ ] GitHub Pages static build/audit succeeds on the exact final candidate commit. The PR/main engineering build does not itself authorize deployment.
 
-R1-G2 is complete under the recorded automation/native scope. Evidence is retained in `docs/qa/` and issue #2 is closed.
+## E. Accessibility and product-quality scope
 
-- [x] stable Chrome desktop engine;
-- [x] native Safari desktop through installed macOS Safari and SafariDriver;
-- [x] Playwright-managed Firefox;
-- [x] iPhone 15 Pro/WebKit automated mobile proxy;
-- [x] Pixel 7/stable-Chrome automated mobile proxy;
-- [x] 375, 768, 1024, and 1440 px coverage;
-- [x] actual navigation clicks and route transitions;
-- [x] no page-level horizontal overflow;
-- [x] visible table fallbacks contained;
-- [x] explicit runtime plot redraw after resize;
-- [x] deliberate production 404 contract;
-- [x] no unexpected runtime/console failures on primary routes.
+- [x] Skip-link/focus, reduced-motion, semantic landmarks, chart/table fallback, responsive containment, runtime resize, 404 behavior, and automated accessibility contracts are implemented.
+- [x] Automated rendered QA covers the configured stable Chrome, Firefox, WebKit/mobile-proxy matrix and native macOS Safari workflow.
+- **Out of Release 1 scope — not claimed as completed evidence:** physical iOS/Android device testing, full human screen-reader traversal, full human keyboard traversal beyond automated contracts, manual color-only-meaning review, and field Core Web Vitals.
 
-**Out of Release 1 scope — not completed evidence:** manual tooltip/label review, manual visual interaction review, native/physical iOS Safari, and physical Android/Chrome spot checks.
+## F. Exact staging and review identity
 
-## F. Accessibility
+- [x] Staging binds the candidate manifest file SHA-256 and canonical digest, predecessor release-registry identity, release diff, review package, and gate status into one portable `stage_id`.
+- [x] Candidate review package excludes private source inputs and contains an uncompleted human attestation template.
+- [x] Review workflow cannot self-attest scientific/editorial/source-rights/CI completion or a future rehydration identity.
+- [ ] Exact candidate-review workflow run selected and retained for the final candidate commit.
+- [ ] Human editorial review completed against that exact candidate-review package.
+- [ ] Human attestation lists the exact source/artifact/diagnostic/claim changes and exact final CI run IDs.
 
-- [x] skip-link keyboard entry and visible-focus contract;
-- [x] reduced-motion behavior;
-- [x] axe: zero unresolved serious/critical violations across the executed matrix;
-- [x] Lighthouse accessibility: 100/100 on all seven final reports;
-- [x] automated semantic landmark assertions;
-- [x] chart/table fallback visibility and containment.
+## G. Trusted exact rehydration
 
-**Out of Release 1 scope — not completed evidence:** human-operated full keyboard traversal beyond the automated contracts, VoiceOver, NVDA/second screen reader, manual color-only-meaning review, manual heading/landmark review, and human screen-reader verification of chart-equivalent tables.
+- [x] `scripts/rehydrate_observatory_v1_candidate.py` re-fetches RPS on the exact reviewed commit, checks the reviewed predecessor release state, and requires the same scientific source identity.
+- [x] Rehydration rebuilds the RPS component, governed claim-surface hashes, vintage-bound global candidate, and immutable stage.
+- [x] Rehydration requires byte-identical candidate-manifest identity and exact equality of the reviewed stage/diff/review/gate records.
+- [x] A changed scientific source identity or any candidate/stage drift fails closed and requires renewed review.
+- [x] Rehydration emits a rights-safe deterministic identity and no private source bytes.
+- [ ] Phase-1 exact rehydration executed for the final reviewed candidate.
+- [ ] Human attestation updated to bind the SHA-256 of that exact rehydration identity.
+- [ ] Phase-2 promotion run repeats exact rehydration successfully before promotion.
 
-## G. Performance and reliability
+## H. Promotion integrity
 
-- [x] Lighthouse performance audits retained as laboratory evidence only.
-- **Post-deployment measurement, not a prelaunch blocker:** field Core Web Vitals remain unavailable until a real deployment and traffic source make them meaningful.
-- [x] Build/static-file inventory reviewed for severe regressions.
-- [x] production 404/not-found behavior tested in the browser matrix.
-- [x] GitHub Pages HTTP-header limitation and retained static/meta security posture documented; the live audit observed platform-delivered HTTPS HSTS and records that application-controlled response headers are not claimed.
-- [x] GitHub Pages caching documented as platform-controlled; the live audit observed `cache-control: max-age=600` on the homepage and release manifest at audit time without treating that value as application-controlled.
-- [x] Release 1 analytics/privacy decision: no third-party analytics, tracking, advertising, analytics cookie, or client telemetry SDK; the live homepage audit found none of the guarded third-party telemetry identifiers.
-- [x] Release 1 monitoring/logging decision: no client-side monitoring SDK; operational evidence uses GitHub Actions/Pages platform records.
+- [x] Canonical low-level promotion is fail-closed without the internal exact-rehydration capability.
+- [x] Promotion independently verifies exact-commit CI evidence against the release CI policy.
+- [x] Promoted release copies declared public artifacts only and retains no private candidate `inputs/`.
+- [x] Promoted review record and registry entry retain exact rehydration traceability.
+- [x] Post-promotion finalization is rollback-protected if rehydration sidecar/registry finalization fails.
+- [ ] Explicit reviewed Release 1 promotion executed successfully.
 
-## H. Publication and deployment
+## I. Publication-commit and deployment integrity
 
-- [x] Release 1 production target selected: GitHub Pages project site `https://fraware.github.io/ai-adoption-us/`.
-- [x] page metadata/title/description and homepage canonical/Open Graph identity are bound to the configured GitHub Pages base URL.
-- [x] GitHub Pages static export passes on the exact deployed R1-G3 evidence commit.
-- [x] GitHub Pages repository setting is **Source: GitHub Actions**, established operationally by successful Pages deployments from the workflow.
-- [x] source citations and public source-state wording received the final automated/editorial consistency review in the Release 1 publication-state tranche.
-- [x] Methodology and Sources are globally reachable from the primary navigation, with explicit methodology/source links retained on the technical essay and regression coverage for the public release surfaces.
-- [x] final editorial consistency pass completed after the Release 1 publication-state corrections and protected by regression tests against stale candidate/future/unexecuted wording.
-- [x] rights-safe GitHub Pages production deployment audited; see `docs/qa/R1_G3_DEPLOYMENT_AUDIT_2026-09-03.md`.
-- [x] deployed Pages artifact/run identity recorded in the dated R1-G3 audit record.
-- [ ] formal Release 1 tag/release created for the final audited release commit.
-- [x] release notes summarize evidence, rights boundaries, hosting limitations, and scientific limitations in `docs/RELEASE1_NOTES.md`.
-- [x] public-launch wording reviewed so it does not imply causal, unsupported residual, native-iOS, human screen-reader, physical-device, field-CWV, or application-controlled GitHub Pages response-header evidence that has not been completed.
+- [x] Public deployment is no longer a side effect of every `main` push.
+- [x] The release authorization commit is constrained to the release registry plus one immutable `data/releases/<release-id>/` directory.
+- [x] `scripts/validate_observatory_publication_commit.py` requires the authorization commit parent to be the exact reviewed candidate commit and verifies release/review/rehydration/artifact identities.
+- [x] GitHub Pages deploy and live-audit jobs run only for a validated `Authorize Observatory release <release-id>` commit.
+- [ ] Release-only authorization commit created and pushed after successful promotion.
+- [ ] GitHub Pages deployment succeeds from that exact authorization commit.
+- [ ] Live deployment audit succeeds and records the exact deployed commit/release identity.
 
-## I. Release 1.1 / later research guardrails
+## J. Final publication
 
-These do not block Release 1 engineering completion, but publication of the relevant analysis must remain within its own scientific/source gates.
+- [x] Release notes document evidence, measurement boundaries, source-rights limits, hosting limits, and scientific limitations.
+- [ ] Final public site manually inspected after the exact release deployment for catastrophic rendering/content errors.
+- [ ] Formal GitHub Release/tag created only after the immutable Observatory release and live deployment audit are complete.
 
-- [x] Execute official April–June 2026 CPS composition pipeline.
-- [x] Validate worker-share adoption weighting and actual-main-job-hour-share H/S weighting on real CPS inputs.
-- [x] Execute CPS coverage and actual-vs-usual-hours sensitivity diagnostics with fail-closed support.
-- [x] Execute Q2-2025/Q2-2026 CPS reliability diagnostics, explicitly without claiming design-based significance.
-- [x] Preserve the fail-closed design-based uncertainty boundary for custom CPS composition vectors.
-- [x] Official May-2025 OEWS staffing robustness input executed and validated.
-- [x] BTOS construct/denominator alignment and preregistered BTOS–RPS descriptive triangulation implemented with non-causal interpretation boundaries.
+A checked implementation control means the control exists in code/tests. It does not mean its release-time execution has already occurred. Unchecked execution items must not be represented as completed in release notes, the public site, or external submission materials.

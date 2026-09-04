@@ -16,6 +16,13 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from genai_at_work.claim_surfaces import (
+    ClaimSurfaceBindingError,
+    bind_claim_surfaces,
+    claim_ids_from_inventory,
+    validate_claim_surface_bindings,
+)
+from genai_at_work.release_engine import validate_release_manifest
 from genai_at_work.rps_release import RpsReleaseError
 from genai_at_work.rps_release_public import build_rps_observatory_release_candidate
 
@@ -36,6 +43,10 @@ def _load_json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise SystemExit(f"Expected a JSON object at {path}")
     return {str(key): item for key, item in value.items()}
+
+
+def _write_json(path: Path, value: object) -> None:
+    path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
 def _assert_output_boundary(output_dir: Path) -> None:
@@ -142,7 +153,20 @@ def main() -> int:
             builder_commit=commit,
             previous_release=previous,
         )
-    except (RpsReleaseError, ValueError) as exc:
+        governed_claim_ids = claim_ids_from_inventory(claims)
+        bind_claim_surfaces(
+            candidate,
+            ROOT,
+            expected_claim_ids=governed_claim_ids,
+        )
+        validate_claim_surface_bindings(
+            candidate,
+            ROOT,
+            expected_claim_ids=governed_claim_ids,
+        )
+        _write_json(args.output_dir / "release.json", candidate)
+        validate_release_manifest(candidate, args.output_dir)
+    except (ClaimSurfaceBindingError, RpsReleaseError, ValueError) as exc:
         raise SystemExit(str(exc)) from exc
 
     source = candidate["sources"][0]
@@ -162,6 +186,7 @@ def main() -> int:
         "full_source_observed_units": source["coverage"]["full_source_observed_units"],
         "derived_artifacts": len(candidate["artifacts"]),
         "public_observation_view_included": "rps-public-observation-view" in artifact_ids,
+        "governed_claim_surface_bindings": len(governed_claim_ids),
         "diagnostics": {
             row["diagnostic_id"]: row["status"] for row in candidate["diagnostics"]
         },

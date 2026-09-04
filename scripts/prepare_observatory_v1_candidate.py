@@ -6,8 +6,10 @@ source-observation bytes under ``inputs/``. Repository-local output is therefore
 restricted to ``data/audit/private/``. External private paths are also allowed.
 
 Before composition, every repository artifact that depends on RPS is required to
-match the exact RPS source vintage in the candidate. This command composes and
-validates a candidate only. It never stages, reviews, or promotes a release.
+match the exact RPS source vintage in the candidate. Governed public claim files
+must also match the exact bytes hash-bound by the RPS component. This command
+composes and validates a candidate only. It never stages, reviews, or promotes a
+release.
 """
 
 from __future__ import annotations
@@ -18,6 +20,11 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from genai_at_work.claim_surfaces import (
+    ClaimSurfaceBindingError,
+    claim_ids_from_inventory,
+    validate_claim_surface_bindings,
+)
 from genai_at_work.observatory_baseline import ObservatoryBaselineError
 from genai_at_work.observatory_rps_bindings import (
     BINDINGS_REPOSITORY_PATH,
@@ -30,6 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = ROOT / "data" / "audit" / "private"
 DEFAULT_CONTRACT = ROOT / "data" / "registry" / "observatory_v1_baseline_contract.json"
 DEFAULT_BINDINGS = ROOT / BINDINGS_REPOSITORY_PATH
+CLAIMS_PATH = ROOT / "data" / "registry" / "longitudinal_claim_inventory.json"
 
 
 def _assert_output_boundary(output_dir: Path) -> None:
@@ -128,10 +136,18 @@ def main() -> int:
 
     contract = load_json_object(args.contract)
     bindings = load_json_object(args.rps_repository_bindings)
+    claims_inventory = load_json_object(CLAIMS_PATH)
+    governed_claim_ids = claim_ids_from_inventory(claims_inventory)
     previous = _previous_release(args.previous_release_manifest)
     commit = _builder_commit()
 
     try:
+        rps_candidate = load_json_object(args.rps_candidate_root / "release.json")
+        validate_claim_surface_bindings(
+            rps_candidate,
+            ROOT,
+            expected_claim_ids=governed_claim_ids,
+        )
         candidate = compose_v1_global_baseline_bound(
             rps_candidate_root=args.rps_candidate_root,
             output_dir=args.output_dir,
@@ -142,7 +158,17 @@ def main() -> int:
             builder_commit=commit,
             previous_release=previous,
         )
-    except (ObservatoryBaselineError, ObservatoryRpsBindingError, ValueError) as exc:
+        validate_claim_surface_bindings(
+            candidate,
+            ROOT,
+            expected_claim_ids=governed_claim_ids,
+        )
+    except (
+        ClaimSurfaceBindingError,
+        ObservatoryBaselineError,
+        ObservatoryRpsBindingError,
+        ValueError,
+    ) as exc:
         raise SystemExit(str(exc)) from exc
 
     binding_build = candidate["component_builds"]["rps_repository_bindings"]
@@ -155,6 +181,7 @@ def main() -> int:
         "rps_repository_binding_id": binding_build["binding_id"],
         "rps_repository_binding_status": binding_build["status"],
         "rps_source_vintage_id": binding_build["source_vintage_id"],
+        "governed_claim_surface_bindings": len(governed_claim_ids),
         "source_ids": [row["source_id"] for row in candidate["sources"]],
         "artifact_count": len(candidate["artifacts"]),
         "diagnostic_count": len(candidate["diagnostics"]),
