@@ -22,7 +22,7 @@ export default function SourcesPage() {
             <h3>RPS / GenAI Adoption Tracker</h3>
             <p>
               RPS supplies worker adoption, recurrence, assisted work hours, and reported time savings.
-              Registered FRED series enter the private release-candidate workspace and generate bounded
+              The authorized aggregate release path uses registered FRED series to generate bounded
               attributed public views plus derived publication artifacts.
             </p>
           </div>
@@ -64,10 +64,11 @@ export default function SourcesPage() {
           records.
         </p>
         <p>
-          Release 1 publishes seven complete national-history quarters through Q2 2026 plus the latest
-          complete industry and occupation A/H/S cross-sections. Historical subgroup panels, bulk download,
-          and generic source-query access remain outside the current public scope. Private source-input bytes
-          are excluded from public release artifacts.
+          The source registry records owner permission for published aggregate project use and derived
+          aggregate analysis. Release 1 publishes seven complete national-history quarters through Q2 2026
+          plus the latest complete industry and occupation A/H/S cross-sections. Historical subgroup panels,
+          bulk download, and generic source-query access remain outside the current public scope. Private
+          source-input bytes are excluded from public release artifacts.
         </p>
         <p>
           <a href="https://fred.stlouisfed.org/release?rid=6">FRED RPS release page</a>
